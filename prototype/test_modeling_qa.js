@@ -54,7 +54,7 @@ const zones = {
 };
 
 const gf = new GeometryFactory();
-console.log('=== RUNNING MODELING COLLISION & TRAVERSAL QA ===\n');
+console.log('=== RUNNING MODELING SPAWN CLEARANCE QA (SPAWN_CLEAR_TEST) ===\n');
 
 let totalTests = 0;
 let passedTests = 0;
@@ -67,7 +67,7 @@ for (const [spawnKey, sp] of Object.entries(DEBUG_SPAWN_POINTS)) {
   const zone = new ZoneClass(dummyScene, gf);
   zone.build();
 
-  // Test 1: Spawn collision test (player radius 0.35m)
+  // Spawn clearance test (player radius 0.35m)
   const pointCheck = CollisionFactory.testPoint(
     zone.colliders,
     sp.pos[0],
@@ -86,18 +86,18 @@ for (const [spawnKey, sp] of Object.entries(DEBUG_SPAWN_POINTS)) {
     SpawnCoords: `[${sp.pos[0]}, ${sp.pos[1]}, ${sp.pos[2]}]`,
     Colliders: zone.colliders.length,
     Walkables: zone.walkables.length,
-    SpawnCollision: pointCheck.collided ? 'FAIL (Blocked)' : 'PASS (Clear)',
+    SpawnClearance: pointCheck.collided ? 'FAIL (Blocked)' : 'PASS (Clear)',
     Overall: passed ? 'PASS' : 'FAIL'
   });
 }
 
 console.table(results);
-console.log(`\nQA Summary: ${passedTests}/${totalTests} tests passed (${Math.round((passedTests/totalTests)*100)}%).`);
+console.log(`\nSPAWN CLEAR: ${passedTests}/${totalTests} tests passed (${Math.round((passedTests/totalTests)*100)}%).`);
 
 if (passedTests === totalTests) {
-  console.log('>>> ALL MODELING MILESTONES (M0 - M13) PASS COLLISION QA <<<');
+  console.log('>>> SPAWN CLEAR TEST: ALL 25 SPAWN POINTS PASS (Clear) <<<');
   process.exit(0);
 } else {
-  console.error('>>> MODELING QA FAILED <<<');
+  console.error('>>> SPAWN CLEAR TEST FAILED <<<');
   process.exit(1);
 }
