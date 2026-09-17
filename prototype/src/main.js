@@ -13,7 +13,7 @@ scene.background = new THREE.Color(0x1a1614);
 scene.fog = new THREE.FogExp2(0x241e1b, 0.025);
 
 const camera = new THREE.PerspectiveCamera(
-  75,
+  68,
   window.innerWidth / window.innerHeight,
   0.1,
   60
@@ -36,7 +36,8 @@ const controller = new FPSController(
   camera,
   renderer.domElement,
   level.colliders,
-  level.interactables
+  level.interactables,
+  level.walkables
 );
 
 // Instantiate UI Manager
@@ -60,7 +61,7 @@ uiManager = new UIManager(
 // Setup Raycast Hover & Interaction
 controller.onHoverChange = (interactable) => {
   if (interactable) {
-    uiManager.showPrompt(`[E] ${interactable.label}`);
+    uiManager.showPrompt(`[E] ${interactable.label}  ·  雙擊走近`);
   } else {
     uiManager.showPrompt(null);
   }
@@ -73,7 +74,7 @@ controller.onInteract = (interactable) => {
     if (!gameState.isTaskComplete('KEY_PICKUP')) {
       soundManager.playKeyPickup();
       gameState.markTaskComplete('KEY_PICKUP');
-      uiManager.showSubtitle('李醫師', '「拿到 4F 值班室 402 的鑰匙了。」');
+      uiManager.showSubtitle('李醫師', '「拿到 4F 獨立值班室的鑰匙了。」');
       if (interactable.targetGroup) {
         interactable.targetGroup.visible = false;
       }

@@ -6,6 +6,7 @@ export class Level3FBlockout {
     this.scene = scene;
     this.interactables = [];
     this.colliders = [];
+    this.walkables = [];
     this.materials = {};
     this.elevatorLight = null;
     this.keyMesh = null;
@@ -18,15 +19,39 @@ export class Level3FBlockout {
     this.buildCorridor();
     this.buildDutyOffice();
     this.buildWorkstations();
+    this.buildEnvironmentalDetails();
     this.setupLighting();
   }
 
   initMaterials() {
-    // Hospital vinyl floor (warm grey/beige)
+    // Hospital vinyl floor with a subtle procedural tile texture.
+    const floorCanvas = document.createElement('canvas');
+    floorCanvas.width = 256;
+    floorCanvas.height = 256;
+    const fctx = floorCanvas.getContext('2d');
+    fctx.fillStyle = '#ddd5c8';
+    fctx.fillRect(0, 0, 256, 256);
+    fctx.strokeStyle = 'rgba(112, 104, 92, 0.16)';
+    fctx.lineWidth = 2;
+    for (let i = 0; i <= 256; i += 64) {
+      fctx.beginPath(); fctx.moveTo(i, 0); fctx.lineTo(i, 256); fctx.stroke();
+      fctx.beginPath(); fctx.moveTo(0, i); fctx.lineTo(256, i); fctx.stroke();
+    }
+    for (let i = 0; i < 900; i++) {
+      const shade = 185 + Math.floor(Math.random() * 35);
+      fctx.fillStyle = `rgba(${shade},${shade - 5},${shade - 12},0.10)`;
+      fctx.fillRect(Math.random() * 256, Math.random() * 256, 1, 1);
+    }
+    const floorTexture = new THREE.CanvasTexture(floorCanvas);
+    floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
+    floorTexture.repeat.set(8, 4);
+    floorTexture.colorSpace = THREE.SRGBColorSpace;
+
     this.materials.floor = new THREE.MeshStandardMaterial({
-      color: 0xdfd9ce,
-      roughness: 0.35,
-      metalness: 0.05
+      color: 0xffffff,
+      map: floorTexture,
+      roughness: 0.5,
+      metalness: 0.02
     });
 
     // Hospital wall (pale warm ivory)
@@ -97,6 +122,11 @@ export class Level3FBlockout {
     this.colliders.push(box);
   }
 
+  addWalkable(mesh) {
+    mesh.userData.walkable = true;
+    this.walkables.push(mesh);
+  }
+
   buildWall(x, y, z, width, height, depth, mat = this.materials.wall) {
     const geo = new THREE.BoxGeometry(width, height, depth);
     const mesh = new THREE.Mesh(geo, mat);
@@ -135,6 +165,7 @@ export class Level3FBlockout {
     floor.position.set(-8, 0, 0);
     floor.receiveShadow = true;
     this.scene.add(floor);
+    this.addWalkable(floor);
 
     // Ceiling
     const ceilGeo = new THREE.PlaneGeometry(8, 7);
@@ -221,6 +252,7 @@ export class Level3FBlockout {
     floor.position.set(6, 0, 0);
     floor.receiveShadow = true;
     this.scene.add(floor);
+    this.addWalkable(floor);
 
     // Corridor ceiling
     const ceilGeo = new THREE.PlaneGeometry(20, 5);
@@ -255,7 +287,7 @@ export class Level3FBlockout {
     this.buildWall(13.5, 1.6, 2.5, 5.0, 3.2, 0.4);
 
     // Directional sign at entrance
-    this.createSignMesh(2, 2.85, 2.25, '302 醫師值班簽到室 (Duty Office)');
+    this.createSignMesh(2, 2.85, 2.25, '316 總醫師辦公室 / 值班簽到 (Chief Resident Office)');
   }
 
   buildDutyOffice() {
@@ -266,6 +298,7 @@ export class Level3FBlockout {
     floor.position.set(6, 0, 5.5);
     floor.receiveShadow = true;
     this.scene.add(floor);
+    this.addWalkable(floor);
 
     // Ceiling
     const ceilGeo = new THREE.PlaneGeometry(10, 6);
@@ -350,7 +383,7 @@ export class Level3FBlockout {
     blade.position.set(0, 0, 0.08);
     keyGroup.add(blade);
 
-    // Key plastic tag with 402
+    // Key plastic tag for the independent 4F duty room
     const tagGeo = new THREE.BoxGeometry(0.08, 0.01, 0.14);
     const tagMat = new THREE.MeshStandardMaterial({ color: 0x1f5f8b, roughness: 0.5 });
     const tag = new THREE.Mesh(tagGeo, tagMat);
@@ -369,7 +402,7 @@ export class Level3FBlockout {
     keyHitbox.userData = {
       interactable: true,
       id: 'KEY_PICKUP',
-      label: '領取 4F 值班室鑰匙 (Pickup Duty-Room Key)',
+      label: '領取 4F 獨立值班室鑰匙 (Pickup Duty-Room Key)',
       type: 'key',
       targetGroup: keyGroup
     };
@@ -491,6 +524,78 @@ export class Level3FBlockout {
     });
   }
 
+
+  buildEnvironmentalDetails() {
+    // Warm wood handrail / bumper strips to match the photo-real art direction.
+    const railMat = new THREE.MeshStandardMaterial({ color: 0x9a7653, roughness: 0.58 });
+    [-2.31, 2.31].forEach((z) => {
+      const rail = new THREE.Mesh(new THREE.BoxGeometry(19.0, 0.10, 0.10), railMat);
+      rail.position.set(6, 1.05, z);
+      rail.castShadow = true;
+      this.scene.add(rail);
+    });
+
+    // Corridor seating: restrained hospital furniture rather than decorative props.
+    const seatMat = new THREE.MeshStandardMaterial({ color: 0x566e65, roughness: 0.78 });
+    [8.7, 10.0].forEach((x) => {
+      const seat = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.12, 0.46), seatMat);
+      seat.position.set(x, 0.48, 1.95);
+      seat.castShadow = true;
+      this.scene.add(seat);
+      const back = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.56, 0.10), seatMat);
+      back.position.set(x, 0.78, 2.18);
+      this.scene.add(back);
+    });
+
+    // A low-maintenance indoor plant softens the 17:00-21:00 warm phase.
+    const potMat = new THREE.MeshStandardMaterial({ color: 0x8a6c52, roughness: 0.9 });
+    const leafMat = new THREE.MeshStandardMaterial({ color: 0x4d725b, roughness: 0.9 });
+    const pot = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.28, 0.42, 20), potMat);
+    pot.position.set(13.6, 0.21, -1.95);
+    this.scene.add(pot);
+    for (let i = 0; i < 8; i++) {
+      const leaf = new THREE.Mesh(new THREE.SphereGeometry(0.14, 10, 8), leafMat);
+      leaf.scale.set(0.65, 1.8, 0.55);
+      const angle = i * Math.PI * 0.25;
+      leaf.position.set(13.6 + Math.cos(angle) * 0.18, 0.58 + (i % 2) * 0.10, -1.95 + Math.sin(angle) * 0.18);
+      leaf.rotation.z = Math.cos(angle) * 0.35;
+      this.scene.add(leaf);
+    }
+
+    // Warm dusk artwork/lightbox at the corridor end. It borrows the palette,
+    // not the real hospital layout, keeping the public prototype fictionalized.
+    const canvas = document.createElement('canvas');
+    canvas.width = 512;
+    canvas.height = 320;
+    const ctx = canvas.getContext('2d');
+    const gradient = ctx.createLinearGradient(0, 0, 0, 320);
+    gradient.addColorStop(0, '#d87845');
+    gradient.addColorStop(0.45, '#e4a26c');
+    gradient.addColorStop(1, '#5b6d75');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, 512, 320);
+    ctx.fillStyle = 'rgba(38,48,47,0.62)';
+    for (let x = 0; x < 512; x += 55) {
+      const h = 55 + (x % 110);
+      ctx.fillRect(x, 320 - h, 45, h);
+    }
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    const art = new THREE.Mesh(
+      new THREE.PlaneGeometry(2.25, 1.40),
+      new THREE.MeshBasicMaterial({ map: tex })
+    );
+    art.position.set(15.77, 1.75, 0);
+    art.rotation.y = -Math.PI / 2;
+    this.scene.add(art);
+
+    // Subtle skirting and door frame detail around 316.
+    const trimMat = new THREE.MeshStandardMaterial({ color: 0xb9b1a4, roughness: 0.78 });
+    const trim = new THREE.Mesh(new THREE.BoxGeometry(2.35, 0.08, 0.08), trimMat);
+    trim.position.set(2, 2.42, 2.28);
+    this.scene.add(trim);
+  }
+
   createSignMesh(x, y, z, text) {
     const canvas = document.createElement('canvas');
     canvas.width = 512;
@@ -518,11 +623,11 @@ export class Level3FBlockout {
 
   setupLighting() {
     // Ambient light - warm hospital indoor bounce (Phase W1)
-    const ambient = new THREE.AmbientLight(0xfff3e6, 0.9);
+    const ambient = new THREE.AmbientLight(0xfff0dc, 0.72);
     this.scene.add(ambient);
 
     // Sunset Directional Light (low angle from south windows)
-    const sunsetSun = new THREE.DirectionalLight(0xffa254, 2.2);
+    const sunsetSun = new THREE.DirectionalLight(0xff9a50, 2.6);
     sunsetSun.position.set(6, 4, -14);
     sunsetSun.target.position.set(6, 1, 2);
     sunsetSun.castShadow = true;
@@ -536,10 +641,13 @@ export class Level3FBlockout {
     // Ceiling fluorescent fixtures (warm white 4000K)
     const fixturePositions = [
       { x: -8, y: 3.15, z: 0 },    // Elevator lobby
-      { x: -1, y: 3.15, z: 0 },    // Corridor west
-      { x: 5, y: 3.15, z: 0 },     // Corridor mid
-      { x: 11, y: 3.15, z: 0 },    // Corridor east
-      { x: 6, y: 3.15, z: 5.5 }    // Office center
+      { x: -1.5, y: 3.15, z: 0 },  // Corridor west
+      { x: 2.5, y: 3.15, z: 0 },   // Corridor west-mid
+      { x: 6.5, y: 3.15, z: 0 },   // Corridor mid
+      { x: 10.5, y: 3.15, z: 0 },  // Corridor east-mid
+      { x: 14.0, y: 3.15, z: 0 },  // Corridor east
+      { x: 4.5, y: 3.15, z: 5.5 }, // Office west
+      { x: 8.0, y: 3.15, z: 5.5 }  // Office east
     ];
 
     fixturePositions.forEach(pos => {
@@ -560,7 +668,7 @@ export class Level3FBlockout {
       this.scene.add(bar);
 
       // Soft point light
-      const light = new THREE.PointLight(0xfffaea, 0.95, 7.5);
+      const light = new THREE.PointLight(0xfff1cf, 0.82, 6.5);
       light.position.set(pos.x, pos.y - 0.2, pos.z);
       this.scene.add(light);
     });

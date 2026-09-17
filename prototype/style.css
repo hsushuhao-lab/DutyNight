@@ -24,6 +24,25 @@ body, html {
   z-index: 1;
 }
 
+
+/* Act 1 visual grade: warm 17:00-21:00 phase. Kept subtle so text/UI remain readable. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 45%, transparent 45%, rgba(27, 18, 13, 0.12) 78%, rgba(12, 9, 8, 0.30) 100%),
+    linear-gradient(180deg, rgba(255, 183, 112, 0.035), rgba(44, 60, 58, 0.025));
+  mix-blend-mode: normal;
+}
+
+#canvas-container canvas {
+  display: block;
+  filter: saturate(0.96) contrast(1.035);
+}
+
 /* Crosshair */
 #crosshair {
   position: absolute;
@@ -193,13 +212,13 @@ body, html {
   bottom: 18px;
   left: 20px;
   z-index: 10;
-  background: rgba(15, 18, 16, 0.75);
+  background: rgba(15, 18, 16, 0.82);
   padding: 6px 12px;
   border-radius: 4px;
   display: flex;
   gap: 12px;
   font-size: 12px;
-  color: #bbb;
+  color: #d0ccc4;
 }
 
 kbd {
