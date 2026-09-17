@@ -1,4 +1,4 @@
-﻿# Unreal Engine
+# Unreal Engine
 Binaries/
 DerivedDataCache/
 Intermediate/
@@ -15,3 +15,6 @@ node_modules/
 dist/
 .vite/
 *.log
+
+# Import dropboxes
+DutyNight_progress_*/
