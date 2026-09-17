@@ -247,10 +247,40 @@ export class Level3FBlockout {
   }
 
   build3FEnvironment() {
-    // Sunset backdrop outside south windows (Taipei sunset horizon)
+    // Realistic Taipei twilight sunset backdrop outside south windows (17:00-18:00 soft dusk)
+    const skyCanvas = document.createElement('canvas');
+    skyCanvas.width = 1024;
+    skyCanvas.height = 512;
+    const sctx = skyCanvas.getContext('2d');
+
+    // Natural evening gradient: twilight navy-slate down to soft amber horizon
+    const skyGrad = sctx.createLinearGradient(0, 0, 0, 512);
+    skyGrad.addColorStop(0, '#1c2438');   // Deep twilight evening blue
+    skyGrad.addColorStop(0.45, '#42323a'); // Subtle dusk mauve
+    skyGrad.addColorStop(0.70, '#6e4536'); // Soft evening warm amber
+    skyGrad.addColorStop(0.85, '#8c593d'); // Distant horizon glow
+    skyGrad.addColorStop(1, '#1b2226');   // Ground silhouette
+    sctx.fillStyle = skyGrad;
+    sctx.fillRect(0, 0, 1024, 512);
+
+    // Distant mountain ridge silhouette (Fuzhoushan / Nangang mountain range)
+    sctx.fillStyle = '#181f23';
+    sctx.beginPath();
+    sctx.moveTo(0, 430);
+    sctx.lineTo(200, 380);
+    sctx.lineTo(420, 410);
+    sctx.lineTo(650, 360);
+    sctx.lineTo(880, 400);
+    sctx.lineTo(1024, 375);
+    sctx.lineTo(1024, 512);
+    sctx.lineTo(0, 512);
+    sctx.closePath();
+    sctx.fill();
+
+    const skyTex = new THREE.CanvasTexture(skyCanvas);
     const skyGeo = new THREE.PlaneGeometry(60, 20);
     const skyMat = new THREE.MeshBasicMaterial({
-      color: 0xff7033,
+      map: skyTex,
       side: THREE.DoubleSide
     });
     const sky = new THREE.Mesh(skyGeo, skyMat);
@@ -1494,9 +1524,10 @@ export class Level3FBlockout {
     this.scene.add(nsWarmLight);
 
     // South wall of 4F corridor (leads to 4F Duty Room)
-    this.buildWall(-1.5, 11.6, -2.5, 5.0, 3.2, 0.4, this.materials.wall4F);
-    this.buildWall(11.5, 11.6, -2.5, 5.0, 3.2, 0.4, this.materials.wall4F);
-    this.buildWall(5.0, 12.8, -2.5, 8.0, 0.8, 0.4, this.materials.wall4F); // Lintel over duty room area
+    // Seamless wall enclosing corridor south side (x: -4 to 14, z = -2.5) with doorway opening at x: 4.5 to 5.7
+    this.buildWall(0.25, 11.6, -2.5, 8.5, 3.2, 0.4, this.materials.wall4F); // West of door (x: -4 to 4.5)
+    this.buildWall(5.1, 12.75, -2.5, 1.2, 0.9, 0.4, this.materials.wall4F);  // Lintel over door (x: 4.5 to 5.7)
+    this.buildWall(9.85, 11.6, -2.5, 8.3, 3.2, 0.4, this.materials.wall4F); // East of door (x: 5.7 to 14.0)
 
     // Directional signs overhead in corridor (x = -1.5)
     // Walking East (+X): Left (South, -Z) is 422 Duty Room, Right (North, +Z) is 4A/4B Closed Ward & Nursing Station
