@@ -1,5 +1,8 @@
 // FirstCampus8FBridgeEntry.js - Milestone M6: First Campus 8F Skybridge Transition Vestibule
 import * as THREE from 'three';
+import { artRoot, solid, asset, wallTrim } from '../../art/ArtDetails.js';
+import { buildCampusBackdrop } from '../../art/CampusBackdrop.js';
+import { disposeZoneArt } from '../../art/ArtResources.js';
 import { Doorway } from '../shared/Doorway.js';
 import { SignAnchor } from '../shared/SignAnchor.js';
 
@@ -26,6 +29,10 @@ export class FirstCampus8FBridgeEntry {
     this.gf.buildWall(this.zoneGroup, this.colliders, -12, 1.6, 0, 0.4, 3.2, 7);
     this.gf.buildWall(this.zoneGroup, this.colliders, -8, 1.6, 3.5, 8, 3.2, 0.4);
     this.gf.buildWall(this.zoneGroup, this.colliders, -8, 1.6, -3.5, 8, 3.2, 0.4);
+
+    // Authorized boundary repair: close the two arrival-core narrowing returns.
+    this.gf.buildWall(this.zoneGroup, this.colliders, -4, 1.6, -2.75, 0.4, 3.2, 1.5);
+    this.gf.buildWall(this.zoneGroup, this.colliders, -4, 1.6, 2.75, 0.4, 3.2, 1.5);
 
     // Elevator doors
     const elFrame = new THREE.Mesh(new THREE.BoxGeometry(0.2, 2.5, 2.4), this.gf.materials.metal);
@@ -96,18 +103,28 @@ export class FirstCampus8FBridgeEntry {
 
     this.gf.buildCeilingLight(this.zoneGroup, -2, 3.15, 0);
 
+    const art=artRoot(this.zoneGroup,'BridgeEntry');
+    buildCampusBackdrop(art);
+    solid(art,this.gf.materials.floorTile,[10,-.08,0],[20,.16,4]);
+    solid(art,this.gf.materials.ceiling,[10,3.2,0],[20,.16,4]);
+    for(const z of [-2,2]) {
+      solid(art,this.gf.materials.wall,[10,.45,z],[20,.9,.35]);
+      solid(art,this.gf.materials.wall,[10,2.95,z],[20,.5,.35]);
+      solid(art,this.gf.materials.glass,[10,1.8,z],[20,1.8,.025]);
+      for(let x=0;x<=20;x+=5)solid(art,this.gf.materials.metal,[x,1.8,z],[.2,1.8,.35]);
+    }
+    solid(art,this.gf.materials.wall,[20,1.6,0],[.3,3.2,4]);
+    for(const x of [5,12,18])solid(art,this.gf.materials.lightWarm,[x,3.10,0],[1.2,.04,.35]);
+    asset(art,'bench',[-8,0,2.8],[1,1,1],Math.PI);
+    asset(art,'plant',[-10.5,0,-2.7]);
+    wallTrim(this.zoneGroup,this.gf.materials);
     return this;
   }
 
   cleanup() {
     if (this.zoneGroup) {
       this.scene.remove(this.zoneGroup);
-      this.zoneGroup.traverse((child) => {
-        if (child.geometry && typeof child.geometry.dispose === 'function') {
-          child.geometry.dispose();
-        }
-      });
-      this.zoneGroup.clear();
+      disposeZoneArt(this.zoneGroup);
     }
     this.colliders = [];
     this.walkables = [];

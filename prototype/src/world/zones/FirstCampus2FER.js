@@ -1,5 +1,8 @@
 // FirstCampus2FER.js - Milestone M4: First Campus 2F Emergency / Acute Floor
 import * as THREE from 'three';
+import { buildCampusBackdrop } from '../../art/CampusBackdrop.js';
+import { artRoot, asset, solid, counterFront, monitor, wallTrim } from '../../art/ArtDetails.js';
+import { disposeZoneArt } from '../../art/ArtResources.js';
 import { Doorway } from '../shared/Doorway.js';
 import { SignAnchor } from '../shared/SignAnchor.js';
 import { CollisionFactory } from '../shared/CollisionFactory.js';
@@ -17,6 +20,7 @@ export class FirstCampus2FER {
 
   build() {
     this.scene.add(this.zoneGroup);
+    this.art = artRoot(this.zoneGroup, 'ER');
 
     // ==========================================
     // 1. ELEVATOR / STAIR CORRIDOR ARRIVAL (x: -12 to -4, z: -3.5 to 3.5)
@@ -54,9 +58,19 @@ export class FirstCampus2FER {
     this.gf.buildFloor(this.zoneGroup, this.walkables, 9, 0, 0, 26, 7, this.gf.materials.floorTile);
     this.gf.buildCeiling(this.zoneGroup, 9, 3.2, 0, 26, 7);
 
+    // User-authorized shell repair: close only the six reproduced corridor boundary gaps.
+    [[-2,-3.5,4],[-2,3.5,4],[8,-3.5,2],[8,3.5,2],[19,-3.5,6],[21,3.5,2]].forEach(([x,z,width]) => {
+      this.gf.buildWall(this.zoneGroup, this.colliders, x, 1.6, z, width, 3.2, .4);
+    });
+
+    // Close the same nonwalkable shaft from the room side; no room/route footprint changes.
+    this.gf.buildWall(this.zoneGroup, this.colliders, 9, 1.6, 6.5, .4, 3.2, 6);
+    this.gf.buildWall(this.zoneGroup, this.colliders, 9, 1.6, -6.5, .4, 3.2, 6);
+
     // Corridor handrails
-    this.gf.buildHandrail(this.zoneGroup, null, 9, 1.05, -3.28, 26);
-    this.gf.buildHandrail(this.zoneGroup, null, 9, 1.05, 3.28, 26);
+    [[1.35, 2.5], [5.65, 2.5], [10.4, 2.6], [14.6, 2.6]].forEach(([x, width]) => {
+      this.gf.buildHandrail(this.zoneGroup, null, x, 1.05, -3.28, width);
+    });
 
     this.gf.buildCeilingLight(this.zoneGroup, 0, 3.15, 0, 0.85, 7.5);
     this.gf.buildCeilingLight(this.zoneGroup, 8, 3.15, 0, 0.85, 7.5);
@@ -82,8 +96,8 @@ export class FirstCampus2FER {
       scene: this.zoneGroup,
       x: 3.5,
       y: 2.5,
-      z: 3.55,
-      rotationY: 0,
+      z: 3.38,
+      rotationY: Math.PI,
       code: 'ER',
       title: '急診檢傷與護理站',
       subtitle: 'TRIAGE & NURSING',
@@ -105,9 +119,7 @@ export class FirstCampus2FER {
     for (let i = 0; i < 4; i++) {
       const bx = 10.5 + i * 2.5;
       // Stretcher/bed
-      const bed = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.55, 2.1), this.gf.materials.bedSheet);
-      bed.position.set(bx, 0.275, 7.5);
-      this.zoneGroup.add(bed);
+      asset(this.art, 'hospitalBed', [bx, 0, 7.5], [1, 1, 2.1 / 2.135], Math.PI);
       CollisionFactory.addBox(this.colliders, bx, 0.4, 7.5, 1.0, 0.8, 2.1);
 
       // Medical gas / monitor headwall box
@@ -117,12 +129,7 @@ export class FirstCampus2FER {
 
       // Curtain rail partition
       if (i < 3) {
-        const curtain = new THREE.Mesh(
-          new THREE.BoxGeometry(0.06, 2.2, 2.8),
-          new THREE.MeshStandardMaterial({ color: 0x8a9da3, roughness: 0.8 })
-        );
-        curtain.position.set(bx + 1.25, 1.5, 7.5);
-        this.zoneGroup.add(curtain);
+        this.buildCurtain(bx + 1.25, 7.5);
         CollisionFactory.addBox(this.colliders, bx + 1.25, 1.5, 7.5, 0.1, 2.2, 2.8);
       }
     }
@@ -131,8 +138,8 @@ export class FirstCampus2FER {
       scene: this.zoneGroup,
       x: 14.5,
       y: 2.6,
-      z: 3.55,
-      rotationY: 0,
+      z: 3.38,
+      rotationY: Math.PI,
       code: 'OBS',
       title: '急診留觀區 (床位 01-04)',
       subtitle: 'OBSERVATION BAYS',
@@ -181,9 +188,7 @@ export class FirstCampus2FER {
     });
 
     // Treatment table
-    const treatTable = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.8, 2.2), this.gf.materials.stainless);
-    treatTable.position.set(3.5, 0.4, -6.5);
-    this.zoneGroup.add(treatTable);
+    asset(this.art, 'hospitalBed', [3.5, 0, -6.5], [1.1 / .992, 1, 2.2 / 2.135]);
     CollisionFactory.addBox(this.colliders, 3.5, 0.4, -6.5, 1.1, 0.8, 2.2);
 
     this.gf.buildCeilingLight(this.zoneGroup, 3.5, 3.15, -6.5, 0.9, 6.5, 0xffffff);
@@ -228,9 +233,9 @@ export class FirstCampus2FER {
     });
 
     // Charting desk & computer
-    const docDesk = new THREE.Mesh(new THREE.BoxGeometry(2.0, 0.76, 1.0), this.gf.materials.doorWood);
-    docDesk.position.set(13.0, 0.38, -6.5);
-    this.zoneGroup.add(docDesk);
+    asset(this.art, 'workDesk', [13, 0, -6.5], [2 / 1.405, 1, 1 / .725]);
+    monitor(this.art, this.gf.materials, 13, .76, -6.5);
+    asset(this.art, 'officeChair', [13, 0, -5.55], [1, 1, 1], Math.PI);
     CollisionFactory.addBox(this.colliders, 13.0, 0.4, -6.5, 2.0, 0.8, 1.0);
 
     // ==========================================
@@ -276,21 +281,81 @@ export class FirstCampus2FER {
       z: 0,
       ceilingY: 3.2,
       rotationY: Math.PI / 2,
-      text: '🚑 急診救護車道 ｜ 戶外山側通道 (Ambulance Bay)'
+      text: '急診救護車道 ｜ 戶外山側通道 (Ambulance Bay)'
     });
 
+    this.buildArtDetails();
+    const exterior=buildCampusBackdrop(this.zoneGroup);
+    exterior.position.y=11.5;
     return this;
+  }
+
+  buildCurtain(x, z) {
+    const material = new THREE.MeshStandardMaterial({color: 0xa6bbb1, roughness: .98, side: THREE.DoubleSide});
+    const geometry = new THREE.PlaneGeometry(2.8, 2.2, 84, 1);
+    const positions = geometry.attributes.position;
+    for(let i=0;i<positions.count;i++) positions.setZ(i, Math.sin(positions.getX(i)*Math.PI*9)*.024);
+    geometry.computeVertexNormals();
+    const cloth = new THREE.Mesh(geometry, material);
+    cloth.position.set(x,1.5,z);
+    cloth.rotation.y=Math.PI/2;
+    cloth.castShadow=true; cloth.receiveShadow=true;
+    this.art.add(cloth);
+    solid(this.art,this.gf.materials.stainless,[x,2.67,z],[.045,.045,2.86]);
+    [-1.2,0,1.2].forEach(offset=>solid(this.art,this.gf.materials.stainless,[x,2.93,z+offset],[.012,.53,.012]));
+    for(let offset=-1.3;offset<1.4;offset+=.23) {
+      const ring=new THREE.Mesh(new THREE.TorusGeometry(.036,.007,6,12),this.gf.materials.stainless);
+      ring.rotation.y=Math.PI/2; ring.position.set(x,2.64,z+offset); this.art.add(ring);
+    }
+  }
+
+  buildArtDetails() {
+    const m=this.gf.materials;
+    const add=(material,position,size)=>solid(this.art,material,position,size);
+    wallTrim(this.zoneGroup,m);
+    counterFront(this.art,m,3.5,3.135,4.8,1.1);
+    add(m.counterTop,[3.5,1.115,3.5],[4.95,.055,.77]);
+    add(m.doorWood,[3.5,2.55,3.5],[5.1,.5,.2]);
+    [1.05,5.95].forEach(x=>add(m.doorWood,[x,1.58,3.5],[.065,3.16,.12]));
+    [1.8,5.2].forEach(x=>monitor(this.art,m,x,1.145,3.5));
+    asset(this.art,'printer',[4.15,1.145,3.5],[.8,.8,.8]);
+    asset(this.art,'plant',[3.15,1.145,3.5],[.25,.25,.25]);
+    // Observation sign is held by a ceiling-fastened beam, above the open route.
+    add(m.wallBumper,[14.5,2.63,3.5],[10.9,.42,.14]);
+    [9.2,14.5,19.8].forEach(x=>add(m.stainless,[x,2.94,3.5],[.025,.52,.025]));
+    for(let bay=0;bay<4;bay++) {
+      const x=10.5+bay*2.5;
+      add(m.bedSheet,[x,1.43,9.17],[.72,.19,.025]);
+      [-.22,0,.22].forEach(dx=> {
+        const socket=new THREE.Mesh(new THREE.CylinderGeometry(.032,.032,.018,16),m.stainless);
+        socket.rotation.x=Math.PI/2; socket.position.set(x+dx,1.43,9.147);this.art.add(socket);
+      });
+      add(m.wallDark,[x,1.66,9.17],[.17,.1,.025]);
+    }
+    // Treatment tools remain over the existing bed footprint or against the back wall.
+    add(m.stainless,[3.5,1.32,-9.265],[1.4,.16,.06]);
+    [3.1,3.5,3.9].forEach(x=>add(m.wallDark,[x,1.32,-9.226],[.07,.07,.018]));
+    // Small wall-mounted charting shelf has support brackets and restrained binders.
+    add(m.doorWood,[13,1.45,-9.24],[2.1,.045,.18]);
+    [12.25,13.75].forEach(x=>add(m.stainless,[x,1.35,-9.26],[.03,.18,.15]));
+    for(let i=0;i<7;i++) {
+      const x=12.4+i*.14;
+      add(i%2?m.wallBumper:m.bedSheet,[x,1.65,-9.23],[.11,.34,.14]);
+      add(m.bedSheet,[x,1.66,-9.151],[.06,.15,.005]);
+    }
+    // Threshold and floor expansion joint details follow the existing exterior slab.
+    add(m.stainless,[-11.598,1.25,0],[.012,2.3,.012]);
+    add(m.stainless,[22,.012,0],[.22,.024,2.32]);
+    [-3.65,3.65].forEach(z=>add(m.metal,[26,.008,z],[7.8,.016,.09]));
+    for(let x=22.2;x<30;x+=.18) {
+      [-3.65,3.65].forEach(z=>add(m.wallDark,[x,.018,z],[.008,.006,.07]));
+    }
   }
 
   cleanup() {
     if (this.zoneGroup) {
       this.scene.remove(this.zoneGroup);
-      this.zoneGroup.traverse((child) => {
-        if (child.geometry && typeof child.geometry.dispose === 'function') {
-          child.geometry.dispose();
-        }
-      });
-      this.zoneGroup.clear();
+      disposeZoneArt(this.zoneGroup);
     }
     this.colliders = [];
     this.walkables = [];

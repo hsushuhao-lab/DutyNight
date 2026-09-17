@@ -1,5 +1,8 @@
 // FirstCampus1F.js - Milestone M5: First Campus 1F Public Lobby
 import * as THREE from 'three';
+import { buildCampusBackdrop } from '../../art/CampusBackdrop.js';
+import { artRoot, asset, solid, monitor, counterFront, wallTrim } from '../../art/ArtDetails.js';
+import { disposeZoneArt } from '../../art/ArtResources.js';
 import { Doorway } from '../shared/Doorway.js';
 import { SignAnchor } from '../shared/SignAnchor.js';
 import { CollisionFactory } from '../shared/CollisionFactory.js';
@@ -57,7 +60,11 @@ export class FirstCampus1F {
     // Right wall segment (x: 4 to 18)
     this.gf.buildWall(this.zoneGroup, this.colliders, 11.0, lobbyHeight / 2, -8, 14, lobbyHeight, 0.4);
 
-    // Main entrance sliding doors opening (x: -2 to 4, width 6m, height 3.2m)
+    // Authorized boundary repair: connect the perimeter to the existing 4m doorway.
+    this.gf.buildWall(this.zoneGroup, this.colliders, -1.5, lobbyHeight / 2, -8, 1, lobbyHeight, 0.4);
+    this.gf.buildWall(this.zoneGroup, this.colliders, 3.5, lobbyHeight / 2, -8, 1, lobbyHeight, 0.4);
+
+    // Main entrance sliding doors opening (x: -1 to 3, width 4m, height 3m)
     Doorway.build({
       scene: this.zoneGroup,
       colliders: this.colliders,
@@ -131,18 +138,32 @@ export class FirstCampus1F {
     this.gf.buildCeilingLight(this.zoneGroup, 12.0, lobbyHeight - 0.05, 0.0, 0.9, 9.0, 0xfff6ea);
     this.gf.buildCeilingLight(this.zoneGroup, -7.0, lobbyHeight - 0.05, 0.0, 0.9, 9.0, 0xfff6ea);
 
+    const art = artRoot(this.zoneGroup, 'Lobby');
+    receptionBase.material = this.gf.materials.doorWood;
+    counterFront(art, this.gf.materials, 2, -1.72, 5, 1.1);
+    monitor(art, this.gf.materials, 1, 1.18, -.5, Math.PI);
+    monitor(art, this.gf.materials, 3, 1.18, -.5, Math.PI);
+    solid(art, this.gf.materials.doorWood, [2,2.2,-1.76], [5.2,.52,.13]);
+    for (const x of [-.4,4.4]) solid(art,this.gf.materials.metal,[x,1.5,-1.7],[.045,3,.045]);
+    for (const child of this.zoneGroup.children) {
+      if (child.geometry?.parameters.width === 5.5 && child.position.y === .24) child.visible = false;
+      if (child.name.startsWith('Plaque_INFO')) { child.rotation.y = Math.PI; child.position.z = -1.85; }
+    }
+    for (const z of [-3.5,0,3.5]) for(const x of [10.3,12.1,13.9]) asset(art,'bench',[x,0,z]);
+    asset(art,'plant',[-10.5,0,6]);
+    asset(art,'plant',[16.5,0,6]);
+    solid(art,this.gf.materials.metal,[-9,2.5,7.76],[2.8,.9,.055]);
+    for (let row=0;row<4;row++) solid(art,this.gf.materials.wall,[-9,2.76-row*.18,7.72],[2.6,.12,.008]);
+    wallTrim(this.zoneGroup,this.gf.materials);
+    const exterior=buildCampusBackdrop(this.zoneGroup);
+    exterior.position.y=11.5;
     return this;
   }
 
   cleanup() {
     if (this.zoneGroup) {
       this.scene.remove(this.zoneGroup);
-      this.zoneGroup.traverse((child) => {
-        if (child.geometry && typeof child.geometry.dispose === 'function') {
-          child.geometry.dispose();
-        }
-      });
-      this.zoneGroup.clear();
+      disposeZoneArt(this.zoneGroup);
     }
     this.colliders = [];
     this.walkables = [];
