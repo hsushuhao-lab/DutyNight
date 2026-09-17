@@ -68,7 +68,7 @@ export class UIManager {
 
     // Debug toggle with Backquote (~)
     document.addEventListener('keydown', (e) => {
-      if (e.code === 'Backquote') {
+      if (e.code === 'Backquote' && (import.meta.env.DEV || new URLSearchParams(location.search).get('debug') === '1')) {
         this.toggleDebug();
       }
       if (e.code === 'Escape') {

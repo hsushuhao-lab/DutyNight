@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>《松德值班夜》第一幕原型</title>
+  <title>《松德值班夜》第一幕</title>
   <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
@@ -24,7 +25,7 @@
   <!-- Top Right Task Checklist -->
   <div id="task-panel">
     <div class="task-header">
-      <span class="task-icon">📋</span> 今日夜班手續 (17:00 交接)
+      今日夜班手續 (17:00 交接)
     </div>
     <div class="task-list">
       <div id="task-key" class="task-item pending">
@@ -53,7 +54,6 @@
     <span><kbd>滑鼠</kbd> 慢速視角</span>
     <span><kbd>雙擊</kbd> 自動走近物品 / 地面</span>
     <span><kbd>E</kbd> 互動</span>
-    <span><kbd>~</kbd> 隱藏狀態面板</span>
   </div>
 
   <!-- Bottom Subtitle Box -->
@@ -69,7 +69,7 @@
         <div class="his-title-text">
           松德醫療中心｜院內醫療資訊系統　夜間交班
         </div>
-        <button id="btn-close-terminal" class="btn-win-close">✕</button>
+        <button aria-label="關閉交班系統" id="btn-close-terminal" class="btn-win-close">✕</button>
       </div>
 
       <div class="his-header-info">
@@ -141,7 +141,7 @@
           </table>
 
           <div class="his-notice-box">
-            <strong>⚠️ 醫師值班備忘錄：</strong><br/>
+            <strong>醫師值班備忘錄：</strong><br/>
             1. 晚餐已由 4F 護理站統一代訂，完成交班後請先至護理站確認。<br/>
             2. 4F 值班室為獨立房間，位於護理站右側走廊，出入請隨手關門。<br/>
             3. 夜間門禁與病房巡視請隨身攜帶鑰匙與感應卡。
@@ -151,7 +151,7 @@
 
       <div class="his-footer">
         <div class="his-system-msg">系統連線正常 ｜ 資料庫版本 2026.09.17-1700</div>
-        <button id="btn-sign-handoff" class="btn-action">✔ 閱讀完畢並簽署確認電子交班</button>
+        <button id="btn-sign-handoff" class="btn-action">確認電子交班</button>
       </div>
     </div>
   </div>

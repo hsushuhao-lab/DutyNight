@@ -702,3 +702,38 @@ kbd {
   from { opacity: 0.4; }
   to { opacity: 1.0; }
 }
+
+/* Quiet on-duty overlay; the hospital scene remains the primary view. */
+:root {
+  --hud-surface: rgba(24, 31, 28, .65);
+  --hud-text: #f3f1e9;
+  --hud-sage: #b4c7b8;
+}
+#hospital-hud-bar, #task-panel {
+  background: var(--hud-surface);
+  box-shadow: none;
+  backdrop-filter: none;
+  border-radius: 2px;
+}
+#hospital-hud-bar { top: 16px; left: 16px; padding: 8px 12px; }
+.hud-location { font-size: 14px; font-weight: 500; }
+.hud-tag { color: var(--hud-sage); font-size: 12px; }
+#task-panel { top: 16px; right: 16px; width: 288px; }
+.task-header { background: transparent; font-size: 12px; font-weight: 500; }
+.task-list { padding: 8px 12px; gap: 4px; }
+#interaction-prompt { border-color: var(--hud-sage); font-size: 12px; box-shadow: none; }
+.his-body { min-height: 0; }
+.his-table tbody tr:nth-child(even) { background: #eef5f0; }
+.his-tab { cursor: default; }
+button:focus-visible { outline: 2px solid #658b76; outline-offset: 3px; }
+@media (max-width: 768px) {
+  #task-panel { top: auto; bottom: 56px; right: 12px; width: 240px; }
+  .hud-time { font-size: 11px; }
+  #control-hint { max-width: calc(100vw - 24px); flex-wrap: wrap; }
+  .workstation-window { width: 96vw; max-width: 96vw; height: 90dvh; }
+  .his-header-info, .ward-summary-banner { flex-wrap: wrap; gap: 8px; }
+  .his-tabs { flex-wrap: wrap; }
+  .his-content-panel { overflow-x: auto; }
+  .his-table { min-width: 640px; }
+  .his-footer { gap: 8px; flex-wrap: wrap; }
+}
