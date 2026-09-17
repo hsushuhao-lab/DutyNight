@@ -355,7 +355,7 @@ export class FirstCampus4F {
       wallHeight: 3.2,
       wallThickness: 0.4,
       isAlongX: false,
-      isOpen: false, // Access controlled closed door
+      isOpen: true, // Gate doorway open for traversal
       doorMaterial: this.gf.materials.doorWood
     });
 
@@ -390,6 +390,17 @@ export class FirstCampus4F {
   }
 
   cleanup() {
-    this.scene.remove(this.zoneGroup);
+    if (this.zoneGroup) {
+      this.scene.remove(this.zoneGroup);
+      this.zoneGroup.traverse((child) => {
+        if (child.geometry && typeof child.geometry.dispose === 'function') {
+          child.geometry.dispose();
+        }
+      });
+      this.zoneGroup.clear();
+    }
+    this.colliders = [];
+    this.walkables = [];
+    this.interactables = [];
   }
 }

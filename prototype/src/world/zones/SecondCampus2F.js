@@ -94,7 +94,10 @@ export class SecondCampus2F {
     // ==========================================
     // 3. ELEVATOR & STAIR CORE (at East wall x = 80)
     // ==========================================
-    this.gf.buildWall(this.zoneGroup, this.colliders, 80.0, 1.6, 0, 0.4, 3.2, 9.0);
+    // Wall segment south of stair door (z: -4.5 to 1.2)
+    this.gf.buildWall(this.zoneGroup, this.colliders, 80.0, 1.6, -1.65, 0.4, 3.2, 5.7);
+    // Wall segment north of stair door (z: 2.4 to 4.5)
+    this.gf.buildWall(this.zoneGroup, this.colliders, 80.0, 1.6, 3.45, 0.4, 3.2, 2.1);
 
     // Elevator doors
     const elFrame = new THREE.Mesh(new THREE.BoxGeometry(0.2, 2.5, 2.4), this.gf.materials.metal);
@@ -104,19 +107,19 @@ export class SecondCampus2F {
     elDoors.position.set(79.65, 1.25, -1.8);
     this.zoneGroup.add(elDoors);
 
-    // Stairwell door to 1F exit
+    // Stairwell door to 1F exit (opening from z = 1.2 to 2.4)
     Doorway.build({
       scene: this.zoneGroup,
       colliders: this.colliders,
-      x: 79.8,
+      x: 80.0,
       y: 0,
       z: 1.8,
       width: 1.2,
-      height: 2.3,
+      height: 2.4,
       wallHeight: 3.2,
       wallThickness: 0.4,
       isAlongX: false,
-      isOpen: false, // Fire door to stairs
+      isOpen: true,
       doorMaterial: this.gf.materials.metal
     });
 
@@ -140,6 +143,17 @@ export class SecondCampus2F {
   }
 
   cleanup() {
-    this.scene.remove(this.zoneGroup);
+    if (this.zoneGroup) {
+      this.scene.remove(this.zoneGroup);
+      this.zoneGroup.traverse((child) => {
+        if (child.geometry && typeof child.geometry.dispose === 'function') {
+          child.geometry.dispose();
+        }
+      });
+      this.zoneGroup.clear();
+    }
+    this.colliders = [];
+    this.walkables = [];
+    this.interactables = [];
   }
 }

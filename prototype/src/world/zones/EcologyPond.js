@@ -64,17 +64,17 @@ export class EcologyPond {
     this.zoneGroup.add(railEast);
     CollisionFactory.addBox(this.colliders, 65.9, 0.1, -43.5, 0.2, 1.2, 6.0);
 
-    // West railing (at x = 55.1)
-    const railWest = new THREE.Mesh(new THREE.BoxGeometry(0.12, 1.0, 6.0), this.gf.materials.doorWood);
-    railWest.position.set(55.1, 0.1, -43.5);
+    // West railing (at x = 55.1, south half z: -46.5 to -42.5, leaving entrance at -42.5 to -40.5)
+    const railWest = new THREE.Mesh(new THREE.BoxGeometry(0.12, 1.0, 4.0), this.gf.materials.doorWood);
+    railWest.position.set(55.1, 0.1, -44.5);
     this.zoneGroup.add(railWest);
-    CollisionFactory.addBox(this.colliders, 55.1, 0.1, -43.5, 0.2, 1.2, 6.0);
+    CollisionFactory.addBox(this.colliders, 55.1, 0.1, -44.5, 0.2, 1.2, 4.0);
 
-    // Observation wooden bench on the deck
+    // Observation wooden bench on the deck (placed against south edge x = 58.0, z = -45.2)
     const bench = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.45, 0.6), this.gf.materials.doorWood);
-    bench.position.set(58.0, -0.2, -41.5);
+    bench.position.set(58.0, -0.2, -45.2);
     this.zoneGroup.add(bench);
-    CollisionFactory.addBox(this.colliders, 58.0, -0.1, -41.5, 2.4, 0.6, 0.6);
+    CollisionFactory.addBox(this.colliders, 58.0, -0.1, -45.2, 2.4, 0.6, 0.6);
 
     // Life-buoy rescue station post
     const buoyPost = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 2.0, 8), this.gf.materials.metal);
@@ -143,6 +143,17 @@ export class EcologyPond {
   }
 
   cleanup() {
-    this.scene.remove(this.zoneGroup);
+    if (this.zoneGroup) {
+      this.scene.remove(this.zoneGroup);
+      this.zoneGroup.traverse((child) => {
+        if (child.geometry && typeof child.geometry.dispose === 'function') {
+          child.geometry.dispose();
+        }
+      });
+      this.zoneGroup.clear();
+    }
+    this.colliders = [];
+    this.walkables = [];
+    this.interactables = [];
   }
 }

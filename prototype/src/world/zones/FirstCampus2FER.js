@@ -149,9 +149,9 @@ export class FirstCampus2FER {
     this.gf.buildWall(this.zoneGroup, this.colliders, 0.0, 1.6, -6.5, 0.4, 3.2, 6.0); // West wall
     this.gf.buildWall(this.zoneGroup, this.colliders, 7.0, 1.6, -6.5, 0.4, 3.2, 6.0); // East wall
 
-    // Corridor front wall (at z = -3.5) with doorway
-    this.gf.buildWall(this.zoneGroup, this.colliders, 1.5, 1.6, -3.5, 3.0, 3.2, 0.4);
-    this.gf.buildWall(this.zoneGroup, this.colliders, 5.5, 1.6, -3.5, 3.0, 3.2, 0.4);
+    // Corridor front wall (at z = -3.5) with doorway opening from x = 2.8 to 4.2
+    this.gf.buildWall(this.zoneGroup, this.colliders, 1.4, 1.6, -3.5, 2.8, 3.2, 0.4);
+    this.gf.buildWall(this.zoneGroup, this.colliders, 5.6, 1.6, -3.5, 2.8, 3.2, 0.4);
 
     Doorway.build({
       scene: this.zoneGroup,
@@ -283,6 +283,17 @@ export class FirstCampus2FER {
   }
 
   cleanup() {
-    this.scene.remove(this.zoneGroup);
+    if (this.zoneGroup) {
+      this.scene.remove(this.zoneGroup);
+      this.zoneGroup.traverse((child) => {
+        if (child.geometry && typeof child.geometry.dispose === 'function') {
+          child.geometry.dispose();
+        }
+      });
+      this.zoneGroup.clear();
+    }
+    this.colliders = [];
+    this.walkables = [];
+    this.interactables = [];
   }
 }
