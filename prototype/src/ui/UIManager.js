@@ -30,6 +30,7 @@ export class UIManager {
   }
 
   initEvents() {
+    // Workstation sign & close button
     const btnSignHandoff = document.getElementById('btn-sign-handoff');
     if (btnSignHandoff) {
       btnSignHandoff.addEventListener('click', () => {
@@ -47,6 +48,7 @@ export class UIManager {
       });
     }
 
+    // Duty log modal buttons
     const btnSignLog = document.getElementById('btn-sign-log');
     if (btnSignLog) {
       btnSignLog.addEventListener('click', () => {
@@ -64,6 +66,7 @@ export class UIManager {
       });
     }
 
+    // Debug toggle with Backquote (~)
     document.addEventListener('keydown', (e) => {
       if (e.code === 'Backquote') {
         this.toggleDebug();
@@ -105,7 +108,7 @@ export class UIManager {
     setTimeout(() => {
       this.showSubtitle(
         '學長 (資深住院醫師)',
-        '「今天你值班喔？鑰匙在老地方，值班本記得簽一下。晚上如果有事，護理站會打給你。」',
+        '「今天你值班。先到 316 拿鑰匙、簽值班本，再用旁邊電腦完成交班。晚點直接上 4F。」',
         8000
       );
     }, 1200);
@@ -133,97 +136,55 @@ export class UIManager {
     if (this.onTerminalClose) this.onTerminalClose();
   }
 
-  triggerElevatorTransition(targetFloor, onTeleport, onFinish) {
+  triggerElevatorTransition(onComplete) {
     document.exitPointerLock();
     soundManager.playElevatorChime();
     this.elevatorCutscene.classList.add('active');
-
-    const isGoingUp = targetFloor === '4F';
-    const displayEl = document.querySelector('.elevator-display');
-    const statusEl = document.getElementById('elevator-status-text');
-
-    if (displayEl) {
-      displayEl.innerHTML = [
-        '<span class="arrow-up">' + (isGoingUp ? '▲' : '▼') + '</span>',
-        '<span class="floor-digit">' + targetFloor + '</span>'
-      ].join('');
-    }
-
-    if (statusEl) {
-      statusEl.innerHTML = [
-        '<p>電梯門緩緩關閉……</p>',
-        '<p class="sub-text">電梯' + (isGoingUp ? '上行中：3F ➔ 4F 病房區' : '下行中：4F ➔ 3F 行政區') + '</p>'
-      ].join('');
-    }
 
     setTimeout(() => {
       soundManager.playElevatorMotor();
     }, 800);
 
     setTimeout(() => {
-      if (onTeleport) onTeleport();
-
-      const locEl = document.querySelector('.hud-location');
-      const timeEl = document.querySelector('.hud-time');
-      if (locEl) {
-        locEl.textContent = isGoingUp
-          ? '4F 病房區 ｜ 值班室前室'
-          : '3F 醫師辦公行政區';
-      }
-      if (timeEl) {
-        timeEl.textContent = isGoingUp
-          ? '17:35 (暮色將至) ｜ 第一線值班：李住院醫師'
-          : '17:05 (夕陽餘暉) ｜ 第一線值班：李住院醫師';
-      }
-    }, 2200);
-
-    setTimeout(() => {
       soundManager.playElevatorChime();
-      this.elevatorCutscene.classList.remove('active');
-      if (onFinish) onFinish();
-    }, 3200);
+      const infoEl = document.getElementById('elevator-status-text');
+      infoEl.innerHTML = [
+        '<div class="arrival-badge">4F 病房區抵達</div>',
+        '<h2>交班完成，夜班正式開始</h2>',
+        '<ul class="milestone-list">',
+        '  <li>下一步：前往護理站確認病房狀態與晚餐代訂。</li>',
+        '  <li>再前往值班室放置個人物品，準備晚間巡房。</li>',
+        '  <li>後續將進入第一幕病房探索與護理站互動。</li>',
+        '</ul>',
+        '<button id="btn-continue-explore" class="btn-primary" style="margin-top:20px;">返回 3F 繼續測試</button>'
+      ].join('');
+
+      const btnContinue = document.getElementById('btn-continue-explore');
+      if (btnContinue) {
+        btnContinue.addEventListener('click', () => {
+          this.elevatorCutscene.classList.remove('active');
+          if (onComplete) onComplete();
+        });
+      }
+    }, 3600);
   }
 
   updateTasks() {
     const t01 = this.gameState.isTaskComplete('KEY_PICKUP');
     const t02 = this.gameState.isTaskComplete('DUTY_LOG');
     const t03 = this.gameState.isTaskComplete('E_HANDOFF');
-    const t04 = this.gameState.isTaskComplete('WARD_ENTRY');
-    const t05 = this.gameState.isTaskComplete('DUTY_ROOM_SETUP');
     const readyFor4F = t01 && t02 && t03;
 
-    const elKey = document.getElementById('task-key');
-    const elLog = document.getElementById('task-log');
-    const elHandoff = document.getElementById('task-handoff');
-    const elElevator = document.getElementById('task-elevator');
-    const elElevatorLabel = document.getElementById('task-elevator-label');
-    const elDutyRoom = document.getElementById('task-dutyroom');
+    document.getElementById('task-key').className = t01 ? 'task-item completed' : 'task-item pending';
+    document.getElementById('task-log').className = t02 ? 'task-item completed' : 'task-item pending';
+    document.getElementById('task-handoff').className = t03 ? 'task-item completed' : 'task-item pending';
+    document.getElementById('task-elevator').className = readyFor4F ? 'task-item ready' : 'task-item locked';
 
-    if (elKey) elKey.className = t01 ? 'task-item completed' : 'task-item pending';
-    if (elLog) elLog.className = t02 ? 'task-item completed' : 'task-item pending';
-    if (elHandoff) elHandoff.className = t03 ? 'task-item completed' : 'task-item pending';
-
-    if (elElevator) {
-      if (t04) {
-        elElevator.className = 'task-item completed';
-        if (elElevatorLabel) elElevatorLabel.textContent = '搭乘電梯前往 4F (已抵達)';
-      } else if (readyFor4F) {
-        elElevator.className = 'task-item ready';
-        if (elElevatorLabel) elElevatorLabel.textContent = '搭乘電梯前往 4F (可出發)';
-      } else {
-        elElevator.className = 'task-item locked';
-        if (elElevatorLabel) elElevatorLabel.textContent = '搭乘電梯前往 4F (待交班手續完成)';
-      }
-    }
-
-    if (elDutyRoom) {
-      if (t05) {
-        elDutyRoom.className = 'task-item completed';
-      } else if (t04) {
-        elDutyRoom.className = 'task-item ready';
-      } else {
-        elDutyRoom.className = 'task-item locked';
-      }
+    const elevatorLabel = document.getElementById('task-elevator-label');
+    if (readyFor4F) {
+      elevatorLabel.textContent = '搭乘電梯前往 4F 病房區';
+    } else {
+      elevatorLabel.textContent = '搭乘電梯前往 4F 病房區（待交班完成）';
     }
   }
 
