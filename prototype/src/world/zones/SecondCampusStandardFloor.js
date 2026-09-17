@@ -1,5 +1,7 @@
 // SecondCampusStandardFloor.js - Milestone M8: Second Campus Reusable Standard Ward Floor Module
 import * as THREE from 'three';
+import { artRoot, solid, asset, monitor, counterFront, wallTrim } from '../../art/ArtDetails.js';
+import { disposeZoneArt } from '../../art/ArtResources.js';
 import { Doorway } from '../shared/Doorway.js';
 import { SignAnchor } from '../shared/SignAnchor.js';
 import { CollisionFactory } from '../shared/CollisionFactory.js';
@@ -138,18 +140,32 @@ export class SecondCampusStandardFloor {
     this.gf.buildCeilingLight(this.zoneGroup, 88, 3.15, 0);
     this.gf.buildCeilingLight(this.zoneGroup, 78, 3.15, 5.5, 0.8, 6.0);
 
+    const art=artRoot(this.zoneGroup,'SecondCampusStandardFloor');
+
+    counterFront(art,this.gf.materials,78,2.62,8,1.05);
+    solid(art,this.gf.materials.doorWood,[78,2.5,3],[8.2,.45,.15]);
+    for(const x of [74,78,82])solid(art,this.gf.materials.doorWood,[x,1.76,3],[.065,1.45,.10]);
+    for(const child of this.zoneGroup.children){
+      if(child.name.startsWith('Plaque_ST')) {child.rotation.y=Math.PI;child.position.z=2.90;}
+      if(child.geometry?.parameters.width===30 && child.geometry?.parameters.height===.08)child.visible=false;
+    }
+    for(const [x,w] of [[68.5,6.5],[89.5,10.5]])solid(art,this.gf.materials.handrail,[x,1.05,2.78],[w,.08,.08]);
+    for(const x of [75.2,77.1,80.8]) monitor(art,this.gf.materials,x,1.12,3,Math.PI);
+    for(const x of [73,83])asset(art,'storageCabinet',[x,0,7.25]);
+    for(const x of [72,80,88]) {
+      for(const dx of [-.8,.8])solid(art,this.gf.materials.wall,[x+dx,1.2,-3],[.4,2.4,.4]);
+      solid(art,this.gf.materials.metal,[x+.36,1.08,-2.965],[.14,.04,.05]);
+      solid(art,this.gf.materials.metal,[x,.18,-2.965],[1,.22,.015]);
+    }
+
+    wallTrim(this.zoneGroup,this.gf.materials);
     return this;
   }
 
   cleanup() {
     if (this.zoneGroup) {
       this.scene.remove(this.zoneGroup);
-      this.zoneGroup.traverse((child) => {
-        if (child.geometry && typeof child.geometry.dispose === 'function') {
-          child.geometry.dispose();
-        }
-      });
-      this.zoneGroup.clear();
+      disposeZoneArt(this.zoneGroup);
     }
     this.colliders = [];
     this.walkables = [];

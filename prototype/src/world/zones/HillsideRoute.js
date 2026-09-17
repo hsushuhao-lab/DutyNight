@@ -1,5 +1,7 @@
 // HillsideRoute.js - Milestone M11: Outdoor Hillside Trail with Contained Boundaries & Pond Branch
 import * as THREE from 'three';
+import { applyHillsideArt } from '../../art/LandscapeArt.js';
+import { disposeZoneArt } from '../../art/ArtResources.js';
 import { CollisionFactory } from '../shared/CollisionFactory.js';
 import { SignAnchor } from '../shared/SignAnchor.js';
 
@@ -60,7 +62,7 @@ export class HillsideRoute {
       const pathGeo = new THREE.PlaneGeometry(3.6, segLength + 0.5);
       const pathMesh = new THREE.Mesh(pathGeo, this.gf.materials.pathGravel);
       pathMesh.rotation.x = -Math.PI / 2;
-      pathMesh.rotation.z = -angle;
+      pathMesh.rotation.z = angle;
       pathMesh.position.set(midX, midY + 0.02, midZ);
       pathMesh.receiveShadow = true;
       this.zoneGroup.add(pathMesh);
@@ -110,7 +112,7 @@ export class HillsideRoute {
       const bPathGeo = new THREE.PlaneGeometry(2.4, segLength + 0.4);
       const bPath = new THREE.Mesh(bPathGeo, this.gf.materials.pathGravel);
       bPath.rotation.x = -Math.PI / 2;
-      bPath.rotation.z = -angle;
+      bPath.rotation.z = angle;
       bPath.position.set(midX, midY + 0.02, midZ);
       this.zoneGroup.add(bPath);
       this.walkables.push(bPath);
@@ -128,7 +130,7 @@ export class HillsideRoute {
       scene: this.zoneGroup,
       x: 42.5,
       y: 1.2,
-      z: -23.4,
+      z: -23.58,
       width: 0.95,
       height: 0.4,
       rotationY: Math.PI,
@@ -180,18 +182,14 @@ export class HillsideRoute {
     // West terrain edge
     CollisionFactory.addBox(this.colliders, 5.0, 1.0, -30.0, 0.5, 4.0, 35);
 
+    applyHillsideArt(this);
     return this;
   }
 
   cleanup() {
     if (this.zoneGroup) {
       this.scene.remove(this.zoneGroup);
-      this.zoneGroup.traverse((child) => {
-        if (child.geometry && typeof child.geometry.dispose === 'function') {
-          child.geometry.dispose();
-        }
-      });
-      this.zoneGroup.clear();
+      disposeZoneArt(this.zoneGroup);
     }
     this.colliders = [];
     this.walkables = [];

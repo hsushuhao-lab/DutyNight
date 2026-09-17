@@ -1,5 +1,7 @@
 // EcologyPond.js - Milestone M12: Contained Ecological Pond Basin & Observation Deck
 import * as THREE from 'three';
+import { applyPondArt } from '../../art/LandscapeArt.js';
+import { disposeZoneArt } from '../../art/ArtResources.js';
 import { CollisionFactory } from '../shared/CollisionFactory.js';
 import { SignAnchor } from '../shared/SignAnchor.js';
 
@@ -139,18 +141,14 @@ export class EcologyPond {
     CollisionFactory.addBox(this.colliders, 82.0, 1.0, -48.0, 0.5, 4.0, 25);  // East edge
     CollisionFactory.addBox(this.colliders, 48.0, 1.0, -48.0, 0.5, 4.0, 25);  // West edge
 
+    applyPondArt(this);
     return this;
   }
 
   cleanup() {
     if (this.zoneGroup) {
       this.scene.remove(this.zoneGroup);
-      this.zoneGroup.traverse((child) => {
-        if (child.geometry && typeof child.geometry.dispose === 'function') {
-          child.geometry.dispose();
-        }
-      });
-      this.zoneGroup.clear();
+      disposeZoneArt(this.zoneGroup);
     }
     this.colliders = [];
     this.walkables = [];

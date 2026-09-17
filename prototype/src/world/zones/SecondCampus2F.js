@@ -1,5 +1,7 @@
 // SecondCampus2F.js - Milestone M9: Second Campus 2F Special Bridge Landing & Gallery
 import * as THREE from 'three';
+import { artRoot, solid, asset, monitor, counterFront, wallTrim } from '../../art/ArtDetails.js';
+import { disposeZoneArt } from '../../art/ArtResources.js';
 import { Doorway } from '../shared/Doorway.js';
 import { SignAnchor } from '../shared/SignAnchor.js';
 import { CollisionFactory } from '../shared/CollisionFactory.js';
@@ -139,18 +141,29 @@ export class SecondCampus2F {
     this.gf.buildCeilingLight(this.zoneGroup, 65, 3.15, 0, 0.8, 7.5);
     this.gf.buildCeilingLight(this.zoneGroup, 75, 3.15, 0, 0.8, 7.5);
 
+    const art=artRoot(this.zoneGroup,'SecondCampus2F');
+
+    counterFront(art,this.gf.materials,67,2.78,4.2,1.1);
+    monitor(art,this.gf.materials,66.5,1.18,3.2,Math.PI);
+    asset(art,'bench',[74,0,-3.85]);
+    asset(art,'plant',[61.4,0,3.65]);
+    solid(art,this.gf.materials.metal,[79.58,1.25,-1.8],[.03,2.3,.012]);
+    for(const z of [-2.8,-.8])solid(art,this.gf.materials.metal,[79.55,1.25,z],[.08,2.5,.06]);
+
+    solid(art,this.gf.materials.floorTile,[82,-.08,1.8],[4,.16,2.4]);
+    solid(art,this.gf.materials.ceiling,[82,3.2,1.8],[4,.16,2.4]);
+    for(const z of [.6,3])solid(art,this.gf.materials.wall,[82,1.6,z],[4,3.2,.25]);
+    solid(art,this.gf.materials.wall,[84,1.6,1.8],[.25,3.2,2.4]);
+    for(let i=0;i<6;i++)solid(art,this.gf.materials.floorTile,[82+i*.28,(i+1)*.075,1.8],[.28,(i+1)*.15,2]);
+    solid(art,this.gf.materials.lightWarm,[82,3.09,1.8],[1.1,.03,.32]);
+    wallTrim(this.zoneGroup,this.gf.materials);
     return this;
   }
 
   cleanup() {
     if (this.zoneGroup) {
       this.scene.remove(this.zoneGroup);
-      this.zoneGroup.traverse((child) => {
-        if (child.geometry && typeof child.geometry.dispose === 'function') {
-          child.geometry.dispose();
-        }
-      });
-      this.zoneGroup.clear();
+      disposeZoneArt(this.zoneGroup);
     }
     this.colliders = [];
     this.walkables = [];

@@ -1,5 +1,8 @@
 // SecondCampus1F.js - Milestone M10: Second Campus 1F Hillside Exit & Outdoor Landing
 import * as THREE from 'three';
+import { buildHillsidePreview } from '../../art/LandscapeArt.js';
+import { artRoot, solid, asset, wallTrim } from '../../art/ArtDetails.js';
+import { disposeZoneArt } from '../../art/ArtResources.js';
 import { Doorway } from '../shared/Doorway.js';
 import { SignAnchor } from '../shared/SignAnchor.js';
 import { CollisionFactory } from '../shared/CollisionFactory.js';
@@ -114,18 +117,32 @@ export class SecondCampus1F {
 
     this.gf.buildCeilingLight(this.zoneGroup, 72, 3.15, -4.0);
 
+    const art=artRoot(this.zoneGroup,'SecondCampus1F');
+    buildHillsidePreview(art);
+
+    asset(art,'bench',[76.5,0,-2],[1,1,1],-Math.PI/2);
+    asset(art,'plant',[67.3,0,1]);
+    solid(art,this.gf.materials.metal,[72,.02,-7.85],[1.6,.04,.6]);
+    solid(art,this.gf.materials.metal,[72,2.7,-8.22],[.42,.18,.12]);
+    solid(art,this.gf.materials.lightWarm,[72,2.68,-8.30],[.34,.11,.045]);
+
+    for(const x of [70.65,73.35])solid(art,this.gf.materials.wall,[x,1.6,-8],[.3,3.2,.4]);
+    const exitDoor=this.zoneGroup.getObjectByName('Doorway_72_-8');
+    for(const mesh of exitDoor.children)if(mesh.geometry?.parameters.depth===2.32)mesh.visible=false;
+    for(const x of [70.92,73.08]) {
+      solid(art,this.gf.materials.metal,[x,1.225,-7.42],[.055,2.45,1.16]);
+      solid(art,this.gf.materials.stainless,[x,1.05,-7.06],[.09,.04,.45]);
+      solid(art,this.gf.materials.stainless,[x,.21,-7.42],[.07,.3,1.06]);
+      for(const y of [.25,1.25,2.15])solid(art,this.gf.materials.stainless,[x,y,-7.97],[.075,.13,.06]);
+    }
+    wallTrim(this.zoneGroup,this.gf.materials);
     return this;
   }
 
   cleanup() {
     if (this.zoneGroup) {
       this.scene.remove(this.zoneGroup);
-      this.zoneGroup.traverse((child) => {
-        if (child.geometry && typeof child.geometry.dispose === 'function') {
-          child.geometry.dispose();
-        }
-      });
-      this.zoneGroup.clear();
+      disposeZoneArt(this.zoneGroup);
     }
     this.colliders = [];
     this.walkables = [];

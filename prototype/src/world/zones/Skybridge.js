@@ -1,5 +1,8 @@
 // Skybridge.js - Milestone M7: Enclosed Long Structural Connector Bridge
 import * as THREE from 'three';
+import { artRoot, solid, wallTrim } from '../../art/ArtDetails.js';
+import { buildCampusBackdrop } from '../../art/CampusBackdrop.js';
+import { disposeZoneArt } from '../../art/ArtResources.js';
 import { CollisionFactory } from '../shared/CollisionFactory.js';
 import { SignAnchor } from '../shared/SignAnchor.js';
 
@@ -162,18 +165,33 @@ export class Skybridge {
       );
     });
 
+    const art=artRoot(this.zoneGroup,'Bridge');
+    buildCampusBackdrop(art);
+    // Adjacent vestibules remain visible until the existing portal changes zones.
+    for (const [x, end] of [[-4,-8],[64,68]]) {
+      solid(art,this.gf.materials.floorTile,[x,-.08,0],[8,.16,4]);
+      solid(art,this.gf.materials.ceiling,[x,3.2,0],[8,.15,4]);
+      for(const z of [-2,2])solid(art,this.gf.materials.wall,[x,1.6,z],[8,3.2,.3]);
+      solid(art,this.gf.materials.wall,[end,1.6,0],[.3,3.2,4]);
+      solid(art,this.gf.materials.stainless,[end+(end<0?.17:-.17),1.25,0],[.04,2.5,2]);
+      solid(art,this.gf.materials.metal,[end+(end<0?.2:-.2),1.25,0],[.04,2.5,.025]);
+      solid(art,this.gf.materials.lightWarm,[x,3.09,0],[1.2,.04,.35]);
+    }
+    for (const z of [-1.8,1.8]) {
+      solid(art,this.gf.materials.metal,[30,.94,z],[60,.055,.12]);
+      solid(art,this.gf.materials.metal,[30,2.7,z],[60,.04,.09]);
+      for(let x=2.5;x<60;x+=5) solid(art,this.gf.materials.metal,[x,1.8,z],[.055,1.8,.08]);
+      for(let x=1;x<60;x+=2) solid(art,this.gf.materials.metal,[x,1.02,z],[.03,.12,.13]);
+    }
+    for(let x=10;x<60;x+=10) solid(art,this.gf.materials.wallDark,[x,.004,0],[.025,.008,3.98]);
+    wallTrim(this.zoneGroup,this.gf.materials);
     return this;
   }
 
   cleanup() {
     if (this.zoneGroup) {
       this.scene.remove(this.zoneGroup);
-      this.zoneGroup.traverse((child) => {
-        if (child.geometry && typeof child.geometry.dispose === 'function') {
-          child.geometry.dispose();
-        }
-      });
-      this.zoneGroup.clear();
+      disposeZoneArt(this.zoneGroup);
     }
     this.colliders = [];
     this.walkables = [];
