@@ -432,18 +432,36 @@ export class Level3FBlockout {
     wSouth.position.set(6.0, 0.50, -2.29);
     this.scene.add(wSouth);
 
-    // Natural beech wood handrails along corridor (at top of wainscot)
-    [-2.27, 2.27].forEach((z) => {
-      const rail = new THREE.Mesh(new THREE.BoxGeometry(19.5, 0.09, 0.08), this.materials.wood);
-      rail.position.set(6, 1.15, z);
-      rail.castShadow = true;
-      this.scene.add(rail);
+    // South wall handrail & baseboard (continuous along south window sill)
+    const railSouth = new THREE.Mesh(new THREE.BoxGeometry(19.5, 0.09, 0.08), this.materials.wood);
+    railSouth.position.set(6, 1.15, -2.27);
+    railSouth.castShadow = true;
+    this.scene.add(railSouth);
 
-      // Baseboard bumper
-      const base = new THREE.Mesh(new THREE.BoxGeometry(19.5, 0.16, 0.04), this.materials.bumperSage);
-      base.position.set(6, 0.08, z);
-      this.scene.add(base);
-    });
+    const baseSouth = new THREE.Mesh(new THREE.BoxGeometry(19.5, 0.16, 0.04), this.materials.bumperSage);
+    baseSouth.position.set(6, 0.08, -2.27);
+    this.scene.add(baseSouth);
+
+    // North wall handrail & baseboard (segmented to keep 316 office doorway x: 1 to 3 completely unobstructed)
+    // Segment 1: West of 316 door (x: -4 to 1, length 5.0, center -1.5)
+    const railNorth1 = new THREE.Mesh(new THREE.BoxGeometry(5.0, 0.09, 0.08), this.materials.wood);
+    railNorth1.position.set(-1.5, 1.15, 2.27);
+    railNorth1.castShadow = true;
+    this.scene.add(railNorth1);
+
+    const baseNorth1 = new THREE.Mesh(new THREE.BoxGeometry(5.0, 0.16, 0.04), this.materials.bumperSage);
+    baseNorth1.position.set(-1.5, 0.08, 2.27);
+    this.scene.add(baseNorth1);
+
+    // Segment 2: East of 316 door (x: 3 to 16, length 13.0, center 9.5)
+    const railNorth2 = new THREE.Mesh(new THREE.BoxGeometry(13.0, 0.09, 0.08), this.materials.wood);
+    railNorth2.position.set(9.5, 1.15, 2.27);
+    railNorth2.castShadow = true;
+    this.scene.add(railNorth2);
+
+    const baseNorth2 = new THREE.Mesh(new THREE.BoxGeometry(13.0, 0.16, 0.04), this.materials.bumperSage);
+    baseNorth2.position.set(9.5, 0.08, 2.27);
+    this.scene.add(baseNorth2);
 
     // Wall Sconces between doorways & pillars (A01 reference)
     [-2.5, 0.5, 4.0, 7.5, 11.0, 14.5].forEach((x) => {
