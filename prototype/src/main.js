@@ -29,21 +29,20 @@ renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.15;
 container.appendChild(renderer.domElement);
 
-// Instantiate World Level (3F Blockout)
-const level = new Level3FBlockout(scene);
-
-// Correct known collision topology regressions before the controller receives
-// the collider array: 316 doorway must be passable; opposite glazed wall solid.
-applyAct1CollisionHotfix(level);
+import { WorldRouter } from './world/WorldRouter.js';
 
 // Instantiate FPS Controller
 const controller = new FPSController(
   camera,
   renderer.domElement,
-  level.colliders,
-  level.interactables,
-  level.walkables
+  [],
+  [],
+  []
 );
+
+// Instantiate World Router
+const worldRouter = new WorldRouter(scene, camera, controller);
+window.worldRouter = worldRouter;
 
 // Instantiate UI Manager
 let uiManager;
@@ -100,6 +99,7 @@ controller.onInteract = (interactable) => {
       controller.enabled = false;
       uiManager.triggerElevatorTransition(() => {
         gameState.markTaskComplete('WARD_ENTRY');
+        worldRouter.loadZone('first_campus_4f', 'm1_4f_lobby');
       });
     } else {
       soundManager.playClick();
@@ -114,7 +114,9 @@ controller.onInteract = (interactable) => {
 
 function checkElevatorReady() {
   const ready = gameState.areRequiredTasksComplete();
-  level.updateElevatorLight(ready);
+  if (worldRouter.activeZoneInstance?.updateElevatorLight) {
+    worldRouter.activeZoneInstance.updateElevatorLight(ready);
+  }
 }
 
 // Window resize
@@ -134,29 +136,43 @@ function animate() {
   renderer.render(scene, camera);
 }
 
-// URL Camera presets for QA and visual capture
+// URL parameters for QA and visual capture
 const urlParams = new URLSearchParams(window.location.search);
+const zoneParam = urlParams.get('zone');
+const spawnParam = urlParams.get('spawn');
 const camPreset = urlParams.get('cam');
-if (camPreset === '316_entrance') {
+
+if (zoneParam || spawnParam) {
+  worldRouter.loadZone(zoneParam || 'first_campus_3f', spawnParam);
+} else if (camPreset === '316_entrance') {
+  worldRouter.loadZone('first_campus_3f');
   controller.teleport(2.1, controller.eyeHeight, 0.4, Math.PI);
   controller.pitch = 0.0;
   controller.updateCameraRotation();
 } else if (camPreset === '3f_corridor' || camPreset === 'corridor') {
+  worldRouter.loadZone('first_campus_3f');
   controller.teleport(-2.5, controller.eyeHeight, 0.0, -Math.PI / 2);
   controller.pitch = 0.0;
   controller.updateCameraRotation();
 } else if (camPreset === 'his_workstation' || camPreset === 'workstation') {
+  worldRouter.loadZone('first_campus_3f');
   controller.teleport(9.0, controller.eyeHeight, 5.5, -Math.PI / 2);
   setTimeout(() => { uiManager.openWorkstation(); }, 300);
 } else if (camPreset === '4f_arrival_signage' || camPreset === 'elevator') {
+  worldRouter.loadZone('first_campus_3f');
   controller.teleport(-4.2, controller.eyeHeight, 0.0, Math.PI / 2);
   controller.pitch = 0.05;
   controller.updateCameraRotation();
 } else if (camPreset === 'duty_room_sign') {
+  worldRouter.loadZone('first_campus_3f');
   controller.teleport(1.25, 1.82, 1.05, Math.PI);
   controller.pitch = 0.0;
   controller.updateCameraRotation();
+} else {
+  worldRouter.loadZone('first_campus_3f', 'm0_316_entrance');
 }
 
+worldRouter.createDebugUI();
+
 animate();
-console.log('Songde Night Duty - Act 1 Prototype Initialized.');
+console.log('Songde Night Duty - Full World Modeling System Initialized.');
