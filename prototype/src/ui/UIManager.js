@@ -30,7 +30,6 @@ export class UIManager {
   }
 
   initEvents() {
-    // Workstation sign & close button
     const btnSignHandoff = document.getElementById('btn-sign-handoff');
     if (btnSignHandoff) {
       btnSignHandoff.addEventListener('click', () => {
@@ -48,7 +47,6 @@ export class UIManager {
       });
     }
 
-    // Duty log modal buttons
     const btnSignLog = document.getElementById('btn-sign-log');
     if (btnSignLog) {
       btnSignLog.addEventListener('click', () => {
@@ -66,7 +64,6 @@ export class UIManager {
       });
     }
 
-    // Debug toggle with Backquote (~)
     document.addEventListener('keydown', (e) => {
       if (e.code === 'Backquote') {
         this.toggleDebug();
@@ -155,7 +152,7 @@ export class UIManager {
     if (statusEl) {
       statusEl.innerHTML = [
         '<p>電梯門緩緩關閉……</p>',
-        '<p class="sub-text">電梯' + (isGoingUp ? '上行中：3F ➔ 4F 閉鎖病房' : '下行中：4F ➔ 3F 行政區') + '</p>'
+        '<p class="sub-text">電梯' + (isGoingUp ? '上行中：3F ➔ 4F 病房區' : '下行中：4F ➔ 3F 行政區') + '</p>'
       ].join('');
     }
 
@@ -170,7 +167,7 @@ export class UIManager {
       const timeEl = document.querySelector('.hud-time');
       if (locEl) {
         locEl.textContent = isGoingUp
-          ? '4F 精神科閉鎖病房區 ｜ 獨立值班室前室'
+          ? '4F 病房區 ｜ 值班室前室'
           : '3F 醫師辦公行政區';
       }
       if (timeEl) {
@@ -205,7 +202,7 @@ export class UIManager {
     if (elKey) elKey.className = t01 ? 'task-item completed' : 'task-item pending';
     if (elLog) elLog.className = t02 ? 'task-item completed' : 'task-item pending';
     if (elHandoff) elHandoff.className = t03 ? 'task-item completed' : 'task-item pending';
-    
+
     if (elElevator) {
       if (t04) {
         elElevator.className = 'task-item completed';
