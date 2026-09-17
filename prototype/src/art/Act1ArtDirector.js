@@ -45,6 +45,72 @@ function addCorrectedSign(scene, { x, y, z, width, height, rotationY = 0, lines,
   return mesh;
 }
 
+function setText(selector, value) {
+  const el = document.querySelector(selector);
+  if (el) el.textContent = value;
+}
+
+function sanitizeAct1UI() {
+  document.documentElement.dataset.artDirection = 'act1-canonical-v2';
+
+  // Public prototype stays fictionalized. Real reference material is not part of the game UI.
+  setText('.hud-tag', '松德醫療中心 ｜ 夜間值班');
+  setText('.his-title-main', '松德醫療中心 醫療資訊整合系統 (HIS)');
+  setText('.his-title-sub', '夜間交班模組');
+  setText('.badge-secure', '病房門禁：刷卡');
+
+  const emblem = document.querySelector('.his-emblem');
+  if (emblem) emblem.textContent = 'HIS';
+
+  // Remove gamey emoji iconography from the medical workstation.
+  document.querySelectorAll('.his-card .card-icon, .his-nav-item .nav-icon').forEach((el) => {
+    el.textContent = '';
+  });
+
+  // No invented duty-room number. It was never part of the approved topology.
+  const stickyBody = document.querySelector('.his-sticky-note .sticky-body');
+  if (stickyBody) {
+    stickyBody.innerHTML = [
+      '李醫師，值班室鑰匙在 316 辦公桌旁。<br/>',
+      '交班完記得先上去放行李。<br/>',
+      '<strong>晚餐約 18:30 送達護理站。</strong>'
+    ].join('');
+  }
+
+  // Bed 33 is a later legend. Act 1 must not prime or reveal it.
+  document.querySelectorAll('.his-table tbody tr').forEach((row) => {
+    const cells = row.querySelectorAll('td');
+    if (cells.length && cells[0].textContent.trim() === '4A33') {
+      cells[0].textContent = '4A31';
+      cells[1].textContent = '王○○';
+      cells[2].textContent = '女 / 45';
+      cells[3].textContent = '情緒症狀穩定期';
+      cells[4].textContent = '常規夜間巡視與交班確認。';
+      cells[5].innerHTML = '<span class="badge-stable">病況平穩</span>';
+    }
+  });
+
+  document.querySelectorAll('.his-card').forEach((card) => {
+    if (card.textContent.includes('4A33')) {
+      card.querySelectorAll('p').forEach((p) => {
+        if (p.textContent.includes('4A33')) {
+          p.textContent = '• 4A31 常規照護中，依交班內容於夜間巡視確認。';
+        }
+      });
+    }
+  });
+
+  document.querySelectorAll('.book-header h3').forEach((el) => {
+    el.textContent = '松德醫療中心';
+  });
+
+  document.querySelectorAll('td').forEach((cell) => {
+    if (cell.textContent.includes('422')) {
+      cell.textContent = cell.textContent.replace(/422\s*/g, '');
+    }
+  });
+}
+
 function add4FVisualCorrections(scene) {
   // Cover the unverified room number used by the earlier implementation.
   addCorrectedSign(scene, {
@@ -129,7 +195,6 @@ export function applyAct1ArtDirection({ scene, renderer }) {
       obj.color.setHex(0xfff2df);
       obj.intensity = Math.min(obj.intensity, 0.62);
     } else if (obj.isPointLight) {
-      // Keep hospital practical lights warm-neutral, not horror-orange.
       if (obj.position.y < 9) {
         obj.color.lerp(new THREE.Color(0xfff1da), 0.55);
       } else {
@@ -151,4 +216,5 @@ export function applyAct1ArtDirection({ scene, renderer }) {
   scene.add(hemisphere);
 
   add4FVisualCorrections(scene);
+  sanitizeAct1UI();
 }
