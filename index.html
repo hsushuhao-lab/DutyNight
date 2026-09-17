@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>《松德值班夜：與避無可避的傳說》 第一幕原型 (Act 1 Prototype)</title>
-  <script type="module" crossorigin src="./assets/index-D3Ym3M5b.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-CJdSdRE3.css">
+  <script type="module" crossorigin src="./assets/index-2fubhWsD.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-Cxoqo9C4.css">
 </head>
 <body>
   <!-- 3D Canvas Viewport -->
@@ -67,37 +67,95 @@
     <div id="subtitle-text">「今天你值班喔？鑰匙在老地方，值班本記得簽一下。」</div>
   </div>
 
-  <!-- HIS Electronic Handoff Workstation Modal -->
+  <!-- HIS Electronic Handoff Workstation Modal (A08 Reference) -->
   <div id="workstation-modal" class="modal-overlay">
     <div class="workstation-window">
       <div class="his-titlebar">
-        <div class="his-title-text">
-          🏥 臺北市立聯合醫院松德院區 醫療資訊整合系統 (HIS) v4.2 [夜間交班子系統]
+        <div class="his-title-left">
+          <span class="his-emblem">🏥</span>
+          <div class="his-title-text-group">
+            <span class="his-title-main">臺北市立聯合醫院 松德院區 醫療資訊整合系統 (HIS)</span>
+            <span class="his-title-sub">夜間交接班子系統 ·「照顧仍在繼續」</span>
+          </div>
         </div>
-        <button id="btn-close-terminal" class="btn-win-close">✕</button>
+        <div class="his-title-controls">
+          <span class="win-btn-min">─</span>
+          <span class="win-btn-max">□</span>
+          <button id="btn-close-terminal" class="btn-win-close" title="關閉">✕</button>
+        </div>
       </div>
 
       <div class="his-header-info">
-        <div class="info-col"><strong>登入人員：</strong>李住院醫師 (第一線值班)</div>
-        <div class="info-col"><strong>交班時段：</strong>今日 17:00 ～ 明日 08:30</div>
-        <div class="info-col"><strong>院區狀態：</strong>精神專科門急診 / 閉鎖病房群</div>
+        <div class="info-item"><span class="info-label">值班醫師：</span><strong>李○○ 住院醫師 (第一線夜班)</strong></div>
+        <div class="info-item"><span class="info-label">交班時段：</span><strong>今日 17:00 ～ 翌日 08:30</strong></div>
+        <div class="info-item"><span class="info-label">管制等級：</span><span class="badge-secure">精神科閉鎖病房防護級</span></div>
+        <div class="info-item"><span class="info-label">系統時間：</span><span class="his-clock">17:05:22 (已連線)</span></div>
       </div>
 
-      <div class="his-body">
-        <div class="his-tabs">
-          <div class="his-tab active">4A 急性閉鎖病房</div>
-          <div class="his-tab">4B 亞急性病房</div>
-          <div class="his-tab">4C 復健病房</div>
-          <div class="his-tab">4D 特殊照護病房</div>
-        </div>
-
-        <div class="his-content-panel">
-          <div class="ward-summary-banner">
-            <span>【4A 閉鎖病房交班摘要】</span>
-            <span>佔床率：32 / 34 床 (空床 2)</span>
-            <span>護理站分機：#4101</span>
+      <div class="his-workspace-layout">
+        <!-- Left Sidebar Navigation & Sticky Note -->
+        <div class="his-sidebar">
+          <div class="his-sidebar-title">病房與系統目錄</div>
+          <div class="his-nav-list">
+            <div class="his-nav-item active"><span class="nav-icon">🛌</span> 4A 急性閉鎖病房 (32/34)</div>
+            <div class="his-nav-item"><span class="nav-icon">🛏️</span> 4B 亞急性病房 (28/30)</div>
+            <div class="his-nav-item"><span class="nav-icon">🌿</span> 4C 慢性復健病房 (40/40)</div>
+            <div class="his-nav-item"><span class="nav-icon">🔒</span> 4D 特殊觀察保護室 (4/6)</div>
+            <div class="his-nav-item"><span class="nav-icon">📋</span> 醫師處方簽核 (0 待審)</div>
+            <div class="his-nav-item"><span class="nav-icon">📞</span> 全院緊急分機表</div>
           </div>
 
+          <!-- Post-it Sticky Note attached to screen bezel (A08 Reference) -->
+          <div class="his-sticky-note">
+            <div class="sticky-pin">📌</div>
+            <div class="sticky-title">學長留言 (16:50)</div>
+            <div class="sticky-body">
+              李醫師，值班室（422室）鑰匙在辦公桌右抽屜。<br/>
+              交班完記得先上去放行李。<br/>
+              <strong>4F便當約18:30送達護理站！</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Main Panel -->
+        <div class="his-main-content">
+          <!-- 4-Card Operational Summary Grid -->
+          <div class="his-grid-cards">
+            <div class="his-card">
+              <div class="card-head"><span class="card-icon">📊</span> 4A 留觀床位現況</div>
+              <div class="card-body">
+                <div class="stat-highlight">總床數 34 ｜ 佔床 32 ｜ 空床 2</div>
+                <p class="card-desc">• 4A33 常規收治觀察中，依規程待夜間巡房確認。</p>
+              </div>
+            </div>
+
+            <div class="his-card">
+              <div class="card-head"><span class="card-icon">⚠️</span> 夜班照護重點提示</div>
+              <div class="card-body">
+                <p class="card-alert">• <strong>4A24 陳○隆</strong>：器質性精神症狀，夜間下床如廁防跌重點護理。</p>
+                <p class="card-notice">• <strong>4A12 林○雅</strong>：思覺失調復原期，反映走廊燈光亮，已調暗夜燈。</p>
+              </div>
+            </div>
+
+            <div class="his-card">
+              <div class="card-head"><span class="card-icon">🛡️</span> 值班行政與防護備忘</div>
+              <div class="card-body">
+                <p class="card-desc">• 4F 為獨立套房式值班室，離開請隨手關門上鎖。</p>
+                <p class="card-desc">• 進出 4A/4B 閉鎖病房門禁嚴格，請隨身佩帶鑰匙與證件。</p>
+              </div>
+            </div>
+
+            <div class="his-card">
+              <div class="card-head"><span class="card-icon">☎️</span> 通報與支援聯絡網</div>
+              <div class="card-body">
+                <p class="card-desc">• 二線值勤主治：<strong>張醫師 (院外待命)</strong></p>
+                <p class="card-desc">• 護理站分機：<strong>#4101</strong> ｜ 值班手機：<strong>#4102</strong></p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Patient Table -->
+          <div class="table-section-title">4A 閉鎖病房 當班重點照護病患名冊</div>
           <table class="his-table">
             <thead>
               <tr>
@@ -144,19 +202,17 @@
               </tr>
             </tbody>
           </table>
-
-          <div class="his-notice-box">
-            <strong>⚠️ 醫師值班備忘錄：</strong><br/>
-            1. 晚餐已由 4F 護理站統一代訂便當，完成交班後請至 4F 護理站領取或確認。<br/>
-            2. 4F 值班室為病房區外的獨立套房式房間，出入請隨手鎖門。<br/>
-            3. 依院內感染與安全管制規範，夜間精神專科閉鎖門禁請隨身配帶鑰匙感應卡。
-          </div>
         </div>
       </div>
 
       <div class="his-footer">
-        <div class="his-system-msg">系統連線正常 ｜ 資料庫版本 2026.09.17-1700</div>
-        <button id="btn-sign-handoff" class="btn-action">✔ 閱讀完畢並簽署確認電子交班</button>
+        <div class="his-system-msg">
+          <span class="status-dot">🟢</span> 系統連線正常 ｜ 精神專科病歷資料庫 2026.09.17-1700
+        </div>
+        <div class="his-footer-actions">
+          <button id="btn-cancel-terminal" class="btn-secondary" onclick="document.getElementById('btn-close-terminal').click()">關閉檢視 (Esc)</button>
+          <button id="btn-sign-handoff" class="btn-action">✔ 閱讀完畢並簽署確認電子交班</button>
+        </div>
       </div>
     </div>
   </div>
