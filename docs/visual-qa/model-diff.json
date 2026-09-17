@@ -1,0 +1,241 @@
+{
+  "baseline": "31f9e1b039a42317989291a1657b9901a673e748",
+  "verdict": "PASS",
+  "zones": [
+    {
+      "zone": "FirstCampus3F",
+      "originalColliders": 21,
+      "addedColliders": [],
+      "walkables": 3,
+      "originalInteractionsRetained": true,
+      "authorizedSurfaceRotations": 0
+    },
+    {
+      "zone": "FirstCampus4F",
+      "originalColliders": 30,
+      "addedColliders": [],
+      "walkables": 5,
+      "originalInteractionsRetained": true,
+      "authorizedSurfaceRotations": 0
+    },
+    {
+      "zone": "FirstCampus2FER",
+      "originalColliders": 37,
+      "addedColliders": [
+        [
+          [
+            -4,
+            0,
+            -3.7
+          ],
+          [
+            0,
+            3.2,
+            -3.3
+          ]
+        ],
+        [
+          [
+            -4,
+            0,
+            3.3
+          ],
+          [
+            0,
+            3.2,
+            3.7
+          ]
+        ],
+        [
+          [
+            7,
+            0,
+            -3.7
+          ],
+          [
+            9,
+            3.2,
+            -3.3
+          ]
+        ],
+        [
+          [
+            7,
+            0,
+            3.3
+          ],
+          [
+            9,
+            3.2,
+            3.7
+          ]
+        ],
+        [
+          [
+            16,
+            0,
+            -3.7
+          ],
+          [
+            22,
+            3.2,
+            -3.3
+          ]
+        ],
+        [
+          [
+            20,
+            0,
+            3.3
+          ],
+          [
+            22,
+            3.2,
+            3.7
+          ]
+        ],
+        [
+          [
+            8.8,
+            0,
+            3.5
+          ],
+          [
+            9.2,
+            3.2,
+            9.5
+          ]
+        ],
+        [
+          [
+            8.8,
+            0,
+            -9.5
+          ],
+          [
+            9.2,
+            3.2,
+            -3.5
+          ]
+        ]
+      ],
+      "walkables": 7,
+      "originalInteractionsRetained": true,
+      "authorizedSurfaceRotations": 0
+    },
+    {
+      "zone": "FirstCampus1F",
+      "originalColliders": 13,
+      "addedColliders": [
+        [
+          [
+            -2,
+            0,
+            -8.2
+          ],
+          [
+            -1,
+            4,
+            -7.8
+          ]
+        ],
+        [
+          [
+            3,
+            0,
+            -8.2
+          ],
+          [
+            4,
+            4,
+            -7.8
+          ]
+        ]
+      ],
+      "walkables": 2,
+      "originalInteractionsRetained": true,
+      "authorizedSurfaceRotations": 0
+    },
+    {
+      "zone": "FirstCampus8FBridgeEntry",
+      "originalColliders": 8,
+      "addedColliders": [
+        [
+          [
+            -4.2,
+            0,
+            -3.5
+          ],
+          [
+            -3.8,
+            3.2,
+            -2
+          ]
+        ],
+        [
+          [
+            -4.2,
+            0,
+            2
+          ],
+          [
+            -3.8,
+            3.2,
+            3.5
+          ]
+        ]
+      ],
+      "walkables": 2,
+      "originalInteractionsRetained": true,
+      "authorizedSurfaceRotations": 0
+    },
+    {
+      "zone": "Skybridge",
+      "originalColliders": 32,
+      "addedColliders": [],
+      "walkables": 1,
+      "originalInteractionsRetained": true,
+      "authorizedSurfaceRotations": 0
+    },
+    {
+      "zone": "SecondCampus2F",
+      "originalColliders": 9,
+      "addedColliders": [],
+      "walkables": 1,
+      "originalInteractionsRetained": true,
+      "authorizedSurfaceRotations": 0
+    },
+    {
+      "zone": "SecondCampusStandardFloor",
+      "originalColliders": 18,
+      "addedColliders": [],
+      "walkables": 2,
+      "originalInteractionsRetained": true,
+      "authorizedSurfaceRotations": 0
+    },
+    {
+      "zone": "SecondCampus1F",
+      "originalColliders": 10,
+      "addedColliders": [],
+      "walkables": 5,
+      "originalInteractionsRetained": true,
+      "authorizedSurfaceRotations": 0
+    },
+    {
+      "zone": "HillsideRoute",
+      "originalColliders": 4,
+      "addedColliders": [],
+      "walkables": 8,
+      "originalInteractionsRetained": true,
+      "authorizedSurfaceRotations": 8
+    },
+    {
+      "zone": "EcologyPond",
+      "originalColliders": 8,
+      "addedColliders": [],
+      "walkables": 2,
+      "originalInteractionsRetained": true,
+      "authorizedSurfaceRotations": 0
+    }
+  ]
+}

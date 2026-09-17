@@ -1,0 +1,7 @@
+PASS FirstCampus8FBridgeEntry x=-4 return -3.5..-2
+PASS FirstCampus8FBridgeEntry x=-4 return 2..3.5
+PASS FirstCampus8FBridgeEntry original central passage preserved
+PASS FirstCampus1F z=-8 return -2..-1
+PASS FirstCampus1F z=-8 return 3..4
+PASS FirstCampus1F original central passage preserved
+AUTHORIZED ENTRY BOUNDARIES: 4/4 PASS

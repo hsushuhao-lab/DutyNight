@@ -1,0 +1,495 @@
+===============================================================
+ DUTYNIGHT WORLD TRAVERSAL & SPATIAL INTEGRITY QA (REAL QA v2) 
+===============================================================
+
+--- TEST CATEGORY 1: ROUTE WALK TEST (18 routes) ---
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+┌─────────┬─────────────────────────────────────────┬──────────────────────────────────────────────────────────────┬─────────────────────┬─────────┬────────┐
+│ (index) │ RouteId                                 │ Name                                                         │ Zone                │ Samples │ Status │
+├─────────┼─────────────────────────────────────────┼──────────────────────────────────────────────────────────────┼─────────────────────┼─────────┼────────┤
+│ 0       │ 'R01_3F_corridor_to_316'                │ '3F Corridor to 316 Office Entrance'                         │ 'first_campus_3f'   │ 82      │ 'PASS' │
+│ 1       │ 'R02_316_to_HIS'                        │ '316 Center to HIS Workstation'                              │ 'first_campus_3f'   │ 38      │ 'PASS' │
+│ 2       │ 'R03_316_HIS_to_Elevator'               │ '316/HIS Workstation to 3F Elevator Lobby'                   │ 'first_campus_3f'   │ 206     │ 'PASS' │
+│ 3       │ 'R04_4F_elevator_to_duty_room'          │ '4F Elevator Lobby to Independent Duty Room'                 │ 'first_campus_4f'   │ 168     │ 'PASS' │
+│ 4       │ 'R05_4F_elevator_to_nursing_station'    │ '4F Elevator Lobby to 4A Nursing Station Counter'            │ 'first_campus_4f'   │ 151     │ 'PASS' │
+│ 5       │ 'R06_4F_nursing_station_to_ward_gate'   │ '4A Nursing Station Corridor to 4A Ward Gate'                │ 'first_campus_4f'   │ 54      │ 'PASS' │
+│ 6       │ 'R07_2F_ER_entrance_to_triage'          │ '2F ER Arrival to Triage / Nursing Station'                  │ 'first_campus_2f'   │ 87      │ 'PASS' │
+│ 7       │ 'R08_ER_corridor_to_observation_bays'   │ '2F ER Corridor to Observation Bays 01-04'                   │ 'first_campus_2f'   │ 130     │ 'PASS' │
+│ 8       │ 'R09_ER_to_treatment_room'              │ '2F ER Corridor into Treatment Room (Pre-ECT)'               │ 'first_campus_2f'   │ 74      │ 'PASS' │
+│ 9       │ 'R10_ER_to_exterior'                    │ '2F ER Corridor to Ambulance Bay Exterior'                   │ 'first_campus_2f'   │ 59      │ 'PASS' │
+│ 10      │ 'R11_1F_entrance_reception_elevator'    │ '1F Main Plaza Entrance to Reception to Elevator Core'       │ 'first_campus_1f'   │ 177     │ 'PASS' │
+│ 11      │ 'R12_8F_to_skybridge_entrance'          │ '8F Lobby to Skybridge Fire Door Threshold'                  │ 'first_campus_8f'   │ 38      │ 'PASS' │
+│ 12      │ 'R13_skybridge_start_to_end'            │ '60m Skybridge Span Full Traversal (First to Second Campus)' │ 'skybridge'         │ 454     │ 'PASS' │
+│ 13      │ 'R14_second_campus_2F_arrival_to_stair' │ 'Second Campus 2F Arrival Lobby to Stairwell Doorway'        │ 'second_campus_2f'  │ 153     │ 'PASS' │
+│ 14      │ 'R15_std_floor_elevator_to_nursing'     │ 'Second Campus Standard Ward Floor Elevator to Station'      │ 'second_campus_std' │ 20      │ 'PASS' │
+│ 15      │ 'R16_second_campus_1F_to_hillside_exit' │ 'Second Campus 1F Corridor to Hillside Trail Exit Door'      │ 'second_campus_1f'  │ 62      │ 'PASS' │
+│ 16      │ 'R17_hillside_main_route_to_fork'       │ 'Hillside Trailhead to Nature Trail Pond Fork'               │ 'hillside_route'    │ 229     │ 'PASS' │
+│ 17      │ 'R18_fork_to_pond_and_return'           │ 'Ecology Pond Approach Trail to Boardwalk Deck and Return'   │ 'ecology_pond'      │ 204     │ 'PASS' │
+└─────────┴─────────────────────────────────────────┴──────────────────────────────────────────────────────────────┴─────────────────────┴─────────┴────────┘
+ROUTE TRAVERSAL: 18/18 (100%)
+
+--- TEST CATEGORY 2: DOORWAY APERTURE TEST ---
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+┌─────────┬──────────────────────────────┬────────────────────┬───────────────┬─────────────┬──────────────────┬────────┐
+│ (index) │ DoorId                       │ Zone               │ Opening       │ Lanes       │ Lintel           │ Status │
+├─────────┼──────────────────────────────┼────────────────────┼───────────────┼─────────────┼──────────────────┼────────┤
+│ 0       │ 'D01_3F_316_door'            │ 'first_campus_3f'  │ '1.2m x 2.4m' │ '3/3 CLEAR' │ 'PASS (>=1.95m)' │ 'PASS' │
+│ 1       │ 'D02_4F_duty_room'           │ 'first_campus_4f'  │ '1.2m x 2.4m' │ '3/3 CLEAR' │ 'PASS (>=1.95m)' │ 'PASS' │
+│ 2       │ 'D03_4F_ward_gate'           │ 'first_campus_4f'  │ '2m x 2.4m'   │ '3/3 CLEAR' │ 'PASS (>=1.95m)' │ 'PASS' │
+│ 3       │ 'D04_2F_ER_treatment'        │ 'first_campus_2f'  │ '1.4m x 2.4m' │ '3/3 CLEAR' │ 'PASS (>=1.95m)' │ 'PASS' │
+│ 4       │ 'D05_8F_bridge_fire_door'    │ 'first_campus_8f'  │ '2.4m x 2.4m' │ '3/3 CLEAR' │ 'PASS (>=1.95m)' │ 'PASS' │
+│ 5       │ 'D06_2F_second_campus_stair' │ 'second_campus_2f' │ '1.2m x 2.4m' │ '3/3 CLEAR' │ 'PASS (>=1.95m)' │ 'PASS' │
+│ 6       │ 'D07_1F_second_campus_exit'  │ 'second_campus_1f' │ '1.4m x 2.4m' │ '3/3 CLEAR' │ 'PASS (>=1.95m)' │ 'PASS' │
+│ 7       │ 'D08_1F_lobby_entrance'      │ 'first_campus_1f'  │ '4m x 3m'     │ '3/3 CLEAR' │ 'PASS (>=1.95m)' │ 'PASS' │
+└─────────┴──────────────────────────────┴────────────────────┴───────────────┴─────────────┴──────────────────┴────────┘
+DOORWAY: 8/8 (100%)
+
+--- TEST CATEGORY 3: WALL CONTAINMENT / PENETRATION TEST ---
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+┌─────────┬───────────────────────────────┬────────────────────┬─────────────┬───────────────┬─────────────────┬────────┐
+│ (index) │ WallId                        │ Zone               │ InsideClear │ DirectBlocked │ DiagonalBlocked │ Status │
+├─────────┼───────────────────────────────┼────────────────────┼─────────────┼───────────────┼─────────────────┼────────┤
+│ 0       │ 'W01_3F_opposite_wall'        │ 'first_campus_3f'  │ 'PASS'      │ 'PASS'        │ 'PASS'          │ 'PASS' │
+│ 1       │ 'W02_316_north_wall'          │ 'first_campus_3f'  │ 'PASS'      │ 'PASS'        │ 'PASS'          │ 'PASS' │
+│ 2       │ 'W03_316_east_wall'           │ 'first_campus_3f'  │ 'PASS'      │ 'PASS'        │ 'PASS'          │ 'PASS' │
+│ 3       │ 'W04_4F_north_wall'           │ 'first_campus_4f'  │ 'PASS'      │ 'PASS'        │ 'PASS'          │ 'PASS' │
+│ 4       │ 'W05_4F_duty_room_south'      │ 'first_campus_4f'  │ 'PASS'      │ 'PASS'        │ 'PASS'          │ 'PASS' │
+│ 5       │ 'W06_4F_nursing_counter'      │ 'first_campus_4f'  │ 'PASS'      │ 'PASS'        │ 'PASS'          │ 'PASS' │
+│ 6       │ 'W07_2F_ER_south_wall'        │ 'first_campus_2f'  │ 'PASS'      │ 'PASS'        │ 'PASS'          │ 'PASS' │
+│ 7       │ 'W08_2F_ER_north_wall'        │ 'first_campus_2f'  │ 'PASS'      │ 'PASS'        │ 'PASS'          │ 'PASS' │
+│ 8       │ 'W09_skybridge_north_window'  │ 'skybridge'        │ 'PASS'      │ 'PASS'        │ 'PASS'          │ 'PASS' │
+│ 9       │ 'W10_skybridge_south_window'  │ 'skybridge'        │ 'PASS'      │ 'PASS'        │ 'PASS'          │ 'PASS' │
+│ 10      │ 'W11_second_campus_north'     │ 'second_campus_2f' │ 'PASS'      │ 'PASS'        │ 'PASS'          │ 'PASS' │
+│ 11      │ 'W12_hillside_north_boundary' │ 'hillside_route'   │ 'PASS'      │ 'PASS'        │ 'PASS'          │ 'PASS' │
+│ 12      │ 'W13_pond_water_boundary'     │ 'ecology_pond'     │ 'PASS'      │ 'PASS'        │ 'PASS'          │ 'PASS' │
+└─────────┴───────────────────────────────┴────────────────────┴─────────────┴───────────────┴─────────────────┴────────┘
+WALL CONTAINMENT: 13/13 (100%)
+
+--- TEST CATEGORY 4: INTERACTION REACHABILITY TEST ---
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+┌─────────┬──────────────────────────┬────────────────────────────────────┬───────────────────┬───────────────┬────────────────┬────────┐
+│ (index) │ InteractId               │ Label                              │ Distance          │ StandingClear │ RayLOS         │ Status │
+├─────────┼──────────────────────────┼────────────────────────────────────┼───────────────────┼───────────────┼────────────────┼────────┤
+│ 0       │ 'I01_KEY_PICKUP'         │ 'Room 316 Duty Key'                │ '1.33m (<= 1.5m)' │ 'PASS'        │ 'PASS (Clear)' │ 'PASS' │
+│ 1       │ 'I02_DUTY_LOG'           │ 'Room 316 Duty Log Book'           │ '1.31m (<= 1.5m)' │ 'PASS'        │ 'PASS (Clear)' │ 'PASS' │
+│ 2       │ 'I03_HIS_WORKSTATION'    │ 'Room 316 Electronic Handover HIS' │ '1.21m (<= 1.5m)' │ 'PASS'        │ 'PASS (Clear)' │ 'PASS' │
+│ 3       │ 'I04_3F_ELEVATOR_BUTTON' │ '3F Elevator Call Panel'           │ '1.44m (<= 1.8m)' │ 'PASS'        │ 'PASS (Clear)' │ 'PASS' │
+│ 4       │ 'I05_WARD_GATE_READER'   │ '4A Ward Gate RFID Card Reader'    │ '1.26m (<= 1.5m)' │ 'PASS'        │ 'PASS (Clear)' │ 'PASS' │
+└─────────┴──────────────────────────┴────────────────────────────────────┴───────────────────┴───────────────┴────────────────┴────────┘
+INTERACTION REACHABILITY: 5/5 (100%)
+
+--- TEST CATEGORY 5: ZONE CLEANUP & LEAKAGE TEST (TEST_ZONE_CLEANUP_NO_LEAK) ---
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+Loops executed: 20 full cycles (220 zone loads)
+Initial 3F scene objects (Loop 1): 379
+Final 3F scene objects (Loop 20): 379
+Post-cleanup remaining scene children: 1 (only baseline lighting group)
+ZONE CLEANUP: 1/1 (100% PASS)
+
+--- TEST CATEGORY 6: STATE PERSISTENCE TEST ---
+[GameState] Task Completed: KEY_PICKUP | Duty: 1
+[GameState] Task Completed: DUTY_LOG | Duty: 2
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+STATE PERSISTENCE: 1/1 (100% PASS)
+
+===============================================================
+                 FINAL TEST METRICS SUMMARY                    
+===============================================================
+ROUTE TRAVERSAL:         18/18
+DOORWAY:                 8/8
+WALL CONTAINMENT:        13/13
+INTERACTION REACHABILITY: 5/5
+ZONE CLEANUP:            1/1
+STATE PERSISTENCE:       1/1
+===============================================================
+>>> TRAVERSAL & SPATIAL QA: ALL CATEGORIES PASS (100%) <<<

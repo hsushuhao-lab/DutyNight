@@ -1,0 +1,19 @@
+{
+  "tasks": [
+    {
+      "id": "task-key",
+      "className": "task-item completed"
+    },
+    {
+      "id": "task-log",
+      "className": "task-item completed"
+    },
+    {
+      "id": "task-handoff",
+      "className": "task-item completed"
+    }
+  ],
+  "doorClosedByKeyboard": true,
+  "doorStatePersists": true,
+  "errors": []
+}

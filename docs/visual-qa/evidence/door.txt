@@ -1,0 +1,1 @@
+DUTY ROOM DOOR: initial open, player clearance, closed collision, idempotent state, reopen restoration, cleanup PASS

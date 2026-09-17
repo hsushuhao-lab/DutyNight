@@ -1,0 +1,30 @@
+PASS south arrival return
+PASS north arrival return
+PASS south treatment-charting junction
+PASS north triage-observation junction
+PASS south ambulance approach
+PASS north ambulance approach
+FAIL observation west return: No visible west return at x=9, z=3.75
+FAIL charting west return: No visible west return at x=9, z=-9.25
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: observation west return: No visible west return at x=9, z=3.75
+charting west return: No visible west return at x=9, z=-9.25
+
+2 !== 0
+
+    at file:///C:/Users/Asher/Documents/game/DutyNight/prototype/test_er_boundary_qa.js:45:8
+    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)
+    at async node:internal/modules/esm/loader:643:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 2,
+  expected: 0,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.18.0

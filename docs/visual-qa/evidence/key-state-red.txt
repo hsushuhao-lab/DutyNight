@@ -1,0 +1,8 @@
+file:///C:/Users/Asher/Documents/game/DutyNight/prototype/scripts/test-browser-flow.mjs:35
+if(await page.evaluate(()=>window.worldRouter.activeZoneInstance.keyMesh.visible))throw new Error('Collected key visually reappears after returning to 3F');
+                                                                                        ^
+
+Error: Collected key visually reappears after returning to 3F
+    at file:///C:/Users/Asher/Documents/game/DutyNight/prototype/scripts/test-browser-flow.mjs:35:89
+
+Node.js v24.18.0

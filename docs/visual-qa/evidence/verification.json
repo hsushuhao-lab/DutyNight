@@ -1,0 +1,11 @@
+{
+  "sourceCommit": "dcd4d1ca6c85ac81d3b6700a8ddd5b0bb069aff6",
+  "bundle": "prototype/dist/assets/index-Cttcdlfd.js",
+  "bundleSha256": "fd5c33fbd40cf5b6637e88d6b95c42351f9851d2428bc45ba0654bfcbd3829ea",
+  "checkedAt": "2026-09-17T17:40:00.544Z",
+  "modelLock": "PASS",
+  "visualLock": "FAIL",
+  "captureCount": 100,
+  "browserConsoleErrors": 0,
+  "sourceAssetIntegrity": "prototype/public/assets/asset-integrity.json"
+}

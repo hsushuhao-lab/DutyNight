@@ -1,0 +1,29 @@
+main segment 1: axis_error=31.8908deg, centerline_misses=2/31
+main segment 2: axis_error=22.6199deg, centerline_misses=4/42
+main segment 3: axis_error=25.9892deg, centerline_misses=22/55
+main segment 4: axis_error=28.0725deg, centerline_misses=20/51
+main segment 5: axis_error=43.6028deg, centerline_misses=24/45
+main segment 6: axis_error=33.3985deg, centerline_misses=16/43
+branch segment 1: axis_error=77.3196deg, centerline_misses=18/27
+branch segment 2: axis_error=77.3196deg, centerline_misses=18/27
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Node-connected path surfaces must cover their full intended centerline: main/1, main/2, main/3, main/4, main/5, main/6, branch/1, branch/2
+
+8 !== 0
+
+    at file:///C:/Users/Asher/Documents/game/DutyNight/prototype/test_hillside_surface_qa.js:44:8
+    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)
+    at async node:internal/modules/esm/loader:643:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 8,
+  expected: 0,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.18.0

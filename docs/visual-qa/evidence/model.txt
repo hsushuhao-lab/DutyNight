@@ -1,0 +1,70 @@
+=== RUNNING MODELING SPAWN CLEARANCE QA (SPAWN_CLEAR_TEST) ===
+
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+┌─────────┬───────────┬───────────────────────────────────────┬─────────────────────┬─────────────────────┬───────────┬───────────┬────────────────┬─────────┐
+│ (index) │ Milestone │ Name                                  │ Zone                │ SpawnCoords         │ Colliders │ Walkables │ SpawnClearance │ Overall │
+├─────────┼───────────┼───────────────────────────────────────┼─────────────────────┼─────────────────────┼───────────┼───────────┼────────────────┼─────────┤
+│ 0       │ 'M0'      │ '3F 行政區走廊'                       │ 'first_campus_3f'   │ '[0, 1.7, 0]'       │ 21        │ 3         │ 'PASS (Clear)' │ 'PASS'  │
+│ 1       │ 'M0'      │ '316 總醫師室門口'                    │ 'first_campus_3f'   │ '[2.1, 1.7, 0.4]'   │ 21        │ 3         │ 'PASS (Clear)' │ 'PASS'  │
+│ 2       │ 'M0'      │ '316 總醫師室內（值班桌）'            │ 'first_campus_3f'   │ '[5.6, 1.7, 5]'     │ 21        │ 3         │ 'PASS (Clear)' │ 'PASS'  │
+│ 3       │ 'M1'      │ '4F 電梯大廳抵達'                     │ 'first_campus_4f'   │ '[-8, 1.7, 0]'      │ 30        │ 5         │ 'PASS (Clear)' │ 'PASS'  │
+│ 4       │ 'M2'      │ '4F 獨立值班室套房'                   │ 'first_campus_4f'   │ '[5.4, 1.7, -3.4]'  │ 30        │ 5         │ 'PASS (Clear)' │ 'PASS'  │
+│ 5       │ 'M3'      │ '4A 護理站工作區'                     │ 'first_campus_4f'   │ '[8, 1.7, 5.8]'     │ 30        │ 5         │ 'PASS (Clear)' │ 'PASS'  │
+│ 6       │ 'M3'      │ '4A 閉鎖病房門禁門前'                 │ 'first_campus_4f'   │ '[12.5, 1.7, 0]'    │ 30        │ 5         │ 'PASS (Clear)' │ 'PASS'  │
+│ 7       │ 'M4'      │ '2F 急診到勤走廊'                     │ 'first_campus_2f'   │ '[-4, 1.7, 0]'      │ 45        │ 7         │ 'PASS (Clear)' │ 'PASS'  │
+│ 8       │ 'M4'      │ '2F 急診檢傷護理台'                   │ 'first_campus_2f'   │ '[3.5, 1.7, 5]'     │ 45        │ 7         │ 'PASS (Clear)' │ 'PASS'  │
+│ 9       │ 'M4'      │ '2F 急診留觀床位區'                   │ 'first_campus_2f'   │ '[14, 1.7, 5.5]'    │ 45        │ 7         │ 'PASS (Clear)' │ 'PASS'  │
+│ 10      │ 'M4'      │ '2F 急診處置室（ECT前處置）'          │ 'first_campus_2f'   │ '[2, 1.7, -6.5]'    │ 45        │ 7         │ 'PASS (Clear)' │ 'PASS'  │
+│ 11      │ 'M4'      │ '2F 救護車道山側出入口'               │ 'first_campus_2f'   │ '[20.5, 1.7, 0]'    │ 45        │ 7         │ 'PASS (Clear)' │ 'PASS'  │
+│ 12      │ 'M5'      │ '1F 醫院正門大廳'                     │ 'first_campus_1f'   │ '[0, 1.7, -6]'      │ 15        │ 2         │ 'PASS (Clear)' │ 'PASS'  │
+│ 13      │ 'M5'      │ '1F 服務台與掛號批價'                 │ 'first_campus_1f'   │ '[2, 1.7, -2.8]'    │ 15        │ 2         │ 'PASS (Clear)' │ 'PASS'  │
+│ 14      │ 'M6'      │ '8F 空中連通道入口前廳'               │ 'first_campus_8f'   │ '[-4, 1.7, 0]'      │ 10        │ 2         │ 'PASS (Clear)' │ 'PASS'  │
+│ 15      │ 'M7'      │ '連通道 起點（近第一院區）'           │ 'skybridge'         │ '[3, 1.7, 0]'       │ 32        │ 1         │ 'PASS (Clear)' │ 'PASS'  │
+│ 16      │ 'M7'      │ '連通道 中央長廊（兩側大窗）'         │ 'skybridge'         │ '[30, 1.7, 0]'      │ 32        │ 1         │ 'PASS (Clear)' │ 'PASS'  │
+│ 17      │ 'M7'      │ '連通道 終點（近第二院區）'           │ 'skybridge'         │ '[57, 1.7, 0]'      │ 32        │ 1         │ 'PASS (Clear)' │ 'PASS'  │
+│ 18      │ 'M9'      │ '第二院區 2F 連通道抵達大廳'          │ 'second_campus_2f'  │ '[63, 1.7, 0]'      │ 9         │ 1         │ 'PASS (Clear)' │ 'PASS'  │
+│ 19      │ 'M8'      │ '第二院區 標準病房層（電梯對護理站）' │ 'second_campus_std' │ '[76, 1.7, 0]'      │ 18        │ 2         │ 'PASS (Clear)' │ 'PASS'  │
+│ 20      │ 'M10'     │ '第二院區 1F 山側後門出入口'          │ 'second_campus_1f'  │ '[72, 1.7, -4]'     │ 10        │ 5         │ 'PASS (Clear)' │ 'PASS'  │
+│ 21      │ 'M11'     │ '山側步道 主徑起點'                   │ 'hillside_route'    │ '[68, 1.7, -18]'    │ 4         │ 8         │ 'PASS (Clear)' │ 'PASS'  │
+│ 22      │ 'M11'     │ '山側步道 生態池叉路口'               │ 'hillside_route'    │ '[42, 1.7, -25]'    │ 4         │ 8         │ 'PASS (Clear)' │ 'PASS'  │
+│ 23      │ 'M12'     │ '生態池 步道入口'                     │ 'ecology_pond'      │ '[53, 1.15, -38]'   │ 8         │ 2         │ 'PASS (Clear)' │ 'PASS'  │
+│ 24      │ 'M12'     │ '生態池 觀景木棧台'                   │ 'ecology_pond'      │ '[61, 1.23, -42.5]' │ 8         │ 2         │ 'PASS (Clear)' │ 'PASS'  │
+└─────────┴───────────┴───────────────────────────────────────┴─────────────────────┴─────────────────────┴───────────┴───────────┴────────────────┴─────────┘
+
+SPAWN CLEAR: 25/25 tests passed (100%).
+>>> SPAWN CLEAR TEST: ALL 25 SPAWN POINTS PASS (Clear) <<<

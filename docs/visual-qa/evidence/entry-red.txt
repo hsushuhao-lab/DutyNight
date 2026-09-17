@@ -1,0 +1,30 @@
+FAIL FirstCampus8FBridgeEntry x=-4 return -3.5..-2: Player radius .35 can cross missing return
+FAIL FirstCampus8FBridgeEntry x=-4 return 2..3.5: Player radius .35 can cross missing return
+PASS FirstCampus8FBridgeEntry original central passage preserved
+FAIL FirstCampus1F z=-8 return -2..-1: Player radius .35 can cross missing return
+FAIL FirstCampus1F z=-8 return 3..4: Player radius .35 can cross missing return
+PASS FirstCampus1F original central passage preserved
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: FirstCampus8FBridgeEntry x=-4 return -3.5..-2: Player radius .35 can cross missing return
+FirstCampus8FBridgeEntry x=-4 return 2..3.5: Player radius .35 can cross missing return
+FirstCampus1F z=-8 return -2..-1: Player radius .35 can cross missing return
+FirstCampus1F z=-8 return 3..4: Player radius .35 can cross missing return
+
+4 !== 0
+
+    at file:///C:/Users/Asher/Documents/game/DutyNight/prototype/test_entry_boundary_qa.js:38:8
+    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)
+    at async node:internal/modules/esm/loader:643:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 4,
+  expected: 0,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.18.0

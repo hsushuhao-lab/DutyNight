@@ -1,0 +1,4 @@
+PASS shadow targets released across three 3F/4F cycles
+PASS instance buffers and unique resources released; shared cache retained
+PASS actual pond reflection render target cleanup
+ART_RESOURCE_QA = PASS (CPU disposal contracts; browser GPU behavior remains separate)

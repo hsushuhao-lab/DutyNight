@@ -1,0 +1,9 @@
+main segment 1: axis_error=0.0000deg, centerline_misses=0/31
+main segment 2: axis_error=0.0000deg, centerline_misses=0/42
+main segment 3: axis_error=0.0000deg, centerline_misses=0/55
+main segment 4: axis_error=0.0000deg, centerline_misses=0/51
+main segment 5: axis_error=0.0000deg, centerline_misses=0/45
+main segment 6: axis_error=0.0000deg, centerline_misses=0/43
+branch segment 1: axis_error=0.0000deg, centerline_misses=0/27
+branch segment 2: axis_error=0.0000deg, centerline_misses=0/27
+HILLSIDE_SURFACE_QA = PASS: eight aligned segments; 321 raycast samples; original widths, nodes, elevations and boundary boxes retained

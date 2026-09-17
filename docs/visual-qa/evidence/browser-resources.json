@@ -1,0 +1,24 @@
+{
+  "cycles": 4,
+  "zonesPerCycle": 11,
+  "samples": [
+    {
+      "geometries": 392,
+      "textures": 49
+    },
+    {
+      "geometries": 392,
+      "textures": 49
+    },
+    {
+      "geometries": 392,
+      "textures": 49
+    },
+    {
+      "geometries": 392,
+      "textures": 49
+    }
+  ],
+  "errors": [],
+  "verdict": "PASS"
+}

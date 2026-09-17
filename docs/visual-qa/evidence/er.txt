@@ -1,0 +1,9 @@
+PASS south arrival return
+PASS north arrival return
+PASS south treatment-charting junction
+PASS north triage-observation junction
+PASS south ambulance approach
+PASS north ambulance approach
+PASS observation west return
+PASS charting west return
+ER AUTHORIZED BOUNDARIES: 8/8 PASS
