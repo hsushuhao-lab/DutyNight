@@ -287,31 +287,75 @@ kbd {
   display: flex;
 }
 
-/* Workstation Modal */
+/* Workstation Modal (A08 Canonical Reference) */
 .workstation-window {
-  width: 960px;
-  max-width: 95vw;
-  height: 640px;
-  max-height: 90vh;
-  background: #f0f2f0;
-  color: #222;
-  border-radius: 6px;
+  width: 1040px;
+  max-width: 96vw;
+  height: 680px;
+  max-height: 92vh;
+  background: #f4f6f5;
+  color: #1a221f;
+  border-radius: 8px;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.8);
-  border: 1px solid #778;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85);
+  border: 2px solid #234538;
   overflow: hidden;
 }
 
 .his-titlebar {
-  background: #1b4d36;
+  background: linear-gradient(90deg, #163e2c, #1f4f39);
   color: #fff;
-  padding: 8px 14px;
+  padding: 8px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  border-bottom: 2px solid #133324;
+}
+
+.his-title-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.his-emblem {
+  font-size: 20px;
+}
+
+.his-title-text-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.his-title-main {
   font-size: 14px;
-  font-weight: bold;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.his-title-sub {
+  font-size: 11px;
+  color: #a3d9bc;
+  font-weight: 500;
+}
+
+.his-title-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.win-btn-min, .win-btn-max {
+  color: #a3d9bc;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 2px;
+}
+
+.win-btn-min:hover, .win-btn-max:hover {
+  background: rgba(255, 255, 255, 0.15);
 }
 
 .btn-win-close {
@@ -320,7 +364,7 @@ kbd {
   color: #fff;
   font-size: 16px;
   cursor: pointer;
-  padding: 2px 6px;
+  padding: 2px 8px;
   border-radius: 3px;
 }
 
@@ -329,76 +373,247 @@ kbd {
 }
 
 .his-header-info {
-  background: #e1e8e3;
-  padding: 8px 16px;
+  background: #dbe4de;
+  padding: 8px 18px;
   display: flex;
-  gap: 24px;
-  font-size: 13px;
-  border-bottom: 1px solid #ccd4cd;
-  color: #333;
+  flex-wrap: wrap;
+  gap: 20px;
+  font-size: 12.5px;
+  border-bottom: 1px solid #bcc9bf;
+  color: #24352b;
 }
 
-.his-body {
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.info-label {
+  color: #556b5f;
+}
+
+.badge-secure {
+  background: #23593f;
+  color: #eaf8f0;
+  padding: 1px 7px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.his-clock {
+  font-family: monospace;
+  color: #1a5632;
+  font-weight: bold;
+}
+
+/* Two-column layout */
+.his-workspace-layout {
   flex: 1;
   display: flex;
+  overflow: hidden;
+  background: #edf1ee;
+}
+
+/* Sidebar */
+.his-sidebar {
+  width: 220px;
+  background: #1c2b25;
+  color: #e2ece6;
+  padding: 12px 10px;
+  display: flex;
   flex-direction: column;
-  padding: 12px 16px;
+  border-right: 1px solid #14201b;
+  flex-shrink: 0;
   overflow-y: auto;
 }
 
-.his-tabs {
+.his-sidebar-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #799a8c;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding: 4px 8px 8px 8px;
+  border-bottom: 1px solid #283e35;
+  margin-bottom: 6px;
+}
+
+.his-nav-list {
   display: flex;
-  gap: 4px;
-  border-bottom: 2px solid #1b4d36;
-  margin-bottom: 12px;
+  flex-direction: column;
+  gap: 3px;
 }
 
-.his-tab {
-  padding: 6px 16px;
-  background: #d8deda;
-  border-radius: 4px 4px 0 0;
-  font-size: 13px;
-  font-weight: 600;
-  color: #444;
+.his-nav-item {
+  padding: 8px 10px;
+  border-radius: 4px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #b5cdc2;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s;
 }
 
-.his-tab.active {
-  background: #1b4d36;
+.his-nav-item:hover {
+  background: #263d33;
   color: #fff;
 }
 
-.ward-summary-banner {
+.his-nav-item.active {
+  background: #2b5643;
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.nav-icon {
+  font-size: 14px;
+}
+
+/* Post-it Sticky Note in Sidebar (A08 Reference) */
+.his-sticky-note {
+  margin-top: auto;
+  background: #fff885;
+  color: #4a3808;
+  padding: 10px 12px;
+  border-radius: 3px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+  transform: rotate(-1.5deg);
+  font-size: 11.5px;
+  line-height: 1.45;
+  position: relative;
+  border-top: 1px solid #fef065;
+}
+
+.sticky-pin {
+  position: absolute;
+  top: -8px;
+  right: 10px;
+  font-size: 14px;
+}
+
+.sticky-title {
+  font-weight: 800;
+  color: #8c5600;
+  margin-bottom: 4px;
+  border-bottom: 1px dashed rgba(140, 86, 0, 0.4);
+  padding-bottom: 2px;
+}
+
+.sticky-body strong {
+  color: #9c2714;
+}
+
+/* Main Content Panel */
+.his-main-content {
+  flex: 1;
+  padding: 14px 18px;
+  overflow-y: auto;
   display: flex;
-  justify-content: space-between;
-  background: #eef5f0;
-  padding: 6px 12px;
-  border-radius: 4px;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* 4-Card Operational Summary Grid (A08 Reference) */
+.his-grid-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.his-card {
+  background: #ffffff;
+  border-radius: 6px;
+  border: 1px solid #cad7cf;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-head {
+  background: #e2ede6;
+  color: #1b4533;
+  font-size: 12.5px;
+  font-weight: 700;
+  padding: 6px 10px;
+  border-bottom: 1px solid #cad7cf;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.card-icon {
   font-size: 13px;
-  font-weight: bold;
-  color: #1b4d36;
-  margin-bottom: 8px;
+}
+
+.card-body {
+  padding: 8px 10px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #2b3931;
+}
+
+.stat-highlight {
+  font-weight: 700;
+  color: #1c5237;
+  margin-bottom: 4px;
+  font-size: 12.5px;
+}
+
+.card-desc {
+  margin: 2px 0;
+  color: #4a5950;
+}
+
+.card-alert {
+  color: #a82020;
+  margin: 2px 0;
+}
+
+.card-notice {
+  color: #7d5918;
+  margin: 2px 0;
+}
+
+.table-section-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1a4130;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .his-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13px;
-  margin-bottom: 12px;
+  font-size: 12px;
+  background: #fff;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid #cad7cf;
 }
 
 .his-table th {
-  background: #cfdbd3;
-  padding: 8px;
+  background: #d8e6de;
+  padding: 7px 9px;
   text-align: left;
-  border: 1px solid #b8c4bc;
-  color: #222;
+  border: 1px solid #cad7cf;
+  color: #173b2a;
+  font-weight: 600;
 }
 
 .his-table td {
-  padding: 8px;
-  border: 1px solid #dde4df;
-  color: #333;
+  padding: 7px 9px;
+  border: 1px solid #e1ebe5;
+  color: #26332c;
 }
 
 .badge-stable {
@@ -407,6 +622,7 @@ kbd {
   padding: 2px 6px;
   border-radius: 3px;
   font-size: 11px;
+  font-weight: 600;
 }
 
 .badge-alert {
@@ -415,6 +631,7 @@ kbd {
   padding: 2px 6px;
   border-radius: 3px;
   font-size: 11px;
+  font-weight: 600;
 }
 
 .badge-observe {
@@ -423,46 +640,55 @@ kbd {
   padding: 2px 6px;
   border-radius: 3px;
   font-size: 11px;
-}
-
-.his-notice-box {
-  background: #fff9e6;
-  border-left: 4px solid #f0ad4e;
-  padding: 10px 14px;
-  font-size: 12px;
-  line-height: 1.6;
-  color: #66512c;
-  margin-top: auto;
+  font-weight: 600;
 }
 
 .his-footer {
-  background: #e8eee9;
-  padding: 10px 16px;
+  background: #e2eae4;
+  padding: 10px 18px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-top: 1px solid #ccd4cd;
+  border-top: 1px solid #c0cec4;
 }
 
 .his-system-msg {
   font-size: 12px;
-  color: #666;
+  color: #4a5c51;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.status-dot {
+  font-size: 10px;
+}
+
+.his-footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .btn-action {
   background: #237b4b;
   color: #fff;
   border: none;
-  padding: 8px 18px;
+  padding: 9px 20px;
   border-radius: 4px;
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: bold;
   cursor: pointer;
-  transition: background 0.2s;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transition: background 0.15s, transform 0.05s;
 }
 
 .btn-action:hover {
-  background: #195d38;
+  background: #186038;
+}
+
+.btn-action:active {
+  transform: translateY(1px);
 }
 
 /* Duty Log Modal */

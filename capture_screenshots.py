@@ -45,9 +45,10 @@ for filename, preset in presets:
     cmd = [
         chrome_path,
         '--headless=new',
-        '--disable-gpu',
         '--no-sandbox',
         '--hide-scrollbars',
+        '--virtual-time-budget=1500',
+        '--run-all-compositor-stages-before-draw',
         '--window-size=1280,720',
         f'--screenshot={out_path}',
         url

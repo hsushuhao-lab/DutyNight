@@ -177,25 +177,27 @@ const camPreset = urlParams.get('cam');
 if (camPreset === 'corridor') {
   controller.teleport(0.0, controller.eyeHeight, 0.0, -Math.PI / 2);
 } else if (camPreset === 'office') {
-  controller.teleport(6.0, controller.eyeHeight, 4.5, Math.PI);
+  controller.teleport(5.8, controller.eyeHeight, 4.4, Math.PI);
+  controller.pitch = -0.14; // Angle down to frame desk props, keys, stamps and wall whiteboard/clock
+  controller.updateCameraRotation();
 } else if (camPreset === 'workstation') {
-  controller.teleport(8.5, controller.eyeHeight, 5.5, -Math.PI / 2);
-  setTimeout(() => { uiManager.openWorkstation(); }, 400);
+  controller.teleport(8.6, controller.eyeHeight, 5.5, -Math.PI / 2);
+  setTimeout(() => { uiManager.openWorkstation(); }, 300);
 } else if (camPreset === 'elevator') {
   controller.teleport(-6.0, controller.eyeHeight, 0.0, Math.PI / 2);
 } else if (camPreset === '4f_gate') {
-  controller.teleport(3.0, 10.0 + controller.eyeHeight, -1.2, Math.PI);
-  controller.pitch = 0.16;
+  controller.teleport(3.0, 10.0 + controller.eyeHeight, -0.6, Math.PI);
+  controller.pitch = -0.02; // Level gaze straight at vision glass & warning plaques
   controller.updateCameraRotation();
   const locEl = document.querySelector('.hud-location');
   if (locEl) locEl.textContent = '4F 精神科閉鎖病房區 ｜ 門禁前室';
 } else if (camPreset === '4f_dutyroom' || camPreset === '4f') {
   level.unlockDutyRoom();
-  controller.teleport(7.0, 10.0 + controller.eyeHeight, -4.6, 0.75);
-  controller.pitch = -0.15;
+  controller.teleport(5.3, 10.0 + controller.eyeHeight, -4.6, 0.0);
+  controller.pitch = -0.10; // Perfectly centered view capturing bed, slippers, lamp, dusk window, desk, and white coat
   controller.updateCameraRotation();
   const locEl = document.querySelector('.hud-location');
-  if (locEl) locEl.textContent = '4F 精神科閉鎖病房區 ｜ 獨立值班室 (私人套房空間)';
+  if (locEl) locEl.textContent = '4F 精神科閉鎖病房區 ｜ 422 獨立值班室 (私人套房空間)';
 }
 
 animate();
