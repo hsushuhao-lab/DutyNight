@@ -42,6 +42,35 @@ function removeLegacyOppositeGlass(level) {
   return toRemove.length;
 }
 
+function removeLegacyOppositeWallMeshes(level) {
+  const toRemove = [];
+
+  level.scene.children.forEach((obj) => {
+    if (!obj?.isMesh || obj.geometry?.type !== 'BoxGeometry') return;
+    const params = obj.geometry.parameters || {};
+    if (!near(obj.position.z, -2.5)) return;
+
+    const width = params.width || 0;
+    const height = params.height || 0;
+    const depth = params.depth || 0;
+
+    const legacyLowerOrUpper =
+      Math.abs(width - 20.0) < 0.2 &&
+      Math.abs(depth - 0.4) < 0.12 &&
+      (Math.abs(height - 1.0) < 0.12 || Math.abs(height - 0.4) < 0.12);
+
+    const legacyMullion =
+      Math.abs(width - 0.3) < 0.08 &&
+      Math.abs(height - 2.0) < 0.15 &&
+      Math.abs(depth - 0.4) < 0.12;
+
+    if (legacyLowerOrUpper || legacyMullion) toRemove.push(obj);
+  });
+
+  toRemove.forEach((obj) => level.scene.remove(obj));
+  return toRemove.length;
+}
+
 function removeLegacyCorridorDutyNotice(level) {
   const toRemove = [];
 
@@ -65,26 +94,45 @@ function removeLegacyCorridorDutyNotice(level) {
 
 function buildModeledOppositeWall(level) {
   const group = new THREE.Group();
-  group.name = 'MODELING_3F_OPPOSITE_WALL_V2';
+  group.name = 'MODELING_3F_OPPOSITE_WALL_V3_SEALED';
 
-  // Modeling-phase backing wall: deliberately neutral and opaque so there are
-  // no open backfaces, black voids, or transparency artifacts. Final glass,
-  // exterior view, materials, and lighting will come only after topology is frozen.
+  // MODELING-FIRST shell: one continuous full-height volume from floor to ceiling.
+  // No transparent exterior, no open backface, and no corner gap is permitted.
   const wallMat = new THREE.MeshStandardMaterial({
     color: 0xd8d6cf,
     roughness: 0.92,
     metalness: 0.0
   });
+
   const wallBacking = new THREE.Mesh(
-    new THREE.BoxGeometry(20.0, 1.88, 0.08),
+    new THREE.BoxGeometry(20.4, 3.2, 0.24),
     wallMat
   );
-  wallBacking.position.set(6.0, 1.82, -2.27);
+  wallBacking.position.set(6.0, 1.6, -2.42);
   wallBacking.receiveShadow = true;
+  wallBacking.castShadow = true;
   group.add(wallBacking);
 
-  // Six clearly modeled window modules. For now the panes are opaque neutral
-  // blue-grey placeholders: this is intentional during modeling-first phase.
+  // Seal the floor and ceiling junctions so the shell reads as one continuous wall.
+  const floorSeal = new THREE.Mesh(new THREE.BoxGeometry(20.4, 0.12, 0.34), wallMat);
+  floorSeal.position.set(6.0, 0.06, -2.35);
+  group.add(floorSeal);
+
+  const ceilingSeal = new THREE.Mesh(new THREE.BoxGeometry(20.4, 0.12, 0.34), wallMat);
+  ceilingSeal.position.set(6.0, 3.14, -2.35);
+  group.add(ceilingSeal);
+
+  // Return walls close the west/east corner joins to the adjacent architecture.
+  const westReturn = new THREE.Mesh(new THREE.BoxGeometry(0.30, 3.2, 0.86), wallMat);
+  westReturn.position.set(-4.08, 1.6, -2.08);
+  group.add(westReturn);
+
+  const eastReturn = new THREE.Mesh(new THREE.BoxGeometry(0.30, 3.2, 0.86), wallMat);
+  eastReturn.position.set(16.08, 1.6, -2.08);
+  group.add(eastReturn);
+
+  // Six window placeholders sit ON the sealed wall during topology lock.
+  // They are intentionally opaque until the later art pass creates real glass/exterior views.
   const frameMat = new THREE.MeshStandardMaterial({
     color: 0x6f7777,
     roughness: 0.72,
@@ -102,25 +150,16 @@ function buildModeledOppositeWall(level) {
       new THREE.BoxGeometry(2.72, 1.58, 0.055),
       frameMat
     );
-    frame.position.set(x, 1.83, -2.205);
+    frame.position.set(x, 1.83, -2.275);
     group.add(frame);
 
     const pane = new THREE.Mesh(
-      new THREE.BoxGeometry(2.50, 1.36, 0.04),
+      new THREE.BoxGeometry(2.50, 1.36, 0.035),
       paneMat
     );
-    pane.position.set(x, 1.83, -2.17);
+    pane.position.set(x, 1.83, -2.235);
     group.add(pane);
   });
-
-  // End caps remove the black/open-looking vertical seams at both ends.
-  const westCap = new THREE.Mesh(new THREE.BoxGeometry(0.34, 2.05, 0.10), wallMat);
-  westCap.position.set(-3.82, 1.74, -2.24);
-  group.add(westCap);
-
-  const eastCap = new THREE.Mesh(new THREE.BoxGeometry(0.34, 2.05, 0.10), wallMat);
-  eastCap.position.set(15.82, 1.74, -2.24);
-  group.add(eastCap);
 
   level.scene.add(group);
   return group;
@@ -171,7 +210,6 @@ function buildDutyNoticeInside316(level) {
     new THREE.PlaneGeometry(2.64, 1.40),
     new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide })
   );
-  // Back wall interior surface is at z ~= 8.30; place the board just inside it.
   face.position.set(3.35, 1.78, 8.235);
   face.rotation.y = Math.PI;
   group.add(face);
@@ -181,62 +219,70 @@ function buildDutyNoticeInside316(level) {
 }
 
 /**
- * Runtime structural correction for Act 1.
+ * Runtime structural correction for Act 1 during MODELING_FIRST.
  *
- * During MODELING_FIRST, this function owns two known topology regressions:
- * 1) the 316 doorway must remain traversable;
- * 2) the wall opposite 316 must be visually closed and physically solid.
- *
- * It also relocates the duty-rules board from the public corridor end into
- * room 316, where it belongs spatially and narratively.
+ * Guarantees:
+ * 1) the 316 doorway remains traversable;
+ * 2) the wall opposite 316 is visually closed and physically solid;
+ * 3) the opposite wall joins floor/ceiling/end returns without exterior gaps;
+ * 4) the duty-rules board lives inside room 316.
  */
 export function applyAct1CollisionHotfix(level) {
   const before = level.colliders.length;
 
-  // buildWall() historically generated floor-origin colliders even for the
-  // overhead 316 lintel. Remove only that legacy invisible blocker.
   level.colliders = level.colliders.filter((box) => !isLegacy316LintelCollider(box));
 
-  // Rebuild the opposite wall as a single continuous physical boundary.
+  // One continuous collision shell for the rebuilt opposite wall.
   const southWindowBarrier = new THREE.Box3(
-    new THREE.Vector3(-4.0, 0.0, -2.68),
-    new THREE.Vector3(16.0, 3.2, -2.12)
+    new THREE.Vector3(-4.23, 0.0, -2.72),
+    new THREE.Vector3(16.23, 3.2, -2.00)
   );
   level.colliders.push(southWindowBarrier);
 
-  // Replace unstable transparent/backface geometry with explicit modeling.
   const removedLegacyGlass = removeLegacyOppositeGlass(level);
+  const removedLegacyWallMeshes = removeLegacyOppositeWallMeshes(level);
   const removedLegacyDutyNotice = removeLegacyCorridorDutyNotice(level);
   buildModeledOppositeWall(level);
   buildDutyNoticeInside316(level);
 
-  // Development-time topology assertions. These do not block gameplay.
   const doorwayBlocked = level.colliders.some((box) =>
     intersectsAtPlayerHeight(box, 2.4, 2.48, 0.30)
   );
   const oppositeWallSolid = level.colliders.some((box) =>
     intersectsAtPlayerHeight(box, 2.4, -2.42, 0.30)
   );
+  const westCornerSolid = level.colliders.some((box) =>
+    intersectsAtPlayerHeight(box, -3.92, -2.22, 0.18)
+  );
+  const eastCornerSolid = level.colliders.some((box) =>
+    intersectsAtPlayerHeight(box, 15.92, -2.22, 0.18)
+  );
 
   if (doorwayBlocked) {
     console.error('[ModelingHotfix] 316 doorway is still blocked. Review corridor colliders.');
   }
-  if (!oppositeWallSolid) {
-    console.error('[ModelingHotfix] Opposite wall is not solid.');
+  if (!oppositeWallSolid || !westCornerSolid || !eastCornerSolid) {
+    console.error('[ModelingHotfix] Opposite wall shell is not completely sealed.');
   }
 
   console.info('[ModelingHotfix] Applied', {
     removedLegacyColliders: before - (level.colliders.length - 1),
     removedLegacyGlass,
+    removedLegacyWallMeshes,
     removedLegacyDutyNotice,
     doorwayPassable: !doorwayBlocked,
     oppositeWallSolid,
+    westCornerSolid,
+    eastCornerSolid,
+    dutyNoticeInside316: true,
     modelingFirst: true
   });
 
   return {
     doorwayPassable: !doorwayBlocked,
     oppositeWallSolid,
+    westCornerSolid,
+    eastCornerSolid,
     dutyNoticeInside316: true,
     modelingFirst: true
   };
