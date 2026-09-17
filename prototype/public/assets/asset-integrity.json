@@ -1,0 +1,288 @@
+{
+  "format": 1,
+  "records": [
+    {
+      "file": "models/officeChair.glb",
+      "bytes": 200856,
+      "sha256": "f722705350fa526f4f2bb93152289ff785b2d31d8cb5eb19fc40b375cf3205f4",
+      "meshes": 19,
+      "dimensions": [
+        0.6049999976158142,
+        1.0041428075970016,
+        0.5682993192088112
+      ]
+    },
+    {
+      "file": "models/workDesk.glb",
+      "bytes": 455972,
+      "sha256": "c36309f3f1feb955a0d9b07854fce506398551ffa414b94060a1070383feff81",
+      "meshes": 18,
+      "dimensions": [
+        1.4049999713897705,
+        0.7505000005587935,
+        0.7250000238418579
+      ]
+    },
+    {
+      "file": "models/storageCabinet.glb",
+      "bytes": 244520,
+      "sha256": "d6c9db58c967340ec51db98b749d3eb2f849598de04829bba756f677aaf24d99",
+      "meshes": 10,
+      "dimensions": [
+        0.8999999761581421,
+        1.7999999970197678,
+        0.5089999944195152
+      ]
+    },
+    {
+      "file": "models/hospitalBed.glb",
+      "bytes": 250312,
+      "sha256": "9cb5d84e94ad9bf6c062f8d45343147dfaf024e0c1d69ba99266b55a689d82f7",
+      "meshes": 26,
+      "dimensions": [
+        0.9923359221220016,
+        0.9900000035762786,
+        2.134999999701977
+      ]
+    },
+    {
+      "file": "models/bench.glb",
+      "bytes": 195588,
+      "sha256": "eedcc08e7c8590aa6b90d7eed065c23a0a951d5492af617e887e9a67b73d0ef5",
+      "meshes": 11,
+      "dimensions": [
+        1.589999990463257,
+        0.8150616425301707,
+        0.512581400181052
+      ]
+    },
+    {
+      "file": "models/printer.glb",
+      "bytes": 356364,
+      "sha256": "8c5ce5150a3aa5ba1d1d985630b5c11ed24fe21cf4818406833627aa17de4d5e",
+      "meshes": 12,
+      "dimensions": [
+        0.47999998927116394,
+        0.3474999998323619,
+        0.5299999995529652
+      ]
+    },
+    {
+      "file": "models/plant.glb",
+      "bytes": 65736,
+      "sha256": "aa72067121a0ea1de53a5c15fc02e5cea288c4648b0b2263b34ac4cb26aa98ab",
+      "meshes": 22,
+      "dimensions": [
+        0.8114010608921816,
+        1.3004942542079378,
+        0.41688333439337943
+      ]
+    },
+    {
+      "file": "models/shrub_02/shrub_02.bin",
+      "bytes": 758692,
+      "sha256": "5c1b79da1cfdbac90599542ccd1f75ba433a3a4d356b1ea03655adb39b0e2c96"
+    },
+    {
+      "file": "models/shrub_02/textures/shrub_02_nor_gl_2k.jpg",
+      "bytes": 1667532,
+      "sha256": "015833e2454cb3140730e1b89c12981de26023144df678eb2c88763d572e6250"
+    },
+    {
+      "file": "models/shrub_02/textures/shrub_02_diff_2k.jpg",
+      "bytes": 1319985,
+      "sha256": "ac1f0a16eef67a6e4884f3a5e913d7562f310c7a7a73d1f6039fbcd120445ca5"
+    },
+    {
+      "file": "models/shrub_02/textures/shrub_02_arm_2k.jpg",
+      "bytes": 1039322,
+      "sha256": "52c769baab5a4d33e8967cea904bf57e34f45767ac8de302103d13f726dd0415"
+    },
+    {
+      "file": "models/shrub_02/textures/shrub_02_alpha_2k.png",
+      "bytes": 198771,
+      "sha256": "e4b3970611262ab4869794bba127067774d0cdc4b7b6beb3293153f9eeeff72c"
+    },
+    {
+      "file": "models/shrub_02/shrub_02_2k.gltf",
+      "bytes": 8083,
+      "sha256": "9ce5762223498bfbaf33d03ef6cf4fdaeeb449cf4745d551e012e7d622a5367e",
+      "variants": {
+        "shrub_02_a": {
+          "dimensions": [
+            1.6355602596278263,
+            2.158229440132593,
+            1.8315207611800246
+          ]
+        },
+        "shrub_02_b": {
+          "dimensions": [
+            2.0632089113281946,
+            1.9539081294317668,
+            1.8209090796669831
+          ]
+        },
+        "shrub_02_c": {
+          "dimensions": [
+            2.4831715401190895,
+            2.3815157996350242,
+            2.535989395067265
+          ]
+        },
+        "shrub_02_d": {
+          "dimensions": [
+            1.6130284632106777,
+            1.946683332352773,
+            1.8173407358652882
+          ]
+        }
+      }
+    },
+    {
+      "file": "models/fern_02/fern_02.bin",
+      "bytes": 176176,
+      "sha256": "fe1abb762bcbbc7ad9e86925c8080437a62add257d9280e9142fdc85c226e64c"
+    },
+    {
+      "file": "models/fern_02/textures/fern_02_nor_gl_2k.jpg",
+      "bytes": 1365615,
+      "sha256": "dfe1ac4a428d21f7c134411500177d66b8dd800c8fec6f0040c50f44414a777b"
+    },
+    {
+      "file": "models/fern_02/textures/fern_02_diff_2k.jpg",
+      "bytes": 993703,
+      "sha256": "9ee18172170728050871772e2cd6d8d37b52f9138e61b49b04486623f9caf84b"
+    },
+    {
+      "file": "models/fern_02/textures/fern_02_arm_2k.jpg",
+      "bytes": 850856,
+      "sha256": "1eaf9bd29e2d83a77ca5d89bdddebcd9216b8b4ba244644580fe5b89bbe713f1"
+    },
+    {
+      "file": "models/fern_02/textures/fern_02_alpha_2k.png",
+      "bytes": 230089,
+      "sha256": "f51eb9b8f9f4b25a882f8fe12d1ef53ba69448bac7e71396ec1f05b684e9ea75"
+    },
+    {
+      "file": "models/fern_02/fern_02_2k.gltf",
+      "bytes": 6899,
+      "sha256": "50540d37531f93fd693d5340d5b3095c9d6d2834fa05c74bea797d54f290cb6a",
+      "variants": {
+        "fern_02_b": {
+          "dimensions": [
+            0.9897474050521851,
+            0.4276947118341923,
+            0.8936897218227386
+          ]
+        },
+        "fern_02_c": {
+          "dimensions": [
+            0.8743258118629456,
+            0.3490203693509102,
+            0.7652256786823273
+          ]
+        },
+        "fern_02_a": {
+          "dimensions": [
+            0.5519406199455261,
+            0.2868035454303026,
+            0.6134210824966431
+          ]
+        },
+        "fern_02_d": {
+          "dimensions": [
+            0.5727821886539459,
+            0.21308755222707987,
+            0.5932782888412476
+          ]
+        }
+      }
+    },
+    {
+      "file": "models/campusTree.glb",
+      "bytes": 16433736,
+      "sha256": "58ec0d84132ea3531a8c767da26ebf73fdfb7807d1c3624a367830db5c462e1d",
+      "meshes": 3,
+      "dimensions": [
+        4.207745313644409,
+        3.4062248039990664,
+        4.070431709289551
+      ]
+    },
+    {
+      "file": "textures/Asphalt033_2K-JPG_Color.jpg",
+      "bytes": 1195209,
+      "sha256": "b33d715d9e07ac26b693234dfbe407960986558744562e28aea41b8b2e61aac6"
+    },
+    {
+      "file": "textures/Asphalt033_2K-JPG_NormalGL.jpg",
+      "bytes": 3941267,
+      "sha256": "6f20439976e4bca67f6ef6042896eeb10b4e2b3f5bdab677a1407d45036b8557"
+    },
+    {
+      "file": "textures/Asphalt033_2K-JPG_Roughness.jpg",
+      "bytes": 1039622,
+      "sha256": "69badfc9b1d512458e9fc3e9d1c445577494ab6f49a62d8d0513f22d54d7d469"
+    },
+    {
+      "file": "textures/Ground037_2K-JPG_Color.jpg",
+      "bytes": 3251213,
+      "sha256": "d4b92b7f3d3f1a692c8d3b4c1f0f93285eaf1e3639d4eecda5422b40f5fc0732"
+    },
+    {
+      "file": "textures/Ground037_2K-JPG_NormalGL.jpg",
+      "bytes": 4579158,
+      "sha256": "65220bc36f32852d3d35a31f54b0e811b5d5806a759ef09c5065579de34fe611"
+    },
+    {
+      "file": "textures/Ground037_2K-JPG_Roughness.jpg",
+      "bytes": 1189976,
+      "sha256": "6b1c979f795e18730f1de2ff0035c2dee88ed211a451cba475e505fb73f6b4d5"
+    },
+    {
+      "file": "textures/Plastic010_2K-JPG_Color.jpg",
+      "bytes": 41359,
+      "sha256": "0224cae78368ea1e0cdf0b04ffd9a645c69c6473b4e3f6ebc1ffda09f72c344d"
+    },
+    {
+      "file": "textures/Plastic010_2K-JPG_NormalGL.jpg",
+      "bytes": 193580,
+      "sha256": "131bb7a9fc58c4e5945e0a629d0f4ab223ab915d73c62764b35764c92f37d706"
+    },
+    {
+      "file": "textures/Plastic010_2K-JPG_Roughness.jpg",
+      "bytes": 504058,
+      "sha256": "d3498367794a1e5814229b5fb8dc075ad654ff7fb5dcaa706b75993843ec1057"
+    },
+    {
+      "file": "textures/Terrazzo001_2K-JPG_Color.jpg",
+      "bytes": 1352901,
+      "sha256": "2ef0a19a4faf80e22d3dd2ded2b1e7e6f6099bef843f3e2cd7fc40e09ca5b731"
+    },
+    {
+      "file": "textures/Terrazzo001_2K-JPG_NormalGL.jpg",
+      "bytes": 1230147,
+      "sha256": "5df61517e826c592f7f40753029db2106c7c34c78b67e7decab98aec302c5bcc"
+    },
+    {
+      "file": "textures/Terrazzo001_2K-JPG_Roughness.jpg",
+      "bytes": 476411,
+      "sha256": "bbcc15e4509430a8fc8c2edcd92be68ae8b219438cf1d980b74cae536d8dd455"
+    },
+    {
+      "file": "textures/Wood051_2K-JPG_Color.jpg",
+      "bytes": 603672,
+      "sha256": "bdb580cf0238e8b5bcdf8bb51b5c1309bcda40fa8f22b1c3859ef21aecd23a9b"
+    },
+    {
+      "file": "textures/Wood051_2K-JPG_NormalGL.jpg",
+      "bytes": 1921309,
+      "sha256": "06a1c99d10f1cc596cf6ce55498143687e58d66f965868b611602fe41815e0e6"
+    },
+    {
+      "file": "textures/Wood051_2K-JPG_Roughness.jpg",
+      "bytes": 1074832,
+      "sha256": "e61044ac8c764542989c24876d82b2cfaa5401ddb04309fec1439e3e8c8a258f"
+    }
+  ]
+}

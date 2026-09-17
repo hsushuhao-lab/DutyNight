@@ -53,7 +53,7 @@ export class SignAnchor {
     ctx.font = 'bold 20px sans-serif';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
-    ctx.fillText(header, 24, 20);
+    ctx.fillText(header, 24, 20, 464);
 
     // Left room number / code badge
     ctx.fillStyle = '#204d37';
@@ -62,17 +62,17 @@ export class SignAnchor {
     ctx.font = 'bold 44px sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(code, 78, 114);
+    ctx.fillText(code, 78, 114, 106);
 
     // Right room designation
     ctx.fillStyle = '#1c2822';
     ctx.font = 'bold 36px sans-serif';
     ctx.textAlign = 'left';
-    ctx.fillText(title, 156, 95);
+    ctx.fillText(title, 156, 95, 332);
 
     ctx.fillStyle = '#556a5e';
     ctx.font = '18px sans-serif';
-    ctx.fillText(subtitle, 156, 140);
+    ctx.fillText(subtitle, 156, 140, 332);
 
     // Border
     ctx.strokeStyle = '#8faaa0';
@@ -144,7 +144,7 @@ export class SignAnchor {
     ctx.font = 'bold 26px sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(text, 256, 64);
+    ctx.fillText(text.replace(/[\p{Extended_Pictographic}\uFE0F]/gu, '').trim(), 256, 64, 464);
 
     const texture = new THREE.CanvasTexture(canvas);
     texture.colorSpace = THREE.SRGBColorSpace;

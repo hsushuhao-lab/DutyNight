@@ -1,5 +1,6 @@
 // WorldRouter.js - Milestone M13: Central Scene/Zone Router, Traversal Verification & Debug Spawns
 import * as THREE from 'three';
+import { applyZoneLighting } from '../art/VisualProfile.js';
 import { GeometryFactory } from './shared/GeometryFactory.js';
 import { DEBUG_SPAWN_POINTS } from './shared/DebugSpawnPoints.js';
 import { CollisionFactory } from './shared/CollisionFactory.js';
@@ -23,6 +24,7 @@ export class WorldRouter {
     this.controller = controller;
     this.gf = new GeometryFactory();
 
+    this.dutyDoorClosed = false;
     this.activeZoneId = null;
     this.activeZoneInstance = null;
 
@@ -54,16 +56,8 @@ export class WorldRouter {
       'ecology_pond': '11. 生態池觀景木棧台 (M12)'
     };
 
-    // Global ambient and fill lights for consistent modeling visibility across zones
     this.lightingGroup = new THREE.Group();
     this.lightingGroup.name = 'WorldRouter_BaselineLighting';
-    const baseAmbient = new THREE.AmbientLight(0xfff3e5, 0.72);
-    const baseHemi = new THREE.HemisphereLight(0xffeedd, 0x443a32, 0.45);
-    const baseDir = new THREE.DirectionalLight(0xffdfba, 0.65);
-    baseDir.position.set(10, 20, 10);
-    this.lightingGroup.add(baseAmbient);
-    this.lightingGroup.add(baseHemi);
-    this.lightingGroup.add(baseDir);
     this.scene.add(this.lightingGroup);
   }
 
@@ -78,17 +72,17 @@ export class WorldRouter {
 
     // Clean up current zone
     if (this.activeZoneInstance && typeof this.activeZoneInstance.cleanup === 'function') {
+      if (this.activeZoneId === 'first_campus_4f') this.dutyDoorClosed = this.activeZoneInstance.dutyDoorClosed;
       this.activeZoneInstance.cleanup();
       this.activeZoneInstance = null;
     }
 
     console.info(`[WorldRouter] Loading Zone: ${zoneId}`);
-    if (this.lightingGroup) {
-      this.lightingGroup.visible = (zoneId !== 'first_campus_3f');
-    }
+    applyZoneLighting(this.lightingGroup, this.scene, zoneId);
     const ZoneClass = this.zones[zoneId];
     this.activeZoneInstance = new ZoneClass(this.scene, this.gf);
     this.activeZoneInstance.build();
+    if (zoneId === 'first_campus_4f') this.activeZoneInstance.setDutyDoorClosed(this.dutyDoorClosed);
     this.activeZoneId = zoneId;
 
     // Connect zone colliders, walkables, and interactables to the controller
@@ -142,7 +136,7 @@ export class WorldRouter {
   updateHUDLocation() {
     const locTag = document.querySelector('.hud-location');
     if (locTag && this.zoneLabels[this.activeZoneId]) {
-      locTag.textContent = this.zoneLabels[this.activeZoneId];
+      locTag.textContent = this.zoneLabels[this.activeZoneId].split(' (M')[0].split('. ').slice(1).join('. ');
     }
   }
 

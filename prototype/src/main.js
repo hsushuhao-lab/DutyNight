@@ -1,5 +1,16 @@
 // main.js - Songde Night Duty Act 1 First Agent Task (1~6)
 import * as THREE from 'three';
+import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUniformsLib.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { ContactShadows } from './art/ContactShadows.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { preloadAssets } from './art/AssetRegistry.js';
+import { preloadMaterials } from './art/MaterialRegistry.js';
+
+RectAreaLightUniformsLib.init();
+await Promise.all([preloadAssets(), preloadMaterials()]);
 import { gameState } from './core/GameState.js';
 import { Level3FBlockout } from './world/Level3FBlockout.js';
 import { applyAct1CollisionHotfix } from './world/CollisionHotfix.js';
@@ -17,7 +28,7 @@ const camera = new THREE.PerspectiveCamera(
   68,
   window.innerWidth / window.innerHeight,
   0.1,
-  60
+  220
 );
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -26,8 +37,22 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.15;
+renderer.toneMappingExposure = 1.0;
 container.appendChild(renderer.domElement);
+const reflectionRoom = new RoomEnvironment();
+const reflectionGenerator = new THREE.PMREMGenerator(renderer);
+scene.environment = reflectionGenerator.fromScene(reflectionRoom, .04).texture;
+scene.environmentIntensity = .25;
+reflectionRoom.dispose();
+reflectionGenerator.dispose();
+const composer = new EffectComposer(renderer);
+const contactShadows = new ContactShadows(scene, camera, window.innerWidth, window.innerHeight, 16);
+contactShadows.kernelRadius = 0.35;
+contactShadows.minDistance = 0.001;
+contactShadows.maxDistance = 0.035;
+composer.addPass(new RenderPass(scene, camera));
+composer.addPass(contactShadows);
+composer.addPass(new OutputPass());
 
 import { WorldRouter } from './world/WorldRouter.js';
 
@@ -74,7 +99,10 @@ controller.onHoverChange = (interactable) => {
 controller.onInteract = (interactable) => {
   console.log('Interacting with:', interactable);
 
-  if (interactable.type === 'key') {
+  if (interactable.type === 'duty_door') {
+    worldRouter.activeZoneInstance.toggleDutyDoor(camera.position);
+    uiManager.showPrompt(null);
+  } else if (interactable.type === 'key') {
     if (!gameState.isTaskComplete('KEY_PICKUP')) {
       soundManager.playKeyPickup();
       gameState.markTaskComplete('KEY_PICKUP');
@@ -124,6 +152,7 @@ window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
+  composer.setSize(window.innerWidth, window.innerHeight);
 });
 
 // Animation Loop
@@ -133,7 +162,7 @@ function animate() {
   const delta = Math.min(clock.getDelta(), 0.1);
 
   controller.update(delta);
-  renderer.render(scene, camera);
+  composer.render();
 }
 
 // URL parameters for QA and visual capture
@@ -172,7 +201,10 @@ if (zoneParam || spawnParam) {
   worldRouter.loadZone('first_campus_3f', 'm0_316_entrance');
 }
 
-worldRouter.createDebugUI();
+if (import.meta.env.DEV || urlParams.get('debug') === '1') {
+  worldRouter.createDebugUI();
+  window.renderResourceStats = () => ({ ...renderer.info.memory });
+}
 
 animate();
 console.log('Songde Night Duty - Full World Modeling System Initialized.');
