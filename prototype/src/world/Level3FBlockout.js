@@ -1,5 +1,6 @@
 // Level3FBlockout.js - 3F Administration Blockout with Sunset Warmth
 import * as THREE from 'three';
+import { getMaterials, materialForSurface } from '../art/MaterialRegistry.js';
 
 export class Level3FBlockout {
   constructor(scene) {
@@ -24,98 +25,17 @@ export class Level3FBlockout {
   }
 
   initMaterials() {
-    // Hospital vinyl floor with a subtle procedural tile texture.
-    const floorCanvas = document.createElement('canvas');
-    floorCanvas.width = 256;
-    floorCanvas.height = 256;
-    const fctx = floorCanvas.getContext('2d');
-    fctx.fillStyle = '#ddd5c8';
-    fctx.fillRect(0, 0, 256, 256);
-    fctx.strokeStyle = 'rgba(112, 104, 92, 0.16)';
-    fctx.lineWidth = 2;
-    for (let i = 0; i <= 256; i += 64) {
-      fctx.beginPath(); fctx.moveTo(i, 0); fctx.lineTo(i, 256); fctx.stroke();
-      fctx.beginPath(); fctx.moveTo(0, i); fctx.lineTo(256, i); fctx.stroke();
-    }
-    for (let i = 0; i < 900; i++) {
-      const shade = 185 + Math.floor(Math.random() * 35);
-      fctx.fillStyle = `rgba(${shade},${shade - 5},${shade - 12},0.10)`;
-      fctx.fillRect(Math.random() * 256, Math.random() * 256, 1, 1);
-    }
-    const floorTexture = new THREE.CanvasTexture(floorCanvas);
-    floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
-    floorTexture.repeat.set(8, 4);
-    floorTexture.colorSpace = THREE.SRGBColorSpace;
-
-    this.materials.floor = new THREE.MeshStandardMaterial({
-      color: 0xffffff,
-      map: floorTexture,
-      roughness: 0.5,
-      metalness: 0.02
-    });
-
-    // Hospital wall (pale warm ivory)
-    this.materials.wall = new THREE.MeshStandardMaterial({
-      color: 0xf5f2eb,
-      roughness: 0.85
-    });
-
-    // Wall protective bumper strip / baseboard (warm wood/sage)
-    this.materials.bumper = new THREE.MeshStandardMaterial({
-      color: 0x5a7364,
-      roughness: 0.5
-    });
-
-    // Ceiling tiles
-    this.materials.ceiling = new THREE.MeshStandardMaterial({
-      color: 0xededed,
-      roughness: 0.95
-    });
-
-    // Elevator doors (brushed stainless steel)
-    this.materials.elevatorDoor = new THREE.MeshStandardMaterial({
-      color: 0x9fa3a6,
-      roughness: 0.25,
-      metalness: 0.8
-    });
-
-    // Wood desks
-    this.materials.wood = new THREE.MeshStandardMaterial({
-      color: 0x7a5230,
-      roughness: 0.6
-    });
-
-    // Fluorescent fixture casing
-    this.materials.fixture = new THREE.MeshStandardMaterial({
-      color: 0xcccccc,
-      roughness: 0.4
-    });
-
-    // Fluorescent emission
-    this.materials.lightEmitter = new THREE.MeshBasicMaterial({
-      color: 0xfffbee
-    });
-
-    // Glass / Window
-    this.materials.glass = new THREE.MeshStandardMaterial({
-      color: 0xe8eef2,
-      roughness: 0.18,
-      metalness: 0.04,
-      transparent: true,
-      opacity: 0.22
-    });
-
-    // Brass key
-    this.materials.brass = new THREE.MeshStandardMaterial({
-      color: 0xd4af37,
-      roughness: 0.3,
-      metalness: 0.9
-    });
-
-    // Computer screen
-    this.materials.screen = new THREE.MeshBasicMaterial({
-      color: 0x1a4532
-    });
+    const shared = getMaterials();
+    this.materials = {
+      ...shared,
+      bumper: shared.wallBumper,
+      elevatorDoor: shared.metal,
+      wood: shared.floorWood,
+      fixture: shared.metal,
+      lightEmitter: new THREE.MeshStandardMaterial({ color: 0xf3f0e5, emissive: 0xfff2d7, emissiveIntensity: 0.5, roughness: 0.8 }),
+      brass: new THREE.MeshStandardMaterial({ color: 0xb5a56c, roughness: 0.35, metalness: 0.8 }),
+      screen: new THREE.MeshBasicMaterial({ color: 0xc9d6c9 })
+    };
   }
 
   addCollider(box) {
@@ -178,7 +98,7 @@ export class Level3FBlockout {
   buildElevatorLobby() {
     // Elevator lobby floor: x from -12 to -4, z from -3.5 to 3.5
     const floorGeo = new THREE.PlaneGeometry(8, 7);
-    const floor = new THREE.Mesh(floorGeo, this.materials.floor);
+    const floor = new THREE.Mesh(floorGeo, materialForSurface('floor', floorGeo.parameters.width, floorGeo.parameters.height));
     floor.rotation.x = -Math.PI / 2;
     floor.position.set(-8, 0, 0);
     floor.receiveShadow = true;
@@ -187,7 +107,7 @@ export class Level3FBlockout {
 
     // Ceiling
     const ceilGeo = new THREE.PlaneGeometry(8, 7);
-    const ceil = new THREE.Mesh(ceilGeo, this.materials.ceiling);
+    const ceil = new THREE.Mesh(ceilGeo, materialForSurface('ceiling', ceilGeo.parameters.width, ceilGeo.parameters.height));
     ceil.rotation.x = Math.PI / 2;
     ceil.position.set(-8, 3.2, 0);
     this.scene.add(ceil);
@@ -228,11 +148,6 @@ export class Level3FBlockout {
     panel.position.set(-11.6, 2.65, 0);
     this.scene.add(panel);
 
-    // Floor indicator text 3F glow
-    const indLight = new THREE.PointLight(0xffb03a, 1.2, 2.5);
-    indLight.position.set(-11.4, 2.65, 0);
-    this.scene.add(indLight);
-
     // Elevator Call Button Panel
     const buttonBox = new THREE.Mesh(
       new THREE.BoxGeometry(0.08, 0.4, 0.2),
@@ -272,7 +187,7 @@ export class Level3FBlockout {
   buildCorridor() {
     // Corridor floor: x from -4 to 16, z from -2.5 to 2.5
     const floorGeo = new THREE.PlaneGeometry(20, 5);
-    const floor = new THREE.Mesh(floorGeo, this.materials.floor);
+    const floor = new THREE.Mesh(floorGeo, materialForSurface('floor', floorGeo.parameters.width, floorGeo.parameters.height));
     floor.rotation.x = -Math.PI / 2;
     floor.position.set(6, 0, 0);
     floor.receiveShadow = true;
@@ -281,7 +196,7 @@ export class Level3FBlockout {
 
     // Corridor ceiling
     const ceilGeo = new THREE.PlaneGeometry(20, 5);
-    const ceil = new THREE.Mesh(ceilGeo, this.materials.ceiling);
+    const ceil = new THREE.Mesh(ceilGeo, materialForSurface('ceiling', ceilGeo.parameters.width, ceilGeo.parameters.height));
     ceil.rotation.x = Math.PI / 2;
     ceil.position.set(6, 3.2, 0);
     this.scene.add(ceil);
@@ -317,7 +232,7 @@ export class Level3FBlockout {
   buildDutyOffice() {
     // Duty office floor: x from 1 to 11, z from 2.5 to 8.5
     const floorGeo = new THREE.PlaneGeometry(10, 6);
-    const floor = new THREE.Mesh(floorGeo, this.materials.floor);
+    const floor = new THREE.Mesh(floorGeo, materialForSurface('floor', floorGeo.parameters.width, floorGeo.parameters.height));
     floor.rotation.x = -Math.PI / 2;
     floor.position.set(6, 0, 5.5);
     floor.receiveShadow = true;
@@ -326,7 +241,7 @@ export class Level3FBlockout {
 
     // Ceiling
     const ceilGeo = new THREE.PlaneGeometry(10, 6);
-    const ceil = new THREE.Mesh(ceilGeo, this.materials.ceiling);
+    const ceil = new THREE.Mesh(ceilGeo, materialForSurface('ceiling', ceilGeo.parameters.width, ceilGeo.parameters.height));
     ceil.rotation.x = Math.PI / 2;
     ceil.position.set(6, 3.2, 5.5);
     this.scene.add(ceil);
@@ -370,7 +285,7 @@ export class Level3FBlockout {
       new THREE.BoxGeometry(3.0, 1.2, 0.06),
       new THREE.MeshStandardMaterial({ color: 0xbf9b68, roughness: 0.9 })
     );
-    board.position.set(6.0, 2.0, 8.28);
+    board.position.set(6.5, 2.0, 8.28);
     this.scene.add(board);
 
     // Desk warm lamp
@@ -382,17 +297,11 @@ export class Level3FBlockout {
     this.scene.add(lampBase);
 
     const lampShade = new THREE.Mesh(
-      new THREE.ConeGeometry(0.16, 0.2, 16),
-      new THREE.MeshStandardMaterial({ color: 0xd9822b, roughness: 0.4 })
+      new THREE.CylinderGeometry(0.075, 0.18, 0.16, 32),
+      new THREE.MeshStandardMaterial({ color: 0xe8e3d7, roughness: 0.6 })
     );
     lampShade.position.set(5.1, 1.15, 6.5);
     this.scene.add(lampShade);
-
-    // Desk warm point light (3800K glow)
-    const deskLight = new THREE.PointLight(0xffbf66, 1.8, 4.5);
-    deskLight.position.set(5.1, 1.1, 6.4);
-    deskLight.castShadow = true;
-    this.scene.add(deskLight);
 
     // INTERACTABLE 1: Duty-Room Key (值班室鑰匙)
     const keyGroup = new THREE.Group();
@@ -788,22 +697,6 @@ export class Level3FBlockout {
   }
 
   setupLighting() {
-    // Ambient light - warm hospital indoor bounce (Phase W1)
-    const ambient = new THREE.AmbientLight(0xfff5e9, 0.78);
-    this.scene.add(ambient);
-
-    // Sunset Directional Light (low angle from south windows)
-    const sunsetSun = new THREE.DirectionalLight(0xffc185, 1.7);
-    sunsetSun.position.set(6, 4, -14);
-    sunsetSun.target.position.set(6, 1, 2);
-    sunsetSun.castShadow = true;
-    sunsetSun.shadow.mapSize.width = 1024;
-    sunsetSun.shadow.mapSize.height = 1024;
-    sunsetSun.shadow.camera.near = 0.5;
-    sunsetSun.shadow.camera.far = 30;
-    this.scene.add(sunsetSun);
-    this.scene.add(sunsetSun.target);
-
     // Ceiling fluorescent fixtures (warm white 4000K)
     const fixturePositions = [
       { x: -8, y: 3.15, z: 0 },    // Elevator lobby
@@ -833,10 +726,7 @@ export class Level3FBlockout {
       bar.position.set(pos.x, pos.y - 0.04, pos.z);
       this.scene.add(bar);
 
-      // Soft point light
-      const light = new THREE.PointLight(0xfff4df, 0.72, 6.3);
-      light.position.set(pos.x, pos.y - 0.2, pos.z);
-      this.scene.add(light);
+
     });
   }
 

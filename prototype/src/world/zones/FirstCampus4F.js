@@ -1,5 +1,8 @@
 // FirstCampus4F.js - Milestones M1, M2, M3: 4F Core Shell, Independent Duty Room, Nursing Station & Ward Gate
 import * as THREE from 'three';
+import { Reflector } from 'three/addons/objects/Reflector.js';
+import { artRoot, asset, solid, counterFront, monitor, wallTrim, wallClock } from '../../art/ArtDetails.js';
+import { disposeZoneArt } from '../../art/ArtResources.js';
 import { Doorway } from '../shared/Doorway.js';
 import { SignAnchor } from '../shared/SignAnchor.js';
 import { CollisionFactory } from '../shared/CollisionFactory.js';
@@ -17,6 +20,7 @@ export class FirstCampus4F {
 
   build() {
     this.scene.add(this.zoneGroup);
+    this.art = artRoot(this.zoneGroup, '4F');
 
     // ==========================================
     // 1. ELEVATOR LOBBY (x: -12 to -4, z: -3.5 to 3.5)
@@ -54,11 +58,6 @@ export class FirstCampus4F {
     btnBox.position.set(-11.65, 1.2, 1.5);
     this.zoneGroup.add(btnBox);
 
-    // Floor indicator 4F glow
-    const indLight = new THREE.PointLight(0xffb03a, 1.0, 2.5);
-    indLight.position.set(-11.5, 2.65, 0);
-    this.zoneGroup.add(indLight);
-
     // Lobby overhead sign
     SignAnchor.buildHangingSign({
       scene: this.zoneGroup,
@@ -67,7 +66,7 @@ export class FirstCampus4F {
       z: 0,
       ceilingY: 3.2,
       rotationY: Math.PI / 2,
-      text: '◀ 4F 醫師值班室 ｜ 4A 護理站・閉鎖病房 ▶'
+      text: '4F 醫師值班室 ｜ 4A 護理站・病房'
     });
 
     this.gf.buildCeilingLight(this.zoneGroup, -8, 3.15, 0);
@@ -147,27 +146,7 @@ export class FirstCampus4F {
 
     // Duty room interior:
     // 1. Made Bed with frame, mattress, pillow, blanket
-    const bedGroup = new THREE.Group();
-    const bFrame = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.4, 2.1), this.gf.materials.bedFrame);
-    bFrame.position.set(0, 0.2, 0);
-    bedGroup.add(bFrame);
-    const bMattress = new THREE.Mesh(new THREE.BoxGeometry(1.32, 0.25, 2.02), this.gf.materials.bedSheet);
-    bMattress.position.set(0, 0.45, 0);
-    bedGroup.add(bMattress);
-    const bPillow = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.12, 0.45), this.gf.materials.bedSheet);
-    bPillow.position.set(0, 0.62, -0.75);
-    bedGroup.add(bPillow);
-
-    // Folded extra blanket at foot of bed
-    const bBlanket = new THREE.Mesh(
-      new THREE.BoxGeometry(1.3, 0.08, 0.55),
-      new THREE.MeshStandardMaterial({ color: 0x5d7366, roughness: 0.85 })
-    );
-    bBlanket.position.set(0, 0.58, 0.65);
-    bedGroup.add(bBlanket);
-
-    bedGroup.position.set(3.5, 0, -6.8);
-    this.zoneGroup.add(bedGroup);
+    asset(this.art, 'hospitalBed', [3.5, 0, -6.8], [1.3, .95, .97]);
     CollisionFactory.addBox(this.colliders, 3.5, 0.4, -6.8, 1.4, 0.8, 2.1);
 
     // Nightstand table beside bed
@@ -188,7 +167,7 @@ export class FirstCampus4F {
     this.zoneGroup.add(lampBase);
 
     const lampShade = new THREE.Mesh(
-      new THREE.ConeGeometry(0.14, 0.18, 12, 1, true),
+      new THREE.CylinderGeometry(0.07, 0.14, 0.18, 32),
       new THREE.MeshStandardMaterial({ color: 0xfff2dc, roughness: 0.4 })
     );
     lampShade.position.set(4.65, 0.72, -7.2);
@@ -199,9 +178,7 @@ export class FirstCampus4F {
     this.zoneGroup.add(nightLampLight);
 
     // 2. Study desk & chair
-    const desk = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.76, 0.8), this.gf.materials.doorWood);
-    desk.position.set(7.5, 0.38, -4.5);
-    this.zoneGroup.add(desk);
+    asset(this.art, 'workDesk', [7.5, 0, -4.5], [1.6 / 1.405, 1, .8 / .725], Math.PI);
     CollisionFactory.addBox(this.colliders, 7.5, 0.4, -4.5, 1.6, 0.8, 0.8);
 
     // Desk study lamp & papers
@@ -216,14 +193,10 @@ export class FirstCampus4F {
     deskPapers.position.set(7.25, 0.77, -4.5);
     this.zoneGroup.add(deskPapers);
 
-    const deskChair = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.85, 0.55), this.gf.materials.metal);
-    deskChair.position.set(7.5, 0.42, -5.3);
-    this.zoneGroup.add(deskChair);
+    asset(this.art, 'officeChair', [7.5, 0, -5.3], [.9, 1, .9]);
 
     // 3. Wardrobe / locker with stainless handle
-    const locker = new THREE.Mesh(new THREE.BoxGeometry(0.8, 2.0, 0.7), this.gf.materials.metal);
-    locker.position.set(8.2, 1.0, -7.5);
-    this.zoneGroup.add(locker);
+    asset(this.art, 'storageCabinet', [8.2, 0, -7.5], [.8 / .9, 2 / 1.8, .7 / .509]);
     CollisionFactory.addBox(this.colliders, 8.2, 1.0, -7.5, 0.8, 2.0, 0.7);
 
     // 4. Private bathroom partition shell & fittings
@@ -237,10 +210,8 @@ export class FirstCampus4F {
     sink.position.set(2.6, 0.8, -4.0);
     this.zoneGroup.add(sink);
 
-    const mirror = new THREE.Mesh(
-      new THREE.PlaneGeometry(0.45, 0.7),
-      this.gf.materials.stainless
-    );
+    const mirror = new Reflector(new THREE.PlaneGeometry(.45,.7), {color:0xf2f2ec,textureWidth:512,textureHeight:512,clipBias:.003});
+    mirror.material.addEventListener('dispose',()=>mirror.getRenderTarget().dispose());
     mirror.position.set(2.6, 1.5, -4.88);
     mirror.rotation.y = 0;
     this.zoneGroup.add(mirror);
@@ -290,19 +261,14 @@ export class FirstCampus4F {
     this.zoneGroup.add(frostStripe);
 
     // Nursing station inner work desk
-    const innerDesk = new THREE.Mesh(new THREE.BoxGeometry(5.0, 0.76, 1.0), this.gf.materials.metal);
-    innerDesk.position.set(8.75, 0.38, 4.5);
-    this.zoneGroup.add(innerDesk);
+    [7.48, 10.02].forEach(x => asset(this.art, 'workDesk', [x, 0, 4.5], [2.45 / 1.405, 1, 1 / .725]));
     CollisionFactory.addBox(this.colliders, 8.75, 0.4, 4.5, 5.0, 0.8, 1.0);
 
     // Desktop monitors & chart binder racks
-    const monitor1 = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.35, 0.06), this.gf.materials.metal);
-    monitor1.position.set(7.5, 0.95, 4.5);
-    this.zoneGroup.add(monitor1);
-
-    const monitor2 = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.35, 0.06), this.gf.materials.metal);
-    monitor2.position.set(9.8, 0.95, 4.5);
-    this.zoneGroup.add(monitor2);
+    monitor(this.art, this.gf.materials, 7.5, .76, 4.5, 0);
+    monitor(this.art, this.gf.materials, 9.8, .76, 4.5, 0);
+    [7.5, 9.8].forEach(x => asset(this.art, 'officeChair', [x, 0, 5.5], [1, 1, 1], Math.PI));
+    asset(this.art, 'printer', [11, .76, 4.5]);
 
     // Wall chart rack on back wall
     const chartRack = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.8, 0.12), this.gf.materials.metal);
@@ -314,8 +280,8 @@ export class FirstCampus4F {
       scene: this.zoneGroup,
       x: 8.75,
       y: 2.55,
-      z: 2.55,
-      rotationY: 0,
+      z: 2.385,
+      rotationY: Math.PI,
       code: '4A',
       title: '護理站',
       subtitle: 'NURSING STATION',
@@ -383,21 +349,145 @@ export class FirstCampus4F {
       z: 0,
       ceilingY: 3.2,
       rotationY: Math.PI / 2,
-      text: '🔒 4A 閉鎖病房 ｜ 門禁管制區域（請刷卡）'
+      text: '4A 閉鎖病房 ｜ 門禁管制區域（請刷卡）'
     });
 
+    this.buildArtDetails();
+    this.buildDutyDoor();
     return this;
+  }
+
+  buildArtDetails() {
+    const m = this.gf.materials;
+    const add = (material, position, size) => solid(this.art, material, position, size);
+    for(const z of [-3,3])add(m.wall,[-4,1.6,z],[.4,3.2,1]);
+    wallTrim(this.zoneGroup, m);
+    counterFront(this.art, m, 8.75, 2.185, 5.5, 1.05);
+    // Continuous timber header holds the plaque and observation glazing physically.
+    add(m.doorWood, [8.75, 2.56, 2.5], [5.7, .48, .18]);
+    [6.05, 8.75, 11.45].forEach(x => add(m.doorWood, [x, 1.73, 2.5], [.065, 1.28, .09]));
+    add(m.doorWood, [8.75, 2.3, 2.5], [5.45, .06, .09]);
+    // Chart pockets attach to the existing rack rather than floating over the desk.
+    for(let i=0;i<8;i++) {
+      add(m.wallBumper, [7.07+i*.265, 1.75, 7.2], [.22, .52, .08]);
+      add(m.bedSheet, [7.07+i*.265, 1.86, 7.145], [.185, .48, .008]);
+      add(m.metal, [7.07+i*.265, 2.09, 7.13], [.05, .03, .016]);
+    }
+    add(m.metal, [4.65, .69, -7.2], [.016, .2, .016]);
+    add(m.doorWood, [4.65, .43, -6.951], [.41, .19, .018]);
+    add(m.metal, [4.65, .43, -6.934], [.14, .015, .025]);
+    wallClock(this.art,m,5.1,2.35,-8.27);
+    add(m.doorWood,[6.5,1.8,-8.26],[.6,.09,.04]);
+    add(m.metal,[6.5,1.78,-8.20],[.035,.10,.08]);
+    const coatMaterial=new THREE.MeshStandardMaterial({color:0xc8c9c0,roughness:.96,side:THREE.DoubleSide});
+    const garment=new THREE.Group();garment.name='DutyRoom/DrapedCoat';garment.position.set(6.5,1.75,-8.13);this.art.add(garment);
+    // A closed circumferential cloth surface gives the hanging garment real volume.
+    const coatGeometry=new THREE.PlaneGeometry(1,1,48,32);
+    const cloth=coatGeometry.attributes.position;
+    for(let i=0;i<cloth.count;i++) {
+      const u=cloth.getX(i)+.5,t=.5-cloth.getY(i),a=u*Math.PI*2;
+      const width=.17+.055*t+.05*Math.exp(-Math.pow((t-.14)*8,2));
+      const fold=.012*Math.sin(a*9+t*2)+.006*Math.sin(a*17-t*4);
+      cloth.setXYZ(i,Math.cos(a)*(width+fold),-.91*t+.012*Math.sin(a*4)*t,Math.sin(a)*(.072+fold)+.035);
+    }
+    coatGeometry.computeVertexNormals();
+    const coat=new THREE.Mesh(coatGeometry,coatMaterial);coat.castShadow=true;coat.receiveShadow=true;garment.add(coat);
+    for(const side of [-1,1]) {
+      const sleevePath=new THREE.CatmullRomCurve3([new THREE.Vector3(side*.17,-.08,.025),new THREE.Vector3(side*.27,-.19,.04),new THREE.Vector3(side*.30,-.37,.07),new THREE.Vector3(side*.29,-.55,.1)]);
+      const sleeve=new THREE.Mesh(new THREE.TubeGeometry(sleevePath,20,.063,12,false),coatMaterial);sleeve.castShadow=true;garment.add(sleeve);
+      const lapel=new THREE.Mesh(new THREE.PlaneGeometry(.075,.22,3,8),coatMaterial);lapel.position.set(side*.052,-.12,.119);lapel.rotation.z=side*-.28;garment.add(lapel);
+      const pocket=new THREE.Mesh(new THREE.BoxGeometry(.115,.13,.012),coatMaterial);pocket.position.set(side*.12,-.64,.106);garment.add(pocket);
+    }
+    for(const y of [-.29,-.42,-.55])add(m.bedSheet,[6.5,1.75+y,-8.006],[.012,.012,.009]);
+    // A finely subdivided cover drapes over the existing mattress, inside its collider footprint.
+    const coverGeometry=new THREE.PlaneGeometry(1.29,1.46,48,56);
+    const coverVertices=coverGeometry.attributes.position;
+    for(let i=0;i<coverVertices.count;i++) {
+      const x=coverVertices.getX(i),z=coverVertices.getY(i),edge=Math.max(0,(Math.abs(x)-.55)/.095);
+      const folds=.013*Math.sin(x*39+z*8)+.006*Math.cos(z*29-x*15);
+      coverVertices.setXYZ(i,x,.646+folds-.14*edge*edge,z);
+    }
+    coverGeometry.computeVertexNormals();
+    const cover=new THREE.Mesh(coverGeometry,new THREE.MeshStandardMaterial({color:0x87998b,roughness:1,side:THREE.DoubleSide}));
+    cover.name='DutyRoom/SoftBedCover';cover.position.set(3.5,0,-6.58);cover.castShadow=true;cover.receiveShadow=true;this.art.add(cover);
+    // Personal items rest on the existing desk and nightstand, away from circulation.
+    add(m.doorWood,[6.96,.777,-4.58],[.24,.04,.18]);
+    add(m.bedSheet,[6.96,.804,-4.58],[.22,.014,.17]);
+    const flask=new THREE.Mesh(new THREE.CylinderGeometry(.037,.039,.20,24),m.stainless);flask.position.set(4.50,.66,-7.33);this.art.add(flask);
+    const flaskLid=new THREE.Mesh(new THREE.CylinderGeometry(.039,.039,.035,24),m.wallDark);flaskLid.position.set(4.50,.778,-7.33);this.art.add(flaskLid);
+    // Reading lamp and ordinary phone make the private room a usable staff retreat.
+    add(m.metal, [8.1, .775, -4.5], [.25, .035, .18]);
+    add(m.bedSheet, [8.1, 1.1, -4.5], [.28, .055, .18]);
+    add(m.metal, [7.8, .79, -4.33], [.22, .065, .18]);
+    add(m.wallDark, [7.8, .84, -4.33], [.24, .045, .065]);
+    asset(this.art, 'plant', [8.9, .76, 4.45], [.26, .26, .26]);
+    // Sink is wall supported with a recessed basin, chrome tap and drain pedestal.
+    const oldSink=this.zoneGroup.children.find(object=>object.isMesh && object.position.equals(new THREE.Vector3(2.6,.8,-4)));
+    oldSink.visible=false;
+    add(m.bedSheet,[2.6,.69,-4.53],[.47,.12,.53]);
+    add(m.bedSheet,[2.6,.79,-4.79],[.52,.13,.07]);
+    add(m.bedSheet,[2.6,.79,-4.27],[.52,.13,.07]);
+    [2.36,2.84].forEach(x=>add(m.bedSheet,[x,.79,-4.53],[.07,.13,.53]));
+    add(m.bedSheet,[2.6,.39,-4.68],[.18,.65,.18]);
+    add(m.stainless,[2.6,.87,-4.74],[.025,.19,.025]);
+    add(m.stainless,[2.6,.96,-4.68],[.025,.025,.15]);
+    add(m.stainless,[2.6,.757,-4.53],[.06,.006,.06]);
+    [2.355,2.845].forEach(x=>add(m.metal,[x,1.5,-4.87],[.035,.75,.025]));
+    [1.125,1.875].forEach(y=>add(m.metal,[2.6,y,-4.87],[.52,.035,.025]));
+    // Elevator seam, thresholds and small hardware remain outside circulation.
+    add(m.wallDark,[-11.598,1.25,0],[.012,2.3,.012]);
+    add(m.stainless,[-11.56,.016,0],[.22,.032,2.1]);
+    add(m.wallDark,[13.724,1.32,-1.2],[.018,.13,.085]);
+  }
+
+  buildDutyDoor() {
+    const doorway=this.zoneGroup.getObjectByName('Doorway_5.4_-2.5');
+    const leaf=doorway.children.find(object=>object.geometry?.parameters.width===.05 && object.geometry.parameters.height===2.35);
+    this.dutyDoorPivot=new THREE.Group();
+    this.dutyDoorPivot.name='DutyRoomHingedLeaf';
+    this.dutyDoorPivot.position.set(4.92,0,-2.5);
+    doorway.add(this.dutyDoorPivot);
+    this.dutyDoorPivot.add(leaf);
+    leaf.position.set(0,1.175,.56);
+    const m=this.gf.materials;
+    solid(this.dutyDoorPivot,m.stainless,[.035,.2,.56],[.022,.27,1.04]);
+    [.22,1.2,2.12].forEach(y=>solid(this.dutyDoorPivot,m.stainless,[0,y,.035],[.08,.09,.04]));
+    const handle=solid(this.dutyDoorPivot,m.stainless,[.085,1.05,.97],[.13,.025,.025]);
+    solid(this.dutyDoorPivot,m.stainless,[-.085,1.05,.97],[.13,.025,.025]);
+    this.dutyDoorHandle=handle;
+    this.dutyDoorHitbox=new THREE.Mesh(new THREE.BoxGeometry(.3,.3,.3),new THREE.MeshBasicMaterial({visible:false}));
+    this.dutyDoorHitbox.userData={interactable:true,id:'DUTY_ROOM_DOOR',type:'duty_door',label:'關閉值班室房門'};
+    this.zoneGroup.add(this.dutyDoorHitbox);
+    this.interactables.push(this.dutyDoorHitbox);
+    this.dutyDoorCollider=new THREE.Box3(new THREE.Vector3(4.92,0,-2.545),new THREE.Vector3(6.04,2.35,-2.455));
+    this.dutyDoorClosed=false;
+    this.setDutyDoorClosed(false);
+  }
+
+  setDutyDoorClosed(closed) {
+    this.dutyDoorClosed=closed;
+    this.dutyDoorPivot.rotation.y=closed?Math.PI/2:0;
+    const index=this.colliders.indexOf(this.dutyDoorCollider);
+    if(closed && index===-1)this.colliders.push(this.dutyDoorCollider);
+    if(!closed && index!==-1)this.colliders.splice(index,1);
+    this.dutyDoorPivot.updateWorldMatrix(true,true);
+    this.dutyDoorHandle.getWorldPosition(this.dutyDoorHitbox.position);
+    this.dutyDoorHitbox.userData.label=closed?'開啟值班室房門':'關閉值班室房門';
+  }
+
+  toggleDutyDoor(playerPosition) {
+    if(!this.dutyDoorClosed && playerPosition) {
+      const player=new THREE.Box3(new THREE.Vector3(playerPosition.x-.35,0,playerPosition.z-.35),new THREE.Vector3(playerPosition.x+.35,1.9,playerPosition.z+.35));
+      if(player.intersectsBox(this.dutyDoorCollider))return false;
+    }
+    this.setDutyDoorClosed(!this.dutyDoorClosed);
+    return true;
   }
 
   cleanup() {
     if (this.zoneGroup) {
       this.scene.remove(this.zoneGroup);
-      this.zoneGroup.traverse((child) => {
-        if (child.geometry && typeof child.geometry.dispose === 'function') {
-          child.geometry.dispose();
-        }
-      });
-      this.zoneGroup.clear();
+      disposeZoneArt(this.zoneGroup);
     }
     this.colliders = [];
     this.walkables = [];

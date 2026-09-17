@@ -1,19 +1,10 @@
 // FirstCampus3F.js - Milestone M0: First Campus 3F Doctor Administrative Area & Room 316
 import * as THREE from 'three';
+import { gameState } from '../../core/GameState.js';
 import { Level3FBlockout } from '../Level3FBlockout.js';
+import { disposeZoneArt } from '../../art/ArtResources.js';
+import { applyFirstFloorArt } from '../../art/FirstFloorArt.js';
 import { applyAct1CollisionHotfix } from '../CollisionHotfix.js';
-
-function disposeMaterial(mat) {
-  if (!mat) return;
-  ['map', 'lightMap', 'bumpMap', 'normalMap', 'specularMap', 'envMap', 'alphaMap', 'roughnessMap', 'metalnessMap'].forEach((key) => {
-    if (mat[key] && typeof mat[key].dispose === 'function') {
-      mat[key].dispose();
-    }
-  });
-  if (typeof mat.dispose === 'function') {
-    mat.dispose();
-  }
-}
 
 export class FirstCampus3F {
   constructor(scene, geometryFactory) {
@@ -32,6 +23,7 @@ export class FirstCampus3F {
     // Pass zoneGroup so all meshes, lights, signs are children of zoneGroup, not global scene
     this.levelInstance = new Level3FBlockout(this.zoneGroup);
     applyAct1CollisionHotfix(this.levelInstance);
+    applyFirstFloorArt(this.levelInstance);
 
     this.colliders = this.levelInstance.colliders;
     this.walkables = this.levelInstance.walkables;
@@ -42,6 +34,8 @@ export class FirstCampus3F {
     this.workstationMesh = this.levelInstance.workstationMesh;
     this.dutyLogMesh = this.levelInstance.dutyLogMesh;
     this.elevatorLight = this.levelInstance.elevatorLight;
+    this.keyMesh.visible = !gameState.isTaskComplete('KEY_PICKUP');
+    this.updateElevatorLight(gameState.areRequiredTasksComplete());
 
     return this;
   }
@@ -55,19 +49,7 @@ export class FirstCampus3F {
   cleanup() {
     if (this.zoneGroup) {
       this.scene.remove(this.zoneGroup);
-      this.zoneGroup.traverse((child) => {
-        if (child.geometry && typeof child.geometry.dispose === 'function') {
-          child.geometry.dispose();
-        }
-        if (child.material) {
-          if (Array.isArray(child.material)) {
-            child.material.forEach((m) => disposeMaterial(m));
-          } else {
-            disposeMaterial(child.material);
-          }
-        }
-      });
-      this.zoneGroup.clear();
+      disposeZoneArt(this.zoneGroup);
     }
     this.levelInstance = null;
     this.colliders = [];
