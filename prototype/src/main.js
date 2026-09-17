@@ -2,6 +2,7 @@
 import * as THREE from 'three';
 import { gameState } from './core/GameState.js';
 import { Level3FBlockout } from './world/Level3FBlockout.js';
+import { applyAct1CollisionHotfix } from './world/CollisionHotfix.js';
 import { FPSController } from './player/FPSController.js';
 import { UIManager } from './ui/UIManager.js';
 import { soundManager } from './audio/SoundManager.js';
@@ -30,6 +31,10 @@ container.appendChild(renderer.domElement);
 
 // Instantiate World Level (3F Blockout)
 const level = new Level3FBlockout(scene);
+
+// Correct known collision topology regressions before the controller receives
+// the collider array: 316 doorway must be passable; opposite glazed wall solid.
+applyAct1CollisionHotfix(level);
 
 // Instantiate FPS Controller
 const controller = new FPSController(
