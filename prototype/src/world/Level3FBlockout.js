@@ -1554,59 +1554,117 @@ export class Level3FBlockout {
     ceil.position.set(5.5, 13.2, -5.5);
     this.scene.add(ceil);
 
-    // Room perimeter walls
-    this.buildWall(5.5, 11.6, -8.5, 7.0, 3.2, 0.4, this.materials.wall4F); // South
-    this.buildWall(2.0, 11.6, -5.5, 0.4, 3.2, 6.0, this.materials.wall4F); // West
-    this.buildWall(9.0, 11.6, -5.5, 0.4, 3.2, 6.0, this.materials.wall4F); // East
+    // Room perimeter walls (enclosing private suite)
+    this.buildWall(5.5, 11.6, -8.5, 7.0, 3.2, 0.4, this.materials.wall4F); // South wall (with dusk window)
+    this.buildWall(2.0, 11.6, -5.5, 0.4, 3.2, 6.0, this.materials.wall4F); // West wall
+    this.buildWall(9.0, 11.6, -5.5, 0.4, 3.2, 6.0, this.materials.wall4F); // East wall
 
-    // North wall of duty room has door opening at x = 5.0
-    this.buildWall(3.2, 11.6, -2.5, 2.0, 3.2, 0.4, this.materials.wall4F);
-    this.buildWall(7.5, 11.6, -2.5, 3.0, 3.2, 0.4, this.materials.wall4F);
-    this.buildWall(5.1, 12.8, -2.5, 1.8, 0.8, 0.4, this.materials.wall4F);
+    // Door Jambs & Casing for Duty Room entrance
+    const doorJambMat = new THREE.MeshStandardMaterial({ color: 0x3d3024, roughness: 0.6 });
+    const jambLeft = new THREE.Mesh(new THREE.BoxGeometry(0.08, 2.3, 0.42), doorJambMat);
+    jambLeft.position.set(4.46, 11.15, -2.5);
+    this.scene.add(jambLeft);
+
+    const jambRight = new THREE.Mesh(new THREE.BoxGeometry(0.08, 2.3, 0.42), doorJambMat);
+    jambRight.position.set(5.74, 11.15, -2.5);
+    this.scene.add(jambRight);
+
+    const jambTop = new THREE.Mesh(new THREE.BoxGeometry(1.36, 0.08, 0.42), doorJambMat);
+    jambTop.position.set(5.10, 12.34, -2.5);
+    this.scene.add(jambTop);
+
+    // Wall-Mounted Duty Room Plaque on corridor wall beside door frame (x = 3.95, y = 11.60, z = -2.28)
+    // Firmly affixed flush to corridor wall face (at z = -2.28, wall face is -2.30), never floating, never clipping
+    const wallSignGroup = new THREE.Group();
+    const signBase = new THREE.Mesh(
+      new THREE.BoxGeometry(0.66, 0.28, 0.02),
+      new THREE.MeshStandardMaterial({ color: 0xc6ded2, metalness: 0.4, roughness: 0.3 })
+    );
+    wallSignGroup.add(signBase);
+
+    const wallSignCanvas = document.createElement('canvas');
+    wallSignCanvas.width = 512; wallSignCanvas.height = 210;
+    const wctx = wallSignCanvas.getContext('2d');
+    wctx.fillStyle = '#1c3d31'; wctx.fillRect(0, 0, 512, 210);
+    wctx.strokeStyle = '#c6ded2'; wctx.lineWidth = 6;
+    wctx.strokeRect(8, 8, 496, 194);
+    wctx.fillStyle = '#ffffff'; wctx.font = 'bold 44px sans-serif';
+    wctx.textAlign = 'center';
+    wctx.fillText('422 值班室', 256, 68);
+    wctx.fillStyle = '#a8e0c4'; wctx.font = 'bold 22px sans-serif';
+    wctx.fillText('醫師獨立值班套房 (Duty Room)', 256, 118);
+    wctx.fillStyle = '#e8f5ee'; wctx.font = '18px sans-serif';
+    wctx.fillText('休息是為了走更長的路', 256, 168);
+    const wallSignTex = new THREE.CanvasTexture(wallSignCanvas);
+    const wallSignMesh = new THREE.Mesh(
+      new THREE.PlaneGeometry(0.64, 0.26),
+      new THREE.MeshBasicMaterial({ map: wallSignTex })
+    );
+    wallSignMesh.position.set(0, 0, 0.012);
+    wallSignGroup.add(wallSignMesh);
+
+    wallSignGroup.position.set(3.95, 11.60, -2.28);
+    this.scene.add(wallSignGroup);
 
     // REAL CLOSABLE WOODEN DOOR FOR DUTY ROOM (Room 422)
     const doorGroup = new THREE.Group();
     const doorLeaf = new THREE.Mesh(
-      new THREE.BoxGeometry(1.1, 2.3, 0.06),
+      new THREE.BoxGeometry(1.18, 2.28, 0.06),
       this.materials.wood
     );
-    doorLeaf.position.set(0.55, 1.15, 0);
+    doorLeaf.position.set(0.59, 1.14, 0);
     doorGroup.add(doorLeaf);
 
     // Brass door handle & lock
     const knob = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.12), this.materials.brass);
     knob.rotateZ(Math.PI / 2);
-    knob.position.set(0.95, 1.05, 0.04);
+    knob.position.set(1.05, 1.05, 0.04);
     doorGroup.add(knob);
 
-    // Door sign plate: "422 值班室 ｜ 休息是為了走更長的路" (A02 Reference)
+    // Door Number Plaque mounted tightly on door leaf face (x = 0.59, y = 1.70, z = 0.035)
+    const doorPlateBase = new THREE.Mesh(
+      new THREE.BoxGeometry(0.26, 0.11, 0.01),
+      new THREE.MeshStandardMaterial({ color: 0x222222, metalness: 0.5 })
+    );
+    doorPlateBase.position.set(0.59, 1.70, 0.035);
+    doorGroup.add(doorPlateBase);
+
     const plateCanvas = document.createElement('canvas');
-    plateCanvas.width = 512; plateCanvas.height = 140;
+    plateCanvas.width = 256; plateCanvas.height = 110;
     const pctx = plateCanvas.getContext('2d');
-    pctx.fillStyle = '#1c3d31'; pctx.fillRect(0, 0, 512, 140);
+    pctx.fillStyle = '#1c3d31'; pctx.fillRect(0, 0, 256, 110);
     pctx.strokeStyle = '#c6ded2'; pctx.lineWidth = 4;
-    pctx.strokeRect(6, 6, 500, 128);
+    pctx.strokeRect(4, 4, 248, 102);
     pctx.fillStyle = '#ffffff'; pctx.font = 'bold 36px sans-serif';
     pctx.textAlign = 'center'; pctx.textBaseline = 'middle';
-    pctx.fillText('422 值班室', 256, 50);
-    pctx.fillStyle = '#a8e0c4'; pctx.font = '20px sans-serif';
-    pctx.fillText('休息是為了走更長的路', 256, 95);
+    pctx.fillText('422', 128, 42);
+    pctx.fillStyle = '#a8e0c4'; pctx.font = 'bold 18px sans-serif';
+    pctx.fillText('值班室', 128, 80);
     const plateTex = new THREE.CanvasTexture(plateCanvas);
-    const plate = new THREE.Mesh(new THREE.PlaneGeometry(0.55, 0.16), new THREE.MeshBasicMaterial({ map: plateTex }));
-    plate.position.set(0.55, 1.55, 0.04);
+    const plate = new THREE.Mesh(new THREE.PlaneGeometry(0.24, 0.095), new THREE.MeshBasicMaterial({ map: plateTex }));
+    plate.position.set(0.59, 1.70, 0.042);
     doorGroup.add(plate);
 
-    // Caution sign below handle: "請輕聲關門 保持安靜"
+    // Caution sign below handle: "請輕聲關門 保持安靜" tightly mounted on door leaf face
+    const quietPlateBase = new THREE.Mesh(
+      new THREE.BoxGeometry(0.32, 0.09, 0.008),
+      new THREE.MeshStandardMaterial({ color: 0xd0d5d2, roughness: 0.4 })
+    );
+    quietPlateBase.position.set(0.59, 1.35, 0.034);
+    doorGroup.add(quietPlateBase);
+
     const quietCanvas = document.createElement('canvas');
     quietCanvas.width = 256; quietCanvas.height = 64;
     const qctx = quietCanvas.getContext('2d');
     qctx.fillStyle = '#f7faf8'; qctx.fillRect(0, 0, 256, 64);
-    qctx.fillStyle = '#333333'; qctx.font = 'bold 18px sans-serif';
+    qctx.strokeStyle = '#8fa398'; qctx.lineWidth = 2;
+    qctx.strokeRect(2, 2, 252, 60);
+    qctx.fillStyle = '#222222'; qctx.font = 'bold 18px sans-serif';
     qctx.textAlign = 'center'; qctx.textBaseline = 'middle';
     qctx.fillText('請輕聲關門 ｜ 保持安靜', 128, 32);
     const quietTex = new THREE.CanvasTexture(quietCanvas);
-    const quietPlate = new THREE.Mesh(new THREE.PlaneGeometry(0.35, 0.09), new THREE.MeshBasicMaterial({ map: quietTex }));
-    quietPlate.position.set(0.55, 1.35, 0.04);
+    const quietPlate = new THREE.Mesh(new THREE.PlaneGeometry(0.30, 0.075), new THREE.MeshBasicMaterial({ map: quietTex }));
+    quietPlate.position.set(0.59, 1.35, 0.040);
     doorGroup.add(quietPlate);
 
     doorGroup.position.set(4.5, 10.0, -2.5);
