@@ -167,7 +167,7 @@ export class FPSController {
       this.autoMoveStopDistance = 0.45;
     }
 
-    target.y = this.eyeHeight;
+    target.y = this.position.y;
     this.autoMoveTarget = target;
   }
 
@@ -272,9 +272,11 @@ export class FPSController {
 
   checkCollision(x, z) {
     const r = this.playerRadius;
+    const bottomY = this.position.y - this.eyeHeight + 0.15;
+    const topY = this.position.y + 0.25;
     const playerBox = new THREE.Box3(
-      new THREE.Vector3(x - r, 0.2, z - r),
-      new THREE.Vector3(x + r, 2.0, z + r)
+      new THREE.Vector3(x - r, bottomY, z - r),
+      new THREE.Vector3(x + r, topY, z + r)
     );
 
     for (const box of this.colliders) {

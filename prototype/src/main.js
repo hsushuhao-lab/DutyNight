@@ -1,4 +1,4 @@
-// main.js - Songde Night Duty Act 1 First Agent Task (1~6)
+// main.js - Songde Night Duty Act 1 First Agent Task & Art Pass v1
 import * as THREE from 'three';
 import { gameState } from './core/GameState.js';
 import { Level3FBlockout } from './world/Level3FBlockout.js';
@@ -9,26 +9,26 @@ import { soundManager } from './audio/SoundManager.js';
 // Setup Three.js Scene & Renderer
 const container = document.getElementById('canvas-container');
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x1a1614);
-scene.fog = new THREE.FogExp2(0x241e1b, 0.025);
+scene.background = new THREE.Color(0x181513);
+scene.fog = new THREE.FogExp2(0x231d1a, 0.022);
 
 const camera = new THREE.PerspectiveCamera(
-  68,
+  68, // Conservative FOV to prevent motion sickness
   window.innerWidth / window.innerHeight,
   0.1,
   60
 );
 
-const renderer = new THREE.WebGLRenderer({ antialias: true });
+const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.15;
+renderer.toneMappingExposure = 1.12;
 container.appendChild(renderer.domElement);
 
-// Instantiate World Level (3F Blockout)
+// Instantiate World Level (3F Admin & 4F Closed Ward / Duty Room)
 const level = new Level3FBlockout(scene);
 
 // Instantiate FPS Controller
@@ -61,7 +61,7 @@ uiManager = new UIManager(
 // Setup Raycast Hover & Interaction
 controller.onHoverChange = (interactable) => {
   if (interactable) {
-    uiManager.showPrompt(`[E] ${interactable.label}  ·  雙擊走近`);
+    uiManager.showPrompt('[E] ' + interactable.label + '  ·  雙擊走近');
   } else {
     uiManager.showPrompt(null);
   }
@@ -90,12 +90,22 @@ controller.onInteract = (interactable) => {
     controller.enabled = false;
     uiManager.openWorkstation();
     checkElevatorReady();
-  } else if (interactable.type === 'elevator') {
+  } else if (interactable.type === 'elevator' || interactable.type === 'elevator_3f') {
     if (gameState.areRequiredTasksComplete()) {
       controller.enabled = false;
-      uiManager.triggerElevatorTransition(() => {
-        gameState.markTaskComplete('WARD_ENTRY');
-      });
+      uiManager.triggerElevatorTransition(
+        '4F',
+        () => {
+          // Teleport to 4F elevator lobby facing east
+          controller.teleport(-8.0, 10.0 + controller.eyeHeight, 0.0, 0);
+          gameState.markTaskComplete('WARD_ENTRY');
+        },
+        () => {
+          controller.enabled = true;
+          renderer.domElement.requestPointerLock();
+          uiManager.showSubtitle('李醫師', '「抵達 4F 閉鎖病房區了。先找到 4F 獨立值班室把公事包安頓好。」');
+        }
+      );
     } else {
       soundManager.playClick();
       const missing = [];
@@ -103,6 +113,38 @@ controller.onInteract = (interactable) => {
       if (!gameState.isTaskComplete('DUTY_LOG')) missing.push('簽到值班本');
       if (!gameState.isTaskComplete('E_HANDOFF')) missing.push('電腦電子交班');
       uiManager.showSubtitle('李醫師 (自語)', '「還沒完成 3F 報到交班手續，還缺：' + missing.join('、') + '。」', 5000);
+    }
+  } else if (interactable.type === 'elevator_4f') {
+    // Return back down to 3F
+    controller.enabled = false;
+    uiManager.triggerElevatorTransition(
+      '3F',
+      () => {
+        controller.teleport(-8.0, 0.0 + controller.eyeHeight, 0.0, 0);
+      },
+      () => {
+        controller.enabled = true;
+        renderer.domElement.requestPointerLock();
+        uiManager.showSubtitle('李醫師', '「回到 3F 醫師行政區。」');
+      }
+    );
+  } else if (interactable.type === 'duty_room_door') {
+    if (gameState.isTaskComplete('KEY_PICKUP')) {
+      if (!level.isDutyRoomUnlocked) {
+        soundManager.playClick();
+        level.unlockDutyRoom();
+        gameState.markTaskComplete('DUTY_ROOM_SETUP');
+        interactable.label = '4F 獨立值班室 (已開啟)';
+        uiManager.showSubtitle('李醫師', '「（用鑰匙轉開門鎖）呼……這就是今晚的值班室，有床有桌子，感覺很安頓。」');
+      }
+    } else {
+      soundManager.playClick();
+      uiManager.showSubtitle('李醫師 (自語)', '「門鎖著，需要 4F 值班室鑰匙。剛才在 316 總醫師辦公桌上好像有看見。」');
+    }
+  } else if (interactable.type === 'prop_info') {
+    soundManager.playClick();
+    if (interactable.info) {
+      uiManager.showSubtitle('李醫師', '「' + interactable.info.replace(/^李醫師：『|』$/g, '') + '」');
     }
   }
 };
@@ -129,5 +171,32 @@ function animate() {
   renderer.render(scene, camera);
 }
 
+// URL Camera presets for QA and visual capture
+const urlParams = new URLSearchParams(window.location.search);
+const camPreset = urlParams.get('cam');
+if (camPreset === 'corridor') {
+  controller.teleport(0.0, controller.eyeHeight, 0.0, -Math.PI / 2);
+} else if (camPreset === 'office') {
+  controller.teleport(6.0, controller.eyeHeight, 4.5, Math.PI);
+} else if (camPreset === 'workstation') {
+  controller.teleport(8.5, controller.eyeHeight, 5.5, -Math.PI / 2);
+  setTimeout(() => { uiManager.openWorkstation(); }, 400);
+} else if (camPreset === 'elevator') {
+  controller.teleport(-6.0, controller.eyeHeight, 0.0, Math.PI / 2);
+} else if (camPreset === '4f_gate') {
+  controller.teleport(3.0, 10.0 + controller.eyeHeight, -1.2, Math.PI);
+  controller.pitch = 0.16;
+  controller.updateCameraRotation();
+  const locEl = document.querySelector('.hud-location');
+  if (locEl) locEl.textContent = '4F 精神科閉鎖病房區 ｜ 門禁前室';
+} else if (camPreset === '4f_dutyroom' || camPreset === '4f') {
+  level.unlockDutyRoom();
+  controller.teleport(7.0, 10.0 + controller.eyeHeight, -4.6, 0.75);
+  controller.pitch = -0.15;
+  controller.updateCameraRotation();
+  const locEl = document.querySelector('.hud-location');
+  if (locEl) locEl.textContent = '4F 精神科閉鎖病房區 ｜ 獨立值班室 (私人套房空間)';
+}
+
 animate();
-console.log('Songde Night Duty - Act 1 Prototype Initialized.');
+console.log('Songde Night Duty - Act 1 Art Pass v1 Initialized.');
