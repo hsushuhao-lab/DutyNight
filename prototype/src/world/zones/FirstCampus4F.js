@@ -157,9 +157,46 @@ export class FirstCampus4F {
     const bPillow = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.12, 0.45), this.gf.materials.bedSheet);
     bPillow.position.set(0, 0.62, -0.75);
     bedGroup.add(bPillow);
+
+    // Folded extra blanket at foot of bed
+    const bBlanket = new THREE.Mesh(
+      new THREE.BoxGeometry(1.3, 0.08, 0.55),
+      new THREE.MeshStandardMaterial({ color: 0x5d7366, roughness: 0.85 })
+    );
+    bBlanket.position.set(0, 0.58, 0.65);
+    bedGroup.add(bBlanket);
+
     bedGroup.position.set(3.5, 0, -6.8);
     this.zoneGroup.add(bedGroup);
     CollisionFactory.addBox(this.colliders, 3.5, 0.4, -6.8, 1.4, 0.8, 2.1);
+
+    // Nightstand table beside bed
+    const nightstand = new THREE.Mesh(
+      new THREE.BoxGeometry(0.48, 0.56, 0.48),
+      this.gf.materials.doorWood
+    );
+    nightstand.position.set(4.65, 0.28, -7.2);
+    this.zoneGroup.add(nightstand);
+    CollisionFactory.addBox(this.colliders, 4.65, 0.28, -7.2, 0.48, 0.56, 0.48);
+
+    // Bedside warm reading lamp
+    const lampBase = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.08, 0.1, 0.04, 12),
+      this.gf.materials.metal
+    );
+    lampBase.position.set(4.65, 0.58, -7.2);
+    this.zoneGroup.add(lampBase);
+
+    const lampShade = new THREE.Mesh(
+      new THREE.ConeGeometry(0.14, 0.18, 12, 1, true),
+      new THREE.MeshStandardMaterial({ color: 0xfff2dc, roughness: 0.4 })
+    );
+    lampShade.position.set(4.65, 0.72, -7.2);
+    this.zoneGroup.add(lampShade);
+
+    const nightLampLight = new THREE.PointLight(0xffe1b0, 0.8, 3.5);
+    nightLampLight.position.set(4.65, 0.70, -7.2);
+    this.zoneGroup.add(nightLampLight);
 
     // 2. Study desk & chair
     const desk = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.76, 0.8), this.gf.materials.doorWood);
@@ -167,19 +204,46 @@ export class FirstCampus4F {
     this.zoneGroup.add(desk);
     CollisionFactory.addBox(this.colliders, 7.5, 0.4, -4.5, 1.6, 0.8, 0.8);
 
+    // Desk study lamp & papers
+    const deskLamp = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.32, 0.12), this.gf.materials.metal);
+    deskLamp.position.set(8.1, 0.92, -4.5);
+    this.zoneGroup.add(deskLamp);
+
+    const deskPapers = new THREE.Mesh(
+      new THREE.BoxGeometry(0.3, 0.02, 0.22),
+      new THREE.MeshStandardMaterial({ color: 0xf8f8f4, roughness: 0.9 })
+    );
+    deskPapers.position.set(7.25, 0.77, -4.5);
+    this.zoneGroup.add(deskPapers);
+
     const deskChair = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.85, 0.55), this.gf.materials.metal);
     deskChair.position.set(7.5, 0.42, -5.3);
     this.zoneGroup.add(deskChair);
 
-    // 3. Wardrobe / locker
+    // 3. Wardrobe / locker with stainless handle
     const locker = new THREE.Mesh(new THREE.BoxGeometry(0.8, 2.0, 0.7), this.gf.materials.metal);
     locker.position.set(8.2, 1.0, -7.5);
     this.zoneGroup.add(locker);
     CollisionFactory.addBox(this.colliders, 8.2, 1.0, -7.5, 0.8, 2.0, 0.7);
 
-    // 4. Private bathroom partition shell (x: 2.2 to 4.2, z: -5.0 to -3.0)
+    // 4. Private bathroom partition shell & fittings
     this.gf.buildWall(this.zoneGroup, this.colliders, 3.2, 1.6, -5.0, 2.0, 3.2, 0.2); // north partition
     this.gf.buildWall(this.zoneGroup, this.colliders, 4.2, 1.6, -4.0, 0.2, 3.2, 2.0); // east partition
+
+    const sink = new THREE.Mesh(
+      new THREE.BoxGeometry(0.5, 0.3, 0.4),
+      new THREE.MeshStandardMaterial({ color: 0xf2f4f2, roughness: 0.2 })
+    );
+    sink.position.set(2.6, 0.8, -4.0);
+    this.zoneGroup.add(sink);
+
+    const mirror = new THREE.Mesh(
+      new THREE.PlaneGeometry(0.45, 0.7),
+      this.gf.materials.stainless
+    );
+    mirror.position.set(2.6, 1.5, -4.88);
+    mirror.rotation.y = 0;
+    this.zoneGroup.add(mirror);
 
     // Warm ceiling light in duty room
     this.gf.buildCeilingLight(this.zoneGroup, 6.0, 3.15, -5.5, 0.85, 6.5, 0xffebce);
@@ -207,16 +271,43 @@ export class FirstCampus4F {
     this.zoneGroup.add(counterTop);
     CollisionFactory.addBox(this.colliders, 8.75, 0.55, 2.5, 5.7, 1.15, 0.75);
 
-    // Upper glass partition (humane hospital observation window, no bars)
+    // Upper glass partition (humane hospital observation window with frosted privacy stripe)
     const glassUpper = new THREE.Mesh(new THREE.PlaneGeometry(5.4, 1.1), this.gf.materials.glass);
     glassUpper.position.set(8.75, 1.72, 2.5);
     this.zoneGroup.add(glassUpper);
+
+    // Frosted privacy stripe across center of glass
+    const frostStripe = new THREE.Mesh(
+      new THREE.PlaneGeometry(5.4, 0.28),
+      new THREE.MeshStandardMaterial({
+        color: 0xdfede6,
+        transparent: true,
+        opacity: 0.65,
+        roughness: 0.6
+      })
+    );
+    frostStripe.position.set(8.75, 1.65, 2.502);
+    this.zoneGroup.add(frostStripe);
 
     // Nursing station inner work desk
     const innerDesk = new THREE.Mesh(new THREE.BoxGeometry(5.0, 0.76, 1.0), this.gf.materials.metal);
     innerDesk.position.set(8.75, 0.38, 4.5);
     this.zoneGroup.add(innerDesk);
     CollisionFactory.addBox(this.colliders, 8.75, 0.4, 4.5, 5.0, 0.8, 1.0);
+
+    // Desktop monitors & chart binder racks
+    const monitor1 = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.35, 0.06), this.gf.materials.metal);
+    monitor1.position.set(7.5, 0.95, 4.5);
+    this.zoneGroup.add(monitor1);
+
+    const monitor2 = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.35, 0.06), this.gf.materials.metal);
+    monitor2.position.set(9.8, 0.95, 4.5);
+    this.zoneGroup.add(monitor2);
+
+    // Wall chart rack on back wall
+    const chartRack = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.8, 0.12), this.gf.materials.metal);
+    chartRack.position.set(8.0, 1.8, 7.3);
+    this.zoneGroup.add(chartRack);
 
     // Nursing Station Signboard
     SignAnchor.buildWallPlaque({

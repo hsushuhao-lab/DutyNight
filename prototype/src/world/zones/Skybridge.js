@@ -146,16 +146,19 @@ export class Skybridge {
     // ==========================================
     const lightPositions = [5, 12, 18, 25, 33, 40, 48, 55];
     lightPositions.forEach((x, index) => {
-      // Intentionally subtle alternating lateral offset
-      const offsetZ = index % 2 === 0 ? -0.3 : 0.3;
+      // Intentionally subtle alternating lateral offset & mixed orientation
+      const offsetZ = index % 2 === 0 ? -0.25 : 0.25;
+      const isTransverse = index % 3 === 0;
+      const tubeColor = (index === 2 || index === 5) ? 0xffe4c0 : 0xfff6ea; // Aged warm tube
       this.gf.buildCeilingLight(
         this.zoneGroup,
         x,
         bridgeHeight - 0.05,
         offsetZ,
-        0.7,
+        0.75,
         8.0,
-        index === 4 ? 0xffe2be : 0xfff5ea // One warm slightly older tube
+        tubeColor,
+        isTransverse
       );
     });
 
