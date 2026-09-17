@@ -1196,7 +1196,10 @@ export class Level3FBlockout {
     this.elevatorLight4F = callButton;
 
     // Overhead Sign & Floor Directory Board (Step 4 Reference)
-    this.createSignMesh(-6, 12.7, 0, '🛗 電梯大廳 4F ｜ 4F 精神科閉鎖病房區', -Math.PI / 2);
+    // Facing corridor (heading East): guides to wards and duty room
+    this.createSignMesh(-6, 12.7, 0, '🛗 電梯大廳 4F ｜ ➔ 4A/4B 急性病房 · 422 值班室', -Math.PI / 2);
+    // Facing elevator lobby (heading West): guides to elevators
+    this.createSignMesh(-6, 12.7, 0.05, '← 4A/4B 急性病房 · 422 值班室 ｜ 🛗 電梯大廳 ➔', Math.PI / 2);
     this.buildElevatorDirectoryBoard(-11.75, 11.65, -2.2, '4F');
   }
 
@@ -1495,9 +1498,11 @@ export class Level3FBlockout {
     this.buildWall(11.5, 11.6, -2.5, 5.0, 3.2, 0.4, this.materials.wall4F);
     this.buildWall(5.0, 12.8, -2.5, 8.0, 0.8, 0.4, this.materials.wall4F); // Lintel over duty room area
 
-    // Directional signs overhead in corridor (placed away from gate view)
-    this.createSignMesh(-1.5, 12.7, 0, '← 4A/4B 閉鎖病房 ｜ 4F 獨立值班室 ➔', -Math.PI / 2);
-    this.createSignMesh(-1.5, 12.7, 0.05, '← 4F 獨立值班室 ｜ 4A/4B 閉鎖病房 ➔', Math.PI / 2);
+    // Directional signs overhead in corridor (x = -1.5)
+    // Walking East (+X): Left (South, -Z) is 422 Duty Room, Right (North, +Z) is 4A/4B Closed Ward & Nursing Station
+    this.createSignMesh(-1.5, 12.7, 0, '← 422 獨立值班室 ｜ 4A/4B 閉鎖病房 · 護理站 ➔', -Math.PI / 2);
+    // Walking West (-X): Left (North, +Z) is 4A/4B Closed Ward, Right (South, -Z) is 422 Duty Room & Elevator Lobby
+    this.createSignMesh(-1.5, 12.7, 0.05, '← 4A/4B 閉鎖病房 ｜ 422 值班室 · 🛗 電梯大廳 ➔', Math.PI / 2);
   }
 
   build4FDutyRoom() {
