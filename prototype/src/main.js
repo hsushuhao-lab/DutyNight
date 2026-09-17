@@ -194,7 +194,31 @@ if (camPreset === 'corridor') {
   controller.pitch = -0.10;
   controller.updateCameraRotation();
   const locEl = document.querySelector('.hud-location');
-  if (locEl) locEl.textContent = '4F 病房區 ｜ 獨立值班室';
+  if (locEl) locEl.textContent = '4F 病房區 ｜ 422 獨立值班室';
+} else if (camPreset === 'hotfix_316_doorway') {
+  controller.teleport(2.0, controller.eyeHeight, -0.4, Math.PI);
+  controller.pitch = -0.12;
+  controller.updateCameraRotation();
+  const locEl = document.querySelector('.hud-location');
+  if (locEl) locEl.textContent = '3F 走廊 ｜ 316 總醫師辦公室門口 (走廊扶手無橫槓阻擋)';
+} else if (camPreset === 'hotfix_4f_signs') {
+  controller.teleport(-3.2, 10.0 + controller.eyeHeight, 0.0, -Math.PI / 2);
+  controller.pitch = 0.08;
+  controller.updateCameraRotation();
+  const locEl = document.querySelector('.hud-location');
+  if (locEl) locEl.textContent = '4F 走廊 ｜ 導引標示檢核 (值班室在左/閉鎖病房在右)';
+} else if (camPreset === 'hotfix_orange_fixed') {
+  controller.teleport(2.2, 10.0 + controller.eyeHeight, 0.8, 0.0);
+  controller.pitch = -0.05;
+  controller.updateCameraRotation();
+  const locEl = document.querySelector('.hud-location');
+  if (locEl) locEl.textContent = '4F 走廊南側 ｜ 422 值班室外牆檢核 (原橘色區塊已移除)';
+} else if (camPreset === 'hotfix_duty_door') {
+  controller.teleport(4.5, 10.0 + controller.eyeHeight, -0.7, 0.0);
+  controller.pitch = -0.06;
+  controller.updateCameraRotation();
+  const locEl = document.querySelector('.hud-location');
+  if (locEl) locEl.textContent = '4F 422值班室 ｜ 牆面門牌與木門組件檢核';
 }
 
 animate();

@@ -35,7 +35,11 @@ presets = [
     ('03_his_workstation.png', 'workstation'),
     ('04_elevator_lobby.png', 'elevator'),
     ('05_4f_arrival_duty_room.png', '4f_dutyroom'),
-    ('06_4f_closed_ward_gate.png', '4f_gate')
+    ('06_4f_closed_ward_gate.png', '4f_gate'),
+    ('hotfix_01_316_doorway.png', 'hotfix_316_doorway'),
+    ('hotfix_02_4f_signs.png', 'hotfix_4f_signs'),
+    ('hotfix_03_orange_fixed.png', 'hotfix_orange_fixed'),
+    ('hotfix_04_duty_door_plate.png', 'hotfix_duty_door')
 ]
 
 for filename, preset in presets:
