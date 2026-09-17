@@ -1,0 +1,99 @@
+{
+  "source": "https://polyhaven.com/a/island_tree_02",
+  "sourceTriangles": 1072213,
+  "derivativeTriangles": 136564,
+  "ratio": 0.1273664840847854,
+  "bytes": 16433736,
+  "sha256": "58ec0d84132ea3531a8c767da26ebf73fdfb7807d1c3624a367830db5c462e1d",
+  "bounds": {
+    "min": [
+      -2.052337884902954,
+      -0.017011718824505806,
+      -1.1138885021209717
+    ],
+    "max": [
+      2.155407428741455,
+      3.3892130851745605,
+      2.956543207168579
+    ]
+  },
+  "format": "glTF 2.0 binary uncompressed geometry; local texture JPEG q88 with leaf alpha PNG",
+  "simplify": {
+    "ratio": 0.13,
+    "error": 0.008
+  },
+  "sourceFiles": [
+    {
+      "name": "island_tree_02_2k.gltf",
+      "source": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/2k/island_tree_02/island_tree_02_2k.gltf",
+      "bytes": 8545,
+      "sha256": "134b85d69f89fa6ad84555999ea02ae28ddf4713d4672e18e03d5917fd43ae62"
+    },
+    {
+      "name": "textures/island_tree_02_nor_gl_2k.jpg",
+      "source": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/2k/island_tree_02/island_tree_02_nor_gl_2k.jpg",
+      "bytes": 4339456,
+      "sha256": "3b088058cd9c8759f1ee223fad90f860257f574ae2ba7401cd4982c687b853cf"
+    },
+    {
+      "name": "textures/island_tree_02_diff_2k.jpg",
+      "source": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/2k/island_tree_02/island_tree_02_diff_2k.jpg",
+      "bytes": 2684467,
+      "sha256": "2ca2706adc5bde6bc46fa4a4680041a1797cf6684a31629259559935a97e0057"
+    },
+    {
+      "name": "textures/island_tree_02_arm_2k.jpg",
+      "source": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/2k/island_tree_02/island_tree_02_arm_2k.jpg",
+      "bytes": 2347246,
+      "sha256": "89e20810f614231578314846acff92821249f4124f4aa6e2f630df45d7acb6b2"
+    },
+    {
+      "name": "textures/island_tree_02_leaves_nor_gl_2k.jpg",
+      "source": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/2k/island_tree_02/island_tree_02_leaves_nor_gl_2k.jpg",
+      "bytes": 1378585,
+      "sha256": "efa74b8b59a7466a295bf210505560002990183817b6c33663f3ec0dd438dd73"
+    },
+    {
+      "name": "textures/island_tree_02_leaves_diff_2k.jpg",
+      "source": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/2k/island_tree_02/island_tree_02_leaves_diff_2k.jpg",
+      "bytes": 661175,
+      "sha256": "e5c56ca13525aed76572852da5f69ae87cbee9e15abe2e1eff23adf92975f14a"
+    },
+    {
+      "name": "textures/island_tree_02_leaves_arm_2k.jpg",
+      "source": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/2k/island_tree_02/island_tree_02_leaves_arm_2k.jpg",
+      "bytes": 1645169,
+      "sha256": "cf4d604711d955d74a13b656bdbf840015ac38a71e24821849efade730634cc6"
+    },
+    {
+      "name": "textures/island_tree_02_branches_nor_gl_2k.jpg",
+      "source": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/2k/island_tree_02/island_tree_02_branches_nor_gl_2k.jpg",
+      "bytes": 2437750,
+      "sha256": "e4cac77b4f35ad47ba4fcdb9061f91acf3318d9889dd259cb5e6e132b0ab60c7"
+    },
+    {
+      "name": "textures/island_tree_02_branches_diff_2k.jpg",
+      "source": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/2k/island_tree_02/island_tree_02_branches_diff_2k.jpg",
+      "bytes": 1476655,
+      "sha256": "52cb2c660983836249e3f31ad286ca1bab8033e93070569b23e1867e3ae70b4d"
+    },
+    {
+      "name": "textures/island_tree_02_branches_arm_2k.jpg",
+      "source": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/2k/island_tree_02/island_tree_02_branches_arm_2k.jpg",
+      "bytes": 1523257,
+      "sha256": "a39d8291ba54adf1ca42f15abe2f622d0ac59fb13c87087a0fabc755b91dfee8"
+    },
+    {
+      "name": "island_tree_02.bin",
+      "source": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/8k/island_tree_02/island_tree_02.bin",
+      "bytes": 40686576,
+      "sha256": "427d69ccc1ea12d1fb9c6af89691563b4a097f39a6f34c15be6e45ef5e5fd4ce"
+    },
+    {
+      "name": "textures/island_tree_02_leaves_alpha_2k.png",
+      "source": "https://dl.polyhaven.org/file/ph-assets/Models/png/2k/island_tree_02/island_tree_02_leaves_alpha_2k.png",
+      "bytes": 139077,
+      "sha256": "30c36ae0d9023400035f0af9d336ed5f73a84bf8a88c8e2bec8faa07d725992b"
+    }
+  ]
+}

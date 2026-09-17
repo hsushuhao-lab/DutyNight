@@ -18,3 +18,7 @@ dist/
 
 # Import dropboxes
 DutyNight_progress_*/
+
+# Local reproducible visual QA working files
+.visual-work/
+prototype/.model-baseline/

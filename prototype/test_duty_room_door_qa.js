@@ -1,0 +1,25 @@
+import assert from 'node:assert/strict';
+import * as THREE from 'three';
+import { FirstCampus4F } from './src/world/zones/FirstCampus4F.js';
+import { GeometryFactory } from './src/world/shared/GeometryFactory.js';
+
+global.document = { createElement: () => ({ width: 512, height: 512, getContext: () => new Proxy({}, { get: () => () => ({ addColorStop() {} }) }) }) };
+const zone = new FirstCampus4F(new THREE.Scene(), new GeometryFactory()).build();
+const original = zone.colliders.map(box => [box.min.toArray(), box.max.toArray()]);
+const aperture = new THREE.Box3(new THREE.Vector3(5.2, .1, -2.7), new THREE.Vector3(5.6, 1.9, -2.3));
+assert.equal(zone.dutyDoorClosed, false);
+assert.equal(zone.colliders.some(box => box.intersectsBox(aperture)), false);
+assert.equal(zone.toggleDutyDoor(new THREE.Vector3(5.4, 1.7, -2.5)), false, 'Door must not close into player');
+assert.equal(zone.toggleDutyDoor(new THREE.Vector3(5.4, 1.7, -4)), true);
+assert.equal(zone.dutyDoorClosed, true);
+assert.equal(zone.colliders.length, original.length + 1);
+assert.equal(zone.colliders.some(box => box.intersectsBox(aperture)), true);
+assert.equal(zone.dutyDoorHitbox.userData.label, '開啟值班室房門');
+zone.setDutyDoorClosed(true);
+assert.equal(zone.colliders.length, original.length + 1, 'Restoring closed state must not duplicate collision');
+assert.equal(zone.toggleDutyDoor(new THREE.Vector3(5.4, 1.7, -4)), true);
+assert.deepEqual(zone.colliders.map(box => [box.min.toArray(), box.max.toArray()]), original);
+assert.equal(zone.dutyDoorHitbox.userData.label, '關閉值班室房門');
+zone.cleanup();
+assert.equal(zone.colliders.length, 0);
+console.log('DUTY ROOM DOOR: initial open, player clearance, closed collision, idempotent state, reopen restoration, cleanup PASS');
