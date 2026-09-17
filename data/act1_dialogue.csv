@@ -1,0 +1,14 @@
+dialogue_id,speaker,zh_tw,condition
+D001,Colleague,今天你值班喔？,ADMIN_START
+D002,Colleague,鑰匙在老地方，值班本記得簽一下。,KEY_PICKUP
+D003,NurseA,醫師，晚餐要一起訂嗎？,DINNER_ORDER
+D004,Patient,醫師，你今天也值班喔？,ROUND_01
+D005,Patient,你們值班可以睡嗎？,ROUND_01_OPTIONAL
+D006,Lee,可以啊，有得睡的話。,ROUND_01_OPTIONAL
+D007,NurseB,醫師不好意思，這邊有個狀況想請你來看一下。,ROUTINE_CALL
+D008,NurseB,好，謝謝醫師。,ROUTINE_CALL_COMPLETE
+D009,NurseB,醫師？……你怎麼又來了？,ANOMALY_HOOK
+D010,NurseB,你剛剛不是才來過嗎？,ANOMALY_HOOK
+D011,Lee,我什麼時候來過？,END_CHOICE_A
+D012,Lee,我先看一下紀錄。,END_CHOICE_B
+D013,Lee,你可能認錯了，我先回值班室。,END_CHOICE_C

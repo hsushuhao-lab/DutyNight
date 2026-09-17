@@ -1,0 +1,11 @@
+task_id,label,required,location,completion_rule,notes
+T01,領取值班室鑰匙,1,3F_ADMIN,Interact key pickup,Use fictionalized office in shipped game
+T02,簽值班本,1,3F_ADMIN,Interact duty log,Simple signature animation
+T03,電腦交班,1,ELIGIBLE_PC,Complete handoff UI flow,Any approved workstation
+T04,整理值班室,1,DUTY_ROOM,Make bed + place bag,Independent room with door
+T05,護理站訂晚餐,1,NURSING_STATION,Dialogue completed,No horror
+T06,第一輪巡房,1,WARD_CLUSTER,Visit required ward nodes,Normal routine
+T07,護理師來電,1,WARD_CLUSTER,Answer phone + reach target,Generic clinical abstraction
+T08,補紀錄,1,WORKSTATION,Close routine task,No real-world treatment algorithm
+T09,晚間優先順序事件,1,MULTI,Choose task priority,Creates queued unresolved item
+T10,第一次矛盾,1,NURSING_STATION,Trigger dialogue once,One queued item already complete
