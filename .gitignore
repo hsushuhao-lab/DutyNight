@@ -1,0 +1,17 @@
+﻿# Unreal Engine
+Binaries/
+DerivedDataCache/
+Intermediate/
+Saved/
+.vs/
+*.sln
+
+# Restricted Reference Protection
+02_ART/RESTRICTED_REFERENCE/
+**/RESTRICTED_REFERENCE/
+
+# Web / Prototype
+node_modules/
+dist/
+.vite/
+*.log

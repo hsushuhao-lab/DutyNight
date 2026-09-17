@@ -1,0 +1,21 @@
+{
+  "act_id": "ACT_01",
+  "title": "今晚輪到你",
+  "time_start": "16:55",
+  "time_end": "21:00",
+  "events": [
+    {"id":"ADMIN_START","required":true,"next":["KEY_PICKUP","DUTY_LOG"]},
+    {"id":"KEY_PICKUP","required":true,"next":["E_HANDOFF"]},
+    {"id":"DUTY_LOG","required":true,"next":["E_HANDOFF"]},
+    {"id":"E_HANDOFF","required":true,"next":["WARD_ENTRY"]},
+    {"id":"WARD_ENTRY","required":true,"next":["DUTY_ROOM_SETUP","DINNER_ORDER"]},
+    {"id":"DUTY_ROOM_SETUP","required":true,"next":["ROUND_01"]},
+    {"id":"DINNER_ORDER","required":true,"next":["ROUND_01"]},
+    {"id":"ROUND_01","required":true,"next":["ROUTINE_CALL"]},
+    {"id":"ROUTINE_CALL","required":true,"next":["DOCUMENT"]},
+    {"id":"DOCUMENT","required":true,"next":["PRIORITY_WINDOW"]},
+    {"id":"PRIORITY_WINDOW","required":true,"next":["ANOMALY_HOOK"]},
+    {"id":"ANOMALY_HOOK","required":true,"next":["END_CHOICE"]},
+    {"id":"END_CHOICE","required":true,"next":["ACT1_SAVE"]}
+  ]
+}

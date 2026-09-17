@@ -1,0 +1,16 @@
+﻿{
+	" FileVersion\: 3,
+ \EngineAssociation\: \5.3\,
+ \Category\: \Games\,
+ \Description\: \Songde Night Duty - Act 1\,
+ \Modules\: [
+ {
+ \Name\: \SongdeNightDuty\,
+ \Type\: \Runtime\,
+ \LoadingPhase\: \Default\,
+ \AdditionalDependencies\: [
+ \Engine\
+ ]
+ }
+ ]
+}

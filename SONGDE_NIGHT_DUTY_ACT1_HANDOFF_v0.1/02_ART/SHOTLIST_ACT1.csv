@@ -1,0 +1,11 @@
+shot_id,time,location,purpose,lighting,required_elements,reference
+A1S01,17:00,3F admin corridor,arrival / normality,sunset warm,"Lee, admin corridor, staff movement",A01
+A1S02,17:10,key office,duty key + log,warm practical,"key hook, duty book, desk",A01
+A1S03,17:20,workstation,electronic handoff,warm-neutral,"computer UI, patient list abstraction",A08
+A1S04,17:35,4F ward corridor,first ward entry,warm sunset,"secure door, nursing station, ordinary staff",A01
+A1S05,17:45,duty room,make bed / safe room,warm lamp,"real door, single bed, desk, phone",A02
+A1S06,18:00,nursing station,dinner order,warm social,"glass/wood station, nurses, normal conversation",A03
+A1S07,18:30,ward cluster,routine rounds,warm-neutral,"patients/staff, calm corridor",A01
+A1S08,19:00,workstation,documentation,warm desk lamp,"computer, phone, papers",A04
+A1S09,20:00,ER,normal consult,neutral clinical,"ER station, staff, no horror",A05
+A1S10,20:58,nursing station,first contradiction,neutral slightly quieter,"Lee foreground, staff confusion, no obvious apparition",A06
