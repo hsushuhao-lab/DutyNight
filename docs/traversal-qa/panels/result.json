@@ -1,0 +1,87 @@
+{
+  "verdict": "PASS",
+  "method": "Isolated oblique closeups via QA positioning; continuous movement is tested separately.",
+  "panels": [
+    {
+      "zone": "first_campus_3f",
+      "id": "first_campus_3f_stairs",
+      "raycastReachable": true
+    },
+    {
+      "zone": "first_campus_4f",
+      "id": "first_campus_4f_elevator",
+      "raycastReachable": true
+    },
+    {
+      "zone": "first_campus_4f",
+      "id": "first_campus_4f_stairs",
+      "raycastReachable": true
+    },
+    {
+      "zone": "first_campus_2f",
+      "id": "first_campus_2f_elevator",
+      "raycastReachable": true
+    },
+    {
+      "zone": "first_campus_1f",
+      "id": "first_campus_1f_elevator",
+      "raycastReachable": true
+    },
+    {
+      "zone": "first_campus_8f",
+      "id": "first_campus_8f_elevator",
+      "raycastReachable": true
+    },
+    {
+      "zone": "second_campus_2f",
+      "id": "second_campus_2f_elevator",
+      "raycastReachable": true
+    },
+    {
+      "zone": "second_campus_2f",
+      "id": "second_campus_2f_stairs",
+      "raycastReachable": true
+    },
+    {
+      "zone": "second_campus_1f",
+      "id": "second_campus_1f_elevator",
+      "raycastReachable": true
+    },
+    {
+      "zone": "second_campus_1f",
+      "id": "second_campus_1f_stairs",
+      "raycastReachable": true
+    },
+    {
+      "zone": "second_campus_3f",
+      "id": "second_campus_3f_elevator",
+      "raycastReachable": true
+    },
+    {
+      "zone": "second_campus_4f",
+      "id": "second_campus_4f_elevator",
+      "raycastReachable": true
+    },
+    {
+      "zone": "second_campus_5f",
+      "id": "second_campus_5f_elevator",
+      "raycastReachable": true
+    },
+    {
+      "zone": "second_campus_6f",
+      "id": "second_campus_6f_elevator",
+      "raycastReachable": true
+    },
+    {
+      "zone": "second_campus_7f",
+      "id": "second_campus_7f_elevator",
+      "raycastReachable": true
+    },
+    {
+      "zone": "second_campus_8f",
+      "id": "second_campus_8f_elevator",
+      "raycastReachable": true
+    }
+  ],
+  "errors": []
+}

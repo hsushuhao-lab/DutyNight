@@ -1,0 +1,82 @@
+{
+  "checkedAt": "2026-09-18T01:10:36.269Z",
+  "sourceRevision": "e94253fe791bfdcba749dd8c6e8ba9c9f0502a70",
+  "verdict": "COLD_LOAD_LIMITATION",
+  "description": "30s and 180s full-route attempts timed out before entering the world; network diagnostics show unfinished downloads without HTTP error responses. A subsequent longer attempt ended with ERR_CONNECTION_RESET and GLTF preload failure on the local test connection.",
+  "diagnostics": [
+    {
+      "name": "Default Chromium, 45s diagnostic",
+      "readyState": "interactive",
+      "worldInitialized": false,
+      "unfinishedRequests": [
+        "https://hsushuhao-lab.github.io/DutyNight/assets/textures/Ground037_2K-JPG_NormalGL.jpg",
+        "https://hsushuhao-lab.github.io/DutyNight/assets/textures/Ground037_2K-JPG_Roughness.jpg",
+        "https://hsushuhao-lab.github.io/DutyNight/assets/textures/Asphalt033_2K-JPG_Color.jpg",
+        "https://hsushuhao-lab.github.io/DutyNight/assets/textures/Asphalt033_2K-JPG_NormalGL.jpg",
+        "https://hsushuhao-lab.github.io/DutyNight/assets/textures/Asphalt033_2K-JPG_Roughness.jpg",
+        "https://hsushuhao-lab.github.io/DutyNight/assets/models/shrub_02/textures/shrub_02_alpha_2k.png",
+        "https://hsushuhao-lab.github.io/DutyNight/assets/models/fern_02/textures/fern_02_alpha_2k.png"
+      ],
+      "failedRequests": [],
+      "responseStatusCounts": {
+        "200": 47
+      }
+    },
+    {
+      "name": "HTTP/1 comparison, 120s diagnostic",
+      "readyState": "interactive",
+      "worldInitialized": false,
+      "unfinishedRequests": [
+        "https://hsushuhao-lab.github.io/DutyNight/assets/models/campusTree.glb",
+        "https://hsushuhao-lab.github.io/DutyNight/assets/textures/Plastic010_2K-JPG_Roughness.jpg",
+        "https://hsushuhao-lab.github.io/DutyNight/assets/textures/Terrazzo001_2K-JPG_Color.jpg",
+        "https://hsushuhao-lab.github.io/DutyNight/assets/textures/Terrazzo001_2K-JPG_NormalGL.jpg",
+        "https://hsushuhao-lab.github.io/DutyNight/assets/textures/Terrazzo001_2K-JPG_Roughness.jpg",
+        "https://hsushuhao-lab.github.io/DutyNight/assets/textures/Wood051_2K-JPG_Color.jpg",
+        "https://hsushuhao-lab.github.io/DutyNight/assets/textures/Wood051_2K-JPG_NormalGL.jpg",
+        "https://hsushuhao-lab.github.io/DutyNight/assets/textures/Wood051_2K-JPG_Roughness.jpg",
+        "https://hsushuhao-lab.github.io/DutyNight/assets/textures/Ground037_2K-JPG_Color.jpg",
+        "https://hsushuhao-lab.github.io/DutyNight/assets/textures/Ground037_2K-JPG_NormalGL.jpg",
+        "https://hsushuhao-lab.github.io/DutyNight/assets/textures/Ground037_2K-JPG_Roughness.jpg",
+        "https://hsushuhao-lab.github.io/DutyNight/assets/textures/Asphalt033_2K-JPG_Color.jpg",
+        "https://hsushuhao-lab.github.io/DutyNight/assets/textures/Asphalt033_2K-JPG_NormalGL.jpg",
+        "https://hsushuhao-lab.github.io/DutyNight/assets/textures/Asphalt033_2K-JPG_Roughness.jpg",
+        "https://hsushuhao-lab.github.io/DutyNight/assets/models/shrub_02/textures/shrub_02_arm_2k.jpg",
+        "https://hsushuhao-lab.github.io/DutyNight/assets/models/fern_02/textures/fern_02_nor_gl_2k.jpg"
+      ],
+      "failedRequests": [],
+      "responseStatusCounts": {
+        "200": 26
+      }
+    }
+  ],
+  "independentTransfer": {
+    "file": "Ground037_2K-JPG_NormalGL.jpg",
+    "httpStatus": 200,
+    "expectedBytes": 4579158,
+    "receivedBytes": 802752,
+    "durationSeconds": 20.008753,
+    "bytesPerSecond": 40120,
+    "complete": false
+  },
+  "note": "Observed on this test connection; not a universal startup-time benchmark. Final live result separately records actual initialization time.",
+  "connectionResetAttempt": {
+    "started": "2026-09-18T01:09:53.920Z",
+    "ended": "2026-09-18T01:11:26.160Z",
+    "worldInitialized": false
+  },
+  "recovery": {
+    "started": "2026-09-18T01:40:55.401Z",
+    "elapsedMs": 14583,
+    "state": {
+      "readyState": "complete",
+      "zone": "first_campus_3f"
+    },
+    "failures": []
+  },
+  "finalAcceptedRun": {
+    "initialLoadMs": 2481,
+    "persistentNetworkCache": true,
+    "source": "live/result.json"
+  }
+}

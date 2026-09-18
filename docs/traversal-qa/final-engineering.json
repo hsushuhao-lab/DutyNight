@@ -1,0 +1,129 @@
+{
+  "verdict": "PASS",
+  "results": [
+    {
+      "command": [
+        "test_art_resources_qa.js"
+      ],
+      "status": 0
+    },
+    {
+      "command": [
+        "test_duty_room_door_qa.js"
+      ],
+      "status": 0
+    },
+    {
+      "command": [
+        "test_entry_boundary_qa.js"
+      ],
+      "status": 0
+    },
+    {
+      "command": [
+        "test_er_boundary_qa.js"
+      ],
+      "status": 0
+    },
+    {
+      "command": [
+        "test_first_campus_rooms_qa.js"
+      ],
+      "status": 0
+    },
+    {
+      "command": [
+        "test_first_upper_rooms_qa.js"
+      ],
+      "status": 0
+    },
+    {
+      "command": [
+        "test_ground_movement_qa.js"
+      ],
+      "status": 0
+    },
+    {
+      "command": [
+        "test_hillside_surface_qa.js"
+      ],
+      "status": 0
+    },
+    {
+      "command": [
+        "test_key_revisit_qa.js"
+      ],
+      "status": 0
+    },
+    {
+      "command": [
+        "test_modeling_qa.js"
+      ],
+      "status": 0
+    },
+    {
+      "command": [
+        "test_playable_world_qa.js"
+      ],
+      "status": 0
+    },
+    {
+      "command": [
+        "test_second_rooms_qa.js"
+      ],
+      "status": 0
+    },
+    {
+      "command": [
+        "test_travel_panel_mount_qa.js"
+      ],
+      "status": 0
+    },
+    {
+      "command": [
+        "test_ward_gate_qa.js"
+      ],
+      "status": 0
+    },
+    {
+      "command": [
+        "test_world_traversal_qa.js"
+      ],
+      "status": 0
+    },
+    {
+      "command": [
+        "node_modules/vite/bin/vite.js",
+        "build"
+      ],
+      "status": 0
+    },
+    {
+      "command": [
+        "scripts/test-travel-panel-browser.mjs",
+        "../docs/traversal-qa/panels"
+      ],
+      "status": 0
+    },
+    {
+      "command": [
+        "scripts/test-browser-resources.mjs",
+        "../docs/traversal-qa/resources.json"
+      ],
+      "status": 0
+    }
+  ],
+  "sourceRevision": "e94253fe791bfdcba749dd8c6e8ba9c9f0502a70",
+  "completedAt": "2026-09-18T00:54:26.412Z",
+  "buildAssets": [
+    {
+      "name": "index-4P_iZA3b.js",
+      "sha256": "e34769d158b881491294a68ee87b018779f55dc4d0c131daa7e608242da57b8c"
+    }
+  ],
+  "panelVisualInspection": {
+    "verdict": "PASS",
+    "count": 16,
+    "scope": "Mounting and overlap; coordinating agent and independent reviewer inspected images."
+  }
+}

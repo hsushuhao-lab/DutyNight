@@ -1,0 +1,46 @@
+{
+  "verdict": "INCOMPLETE_SOFTWARE_RENDERER",
+  "attempts": [
+    {
+      "databaseId": 35294422602,
+      "url": "https://github.com/hsushuhao-lab/DutyNight/actions/runs/35294422602",
+      "headSha": "9e260a308fbbb815b78ab22209032bf61ef182c7",
+      "conclusion": "failure",
+      "initialLoadMs": 11905,
+      "zones": 1,
+      "rooms": 0,
+      "lastStep": {
+        "label": "Act1 production start",
+        "zone": "first_campus_3f",
+        "position": [
+          2.1,
+          1.7,
+          0.4
+        ],
+        "enabled": true
+      },
+      "reason": "page.waitForFunction: Timeout 5000ms exceeded."
+    },
+    {
+      "databaseId": 35294765086,
+      "url": "https://github.com/hsushuhao-lab/DutyNight/actions/runs/35294765086",
+      "headSha": "591e528addf47fa28a0161c8877cbcf32e436d10",
+      "conclusion": "cancelled",
+      "initialLoadMs": 10589,
+      "zones": 4,
+      "rooms": 13,
+      "lastStep": {
+        "label": "room in/out MEET",
+        "zone": "first_campus_2f",
+        "position": [
+          -3.199999999998911,
+          1.7,
+          18.004746926299024
+        ],
+        "enabled": true
+      },
+      "reason": "25-minute job timeout; incomplete route, not PASS"
+    }
+  ],
+  "note": "These independent runs are diagnostic only. Final acceptance is the separately recorded complete live browser run."
+}

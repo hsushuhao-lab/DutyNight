@@ -1,0 +1,85 @@
+Act1 production start {"zone":"first_campus_3f","position":[2.1,1.7,0.4],"enabled":true}
+3F lift locked before handoff {"zone":"first_campus_3f","position":[-10.057170399847793,1.6999999999999997,0.9930969787359761],"enabled":true}
+316 key log HIS completed {"zone":"first_campus_3f","position":[8.553385518528097,1.7000000000000002,4.905380795973185],"enabled":true}
+room in/out 3F_ADMIN {"zone":"first_campus_3f","position":[18.999828686587634,1.7,-0.15515075464874029],"enabled":true}
+room in/out 3F_STAIRS {"zone":"first_campus_3f","position":[18.999999805064885,1.7,0.1540410563151451],"enabled":true}
+Travel cancel button preserves zone and resumes controls {"zone":"first_campus_3f","position":[18.99997789466056,1.6999999999999997,5.3446798040105605],"enabled":true}
+Travel Escape preserves zone and resumes controls {"zone":"first_campus_3f","position":[18.999977895992,1.6999999999999997,5.3447899869630415],"enabled":true}
+travel stairs first_campus_3f -> first_campus_4f {"zone":"first_campus_4f","position":[37,1.7,4.6],"enabled":true}
+Duty room entry exit close reopen {"zone":"first_campus_4f","position":[5.3999071452325635,1.7000000000000002,-1.150165404843465],"enabled":true}
+Ward gate closed blocks actual W movement {"zone":"first_campus_4f","position":[13.594124387376572,1.7,0.005359038911808423],"enabled":true}
+Inside ward reader close and reopen {"zone":"first_campus_4f","position":[15.352250480822276,1.7,-0.005189947783016716],"enabled":true}
+Ward gate reopened allows passage {"zone":"first_campus_4f","position":[22.84614743506901,1.7,-0.00010440807145589247],"enabled":true}
+room in/out 4A {"zone":"first_campus_4f","position":[24.999824011332965,1.7,-0.1530594210991728],"enabled":true}
+room in/out 4B {"zone":"first_campus_4f","position":[24.99999980336267,1.7,0.1554745647359909],"enabled":true}
+room in/out 4C {"zone":"first_campus_4f","position":[30.999820140117105,1.7,-0.15326678919219974],"enabled":true}
+room in/out 4D {"zone":"first_campus_4f","position":[30.999999820689695,1.7,0.14331157674157272],"enabled":true}
+room in/out 4F_PHYSICIAN {"zone":"first_campus_4f","position":[36.999831592241456,1.7,-0.15617957646339845],"enabled":true}
+room in/out 4F_STAIRS {"zone":"first_campus_4f","position":[36.99999982696567,1.7,0.14881185222419158],"enabled":true}
+travel stairs first_campus_4f -> first_campus_3f {"zone":"first_campus_3f","position":[19,1.7,4.6],"enabled":true}
+travel elevator first_campus_3f -> first_campus_1f {"zone":"first_campus_1f","position":[-11.5,1.7,0],"enabled":true}
+room in/out OPD {"zone":"first_campus_1f","position":[20.999834406995266,1.7,-0.1514021402547184],"enabled":true}
+room in/out GROUP {"zone":"first_campus_1f","position":[20.999999826080515,1.7,0.14780083615061151],"enabled":true}
+room in/out PHARM {"zone":"first_campus_1f","position":[26.99981627237322,1.7,-0.1563221246071036],"enabled":true}
+Lobby main entrance exit {"zone":"first_campus_1f","position":[0.9954785500112373,1.7,-10.845100020402276],"enabled":true}
+travel elevator first_campus_1f -> first_campus_2f {"zone":"first_campus_2f","position":[-9.5,1.7,0],"enabled":true}
+room in/out PHYS {"zone":"first_campus_2f","position":[-3.200161476036824,1.7,17.850866739394],"enabled":true}
+room in/out MEET {"zone":"first_campus_2f","position":[-3.2000001531253903,1.7,18.142123251467307],"enabled":true}
+room in/out EEG {"zone":"first_campus_2f","position":[2.799841986539802,1.7,17.857419918442325],"enabled":true}
+room in/out XRAY {"zone":"first_campus_2f","position":[2.799999824701004,1.7,18.15667887301746],"enabled":true}
+room in/out CLINIC {"zone":"first_campus_2f","position":[8.799837537750653,1.7,17.843333708786037],"enabled":true}
+room in/out BLOOD {"zone":"first_campus_2f","position":[8.799999827077233,1.7,18.154108044913322],"enabled":true}
+ER treatment ECT {"zone":"first_campus_2f","position":[2.0105594619062077,1.7,-6.3431335015211605],"enabled":true}
+ER chart office {"zone":"first_campus_2f","position":[12.495279986198101,1.6999999999999995,-4.65377975449171],"enabled":true}
+ER bedside {"zone":"first_campus_2f","position":[13.995018244776938,1.7000000000000004,4.361341126567608],"enabled":true}
+ER nurse station {"zone":"first_campus_2f","position":[3.6516031300084646,1.6999999999999995,2.0718174228327095],"enabled":true}
+travel elevator first_campus_2f -> first_campus_8f {"zone":"first_campus_8f","position":[-9.5,1.7,0],"enabled":true}
+first_to_bridge {"zone":"skybridge","position":[1.6,1.7,0],"enabled":true}
+bridge_to_first {"zone":"first_campus_8f","position":[-1.6,1.7,0],"enabled":true}
+bridge_to_second {"zone":"second_campus_2f","position":[61.6,1.7,0],"enabled":true}
+second_to_bridge {"zone":"skybridge","position":[58.4,1.7,0],"enabled":true}
+room in/out 201 {"zone":"second_campus_2f","position":[65.99993662031575,1.7,-0.15062522862621247],"enabled":true}
+room in/out 202 {"zone":"second_campus_2f","position":[73.99993781543743,1.7,-0.14835518377355492],"enabled":true}
+travel elevator second_campus_2f -> second_campus_3f {"zone":"second_campus_3f","position":[77.5,1.7000000000000002,-1.3],"enabled":true}
+second 3F station staff entry {"zone":"second_campus_3f","position":[73.0052129260868,1.7000000000000002,4.347217351477915],"enabled":true}
+room in/out B3-01 {"zone":"second_campus_3f","position":[72.00009998531097,1.7,-0.1505112188022461],"enabled":true}
+room in/out B3-02 {"zone":"second_campus_3f","position":[79.99989333990628,1.7,-0.15640173723471892],"enabled":true}
+room in/out B3-03 {"zone":"second_campus_3f","position":[87.99989539488591,1.7,-0.15422162520134872],"enabled":true}
+travel elevator second_campus_3f -> second_campus_4f {"zone":"second_campus_4f","position":[77.5,1.7000000000000002,-1.3],"enabled":true}
+second 4F station staff entry {"zone":"second_campus_4f","position":[73.005258125125,1.7000000000000002,4.34748727516502],"enabled":true}
+room in/out B4-01 {"zone":"second_campus_4f","position":[72.00010301928039,1.7,-0.1535658853320125],"enabled":true}
+room in/out B4-02 {"zone":"second_campus_4f","position":[79.99989499636212,1.7,-0.15492819192540402],"enabled":true}
+room in/out B4-03 {"zone":"second_campus_4f","position":[87.99990008282447,1.7,-0.14828390462605154],"enabled":true}
+travel elevator second_campus_4f -> second_campus_5f {"zone":"second_campus_5f","position":[77.5,1.7000000000000002,-1.3],"enabled":true}
+second 5F station staff entry {"zone":"second_campus_5f","position":[73.00496463089425,1.7000000000000002,4.349696992488721],"enabled":true}
+room in/out B5-01 {"zone":"second_campus_5f","position":[72.00010471755078,1.7,-0.1546203559852483],"enabled":true}
+room in/out B5-02 {"zone":"second_campus_5f","position":[79.99990063684788,1.7,-0.15367571109095693],"enabled":true}
+room in/out B5-03 {"zone":"second_campus_5f","position":[87.99990341927793,1.7,-0.14790484633676845],"enabled":true}
+travel elevator second_campus_5f -> second_campus_6f {"zone":"second_campus_6f","position":[77.5,1.7000000000000002,-1.3],"enabled":true}
+second 6F station staff entry {"zone":"second_campus_6f","position":[73.00508789456265,1.7000000000000002,4.348591211043648],"enabled":true}
+room in/out B6-01 {"zone":"second_campus_6f","position":[72.00010417590548,1.7,-0.15448277969110577],"enabled":true}
+room in/out B6-02 {"zone":"second_campus_6f","position":[79.99990191834618,1.7,-0.14708957084083682],"enabled":true}
+room in/out B6-03 {"zone":"second_campus_6f","position":[87.99989970148508,1.7,-0.15314089093876168],"enabled":true}
+travel elevator second_campus_6f -> second_campus_7f {"zone":"second_campus_7f","position":[77.5,1.7000000000000002,-1.3],"enabled":true}
+second 7F station staff entry {"zone":"second_campus_7f","position":[73.00510282740701,1.7000000000000002,4.348975127846002],"enabled":true}
+room in/out B7-01 {"zone":"second_campus_7f","position":[72.00010374526138,1.7,-0.15309673388570602],"enabled":true}
+room in/out B7-02 {"zone":"second_campus_7f","position":[79.99989864223355,1.7,-0.15603825040974442],"enabled":true}
+room in/out B7-03 {"zone":"second_campus_7f","position":[87.99990373000794,1.7,-0.1485367449891421],"enabled":true}
+travel elevator second_campus_7f -> second_campus_8f {"zone":"second_campus_8f","position":[77.5,1.7000000000000002,-1.3],"enabled":true}
+second 8F station staff entry {"zone":"second_campus_8f","position":[73.0050646017438,1.7000000000000002,4.348244477126563],"enabled":true}
+room in/out B8-01 {"zone":"second_campus_8f","position":[72.00010396907305,1.7,-0.15428050973937088],"enabled":true}
+room in/out B8-02 {"zone":"second_campus_8f","position":[79.99990650854595,1.7,-0.1511757357192021],"enabled":true}
+room in/out B8-03 {"zone":"second_campus_8f","position":[87.9998953386761,1.7,-0.15314068521867572],"enabled":true}
+travel elevator second_campus_8f -> second_campus_2f {"zone":"second_campus_2f","position":[78,1.7000000000000004,-1.8],"enabled":true}
+travel stairs second_campus_2f -> second_campus_1f {"zone":"second_campus_1f","position":[74,1.6999999999999993,0.2],"enabled":true}
+travel stairs second_campus_1f -> second_campus_2f {"zone":"second_campus_2f","position":[78,1.7000000000000004,-1.8],"enabled":true}
+travel stairs second_campus_2f -> second_campus_1f {"zone":"second_campus_1f","position":[74,1.6999999999999993,0.2],"enabled":true}
+second_to_hill {"zone":"hillside_route","position":[70.3,1.27,-18.5],"enabled":true}
+hill_to_second {"zone":"second_campus_1f","position":[72,1.55,-15.5],"enabled":true}
+hill_to_er {"zone":"first_campus_2f","position":[28.2,1.7,0],"enabled":true}
+er_to_hill {"zone":"hillside_route","position":[11.5,1.27,-34.55],"enabled":true}
+hill_to_pond {"zone":"ecology_pond","position":[53,1.1199999999999992,-36.8],"enabled":true}
+pond_to_hill {"zone":"hillside_route","position":[48.8,1.1950000000000003,-33.5],"enabled":true}
+travel elevator second_campus_1f -> second_campus_2f {"zone":"second_campus_2f","position":[78,1.7000000000000004,-1.8],"enabled":true}
+travel elevator first_campus_8f -> first_campus_3f {"zone":"first_campus_3f","position":[-9.5,1.7,0],"enabled":true}
+Full loop returns to 3F {"zone":"first_campus_3f","position":[-9.5,1.7,0],"enabled":true}
