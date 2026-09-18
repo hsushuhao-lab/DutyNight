@@ -2,7 +2,8 @@
 import * as THREE from 'three';
 import { applyZoneLighting } from '../art/VisualProfile.js';
 import { GeometryFactory } from './shared/GeometryFactory.js';
-import { DEBUG_SPAWN_POINTS } from './shared/DebugSpawnPoints.js';
+import { WORLD_SPAWNS as DEBUG_SPAWN_POINTS, ROUTE_PORTALS, FIRST_FLOORS, SECOND_FLOORS } from './shared/WorldRoutes.js';
+import { addTravelFixtures } from './shared/TravelFixtures.js';
 import { CollisionFactory } from './shared/CollisionFactory.js';
 
 import { FirstCampus3F } from './zones/FirstCampus3F.js';
@@ -25,6 +26,7 @@ export class WorldRouter {
     this.gf = new GeometryFactory();
 
     this.dutyDoorClosed = false;
+    this.wardGateClosed = false;
     this.activeZoneId = null;
     this.activeZoneInstance = null;
 
@@ -42,6 +44,7 @@ export class WorldRouter {
       'ecology_pond': EcologyPond
     };
 
+    for(const floor of [3,4,5,6,7,8])this.zones[`second_campus_${floor}f`]=SecondCampusStandardFloor;
     this.zoneLabels = {
       'first_campus_3f': '1. 第一院區 3F 行政與總醫師室 (M0)',
       'first_campus_4f': '2. 第一院區 4F 病房、值班室與護理站 (M1-M3)',
@@ -56,6 +59,7 @@ export class WorldRouter {
       'ecology_pond': '11. 生態池觀景木棧台 (M12)'
     };
 
+    for(const floor of [3,4,5,6,7,8])this.zoneLabels[`second_campus_${floor}f`]=`第二院區 ${floor}F 病房護理站`;
     this.lightingGroup = new THREE.Group();
     this.lightingGroup.name = 'WorldRouter_BaselineLighting';
     this.scene.add(this.lightingGroup);
@@ -72,17 +76,32 @@ export class WorldRouter {
 
     // Clean up current zone
     if (this.activeZoneInstance && typeof this.activeZoneInstance.cleanup === 'function') {
-      if (this.activeZoneId === 'first_campus_4f') this.dutyDoorClosed = this.activeZoneInstance.dutyDoorClosed;
+      if (this.activeZoneId === 'first_campus_4f') {
+        this.dutyDoorClosed = this.activeZoneInstance.dutyDoorClosed;
+        this.wardGateClosed = this.activeZoneInstance.wardGateClosed;
+      }
       this.activeZoneInstance.cleanup();
       this.activeZoneInstance = null;
     }
 
     console.info(`[WorldRouter] Loading Zone: ${zoneId}`);
-    applyZoneLighting(this.lightingGroup, this.scene, zoneId);
+    applyZoneLighting(this.lightingGroup, this.scene, /^second_campus_[3-8]f$/.test(zoneId)?'second_campus_std':zoneId);
     const ZoneClass = this.zones[zoneId];
-    this.activeZoneInstance = new ZoneClass(this.scene, this.gf);
+    this.activeZoneInstance = new ZoneClass(this.scene, this.gf, {floor:Number(zoneId.match(/_([0-9])f$/)?.[1] || 3)});
     this.activeZoneInstance.build();
-    if (zoneId === 'first_campus_4f') this.activeZoneInstance.setDutyDoorClosed(this.dutyDoorClosed);
+    addTravelFixtures(this.activeZoneInstance,zoneId);
+    this.activeZoneInstance.zoneGroup.updateMatrixWorld(true);
+    const corridorLights=new Set();
+    for(const room of this.activeZoneInstance.roomAreas || []) {
+      for(const point of [room.point,room.corridor].filter(Boolean)) {
+        const key=point[0]+':'+point[2];if(corridorLights.has(key))continue;corridorLights.add(key);
+        const light=new THREE.RectAreaLight(0xfff0d9,3.5,2,1.2);light.position.set(point[0],3,point[2]);light.lookAt(point[0],0,point[2]);this.lightingGroup.add(light);
+      }
+    }
+    if (zoneId === 'first_campus_4f') {
+      this.activeZoneInstance.setDutyDoorClosed(this.dutyDoorClosed);
+      this.activeZoneInstance.setWardGateClosed(this.wardGateClosed);
+    }
     this.activeZoneId = zoneId;
 
     // Connect zone colliders, walkables, and interactables to the controller
@@ -136,8 +155,20 @@ export class WorldRouter {
   updateHUDLocation() {
     const locTag = document.querySelector('.hud-location');
     if (locTag && this.zoneLabels[this.activeZoneId]) {
-      locTag.textContent = this.zoneLabels[this.activeZoneId].split(' (M')[0].split('. ').slice(1).join('. ');
+      locTag.textContent = this.zoneLabels[this.activeZoneId].replace(/^[0-9]+[.] /,'').split(' (M')[0];
     }
+  }
+
+  update() {
+    if(!this.controller?.enabled)return;
+    const portal=ROUTE_PORTALS.find(p=>p.from===this.activeZoneId && new THREE.Box3(new THREE.Vector3(...p.bounds[0]),new THREE.Vector3(...p.bounds[1])).containsPoint(this.controller.position));
+    if(portal)this.teleportToSpawn(portal.spawn);
+  }
+
+  floorDestinations(kind='elevator') {
+    const campus=this.activeZoneId.startsWith('first')?'first':'second';
+    const floors=campus==='first'?FIRST_FLOORS:SECOND_FLOORS;
+    return floors.filter(f=>kind!=='stairs'||(campus==='first'?[3,4].includes(f):f<=2)).map(f=>({zoneId:`${campus}_campus_${f}f`,spawn:`${campus}_${f}f_${kind==='stairs'&&campus==='first'&&[3,4].includes(f)?'stairs':'lift'}`,label:`${f}F${campus==='first'&&f===8?' 連通天橋':''}`}));
   }
 
   /**

@@ -31,6 +31,7 @@ export class FPSController {
     this.lastFootstepDistance = 0;
 
     // Raycast interaction
+    this.groundRaycaster = new THREE.Raycaster();
     this.raycaster = new THREE.Raycaster();
     this.raycaster.far = 2.6;
     this.clickRaycaster = new THREE.Raycaster();
@@ -252,21 +253,39 @@ export class FPSController {
     this.updateRaycast();
   }
 
-  moveWithCollision(deltaX, deltaZ) {
-    const newPosX = this.position.x + deltaX;
-    if (!this.checkCollision(newPosX, this.position.z)) {
-      this.position.x = newPosX;
-    } else {
-      this.velocity.x = 0;
-      if (this.autoMoveTarget) this.cancelAutoMove();
-    }
+  groundHeightAt(x, z, feetY, stepLimit = .35) {
+    this.groundRaycaster.set(new THREE.Vector3(x, feetY + stepLimit + .02, z), new THREE.Vector3(0, -1, 0));
+    this.groundRaycaster.far = stepLimit * 2 + .04;
+    const hit = this.groundRaycaster.intersectObjects(this.walkables, false)[0];
+    return hit ? hit.point.y : null;
+  }
 
-    const newPosZ = this.position.z + deltaZ;
-    if (!this.checkCollision(this.position.x, newPosZ)) {
-      this.position.z = newPosZ;
-    } else {
-      this.velocity.z = 0;
-      if (this.autoMoveTarget) this.cancelAutoMove();
+  supportedHeight(x, z) {
+    const feetY = this.position.y - this.eyeHeight;
+    const height = this.groundHeightAt(x, z, feetY);
+    if (height === null) return null;
+    const r = this.playerRadius * .8;
+    for (const [dx, dz] of [[r,0],[-r,0],[0,r],[0,-r]]) {
+      if (this.groundHeightAt(x + dx, z + dz, height) === null) return null;
+    }
+    return height;
+  }
+
+  moveWithCollision(deltaX, deltaZ) {
+    const steps = Math.max(1, Math.ceil(Math.max(Math.abs(deltaX), Math.abs(deltaZ)) / .10));
+    for (let i = 0; i < steps; i++) {
+      for (const [axis, delta] of [['x',deltaX / steps],['z',deltaZ / steps]]) {
+        const x = this.position.x + (axis === 'x' ? delta : 0);
+        const z = this.position.z + (axis === 'z' ? delta : 0);
+        const ground = this.supportedHeight(x, z);
+        if (ground !== null && !this.checkCollision(x, z)) {
+          this.position[axis] += delta;
+          this.position.y = ground + this.eyeHeight;
+        } else {
+          this.velocity[axis] = 0;
+          if (this.autoMoveTarget) this.cancelAutoMove();
+        }
+      }
     }
   }
 
@@ -310,6 +329,14 @@ export class FPSController {
   teleport(x, y, z, yaw = 0) {
     this.cancelAutoMove();
     this.position.set(x, y, z);
+    this.velocity.set(0, 0, 0);
+    for (const key of Object.keys(this.keys)) this.keys[key] = false;
+    for (const surface of this.walkables) surface.updateWorldMatrix(true, false);
+    const ground = this.groundHeightAt(x, z, y - this.eyeHeight, 1);
+    if (ground !== null) this.position.y = ground + this.eyeHeight;
+    this.camera.position.copy(this.position);
+    this.currentInteractable = null;
+    this.onHoverChange?.(null);
     this.yaw = yaw;
     this.pitch = 0;
     this.updateCameraRotation();

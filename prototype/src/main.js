@@ -101,6 +101,7 @@ controller.onInteract = (interactable) => {
 
   if (interactable.type === 'duty_door') {
     worldRouter.activeZoneInstance.toggleDutyDoor(camera.position);
+    controller.currentInteractable = null;
     uiManager.showPrompt(null);
   } else if (interactable.type === 'key') {
     if (!gameState.isTaskComplete('KEY_PICKUP')) {
@@ -122,21 +123,28 @@ controller.onInteract = (interactable) => {
     controller.enabled = false;
     uiManager.openWorkstation();
     checkElevatorReady();
-  } else if (interactable.type === 'elevator') {
-    if (gameState.areRequiredTasksComplete()) {
+  } else if (interactable.type === 'elevator' || interactable.type === 'travel_selector') {
+    if (worldRouter.activeZoneId !== 'first_campus_3f' || gameState.areRequiredTasksComplete()) {
       controller.enabled = false;
-      uiManager.triggerElevatorTransition(() => {
-        gameState.markTaskComplete('WARD_ENTRY');
-        worldRouter.loadZone('first_campus_4f', 'm1_4f_lobby');
-      });
+      uiManager.openTravelSelector(worldRouter.floorDestinations(interactable.kind),worldRouter.activeZoneId,destination=>{
+        if(destination.zoneId==='first_campus_4f')gameState.markTaskComplete('WARD_ENTRY');
+        worldRouter.loadZone(destination.zoneId,destination.spawn);
+        controller.enabled=true;
+      },interactable.kind);
     } else {
       soundManager.playClick();
-      const missing = [];
-      if (!gameState.isTaskComplete('KEY_PICKUP')) missing.push('值班室鑰匙');
-      if (!gameState.isTaskComplete('DUTY_LOG')) missing.push('簽到值班本');
-      if (!gameState.isTaskComplete('E_HANDOFF')) missing.push('電腦電子交班');
-      uiManager.showSubtitle('李醫師 (自語)', '「還沒完成 3F 報到交班手續，還缺：' + missing.join('、') + '。」', 5000);
+      const missing=[];
+      if(!gameState.isTaskComplete('KEY_PICKUP'))missing.push('值班室鑰匙');
+      if(!gameState.isTaskComplete('DUTY_LOG'))missing.push('簽到值班本');
+      if(!gameState.isTaskComplete('E_HANDOFF'))missing.push('電腦電子交班');
+      uiManager.showSubtitle('李醫師','「還沒完成 3F 報到交班手續，還缺：'+missing.join('、')+'。」',5000);
     }
+  } else if(interactable.type==='ward_gate') {
+    const changed = worldRouter.activeZoneInstance.toggleWardGate(controller.position);
+    if (changed) soundManager.playClick();
+    else uiManager.showSubtitle('門禁', '請先離開門口，再刷卡關門。', 2500);
+    controller.currentInteractable = null;
+    uiManager.showPrompt(null);
   }
 };
 
@@ -162,6 +170,7 @@ function animate() {
   const delta = Math.min(clock.getDelta(), 0.1);
 
   controller.update(delta);
+  worldRouter.update();
   composer.render();
 }
 

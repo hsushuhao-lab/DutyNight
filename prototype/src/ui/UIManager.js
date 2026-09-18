@@ -72,6 +72,7 @@ export class UIManager {
         this.toggleDebug();
       }
       if (e.code === 'Escape') {
+        if(this.elevatorCutscene.dataset.selecting==='true')this.closeTravelSelector();
         if (this.workstationModal.classList.contains('active')) {
           this.closeWorkstation();
         }
@@ -136,6 +137,29 @@ export class UIManager {
     if (this.onTerminalClose) this.onTerminalClose();
   }
 
+  openTravelSelector(destinations, currentZone, onSelect, kind='elevator') {
+    document.exitPointerLock();
+    this.elevatorCutscene.dataset.selecting='true';
+    this.elevatorCutscene.classList.add('active');
+    this.elevatorCutscene.querySelector('.floor-digit').textContent=kind==='stairs'?'樓梯':'電梯';
+    const info=document.getElementById('elevator-status-text');info.replaceChildren();
+    const title=document.createElement('p');title.textContent='請選擇前往樓層';info.appendChild(title);
+    for(const destination of destinations) {
+      const button=document.createElement('button');button.className='btn-primary';button.dataset.floor=destination.zoneId;
+      button.textContent=destination.label+(destination.zoneId===currentZone?'（目前樓層）':'');
+      button.disabled=destination.zoneId===currentZone;
+      button.style.margin='6px';
+      button.addEventListener('click',()=>{this.closeTravelSelector();soundManager.playElevatorChime();onSelect(destination);});
+      info.appendChild(button);
+    }
+    const cancel=document.createElement('button');cancel.id='btn-cancel-travel';cancel.className='btn-secondary';cancel.textContent='取消';cancel.addEventListener('click',()=>this.closeTravelSelector());info.appendChild(cancel);
+  }
+
+  closeTravelSelector() {
+    this.elevatorCutscene.dataset.selecting='false';this.elevatorCutscene.classList.remove('active');
+    this.onElevatorTransitionComplete?.();
+  }
+
   triggerElevatorTransition(onComplete) {
     document.exitPointerLock();
     soundManager.playElevatorChime();
@@ -174,14 +198,17 @@ export class UIManager {
     const t02 = this.gameState.isTaskComplete('DUTY_LOG');
     const t03 = this.gameState.isTaskComplete('E_HANDOFF');
     const readyFor4F = t01 && t02 && t03;
+    const enteredWard = this.gameState.isTaskComplete('WARD_ENTRY');
 
     document.getElementById('task-key').className = t01 ? 'task-item completed' : 'task-item pending';
     document.getElementById('task-log').className = t02 ? 'task-item completed' : 'task-item pending';
     document.getElementById('task-handoff').className = t03 ? 'task-item completed' : 'task-item pending';
-    document.getElementById('task-elevator').className = readyFor4F ? 'task-item ready' : 'task-item locked';
+    document.getElementById('task-elevator').className = enteredWard ? 'task-item completed' : readyFor4F ? 'task-item ready' : 'task-item locked';
 
     const elevatorLabel = document.getElementById('task-elevator-label');
-    if (readyFor4F) {
+    if (enteredWard) {
+      elevatorLabel.textContent = '已抵達 4F 病房區';
+    } else if (readyFor4F) {
       elevatorLabel.textContent = '搭乘電梯前往 4F 病房區';
     } else {
       elevatorLabel.textContent = '搭乘電梯前往 4F 病房區（待交班完成）';
