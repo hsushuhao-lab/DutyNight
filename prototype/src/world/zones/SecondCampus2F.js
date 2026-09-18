@@ -13,6 +13,7 @@ export class SecondCampus2F {
     this.colliders = [];
     this.walkables = [];
     this.interactables = [];
+    this.roomAreas = [];
     this.zoneGroup = new THREE.Group();
     this.zoneGroup.name = 'SecondCampus2F_Zone';
   }
@@ -29,7 +30,23 @@ export class SecondCampus2F {
     // North wall
     this.gf.buildWall(this.zoneGroup, this.colliders, 70, 1.6, 4.5, 20, 3.2, 0.4);
     // South wall
-    this.gf.buildWall(this.zoneGroup, this.colliders, 70, 1.6, -4.5, 20, 3.2, 0.4);
+    for (const [x, width] of [[62.65,5.3],[70,6.6],[77.35,5.3]]) {
+      this.gf.buildWall(this.zoneGroup, this.colliders, x, 1.6, -4.5, width, 3.2, .4);
+    }
+    for (const [index, x] of [66,74].entries()) {
+      this.gf.buildFloor(this.zoneGroup, this.walkables, x, 0, -7.5, 8.04, 6.04);
+      this.gf.buildCeiling(this.zoneGroup, x, 3.2, -7.5, 8, 6);
+      this.gf.buildWall(this.zoneGroup, this.colliders, x, 1.6, -10.5, 8, 3.2, .4);
+      for(const side of [-1,1])this.gf.buildWall(this.zoneGroup, this.colliders, x+side*4, 1.6, -7.5, .4, 3.2, 6);
+      Doorway.build({scene:this.zoneGroup,colliders:this.colliders,x,z:-4.5,width:1.4,height:2.4,wallHeight:3.2,isAlongX:true,isOpen:true,doorMaterial:this.gf.materials.doorWood});
+      const code = index === 0 ? '201' : '202';
+      const label = index === 0 ? '病房' : '醫師辦公室／支援室';
+      SignAnchor.buildWallPlaque({scene:this.zoneGroup,x:x-1.25,y:1.9,z:-4.28,rotationY:0,code,title:label,subtitle:'',header:'第二院區 2F'});
+      asset(this.zoneGroup,index===0?'hospitalBed':'workDesk',[x+2,0,-9]);
+      CollisionFactory.addBox(this.colliders,x+2,.55,-9,index===0?1.15:1.5,1.1,index===0?2.15:.8);
+      this.gf.buildCeilingLight(this.zoneGroup,x,3.15,-7.5);
+      this.roomAreas.push({id:code,label,point:[x,1.7,-7.5],door:[x,1.7,-4.5],corridor:[x,1.7,0]});
+    }
 
     // West wall with bridge entrance portal (at x = 60)
     // Left segment (z: -4.5 to -1.4)
@@ -88,8 +105,8 @@ export class SecondCampus2F {
       z: 4.28,
       rotationY: Math.PI,
       code: '2F',
-      title: '跨院區聯絡諮詢處',
-      subtitle: 'CAMPUS LIAISON DESK',
+      title: '2F 護理站／跨院區聯絡',
+      subtitle: 'NURSING & CAMPUS LIAISON',
       header: '松德醫療中心 ｜ 第二院區 2F'
     });
 
@@ -145,7 +162,7 @@ export class SecondCampus2F {
 
     counterFront(art,this.gf.materials,67,2.78,4.2,1.1);
     monitor(art,this.gf.materials,66.5,1.18,3.2,Math.PI);
-    asset(art,'bench',[74,0,-3.85]);
+    asset(art,'bench',[70,0,-3.85]);
     asset(art,'plant',[61.4,0,3.65]);
     solid(art,this.gf.materials.metal,[79.58,1.25,-1.8],[.03,2.3,.012]);
     for(const z of [-2.8,-.8])solid(art,this.gf.materials.metal,[79.55,1.25,z],[.08,2.5,.06]);
@@ -168,5 +185,6 @@ export class SecondCampus2F {
     this.colliders = [];
     this.walkables = [];
     this.interactables = [];
+    this.roomAreas = [];
   }
 }

@@ -167,7 +167,7 @@ export class Level3FBlockout {
     callButton.userData = {
       interactable: true,
       id: 'ELEVATOR_BUTTON',
-      label: '搭乘電梯前往 4F 病房區',
+      label: '電梯選擇樓層',
       type: 'elevator'
     };
     this.interactables.push(callButton);
@@ -202,7 +202,8 @@ export class Level3FBlockout {
     this.scene.add(ceil);
 
     // East end wall
-    this.buildWall(16, 1.6, 0, 0.4, 3.2, 5);
+    // User-authorized east administrative wing opening.
+    for(const side of [-1,1])this.buildWall(16,1.6,side*1.85,.4,3.2,1.3);
 
     // South wall with large windows (Sunset view)
     // Pillars and window sills

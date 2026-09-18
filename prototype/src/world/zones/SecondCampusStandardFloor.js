@@ -7,14 +7,16 @@ import { SignAnchor } from '../shared/SignAnchor.js';
 import { CollisionFactory } from '../shared/CollisionFactory.js';
 
 export class SecondCampusStandardFloor {
-  constructor(scene, geometryFactory) {
+  constructor(scene, geometryFactory, { floor = 3 } = {}) {
+    this.floor = floor;
+    this.roomAreas = [];
     this.scene = scene;
     this.gf = geometryFactory;
     this.colliders = [];
     this.walkables = [];
     this.interactables = [];
     this.zoneGroup = new THREE.Group();
-    this.zoneGroup.name = 'SecondCampusStandardFloor_Zone';
+    this.zoneGroup.name = `SecondCampus${floor}F_Zone`;
   }
 
   build() {
@@ -26,15 +28,17 @@ export class SecondCampusStandardFloor {
     this.gf.buildFloor(this.zoneGroup, this.walkables, 80, 0, 0, 30, 6, this.gf.materials.floorTile);
     this.gf.buildCeiling(this.zoneGroup, 80, 3.2, 0, 30, 6);
 
-    // West end wall (Elevator doors at x = 65, z = 0)
+    // Sealed west end of the corridor
     this.gf.buildWall(this.zoneGroup, this.colliders, 65.0, 1.6, 0, 0.4, 3.2, 6.0);
 
-    // Elevator doors mesh
+    // Elevator opens north toward the nursing station
     const elFrame = new THREE.Mesh(new THREE.BoxGeometry(0.2, 2.5, 2.4), this.gf.materials.metal);
-    elFrame.position.set(65.25, 1.25, 0);
+    elFrame.position.set(77.5, 1.25, -2.75);
+    elFrame.rotation.y = Math.PI / 2;
     this.zoneGroup.add(elFrame);
     const elDoors = new THREE.Mesh(new THREE.BoxGeometry(0.08, 2.3, 2.0), this.gf.materials.stainless);
-    elDoors.position.set(65.35, 1.25, 0);
+    elDoors.position.set(77.5, 1.25, -2.65);
+    elDoors.rotation.y = Math.PI / 2;
     this.zoneGroup.add(elDoors);
 
     // East end wall of corridor
@@ -74,17 +78,17 @@ export class SecondCampusStandardFloor {
     glassPanel.position.set(78.0, 1.72, 3.0);
     this.zoneGroup.add(glassPanel);
 
-    // Unnumbered standard floor identity sign / Care station plaque
+    // Floor-specific care station identity
     SignAnchor.buildWallPlaque({
       scene: this.zoneGroup,
       x: 78.0,
       y: 2.6,
       z: 3.05,
       rotationY: 0,
-      code: 'ST',
-      title: '病房護理站',
+      code: `${this.floor}F-ST`,
+      title: `${this.floor}F 病房護理站`,
       subtitle: 'INPATIENT CARE STATION',
-      header: '松德醫療中心 ｜ 第二院區標準病房層'
+      header: `松德醫療中心 ｜ 第二院區 ${this.floor}F`
     });
 
     // ==========================================
@@ -103,30 +107,45 @@ export class SecondCampusStandardFloor {
 
     // Room doorways (Room A at x = 72, Room B at x = 80, Room C at x = 88)
     [72.0, 80.0, 88.0].forEach((rx, idx) => {
+      const roomCode = `B${this.floor}-${String(idx + 1).padStart(2, '0')}`;
+      const roomZ = -6;
+      this.gf.buildFloor(this.zoneGroup, this.walkables, rx, 0, roomZ, 8.04, 6.04);
+      this.gf.buildCeiling(this.zoneGroup, rx, 3.2, roomZ, 8, 6);
+      this.gf.buildWall(this.zoneGroup, this.colliders, rx, 1.6, -9, 8, 3.2, .4);
+      for (const side of [-1, 1]) {
+        this.gf.buildWall(this.zoneGroup, this.colliders, rx + side * 4, 1.6, roomZ, .4, 3.2, 6);
+        this.gf.buildWall(this.zoneGroup, this.colliders, rx + side * .85, 1.6, -3, .3, 3.2, .4);
+      }
+      const model = idx === 2 ? 'workDesk' : 'hospitalBed';
+      asset(this.zoneGroup, model, [rx + 2, 0, -7.6]);
+      CollisionFactory.addBox(this.colliders, rx + 2, .55, -7.6, idx === 2 ? 1.5 : 1.15, 1.1, idx === 2 ? .8 : 2.15);
+      this.gf.buildCeilingLight(this.zoneGroup, rx, 3.15, roomZ);
+      this.roomAreas.push({id: roomCode, label: idx === 2 ? '醫師辦公室／支援室' : '病房', point: [rx, 1.7, -6], door: [rx, 1.7, -3], corridor: [rx, 1.7, 0]});
+
       Doorway.build({
         scene: this.zoneGroup,
         colliders: this.colliders,
         x: rx,
         y: 0,
         z: -3.0,
-        width: 1.2,
+        width: 1.4,
         height: 2.4,
         wallHeight: 3.2,
         wallThickness: 0.4,
         isAlongX: true,
-        isOpen: false, // Closed patient room doors
+        isOpen: true,
         doorMaterial: this.gf.materials.doorWood
       });
 
       SignAnchor.buildWallPlaque({
         scene: this.zoneGroup,
-        x: rx - 1.0,
+        x: rx + 1.25,
         y: 1.85,
         z: -2.78,
         rotationY: 0,
-        code: `R${idx + 1}`,
-        title: `病房 (Room ${idx + 1})`,
-        subtitle: 'PATIENT ROOM',
+        code: roomCode,
+        title: idx === 2 ? `${roomCode} 醫師辦公室／支援室` : `${roomCode} 病房`,
+        subtitle: idx === 2 ? 'STAFF SUPPORT' : 'PATIENT ROOM',
         header: '第二院區'
       });
     });
@@ -146,17 +165,13 @@ export class SecondCampusStandardFloor {
     solid(art,this.gf.materials.doorWood,[78,2.5,3],[8.2,.45,.15]);
     for(const x of [74,78,82])solid(art,this.gf.materials.doorWood,[x,1.76,3],[.065,1.45,.10]);
     for(const child of this.zoneGroup.children){
-      if(child.name.startsWith('Plaque_ST')) {child.rotation.y=Math.PI;child.position.z=2.90;}
+      if(child.name.startsWith(`Plaque_${this.floor}F-ST`)) {child.rotation.y=Math.PI;child.position.z=2.90;}
       if(child.geometry?.parameters.width===30 && child.geometry?.parameters.height===.08)child.visible=false;
     }
     for(const [x,w] of [[68.5,6.5],[89.5,10.5]])solid(art,this.gf.materials.handrail,[x,1.05,2.78],[w,.08,.08]);
     for(const x of [75.2,77.1,80.8]) monitor(art,this.gf.materials,x,1.12,3,Math.PI);
     for(const x of [73,83])asset(art,'storageCabinet',[x,0,7.25]);
-    for(const x of [72,80,88]) {
-      for(const dx of [-.8,.8])solid(art,this.gf.materials.wall,[x+dx,1.2,-3],[.4,2.4,.4]);
-      solid(art,this.gf.materials.metal,[x+.36,1.08,-2.965],[.14,.04,.05]);
-      solid(art,this.gf.materials.metal,[x,.18,-2.965],[1,.22,.015]);
-    }
+
 
     wallTrim(this.zoneGroup,this.gf.materials);
     return this;
@@ -170,5 +185,6 @@ export class SecondCampusStandardFloor {
     this.colliders = [];
     this.walkables = [];
     this.interactables = [];
+    this.roomAreas = [];
   }
 }

@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { buildCampusBackdrop } from '../../art/CampusBackdrop.js';
 import { artRoot, asset, solid, counterFront, monitor, wallTrim } from '../../art/ArtDetails.js';
 import { disposeZoneArt } from '../../art/ArtResources.js';
+import { buildRoomWing } from '../shared/RoomWing.js';
 import { Doorway } from '../shared/Doorway.js';
 import { SignAnchor } from '../shared/SignAnchor.js';
 import { CollisionFactory } from '../shared/CollisionFactory.js';
@@ -29,7 +30,23 @@ export class FirstCampus2FER {
     this.gf.buildCeiling(this.zoneGroup, -8, 3.2, 0, 8, 7);
 
     this.gf.buildWall(this.zoneGroup, this.colliders, -12, 1.6, 0, 0.4, 3.2, 7);
-    this.gf.buildWall(this.zoneGroup, this.colliders, -8, 1.6, 3.5, 8, 3.2, 0.4);
+    for(const x of [-10.6,-5.4]) this.gf.buildWall(this.zoneGroup,this.colliders,x,1.6,3.5,2.8,3.2,.4);
+    Doorway.build({scene:this.zoneGroup,colliders:this.colliders,x:-8,z:3.5,width:2.4,height:2.4,wallHeight:3.2,isAlongX:true,isOpen:true});
+    this.gf.buildFloor(this.zoneGroup,this.walkables,-8,0,11.65,3.6,16.3,this.gf.materials.floor);
+    this.gf.buildCeiling(this.zoneGroup,-8,3.2,11.65,3.6,16.3);
+    this.gf.buildWall(this.zoneGroup,this.colliders,-9.8,1.6,11.65,.3,3.2,16.3);
+    this.gf.buildWall(this.zoneGroup,this.colliders,-8,1.6,19.8,3.6,3.2,.3);
+    this.gf.buildWall(this.zoneGroup,this.colliders,-6.2,1.6,10.15,.3,3.2,13.3);
+    this.gf.buildWall(this.zoneGroup,this.colliders,-6.2,1.6,19.5,.3,3.2,.6);
+    for(const z of [7,12,17])this.gf.buildCeilingLight(this.zoneGroup,-8,3.15,z);
+    this.roomWing = buildRoomWing(this,{x:-6.2,z:18,rooms:[
+      {code:'PHYS',label:'醫師辦公室',kind:'office'},
+      {code:'MEET',label:'會議室',kind:'meeting'},
+      {code:'EEG',label:'腦波室',kind:'treatment'},
+      {code:'XRAY',label:'X 光室',kind:'treatment'},
+      {code:'CLINIC',label:'診察室',kind:'clinic'},
+      {code:'BLOOD',label:'抽血檢驗室',kind:'treatment'}
+    ]});
     this.gf.buildWall(this.zoneGroup, this.colliders, -8, 1.6, -3.5, 8, 3.2, 0.4);
 
     // Elevator doors
@@ -182,8 +199,8 @@ export class FirstCampus2FER {
       z: -3.28,
       rotationY: 0,
       code: 'TR-1',
-      title: '急性處置室 (前處置整備)',
-      subtitle: 'ACUTE TREATMENT ROOM',
+      title: '急性處置室 ｜ ECT 準備／集合區',
+      subtitle: 'ACUTE TREATMENT / ECT PREPARATION',
       header: '松德醫療中心 ｜ 急診醫學部'
     });
 
@@ -287,6 +304,12 @@ export class FirstCampus2FER {
     this.buildArtDetails();
     const exterior=buildCampusBackdrop(this.zoneGroup);
     exterior.position.y=11.5;
+    // Only cached backdrop vegetation intersecting the newly occupied clinical wing is hidden.
+    exterior.updateMatrixWorld(true);
+    const wingVolume=new THREE.Box3(new THREE.Vector3(-6.35,0,10.45),new THREE.Vector3(11.95,3.2,25.55));
+    for(const child of exterior.children) {
+      if(child.name.startsWith('ArtAsset/') && new THREE.Box3().setFromObject(child).intersectsBox(wingVolume)) child.visible=false;
+    }
     return this;
   }
 

@@ -1,6 +1,7 @@
 // FirstCampus3F.js - Milestone M0: First Campus 3F Doctor Administrative Area & Room 316
 import * as THREE from 'three';
 import { gameState } from '../../core/GameState.js';
+import { buildRoomWing } from '../shared/RoomWing.js';
 import { Level3FBlockout } from '../Level3FBlockout.js';
 import { disposeZoneArt } from '../../art/ArtResources.js';
 import { applyFirstFloorArt } from '../../art/FirstFloorArt.js';
@@ -10,6 +11,7 @@ export class FirstCampus3F {
   constructor(scene, geometryFactory) {
     this.scene = scene;
     this.geometryFactory = geometryFactory;
+    this.gf = geometryFactory;
     this.colliders = [];
     this.walkables = [];
     this.interactables = [];
@@ -29,12 +31,20 @@ export class FirstCampus3F {
     this.walkables = this.levelInstance.walkables;
     this.interactables = this.levelInstance.interactables;
 
+    buildRoomWing(this,{x:16,z:0,rooms:[
+      {code:'3F_ADMIN',label:'行政辦公室',kind:'office'},
+      {code:'3F_STAIRS',label:'樓梯前室',kind:'foyer'},
+    ]});
+
     // References for gameplay state
     this.keyMesh = this.levelInstance.keyMesh;
     this.workstationMesh = this.levelInstance.workstationMesh;
     this.dutyLogMesh = this.levelInstance.dutyLogMesh;
     this.elevatorLight = this.levelInstance.elevatorLight;
-    this.keyMesh.visible = !gameState.isTaskComplete('KEY_PICKUP');
+    const keyAvailable = !gameState.isTaskComplete('KEY_PICKUP');
+    this.keyMesh.visible = keyAvailable;
+    this.keyMesh.userData.targetGroup.visible = keyAvailable;
+    this.keyMesh.userData.interactable = keyAvailable;
     this.updateElevatorLight(gameState.areRequiredTasksComplete());
 
     return this;

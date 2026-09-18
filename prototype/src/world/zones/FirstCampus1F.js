@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { buildCampusBackdrop } from '../../art/CampusBackdrop.js';
 import { artRoot, asset, solid, monitor, counterFront, wallTrim } from '../../art/ArtDetails.js';
 import { disposeZoneArt } from '../../art/ArtResources.js';
+import { buildRoomWing } from '../shared/RoomWing.js';
 import { Doorway } from '../shared/Doorway.js';
 import { SignAnchor } from '../shared/SignAnchor.js';
 import { CollisionFactory } from '../shared/CollisionFactory.js';
@@ -30,7 +31,12 @@ export class FirstCampus1F {
     this.gf.buildCeiling(this.zoneGroup, 2, lobbyHeight, 0, 32, 16);
 
     // Outer perimeter walls
-    this.gf.buildWall(this.zoneGroup, this.colliders, 18, lobbyHeight / 2, 0, 0.4, lobbyHeight, 16); // East wall
+    for(const z of [-4.6,4.6]) this.gf.buildWall(this.zoneGroup,this.colliders,18,lobbyHeight/2,z,.4,lobbyHeight,6.8);
+    this.roomWing = buildRoomWing(this,{x:18,z:0,height:lobbyHeight,rooms:[
+      {code:'OPD',label:'門診區',kind:'clinic'},
+      {code:'GROUP',label:'團體治療室',kind:'meeting'},
+      {code:'PHARM',label:'藥局',kind:'pharmacy'}
+    ]});
     this.gf.buildWall(this.zoneGroup, this.colliders, 2, lobbyHeight / 2, 8, 32, lobbyHeight, 0.4);  // North wall
 
     // West wall with elevator / stairs core
@@ -51,7 +57,7 @@ export class FirstCampus1F {
       z: 0,
       ceilingY: lobbyHeight,
       rotationY: Math.PI / 2,
-      text: '◀ 1F 門診大廳 ｜ 電梯往 2F-8F 各病房區 ▶'
+      text: '大廳西側電梯 ｜ 2F 急診・3F 行政・4F 病房・8F 天橋'
     });
 
     // South wall with main entrance (z = -8)

@@ -1,0 +1,21 @@
+import assert from 'node:assert/strict';
+import * as THREE from 'three';
+import {FirstCampus3F} from './src/world/zones/FirstCampus3F.js';
+import {GeometryFactory} from './src/world/shared/GeometryFactory.js';
+import {gameState} from './src/core/GameState.js';
+
+global.document={createElement:()=>({getContext:()=>new Proxy({},{get:()=>()=>({addColorStop(){}})})})};
+const scene=new THREE.Scene(),gf=new GeometryFactory();
+let zone=new FirstCampus3F(scene,gf).build();
+let key=zone.interactables.find(object=>object.userData.id==='KEY_PICKUP');
+assert.equal(key.userData.targetGroup.visible,true,'Uncollected key must be visible');
+assert.equal(key.userData.interactable,true,'Uncollected key must be available');
+gameState.markTaskComplete('KEY_PICKUP');
+zone.cleanup();
+zone=new FirstCampus3F(scene,gf).build();
+key=zone.interactables.find(object=>object.userData.id==='KEY_PICKUP');
+assert.equal(key.userData.targetGroup.visible,false,'Collected key must not reappear after zone return');
+assert.equal(key.userData.interactable,false,'Collected key must not offer pickup after zone return');
+assert.equal(gameState.isTaskComplete('KEY_PICKUP'),true,'Cleanup must preserve pickup task');
+zone.cleanup();
+console.log('KEY REVISIT PASS: initial pickup available; collected render and interaction absent after return; task retained');

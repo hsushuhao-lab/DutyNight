@@ -1,7 +1,7 @@
 // SecondCampus1F.js - Milestone M10: Second Campus 1F Hillside Exit & Outdoor Landing
 import * as THREE from 'three';
 import { buildHillsidePreview } from '../../art/LandscapeArt.js';
-import { artRoot, solid, asset, wallTrim } from '../../art/ArtDetails.js';
+import { artRoot, solid, asset, monitor, counterFront, wallTrim } from '../../art/ArtDetails.js';
 import { disposeZoneArt } from '../../art/ArtResources.js';
 import { Doorway } from '../shared/Doorway.js';
 import { SignAnchor } from '../shared/SignAnchor.js';
@@ -47,7 +47,7 @@ export class SecondCampus1F {
       z: -2.0,
       ceilingY: 3.2,
       rotationY: 0,
-      text: '◀ 第二院區 1F 後棟大廳 ｜ 往 山側步道・生態池出入口 ▶'
+      text: '第二院區 1F ｜ 護理站・山側步道・生態池'
     });
 
     // South wall (z = -8.0) with heavy exterior exit doors
@@ -119,6 +119,12 @@ export class SecondCampus1F {
 
     const art=artRoot(this.zoneGroup,'SecondCampus1F');
     buildHillsidePreview(art);
+    solid(art, this.gf.materials.wallDark, [74, .55, -4.5], [2.6, 1.1, .8]);
+    solid(art, this.gf.materials.counterTop, [74, 1.14, -4.5], [2.7, .08, .9]);
+    counterFront(art, this.gf.materials, 74, -4.04, 2.6, 1.1);
+    monitor(art, this.gf.materials, 74, 1.18, -4.5, Math.PI);
+    CollisionFactory.addBox(this.colliders, 74, .6, -4.5, 2.7, 1.2, .9);
+    SignAnchor.buildWallPlaque({scene:this.zoneGroup,x:74,y:.73,z:-4.02,rotationY:0,code:'1F-ST',title:'1F 護理站',subtitle:'NURSING STATION',header:'第二院區'});
 
     asset(art,'bench',[76.5,0,-2],[1,1,1],-Math.PI/2);
     asset(art,'plant',[67.3,0,1]);

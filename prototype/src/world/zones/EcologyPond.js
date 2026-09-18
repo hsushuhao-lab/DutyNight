@@ -53,6 +53,9 @@ export class EcologyPond {
     this.zoneGroup.add(deck);
     this.walkables.push(deck);
 
+    // Connect the approach to the existing deck entrance; the old gap was not walkable.
+    this.gf.buildFloor(this.zoneGroup,this.walkables,54.65,-.58,-41.5,1.4,1.6,this.gf.materials.floorWood);
+
     // Wooden deck safety railings
     // South railing facing the water (at z = -46.4)
     const railSouth = new THREE.Mesh(new THREE.BoxGeometry(11.0, 1.0, 0.12), this.gf.materials.doorWood);

@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { Reflector } from 'three/addons/objects/Reflector.js';
 import { artRoot, asset, solid, counterFront, monitor, wallTrim, wallClock } from '../../art/ArtDetails.js';
 import { disposeZoneArt } from '../../art/ArtResources.js';
+import { buildRoomWing } from '../shared/RoomWing.js';
 import { Doorway } from '../shared/Doorway.js';
 import { SignAnchor } from '../shared/SignAnchor.js';
 import { CollisionFactory } from '../shared/CollisionFactory.js';
@@ -301,7 +302,16 @@ export class FirstCampus4F {
     this.gf.buildWall(this.zoneGroup, this.colliders, 18, 1.6, -2.5, 8, 3.2, 0.4);
     this.gf.buildWall(this.zoneGroup, this.colliders, 18, 1.6, 2.5, 8, 3.2, 0.4);
     // East boundary wall
-    this.gf.buildWall(this.zoneGroup, this.colliders, 22, 1.6, 0, 0.4, 3.2, 5.0);
+    // User-authorized room expansion leaves the original corridor and gate intact.
+    for(const side of [-1,1])this.gf.buildWall(this.zoneGroup,this.colliders,22,1.6,side*1.85,.4,3.2,1.3);
+    buildRoomWing(this,{x:22,z:0,rooms:[
+      {code:'4A',label:'4A 病房區',kind:'ward'},
+      {code:'4B',label:'4B 病房區',kind:'ward'},
+      {code:'4C',label:'4C 病房區',kind:'ward'},
+      {code:'4D',label:'4D 病房區',kind:'ward'},
+      {code:'4F_PHYSICIAN',label:'醫師辦公室',kind:'office'},
+      {code:'4F_STAIRS',label:'樓梯前室',kind:'foyer'},
+    ]});
 
     // Ward Gate Partition Wall at x = 14:
     // Left segment (z: -2.5 to -1.0)
@@ -336,10 +346,16 @@ export class FirstCampus4F {
     cardReader.userData = {
       interactable: true,
       id: 'WARD_GATE_ACCESS',
-      label: '4A 閉鎖病房門禁（感應刷卡）',
+      label: '4F 閉鎖病房區門禁（感應刷卡）',
       type: 'ward_gate'
     };
     this.interactables.push(cardReader);
+    const insideReader = cardReader.clone();
+    insideReader.position.set(14.26, 1.3, 1.2);
+    insideReader.userData = {...cardReader.userData, id:'WARD_GATE_ACCESS_INSIDE'};
+    this.zoneGroup.add(insideReader);
+    this.interactables.push(insideReader);
+    this.wardGateReaders = [cardReader, insideReader];
 
     // Ward Entrance Overhead Sign
     SignAnchor.buildHangingSign({
@@ -349,11 +365,12 @@ export class FirstCampus4F {
       z: 0,
       ceilingY: 3.2,
       rotationY: Math.PI / 2,
-      text: '4A 閉鎖病房 ｜ 門禁管制區域（請刷卡）'
+      text: '4F 閉鎖病房區 ｜ 門禁管制區域（請刷卡）'
     });
 
     this.buildArtDetails();
     this.buildDutyDoor();
+    this.buildWardGate();
     return this;
   }
 
@@ -481,6 +498,41 @@ export class FirstCampus4F {
       if(player.intersectsBox(this.dutyDoorCollider))return false;
     }
     this.setDutyDoorClosed(!this.dutyDoorClosed);
+    return true;
+  }
+
+  buildWardGate() {
+    const doorway = this.zoneGroup.getObjectByName('Doorway_14_0');
+    const leaf = doorway.children.find(object => object.geometry?.parameters.width === 1.92 && object.geometry.parameters.height === 2.35);
+    this.wardGatePivot = new THREE.Group();
+    this.wardGatePivot.name = 'WardGateHingedLeaf';
+    this.wardGatePivot.position.set(14, 0, -.96);
+    doorway.add(this.wardGatePivot);
+    this.wardGatePivot.add(leaf);
+    leaf.position.set(.96, 1.175, 0);
+    solid(this.wardGatePivot, this.gf.materials.stainless, [1.68, 1.1, .06], [.28, .035, .04]);
+    solid(this.wardGatePivot, this.gf.materials.stainless, [1.68, 1.1, -.06], [.28, .035, .04]);
+    solid(this.art, this.gf.materials.wallDark, [14.336, 1.32, 1.2], [.018, .13, .085]);
+    this.wardGateCollider = new THREE.Box3(new THREE.Vector3(13.955, 0, -.96), new THREE.Vector3(14.045, 2.35, .96));
+    this.setWardGateClosed(false);
+  }
+
+  setWardGateClosed(closed) {
+    this.wardGateClosed = closed;
+    this.wardGatePivot.rotation.y = closed ? -Math.PI / 2 : 0;
+    const index = this.colliders.indexOf(this.wardGateCollider);
+    if (closed && index === -1) this.colliders.push(this.wardGateCollider);
+    if (!closed && index !== -1) this.colliders.splice(index, 1);
+    this.wardGatePivot.updateWorldMatrix(true, true);
+    for (const reader of this.wardGateReaders) reader.userData.label = closed ? '刷卡開啟病房門' : '刷卡關閉病房門';
+  }
+
+  toggleWardGate(playerPosition) {
+    if (!this.wardGateClosed) {
+      const player = new THREE.Box3(new THREE.Vector3(playerPosition.x - .35, 0, playerPosition.z - .35), new THREE.Vector3(playerPosition.x + .35, 1.9, playerPosition.z + .35));
+      if (player.intersectsBox(this.wardGateCollider)) return false;
+    }
+    this.setWardGateClosed(!this.wardGateClosed);
     return true;
   }
 
