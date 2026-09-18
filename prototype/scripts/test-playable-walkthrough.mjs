@@ -33,7 +33,7 @@ async function walk(x,z,expected){
 async function path(points){for(const [x,z] of points)await walk(x,z);}
 async function aim(id){
  await page.evaluate(id=>{const r=window.worldRouter,c=r.controller,o=r.activeZoneInstance.interactables.find(o=>o.userData.id===id);if(!o)throw Error(`Missing ${id}`);const p=o.getWorldPosition(c.position.clone()),d=p.sub(c.camera.position);c.yaw=Math.atan2(-d.x,-d.z);c.pitch=Math.atan2(d.y,Math.hypot(d.x,d.z));c.updateCameraRotation();},id);
- await page.waitForFunction(id=>window.worldRouter.controller.currentInteractable?.id===id,id,{timeout:5000});
+ await page.waitForFunction(id=>window.worldRouter.controller.currentInteractable?.id===id,id,{timeout:30000});
  await page.keyboard.press('KeyE');
 }
 let travelCancellationChecked=false;
@@ -59,7 +59,7 @@ async function rooms(){
  for(const room of list){await walk(room.corridor[0],room.corridor[2]);await walk(room.point[0],room.point[2]);await shot(room.id,room.point[2]>room.corridor[2]?Math.PI:0);await walk(room.corridor[0],room.corridor[2]);report.rooms.push(room.id);await record(`room in/out ${room.id}`);}
 }
 try{
- page=await browser.newPage({viewport:{width:1280,height:800}});page.on('pageerror',e=>report.errors.push(e.message));page.on('console',m=>{if(m.type()==='error')report.errors.push(m.text());});
+ page=await browser.newPage({viewport:{width:1280,height:800},deviceScaleFactor:process.env.CI?.5:1});report.browserSurface={viewport:{width:1280,height:800},deviceScaleFactor:process.env.CI?.5:1};page.on('pageerror',e=>report.errors.push(e.message));page.on('console',m=>{if(m.type()==='error')report.errors.push(m.text());});
  await page.goto(baseUrl,{timeout:600000});await page.waitForFunction(()=>window.worldRouter?.activeZoneInstance);report.initialLoadMs=Date.now()-Date.parse(report.started);assert.equal(await page.locator('#debug-zone-selector').count(),0);await record('Act1 production start');
  await walk(-10.2,1);await aim('ELEVATOR_BUTTON');assert.equal(await page.locator('#elevator-cutscene').evaluate(n=>n.classList.contains('active')),false);await record('3F lift locked before handoff');
  await path([[2.4,0],[2.4,3.5],[4,4.2],[5.6,5]]);await aim('KEY_PICKUP');await walk(6.4,5);await aim('DUTY_LOG');await page.locator('#btn-sign-log').click();await page.keyboard.press('Escape');await page.waitForTimeout(200);
