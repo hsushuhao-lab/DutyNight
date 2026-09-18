@@ -6,7 +6,7 @@ export function addTravelFixtures(zone,zoneId){
  const m=zone.gf.materials;
  function panel(position,yaw,kind='elevator'){
   const root=new THREE.Group();root.position.set(...position);root.rotation.y=yaw;zone.zoneGroup.add(root);
-  solid(root,m.metal,[0,0,0],[.22,.38,.08]);
+  solid(root,m.metal,[0,.15,-.0575],[.70,.74,.185]);
   const button=solid(root,m.wallDark,[0,0,.046],[.12,.22,.025]);
   button.userData={interactable:true,id:`${zoneId}_${kind}`,type:'travel_selector',kind,campus:zoneId.startsWith('first')?'first':'second',label:kind==='elevator'?'電梯選擇樓層':'樓梯前往其他樓層'};
   zone.interactables.push(button);
