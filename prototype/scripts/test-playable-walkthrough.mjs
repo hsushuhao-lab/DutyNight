@@ -7,7 +7,10 @@ const output=process.argv[2]||'../docs/traversal-qa/local';
 const baseUrl=process.argv[3]||'http://localhost:4173/';
 await mkdir(output,{recursive:true});
 const server=process.argv[3]?null:await preview({root:fileURLToPath(new URL('..',import.meta.url)),preview:{port:4173,strictPort:true}});
-const browser=await chromium.launch({channel:'chrome',headless:true});
+const browserSurface={viewport:{width:1280,height:800},deviceScaleFactor:process.env.CI ? .5 : 1};
+const browser=process.env.DUTYNIGHT_QA_PROFILE
+ ? await chromium.launchPersistentContext(process.env.DUTYNIGHT_QA_PROFILE,{channel:'chrome',headless:true,...browserSurface})
+ : await chromium.launch({channel:'chrome',headless:true});
 const report={url:baseUrl,started:new Date().toISOString(),method:'Continuous production route; controller movement inputs and camera aim are automated. No direct loadZone, teleport, or player-position writes. E interactions and floor buttons use browser keyboard/DOM.',zones:[],rooms:[],steps:[],screenshots:[],errors:[]};
 let page;
 async function state(){return page.evaluate(()=>({zone:window.worldRouter.activeZoneId,position:window.worldRouter.controller.position.toArray(),enabled:window.worldRouter.controller.enabled}));}
@@ -59,7 +62,7 @@ async function rooms(){
  for(const room of list){await walk(room.corridor[0],room.corridor[2]);await walk(room.point[0],room.point[2]);await shot(room.id,room.point[2]>room.corridor[2]?Math.PI:0);await walk(room.corridor[0],room.corridor[2]);report.rooms.push(room.id);await record(`room in/out ${room.id}`);}
 }
 try{
- page=await browser.newPage({viewport:{width:1280,height:800},deviceScaleFactor:process.env.CI?.5:1});report.browserSurface={viewport:{width:1280,height:800},deviceScaleFactor:process.env.CI?.5:1};page.on('pageerror',e=>report.errors.push(e.message));page.on('console',m=>{if(m.type()==='error')report.errors.push(m.text());});
+ page=await browser.newPage(browserSurface);report.browserSurface=browserSurface;report.persistentNetworkCache=!!process.env.DUTYNIGHT_QA_PROFILE;page.on('pageerror',e=>report.errors.push(e.message));page.on('console',m=>{if(m.type()==='error')report.errors.push(m.text());});
  await page.goto(baseUrl,{timeout:600000});await page.waitForFunction(()=>window.worldRouter?.activeZoneInstance);report.initialLoadMs=Date.now()-Date.parse(report.started);assert.equal(await page.locator('#debug-zone-selector').count(),0);await record('Act1 production start');
  await walk(-10.2,1);await aim('ELEVATOR_BUTTON');assert.equal(await page.locator('#elevator-cutscene').evaluate(n=>n.classList.contains('active')),false);await record('3F lift locked before handoff');
  await path([[2.4,0],[2.4,3.5],[4,4.2],[5.6,5]]);await aim('KEY_PICKUP');await walk(6.4,5);await aim('DUTY_LOG');await page.locator('#btn-sign-log').click();await page.keyboard.press('Escape');await page.waitForTimeout(200);
