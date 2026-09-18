@@ -12,8 +12,8 @@ try{
  await page.goto('http://localhost:4173/?debug=1');
  await page.waitForFunction(()=>typeof window.renderResourceStats==='function');
  const samples=[];
+ const zones=await page.evaluate(()=>Object.keys(window.worldRouter.zones));
  for(let cycle=0;cycle<4;cycle++){
-  const zones=await page.evaluate(()=>Object.keys(window.worldRouter.zones));
   for(const zone of zones){await page.evaluate(zone=>window.worldRouter.loadZone(zone),zone);await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));}
   await page.evaluate(()=>window.worldRouter.loadZone('first_campus_3f'));
   await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
@@ -22,6 +22,6 @@ try{
  assert.deepEqual(samples[3],samples[1],'GPU geometry/texture counts must stabilize after all zones warm');
  assert.equal(errors.length,0,JSON.stringify(errors));
  await mkdir(fileURLToPath(new URL('../../.visual-work/',import.meta.url)),{recursive:true});
- await writeFile(output,JSON.stringify({cycles:4,zonesPerCycle:11,samples,errors,verdict:'PASS'},null,2));
+ await writeFile(output,JSON.stringify({cycles:4,zonesPerCycle:zones.length,samples,errors,verdict:'PASS'},null,2));
  console.log('Browser GPU resource counts stable: '+JSON.stringify(samples));
 }finally{await browser.close();await new Promise(resolve=>server.httpServer.close(resolve));}
