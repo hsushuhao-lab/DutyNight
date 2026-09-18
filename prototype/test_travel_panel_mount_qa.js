@@ -20,6 +20,11 @@ for(const zoneId of zones){
   try{
    assert(backingBox.intersectsBox(new THREE.Box3().setFromObject(button)),`${label}: backing must contact button`);
    assert(backingBox.intersectsBox(new THREE.Box3().setFromObject(plaque)),`${label}: backing must contact plaque`);
+   zone.zoneGroup.traverse(object=>{
+    if(!object.name.startsWith('Plaque_'))return;
+    for(let node=object;node;node=node.parent)if(node===root)return;
+    assert(!backingBox.intersectsBox(new THREE.Box3().setFromObject(object)),label+': backing must not cover '+object.name);
+   });
    const origin=root.localToWorld(new THREE.Vector3(0,.15,.4));
    const direction=new THREE.Vector3(0,0,-1).applyQuaternion(root.getWorldQuaternion(new THREE.Quaternion()));
    const architecturalMeshes=[];

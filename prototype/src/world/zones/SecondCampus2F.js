@@ -144,8 +144,8 @@ export class SecondCampus2F {
 
     SignAnchor.buildWallPlaque({
       scene: this.zoneGroup,
-      x: 79.7,
-      y: 1.8,
+      x: 79.79,
+      y: 2.3,
       z: 3.0,
       rotationY: -Math.PI / 2,
       code: 'STAIR',
