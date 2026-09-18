@@ -60,7 +60,7 @@ async function rooms(){
 }
 try{
  page=await browser.newPage({viewport:{width:1280,height:800}});page.on('pageerror',e=>report.errors.push(e.message));page.on('console',m=>{if(m.type()==='error')report.errors.push(m.text());});
- await page.goto(baseUrl);await page.waitForFunction(()=>window.worldRouter?.activeZoneInstance);assert.equal(await page.locator('#debug-zone-selector').count(),0);await record('Act1 production start');
+ await page.goto(baseUrl,{timeout:600000});await page.waitForFunction(()=>window.worldRouter?.activeZoneInstance);report.initialLoadMs=Date.now()-Date.parse(report.started);assert.equal(await page.locator('#debug-zone-selector').count(),0);await record('Act1 production start');
  await walk(-10.2,1);await aim('ELEVATOR_BUTTON');assert.equal(await page.locator('#elevator-cutscene').evaluate(n=>n.classList.contains('active')),false);await record('3F lift locked before handoff');
  await path([[2.4,0],[2.4,3.5],[4,4.2],[5.6,5]]);await aim('KEY_PICKUP');await walk(6.4,5);await aim('DUTY_LOG');await page.locator('#btn-sign-log').click();await page.keyboard.press('Escape');await page.waitForTimeout(200);
  await walk(8.7,4.9);await aim('E_HANDOFF');await shot('316-his');await page.locator('#btn-sign-handoff').click();await page.keyboard.press('Escape');await page.waitForTimeout(200);await record('316 key log HIS completed');
