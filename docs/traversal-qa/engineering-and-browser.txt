@@ -1,0 +1,942 @@
+RUN test_art_resources_qa.js
+PASS shadow targets released across three 3F/4F cycles
+PASS instance buffers and unique resources released; shared cache retained
+PASS actual pond reflection render target cleanup
+ART_RESOURCE_QA = PASS (CPU disposal contracts; browser GPU behavior remains separate)
+RUN test_duty_room_door_qa.js
+DUTY ROOM DOOR: initial open, player clearance, closed collision, idempotent state, reopen restoration, cleanup PASS
+RUN test_entry_boundary_qa.js
+PASS FirstCampus8FBridgeEntry x=-4 return -3.5..-2
+PASS FirstCampus8FBridgeEntry x=-4 return 2..3.5
+PASS FirstCampus8FBridgeEntry original central passage preserved
+PASS FirstCampus1F z=-8 return -2..-1
+PASS FirstCampus1F z=-8 return 3..4
+PASS FirstCampus1F original central passage preserved
+AUTHORIZED ENTRY BOUNDARIES: 4/4 PASS
+RUN test_er_boundary_qa.js
+PASS south arrival return
+PASS north arrival return
+PASS south treatment-charting junction
+PASS north triage-observation junction
+PASS south ambulance approach
+PASS north ambulance approach
+PASS observation west return
+PASS charting west return
+ER AUTHORIZED BOUNDARIES: 8/8 PASS
+RUN test_first_campus_rooms_qa.js
+PASS OPD continuous in/out [21,1.7,-4.6]
+PASS GROUP continuous in/out [21,1.7,4.6]
+PASS PHARM continuous in/out [27,1.7,-4.6]
+PASS PHYS continuous in/out [-3.2,1.7,13.399999999999999]
+PASS MEET continuous in/out [-3.2,1.7,22.6]
+PASS EEG continuous in/out [2.8,1.7,13.399999999999999]
+PASS XRAY continuous in/out [2.8,1.7,22.6]
+PASS CLINIC continuous in/out [8.8,1.7,13.399999999999999]
+PASS BLOOD continuous in/out [8.8,1.7,22.6]
+FIRST_CAMPUS_ROOMS_QA = PASS (9 rooms, 5964 radius .35 supported traversal samples)
+RUN test_first_upper_rooms_qa.js
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+PASS room in/out 3F_ADMIN [19,1.7,-4.6]
+PASS room in/out 3F_STAIRS [19,1.7,4.6]
+PASS room in/out 4A [25,1.7,-4.6]
+PASS room in/out 4B [25,1.7,4.6]
+PASS room in/out 4C [31,1.7,-4.6]
+PASS room in/out 4D [31,1.7,4.6]
+PASS room in/out 4F_PHYSICIAN [37,1.7,-4.6]
+PASS room in/out 4F_STAIRS [37,1.7,4.6]
+FIRST UPPER ROOMS: 8/8 in/out floor-supported routes PASS
+RUN test_ground_movement_qa.js
+Ground movement PASS: floor edge, stair descent/return, swept wall containment
+RUN test_hillside_surface_qa.js
+main segment 1: axis_error=0.0000deg, centerline_misses=0/31
+main segment 2: axis_error=0.0000deg, centerline_misses=0/42
+main segment 3: axis_error=0.0000deg, centerline_misses=0/55
+main segment 4: axis_error=0.0000deg, centerline_misses=0/51
+main segment 5: axis_error=0.0000deg, centerline_misses=0/45
+main segment 6: axis_error=0.0000deg, centerline_misses=0/43
+branch segment 1: axis_error=0.0000deg, centerline_misses=0/27
+branch segment 2: axis_error=0.0000deg, centerline_misses=0/27
+HILLSIDE_SURFACE_QA = PASS: eight aligned segments; 321 raycast samples; original widths, nodes, elevations and boundary boxes retained
+RUN test_key_revisit_qa.js
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[GameState] Task Completed: KEY_PICKUP | Duty: 1
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+KEY REVISIT PASS: initial pickup available; collected render and interaction absent after return; task retained
+RUN test_modeling_qa.js
+=== RUNNING MODELING SPAWN CLEARANCE QA (SPAWN_CLEAR_TEST) ===
+
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+┌─────────┬───────────┬───────────────────────────────────────┬─────────────────────┬─────────────────────┬───────────┬───────────┬────────────────┬─────────┐
+│ (index) │ Milestone │ Name                                  │ Zone                │ SpawnCoords         │ Colliders │ Walkables │ SpawnClearance │ Overall │
+├─────────┼───────────┼───────────────────────────────────────┼─────────────────────┼─────────────────────┼───────────┼───────────┼────────────────┼─────────┤
+│ 0       │ 'M0'      │ '3F 行政區走廊'                       │ 'first_campus_3f'   │ '[0, 1.7, 0]'       │ 40        │ 6         │ 'PASS (Clear)' │ 'PASS'  │
+│ 1       │ 'M0'      │ '316 總醫師室門口'                    │ 'first_campus_3f'   │ '[2.1, 1.7, 0.4]'   │ 40        │ 6         │ 'PASS (Clear)' │ 'PASS'  │
+│ 2       │ 'M0'      │ '316 總醫師室內（值班桌）'            │ 'first_campus_3f'   │ '[5.6, 1.7, 5]'     │ 40        │ 6         │ 'PASS (Clear)' │ 'PASS'  │
+│ 3       │ 'M1'      │ '4F 電梯大廳抵達'                     │ 'first_campus_4f'   │ '[-8, 1.7, 0]'      │ 77        │ 12        │ 'PASS (Clear)' │ 'PASS'  │
+│ 4       │ 'M2'      │ '4F 獨立值班室套房'                   │ 'first_campus_4f'   │ '[5.4, 1.7, -3.4]'  │ 77        │ 12        │ 'PASS (Clear)' │ 'PASS'  │
+│ 5       │ 'M3'      │ '4A 護理站工作區'                     │ 'first_campus_4f'   │ '[8, 1.7, 5.8]'     │ 77        │ 12        │ 'PASS (Clear)' │ 'PASS'  │
+│ 6       │ 'M3'      │ '4A 閉鎖病房門禁門前'                 │ 'first_campus_4f'   │ '[12.5, 1.7, 0]'    │ 77        │ 12        │ 'PASS (Clear)' │ 'PASS'  │
+│ 7       │ 'M4'      │ '2F 急診到勤走廊'                     │ 'first_campus_2f'   │ '[-4, 1.7, 0]'      │ 97        │ 15        │ 'PASS (Clear)' │ 'PASS'  │
+│ 8       │ 'M4'      │ '2F 急診檢傷護理台'                   │ 'first_campus_2f'   │ '[3.5, 1.7, 5]'     │ 97        │ 15        │ 'PASS (Clear)' │ 'PASS'  │
+│ 9       │ 'M4'      │ '2F 急診留觀床位區'                   │ 'first_campus_2f'   │ '[14, 1.7, 5.5]'    │ 97        │ 15        │ 'PASS (Clear)' │ 'PASS'  │
+│ 10      │ 'M4'      │ '2F 急診處置室（ECT前處置）'          │ 'first_campus_2f'   │ '[2, 1.7, -6.5]'    │ 97        │ 15        │ 'PASS (Clear)' │ 'PASS'  │
+│ 11      │ 'M4'      │ '2F 救護車道山側出入口'               │ 'first_campus_2f'   │ '[20.5, 1.7, 0]'    │ 97        │ 15        │ 'PASS (Clear)' │ 'PASS'  │
+│ 12      │ 'M5'      │ '1F 醫院正門大廳'                     │ 'first_campus_1f'   │ '[0, 1.7, -6]'      │ 42        │ 6         │ 'PASS (Clear)' │ 'PASS'  │
+│ 13      │ 'M5'      │ '1F 服務台與掛號批價'                 │ 'first_campus_1f'   │ '[2, 1.7, -2.8]'    │ 42        │ 6         │ 'PASS (Clear)' │ 'PASS'  │
+│ 14      │ 'M6'      │ '8F 空中連通道入口前廳'               │ 'first_campus_8f'   │ '[-4, 1.7, 0]'      │ 10        │ 2         │ 'PASS (Clear)' │ 'PASS'  │
+│ 15      │ 'M7'      │ '連通道 起點（近第一院區）'           │ 'skybridge'         │ '[3, 1.7, 0]'       │ 32        │ 1         │ 'PASS (Clear)' │ 'PASS'  │
+│ 16      │ 'M7'      │ '連通道 中央長廊（兩側大窗）'         │ 'skybridge'         │ '[30, 1.7, 0]'      │ 32        │ 1         │ 'PASS (Clear)' │ 'PASS'  │
+│ 17      │ 'M7'      │ '連通道 終點（近第二院區）'           │ 'skybridge'         │ '[57, 1.7, 0]'      │ 32        │ 1         │ 'PASS (Clear)' │ 'PASS'  │
+│ 18      │ 'M9'      │ '第二院區 2F 連通道抵達大廳'          │ 'second_campus_2f'  │ '[63, 1.7, 0]'      │ 21        │ 3         │ 'PASS (Clear)' │ 'PASS'  │
+│ 19      │ 'M8'      │ '第二院區 標準病房層（電梯對護理站）' │ 'second_campus_std' │ '[76, 1.7, 0]'      │ 33        │ 5         │ 'PASS (Clear)' │ 'PASS'  │
+│ 20      │ 'M10'     │ '第二院區 1F 山側後門出入口'          │ 'second_campus_1f'  │ '[72, 1.7, -4]'     │ 11        │ 5         │ 'PASS (Clear)' │ 'PASS'  │
+│ 21      │ 'M11'     │ '山側步道 主徑起點'                   │ 'hillside_route'    │ '[68, 1.7, -18]'    │ 4         │ 8         │ 'PASS (Clear)' │ 'PASS'  │
+│ 22      │ 'M11'     │ '山側步道 生態池叉路口'               │ 'hillside_route'    │ '[42, 1.7, -25]'    │ 4         │ 8         │ 'PASS (Clear)' │ 'PASS'  │
+│ 23      │ 'M12'     │ '生態池 步道入口'                     │ 'ecology_pond'      │ '[53, 1.15, -38]'   │ 8         │ 3         │ 'PASS (Clear)' │ 'PASS'  │
+│ 24      │ 'M12'     │ '生態池 觀景木棧台'                   │ 'ecology_pond'      │ '[61, 1.23, -42.5]' │ 8         │ 3         │ 'PASS (Clear)' │ 'PASS'  │
+└─────────┴───────────┴───────────────────────────────────────┴─────────────────────┴─────────────────────┴───────────┴───────────┴────────────────┴─────────┘
+
+SPAWN CLEAR: 25/25 tests passed (100%).
+>>> SPAWN CLEAR TEST: ALL 25 SPAWN POINTS PASS (Clear) <<<
+RUN test_playable_world_qa.js
+[WorldRouter] Loading Zone: first_campus_1f
+[WorldRouter] Teleported to m5_1f_lobby_entrance (1F 醫院正門大廳): [ 0, 1.7, -6 ]
+[WorldRouter] Teleported to m5_1f_lobby_entrance (1F 醫院正門大廳): [ 0, 1.7, -6 ]
+[WorldRouter] Teleported to m5_1f_reception (1F 服務台與掛號批價): [ 2, 1.7, -2.8 ]
+[WorldRouter] Teleported to first_1f_lift (第一院區 1F 電梯): [ -11.5, 1.7, 0 ]
+[WorldRouter] Loading Zone: first_campus_2f
+[WorldRouter] Teleported to m4_2f_er_arrival (2F 急診到勤走廊): [ -4, 1.7, 0 ]
+[WorldRouter] Teleported to m4_2f_er_arrival (2F 急診到勤走廊): [ -4, 1.7, 0 ]
+[WorldRouter] Teleported to m4_2f_er_triage (2F 急診檢傷護理台): [ 3.5, 1.7, 5 ]
+[WorldRouter] Teleported to m4_2f_er_bays (2F 急診留觀床位區): [ 14, 1.7, 5.5 ]
+[WorldRouter] Teleported to m4_2f_er_treatment (2F 急診處置室（ECT前處置）): [ 2, 1.7, -6.5 ]
+[WorldRouter] Teleported to m4_2f_er_exterior (2F 救護車道山側出入口): [ 20.5, 1.7, 0 ]
+[WorldRouter] Teleported to first_2f_lift (第一院區 2F 電梯): [ -9.5, 1.7, 0 ]
+[WorldRouter] Teleported to first_er_return (第一院區 2F 山側入口): [ 28.2, 1.7, 0 ]
+[WorldRouter] Loading Zone: first_campus_3f
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[WorldRouter] Teleported to m0_3f_corridor (3F 行政區走廊): [ 0, 1.7, 0 ]
+[WorldRouter] Teleported to m0_3f_corridor (3F 行政區走廊): [ 0, 1.7, 0 ]
+[WorldRouter] Teleported to m0_316_entrance (316 總醫師室門口): [ 2.1, 1.7, 0.4 ]
+[WorldRouter] Teleported to m0_316_office (316 總醫師室內（值班桌）): [ 5.6, 1.7, 5 ]
+[WorldRouter] Teleported to first_3f_lift (第一院區 3F 電梯): [ -9.5, 1.7, 0 ]
+[WorldRouter] Teleported to first_3f_stairs (3F 樓梯前室): [ 19, 1.7, 4.6 ]
+[WorldRouter] Loading Zone: first_campus_4f
+[WorldRouter] Teleported to m1_4f_lobby (4F 電梯大廳抵達): [ -8, 1.7, 0 ]
+[WorldRouter] Teleported to m1_4f_lobby (4F 電梯大廳抵達): [ -8, 1.7, 0 ]
+[WorldRouter] Teleported to m2_4f_duty_room (4F 獨立值班室套房): [ 5.4, 1.7, -3.4 ]
+[WorldRouter] Teleported to m3_4f_nursing_station (4A 護理站工作區): [ 8, 1.7, 5.8 ]
+[WorldRouter] Teleported to m3_4f_ward_gate (4A 閉鎖病房門禁門前): [ 12.5, 1.7, 0 ]
+[WorldRouter] Teleported to first_4f_lift (第一院區 4F 電梯): [ -9.5, 1.7, 0 ]
+[WorldRouter] Teleported to first_4f_stairs (4F 樓梯前室): [ 37, 1.7, 4.6 ]
+[WorldRouter] Loading Zone: first_campus_8f
+[WorldRouter] Teleported to m6_8f_bridge_entry (8F 空中連通道入口前廳): [ -4, 1.7, 0 ]
+[WorldRouter] Teleported to m6_8f_bridge_entry (8F 空中連通道入口前廳): [ -4, 1.7, 0 ]
+[WorldRouter] Teleported to first_8f_lift (第一院區 8F 電梯): [ -9.5, 1.7, 0 ]
+[WorldRouter] Teleported to first_bridge_return (返回第一院區 8F): [ -1.6, 1.7, 0 ]
+[WorldRouter] Loading Zone: skybridge
+[WorldRouter] Teleported to m7_skybridge_start (連通道 起點（近第一院區）): [ 3, 1.7, 0 ]
+[WorldRouter] Teleported to m7_skybridge_start (連通道 起點（近第一院區）): [ 3, 1.7, 0 ]
+[WorldRouter] Teleported to m7_skybridge_mid (連通道 中央長廊（兩側大窗）): [ 30, 1.7, 0 ]
+[WorldRouter] Teleported to m7_skybridge_end (連通道 終點（近第二院區）): [ 57, 1.7, 0 ]
+[WorldRouter] Teleported to bridge_from_first (天橋第一院區端): [ 1.6, 1.7, 0 ]
+[WorldRouter] Teleported to bridge_from_second (天橋第二院區端): [ 58.4, 1.7, 0 ]
+[WorldRouter] Loading Zone: second_campus_1f
+[WorldRouter] Teleported to m10_second_campus_1f (第二院區 1F 山側後門出入口): [ 72, 1.7, -4 ]
+[WorldRouter] Teleported to m10_second_campus_1f (第二院區 1F 山側後門出入口): [ 72, 1.7, -4 ]
+[WorldRouter] Teleported to second_1f_lift (第二院區 1F 電梯): [ 74, 1.7, 0.2 ]
+[WorldRouter] Teleported to second_outdoor_return (返回第二院區 1F): [ 72, 1.55, -15.5 ]
+[WorldRouter] Loading Zone: second_campus_2f
+[WorldRouter] Teleported to m9_second_campus_2f (第二院區 2F 連通道抵達大廳): [ 63, 1.7, 0 ]
+[WorldRouter] Teleported to m9_second_campus_2f (第二院區 2F 連通道抵達大廳): [ 63, 1.7, 0 ]
+[WorldRouter] Teleported to second_2f_lift (第二院區 2F 電梯): [ 78, 1.7, -1.8 ]
+[WorldRouter] Teleported to second_bridge_return (第二院區 2F 連通口): [ 61.6, 1.7, 0 ]
+[WorldRouter] Loading Zone: second_campus_3f
+[WorldRouter] Teleported to second_3f_lift (第二院區 3F 電梯): [ 77.5, 1.7, -1.3 ]
+[WorldRouter] Teleported to second_3f_lift (第二院區 3F 電梯): [ 77.5, 1.7, -1.3 ]
+[WorldRouter] Loading Zone: second_campus_4f
+[WorldRouter] Teleported to second_4f_lift (第二院區 4F 電梯): [ 77.5, 1.7, -1.3 ]
+[WorldRouter] Teleported to second_4f_lift (第二院區 4F 電梯): [ 77.5, 1.7, -1.3 ]
+[WorldRouter] Loading Zone: second_campus_5f
+[WorldRouter] Teleported to second_5f_lift (第二院區 5F 電梯): [ 77.5, 1.7, -1.3 ]
+[WorldRouter] Teleported to second_5f_lift (第二院區 5F 電梯): [ 77.5, 1.7, -1.3 ]
+[WorldRouter] Loading Zone: second_campus_6f
+[WorldRouter] Teleported to second_6f_lift (第二院區 6F 電梯): [ 77.5, 1.7, -1.3 ]
+[WorldRouter] Teleported to second_6f_lift (第二院區 6F 電梯): [ 77.5, 1.7, -1.3 ]
+[WorldRouter] Loading Zone: second_campus_7f
+[WorldRouter] Teleported to second_7f_lift (第二院區 7F 電梯): [ 77.5, 1.7, -1.3 ]
+[WorldRouter] Teleported to second_7f_lift (第二院區 7F 電梯): [ 77.5, 1.7, -1.3 ]
+[WorldRouter] Loading Zone: second_campus_8f
+[WorldRouter] Teleported to second_8f_lift (第二院區 8F 電梯): [ 77.5, 1.7, -1.3 ]
+[WorldRouter] Teleported to second_8f_lift (第二院區 8F 電梯): [ 77.5, 1.7, -1.3 ]
+[WorldRouter] Loading Zone: hillside_route
+[WorldRouter] Teleported to m11_hillside_main (山側步道 主徑起點): [ 68, 1.7, -18 ]
+[WorldRouter] Teleported to m11_hillside_main (山側步道 主徑起點): [ 68, 1.7, -18 ]
+[WorldRouter] Teleported to m11_hillside_branch (山側步道 生態池叉路口): [ 42, 1.7, -25 ]
+[WorldRouter] Teleported to hill_from_second (山路第二院區端): [ 70.3, 1.27, -18.5 ]
+[WorldRouter] Teleported to hill_from_first (山路第一院區端): [ 11.5, 1.27, -34.55 ]
+[WorldRouter] Teleported to hill_from_pond (返回山路叉路): [ 48.8, 1.195, -33.5 ]
+[WorldRouter] Loading Zone: ecology_pond
+[WorldRouter] Teleported to m12_pond_approach (生態池 步道入口): [ 53, 1.15, -38 ]
+[WorldRouter] Teleported to m12_pond_approach (生態池 步道入口): [ 53, 1.15, -38 ]
+[WorldRouter] Teleported to m12_pond_deck (生態池 觀景木棧台): [ 61, 1.23, -42.5 ]
+[WorldRouter] Teleported to pond_from_hill (生態池步道入口): [ 53, 1.12, -36.8 ]
+[WorldRouter] Loading Zone: first_campus_8f
+[WorldRouter] Teleported to m6_8f_bridge_entry (8F 空中連通道入口前廳): [ -4, 1.7, 0 ]
+[WorldRouter] Loading Zone: skybridge
+[WorldRouter] Teleported to bridge_from_first (天橋第一院區端): [ 1.6, 1.7, 0 ]
+[WorldRouter] Loading Zone: skybridge
+[WorldRouter] Teleported to m7_skybridge_start (連通道 起點（近第一院區）): [ 3, 1.7, 0 ]
+[WorldRouter] Loading Zone: first_campus_8f
+[WorldRouter] Teleported to first_bridge_return (返回第一院區 8F): [ -1.6, 1.7, 0 ]
+[WorldRouter] Loading Zone: skybridge
+[WorldRouter] Teleported to m7_skybridge_start (連通道 起點（近第一院區）): [ 3, 1.7, 0 ]
+[WorldRouter] Loading Zone: second_campus_2f
+[WorldRouter] Teleported to second_bridge_return (第二院區 2F 連通口): [ 61.6, 1.7, 0 ]
+[WorldRouter] Loading Zone: second_campus_2f
+[WorldRouter] Teleported to m9_second_campus_2f (第二院區 2F 連通道抵達大廳): [ 63, 1.7, 0 ]
+[WorldRouter] Loading Zone: skybridge
+[WorldRouter] Teleported to bridge_from_second (天橋第二院區端): [ 58.4, 1.7, 0 ]
+[WorldRouter] Loading Zone: second_campus_1f
+[WorldRouter] Teleported to m10_second_campus_1f (第二院區 1F 山側後門出入口): [ 72, 1.7, -4 ]
+[WorldRouter] Loading Zone: hillside_route
+[WorldRouter] Teleported to hill_from_second (山路第二院區端): [ 70.3, 1.27, -18.5 ]
+[WorldRouter] Loading Zone: hillside_route
+[WorldRouter] Teleported to m11_hillside_main (山側步道 主徑起點): [ 68, 1.7, -18 ]
+[WorldRouter] Loading Zone: second_campus_1f
+[WorldRouter] Teleported to second_outdoor_return (返回第二院區 1F): [ 72, 1.55, -15.5 ]
+[WorldRouter] Loading Zone: first_campus_2f
+[WorldRouter] Teleported to m4_2f_er_arrival (2F 急診到勤走廊): [ -4, 1.7, 0 ]
+[WorldRouter] Loading Zone: hillside_route
+[WorldRouter] Teleported to hill_from_first (山路第一院區端): [ 11.5, 1.27, -34.55 ]
+[WorldRouter] Loading Zone: hillside_route
+[WorldRouter] Teleported to m11_hillside_main (山側步道 主徑起點): [ 68, 1.7, -18 ]
+[WorldRouter] Loading Zone: first_campus_2f
+[WorldRouter] Teleported to first_er_return (第一院區 2F 山側入口): [ 28.2, 1.7, 0 ]
+[WorldRouter] Loading Zone: hillside_route
+[WorldRouter] Teleported to m11_hillside_main (山側步道 主徑起點): [ 68, 1.7, -18 ]
+[WorldRouter] Loading Zone: ecology_pond
+[WorldRouter] Teleported to pond_from_hill (生態池步道入口): [ 53, 1.12, -36.8 ]
+[WorldRouter] Loading Zone: ecology_pond
+[WorldRouter] Teleported to m12_pond_approach (生態池 步道入口): [ 53, 1.15, -38 ]
+[WorldRouter] Loading Zone: hillside_route
+[WorldRouter] Teleported to hill_from_pond (返回山路叉路): [ 48.8, 1.195, -33.5 ]
+[WorldRouter] Loading Zone: ecology_pond
+[WorldRouter] Teleported to pond_from_hill (生態池步道入口): [ 53, 1.12, -36.8 ]
+PLAYABLE_WORLD PASS: 16 canonical zones, 49 supported spawns, 37 actual-controller room round trips, 10 physical portal transitions, pond deck in/out
+RUN test_second_rooms_qa.js
+SECOND CAMPUS ROOMS: 33 enter/exit/return routes PASS, 18 unique room identities
+RUN test_ward_gate_qa.js
+[WorldRouter] Loading Zone: first_campus_4f
+[WorldRouter] Teleported to m1_4f_lobby (4F 電梯大廳抵達): [ -8, 1.7, 0 ]
+[WorldRouter] Loading Zone: first_campus_3f
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[WorldRouter] Teleported to m0_3f_corridor (3F 行政區走廊): [ 0, 1.7, 0 ]
+[WorldRouter] Loading Zone: first_campus_4f
+[WorldRouter] Teleported to m1_4f_lobby (4F 電梯大廳抵達): [ -8, 1.7, 0 ]
+[WorldRouter] Loading Zone: first_campus_3f
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[WorldRouter] Teleported to m0_3f_corridor (3F 行政區走廊): [ 0, 1.7, 0 ]
+[WorldRouter] Loading Zone: first_campus_4f
+[WorldRouter] Teleported to m1_4f_lobby (4F 電梯大廳抵達): [ -8, 1.7, 0 ]
+WARD GATE PASS: initial open, occupancy guard, visible closed leaf, collision, two readers, closed/open revisit persistence, cleanup
+RUN test_world_traversal_qa.js
+===============================================================
+ DUTYNIGHT WORLD TRAVERSAL & SPATIAL INTEGRITY QA (REAL QA v2)
+===============================================================
+
+--- TEST CATEGORY 1: ROUTE WALK TEST (18 routes) ---
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+┌─────────┬─────────────────────────────────────────┬──────────────────────────────────────────────────────────────┬─────────────────────┬─────────┬────────┐
+│ (index) │ RouteId                                 │ Name                                                         │ Zone                │ Samples │ Status │
+├─────────┼─────────────────────────────────────────┼──────────────────────────────────────────────────────────────┼─────────────────────┼─────────┼────────┤
+│ 0       │ 'R01_3F_corridor_to_316'                │ '3F Corridor to 316 Office Entrance'                         │ 'first_campus_3f'   │ 82      │ 'PASS' │
+│ 1       │ 'R02_316_to_HIS'                        │ '316 Center to HIS Workstation'                              │ 'first_campus_3f'   │ 38      │ 'PASS' │
+│ 2       │ 'R03_316_HIS_to_Elevator'               │ '316/HIS Workstation to 3F Elevator Lobby'                   │ 'first_campus_3f'   │ 206     │ 'PASS' │
+│ 3       │ 'R04_4F_elevator_to_duty_room'          │ '4F Elevator Lobby to Independent Duty Room'                 │ 'first_campus_4f'   │ 168     │ 'PASS' │
+│ 4       │ 'R05_4F_elevator_to_nursing_station'    │ '4F Elevator Lobby to 4A Nursing Station Counter'            │ 'first_campus_4f'   │ 151     │ 'PASS' │
+│ 5       │ 'R06_4F_nursing_station_to_ward_gate'   │ '4A Nursing Station Corridor to 4A Ward Gate'                │ 'first_campus_4f'   │ 54      │ 'PASS' │
+│ 6       │ 'R07_2F_ER_entrance_to_triage'          │ '2F ER Arrival to Triage / Nursing Station'                  │ 'first_campus_2f'   │ 87      │ 'PASS' │
+│ 7       │ 'R08_ER_corridor_to_observation_bays'   │ '2F ER Corridor to Observation Bays 01-04'                   │ 'first_campus_2f'   │ 130     │ 'PASS' │
+│ 8       │ 'R09_ER_to_treatment_room'              │ '2F ER Corridor into Treatment Room (Pre-ECT)'               │ 'first_campus_2f'   │ 74      │ 'PASS' │
+│ 9       │ 'R10_ER_to_exterior'                    │ '2F ER Corridor to Ambulance Bay Exterior'                   │ 'first_campus_2f'   │ 59      │ 'PASS' │
+│ 10      │ 'R11_1F_entrance_reception_elevator'    │ '1F Main Plaza Entrance to Reception to Elevator Core'       │ 'first_campus_1f'   │ 177     │ 'PASS' │
+│ 11      │ 'R12_8F_to_skybridge_entrance'          │ '8F Lobby to Skybridge Fire Door Threshold'                  │ 'first_campus_8f'   │ 38      │ 'PASS' │
+│ 12      │ 'R13_skybridge_start_to_end'            │ '60m Skybridge Span Full Traversal (First to Second Campus)' │ 'skybridge'         │ 454     │ 'PASS' │
+│ 13      │ 'R14_second_campus_2F_arrival_to_stair' │ 'Second Campus 2F Arrival Lobby to Stairwell Doorway'        │ 'second_campus_2f'  │ 153     │ 'PASS' │
+│ 14      │ 'R15_std_floor_elevator_to_nursing'     │ 'Second Campus Standard Ward Floor Elevator to Station'      │ 'second_campus_std' │ 20      │ 'PASS' │
+│ 15      │ 'R16_second_campus_1F_to_hillside_exit' │ 'Second Campus 1F Corridor to Hillside Trail Exit Door'      │ 'second_campus_1f'  │ 62      │ 'PASS' │
+│ 16      │ 'R17_hillside_main_route_to_fork'       │ 'Hillside Trailhead to Nature Trail Pond Fork'               │ 'hillside_route'    │ 229     │ 'PASS' │
+│ 17      │ 'R18_fork_to_pond_and_return'           │ 'Ecology Pond Approach Trail to Boardwalk Deck and Return'   │ 'ecology_pond'      │ 204     │ 'PASS' │
+└─────────┴─────────────────────────────────────────┴──────────────────────────────────────────────────────────────┴─────────────────────┴─────────┴────────┘
+ROUTE TRAVERSAL: 18/18 (100%)
+
+--- TEST CATEGORY 2: DOORWAY APERTURE TEST ---
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+┌─────────┬──────────────────────────────┬────────────────────┬───────────────┬─────────────┬──────────────────┬────────┐
+│ (index) │ DoorId                       │ Zone               │ Opening       │ Lanes       │ Lintel           │ Status │
+├─────────┼──────────────────────────────┼────────────────────┼───────────────┼─────────────┼──────────────────┼────────┤
+│ 0       │ 'D01_3F_316_door'            │ 'first_campus_3f'  │ '1.2m x 2.4m' │ '3/3 CLEAR' │ 'PASS (>=1.95m)' │ 'PASS' │
+│ 1       │ 'D02_4F_duty_room'           │ 'first_campus_4f'  │ '1.2m x 2.4m' │ '3/3 CLEAR' │ 'PASS (>=1.95m)' │ 'PASS' │
+│ 2       │ 'D03_4F_ward_gate'           │ 'first_campus_4f'  │ '2m x 2.4m'   │ '3/3 CLEAR' │ 'PASS (>=1.95m)' │ 'PASS' │
+│ 3       │ 'D04_2F_ER_treatment'        │ 'first_campus_2f'  │ '1.4m x 2.4m' │ '3/3 CLEAR' │ 'PASS (>=1.95m)' │ 'PASS' │
+│ 4       │ 'D05_8F_bridge_fire_door'    │ 'first_campus_8f'  │ '2.4m x 2.4m' │ '3/3 CLEAR' │ 'PASS (>=1.95m)' │ 'PASS' │
+│ 5       │ 'D06_2F_second_campus_stair' │ 'second_campus_2f' │ '1.2m x 2.4m' │ '3/3 CLEAR' │ 'PASS (>=1.95m)' │ 'PASS' │
+│ 6       │ 'D07_1F_second_campus_exit'  │ 'second_campus_1f' │ '1.4m x 2.4m' │ '3/3 CLEAR' │ 'PASS (>=1.95m)' │ 'PASS' │
+│ 7       │ 'D08_1F_lobby_entrance'      │ 'first_campus_1f'  │ '4m x 3m'     │ '3/3 CLEAR' │ 'PASS (>=1.95m)' │ 'PASS' │
+└─────────┴──────────────────────────────┴────────────────────┴───────────────┴─────────────┴──────────────────┴────────┘
+DOORWAY: 8/8 (100%)
+
+--- TEST CATEGORY 3: WALL CONTAINMENT / PENETRATION TEST ---
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+┌─────────┬───────────────────────────────┬────────────────────┬─────────────┬───────────────┬─────────────────┬────────┐
+│ (index) │ WallId                        │ Zone               │ InsideClear │ DirectBlocked │ DiagonalBlocked │ Status │
+├─────────┼───────────────────────────────┼────────────────────┼─────────────┼───────────────┼─────────────────┼────────┤
+│ 0       │ 'W01_3F_opposite_wall'        │ 'first_campus_3f'  │ 'PASS'      │ 'PASS'        │ 'PASS'          │ 'PASS' │
+│ 1       │ 'W02_316_north_wall'          │ 'first_campus_3f'  │ 'PASS'      │ 'PASS'        │ 'PASS'          │ 'PASS' │
+│ 2       │ 'W03_316_east_wall'           │ 'first_campus_3f'  │ 'PASS'      │ 'PASS'        │ 'PASS'          │ 'PASS' │
+│ 3       │ 'W04_4F_north_wall'           │ 'first_campus_4f'  │ 'PASS'      │ 'PASS'        │ 'PASS'          │ 'PASS' │
+│ 4       │ 'W05_4F_duty_room_south'      │ 'first_campus_4f'  │ 'PASS'      │ 'PASS'        │ 'PASS'          │ 'PASS' │
+│ 5       │ 'W06_4F_nursing_counter'      │ 'first_campus_4f'  │ 'PASS'      │ 'PASS'        │ 'PASS'          │ 'PASS' │
+│ 6       │ 'W07_2F_ER_south_wall'        │ 'first_campus_2f'  │ 'PASS'      │ 'PASS'        │ 'PASS'          │ 'PASS' │
+│ 7       │ 'W08_2F_ER_north_wall'        │ 'first_campus_2f'  │ 'PASS'      │ 'PASS'        │ 'PASS'          │ 'PASS' │
+│ 8       │ 'W09_skybridge_north_window'  │ 'skybridge'        │ 'PASS'      │ 'PASS'        │ 'PASS'          │ 'PASS' │
+│ 9       │ 'W10_skybridge_south_window'  │ 'skybridge'        │ 'PASS'      │ 'PASS'        │ 'PASS'          │ 'PASS' │
+│ 10      │ 'W11_second_campus_north'     │ 'second_campus_2f' │ 'PASS'      │ 'PASS'        │ 'PASS'          │ 'PASS' │
+│ 11      │ 'W12_hillside_north_boundary' │ 'hillside_route'   │ 'PASS'      │ 'PASS'        │ 'PASS'          │ 'PASS' │
+│ 12      │ 'W13_pond_water_boundary'     │ 'ecology_pond'     │ 'PASS'      │ 'PASS'        │ 'PASS'          │ 'PASS' │
+└─────────┴───────────────────────────────┴────────────────────┴─────────────┴───────────────┴─────────────────┴────────┘
+WALL CONTAINMENT: 13/13 (100%)
+
+--- TEST CATEGORY 4: INTERACTION REACHABILITY TEST ---
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+┌─────────┬──────────────────────────┬────────────────────────────────────┬───────────────────┬───────────────┬────────────────┬────────┐
+│ (index) │ InteractId               │ Label                              │ Distance          │ StandingClear │ RayLOS         │ Status │
+├─────────┼──────────────────────────┼────────────────────────────────────┼───────────────────┼───────────────┼────────────────┼────────┤
+│ 0       │ 'I01_KEY_PICKUP'         │ 'Room 316 Duty Key'                │ '1.33m (<= 1.5m)' │ 'PASS'        │ 'PASS (Clear)' │ 'PASS' │
+│ 1       │ 'I02_DUTY_LOG'           │ 'Room 316 Duty Log Book'           │ '1.31m (<= 1.5m)' │ 'PASS'        │ 'PASS (Clear)' │ 'PASS' │
+│ 2       │ 'I03_HIS_WORKSTATION'    │ 'Room 316 Electronic Handover HIS' │ '1.21m (<= 1.5m)' │ 'PASS'        │ 'PASS (Clear)' │ 'PASS' │
+│ 3       │ 'I04_3F_ELEVATOR_BUTTON' │ '3F Elevator Call Panel'           │ '1.44m (<= 1.8m)' │ 'PASS'        │ 'PASS (Clear)' │ 'PASS' │
+│ 4       │ 'I05_WARD_GATE_READER'   │ '4A Ward Gate RFID Card Reader'    │ '1.26m (<= 1.5m)' │ 'PASS'        │ 'PASS (Clear)' │ 'PASS' │
+└─────────┴──────────────────────────┴────────────────────────────────────┴───────────────────┴───────────────┴────────────────┴────────┘
+INTERACTION REACHABILITY: 5/5 (100%)
+
+--- TEST CATEGORY 5: ZONE CLEANUP & LEAKAGE TEST (TEST_ZONE_CLEANUP_NO_LEAK) ---
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+Loops executed: 20 full cycles (220 zone loads)
+Initial 3F scene objects (Loop 1): 483
+Final 3F scene objects (Loop 20): 483
+Post-cleanup remaining scene children: 1 (only baseline lighting group)
+ZONE CLEANUP: 1/1 (100% PASS)
+
+--- TEST CATEGORY 6: STATE PERSISTENCE TEST ---
+[GameState] Task Completed: KEY_PICKUP | Duty: 1
+[GameState] Task Completed: DUTY_LOG | Duty: 2
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+[ModelingHotfix] Applied {
+  removedLegacyColliders: 1,
+  removedLegacyGlass: 1,
+  removedLegacyWallMeshes: 8,
+  removedLegacyDutyNotice: 1,
+  doorwayPassable: true,
+  oppositeWallSolid: true,
+  westCornerSolid: true,
+  eastCornerSolid: true,
+  dutyNoticeInside316: true,
+  modelingFirst: true
+}
+STATE PERSISTENCE: 1/1 (100% PASS)
+
+===============================================================
+                 FINAL TEST METRICS SUMMARY
+===============================================================
+ROUTE TRAVERSAL:         18/18
+DOORWAY:                 8/8
+WALL CONTAINMENT:        13/13
+INTERACTION REACHABILITY: 5/5
+ZONE CLEANUP:            1/1
+STATE PERSISTENCE:       1/1
+===============================================================
+>>> TRAVERSAL & SPATIAL QA: ALL CATEGORIES PASS (100%) <<<
+RUN node_modules/vite/bin/vite.js build
+vite v6.4.3 building for production...
+transforming...
+✓ 58 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                     9.56 kB │ gzip:   3.46 kB
+dist/assets/index-j4MJrLLq.css      9.99 kB │ gzip:   3.00 kB
+dist/assets/index-ZbrF-CgS.js   1,011.68 kB │ gzip: 306.66 kB
+
+(!) Some chunks are larger than 1000 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 1.06s
+RUN scripts/test-browser-resources.mjs ../docs/traversal-qa/resources.json
+Browser GPU resource counts stable: [{"geometries":492,"textures":52},{"geometries":492,"textures":52},{"geometries":492,"textures":52},{"geometries":492,"textures":52}]
+RUN scripts/test-playable-walkthrough.mjs ../docs/traversal-qa/local-final
+Act1 production start {"zone":"first_campus_3f","position":[2.1,1.7,0.4],"enabled":true}
+3F lift locked before handoff {"zone":"first_campus_3f","position":[-10.0479049300186,1.6999999999999997,0.9926498839094436],"enabled":true}
+316 key log HIS completed {"zone":"first_campus_3f","position":[8.545560707512287,1.7000000000000002,4.905585074001897],"enabled":true}
+room in/out 3F_ADMIN {"zone":"first_campus_3f","position":[18.99983828370702,1.7,-0.15546782589919375],"enabled":true}
+room in/out 3F_STAIRS {"zone":"first_campus_3f","position":[18.999999823440838,1.7,0.14884941719987851],"enabled":true}
+Travel cancel button preserves zone and resumes controls {"zone":"first_campus_3f","position":[18.999976213841787,1.6999999999999997,5.345282943741563],"enabled":true}
+Travel Escape preserves zone and resumes controls {"zone":"first_campus_3f","position":[18.999976213841787,1.6999999999999997,5.345282943741563],"enabled":true}
+travel stairs first_campus_3f -> first_campus_4f {"zone":"first_campus_4f","position":[37,1.7,4.6],"enabled":true}
+Duty room entry exit close reopen {"zone":"first_campus_4f","position":[5.399954165742146,1.7000000000000002,-1.1536611893177517],"enabled":true}
+Ward gate closed blocks actual W movement {"zone":"first_campus_4f","position":[13.604562006314346,1.7,0.005450917347241637],"enabled":true}
+Inside ward reader close and reopen {"zone":"first_campus_4f","position":[15.352119435352392,1.7,-0.004687069704477856],"enabled":true}
+Ward gate reopened allows passage {"zone":"first_campus_4f","position":[22.856351940838916,1.7,-0.00008803595460332296],"enabled":true}
+room in/out 4A {"zone":"first_campus_4f","position":[24.999840484504908,1.7,-0.1517490907931398],"enabled":true}
+room in/out 4B {"zone":"first_campus_4f","position":[24.999999832320448,1.7,0.14565064520713336],"enabled":true}
+room in/out 4C {"zone":"first_campus_4f","position":[30.999841628762017,1.7,-0.1439482888127398],"enabled":true}
+room in/out 4D {"zone":"first_campus_4f","position":[30.99999982381583,1.7,0.15239044659948348],"enabled":true}
+room in/out 4F_PHYSICIAN {"zone":"first_campus_4f","position":[36.99983974547088,1.7,-0.14964126790299484],"enabled":true}
+room in/out 4F_STAIRS {"zone":"first_campus_4f","position":[36.999999822319175,1.7,0.1516060691210588],"enabled":true}
+travel stairs first_campus_4f -> first_campus_3f {"zone":"first_campus_3f","position":[19,1.7,4.6],"enabled":true}
+travel elevator first_campus_3f -> first_campus_1f {"zone":"first_campus_1f","position":[-11.5,1.7,0],"enabled":true}
+room in/out OPD {"zone":"first_campus_1f","position":[20.99983151777137,1.7,-0.14938793820369978],"enabled":true}
+room in/out GROUP {"zone":"first_campus_1f","position":[20.999999830416424,1.7,0.14415131066531012],"enabled":true}
+room in/out PHARM {"zone":"first_campus_1f","position":[26.999822312939404,1.7,-0.15363937584090692],"enabled":true}
+Lobby main entrance exit {"zone":"first_campus_1f","position":[0.995369854357218,1.7,-10.8501768589059],"enabled":true}
+travel elevator first_campus_1f -> first_campus_2f {"zone":"first_campus_2f","position":[-9.5,1.7,0],"enabled":true}
+room in/out PHYS {"zone":"first_campus_2f","position":[-3.20015334791533,1.7,17.853573963708204],"enabled":true}
+room in/out MEET {"zone":"first_campus_2f","position":[-3.2000001655791177,1.7,18.15568122514388],"enabled":true}
+room in/out EEG {"zone":"first_campus_2f","position":[2.7998407056291272,1.7,17.84629988870355],"enabled":true}
+room in/out XRAY {"zone":"first_campus_2f","position":[2.7999998255736456,1.7,18.153389091993176],"enabled":true}
+room in/out CLINIC {"zone":"first_campus_2f","position":[8.79983008607373,1.7,17.84864609850371],"enabled":true}
+room in/out BLOOD {"zone":"first_campus_2f","position":[8.799999836029826,1.7,18.13968782356769],"enabled":true}
+ER treatment ECT {"zone":"first_campus_2f","position":[2.0102291894435007,1.7,-6.347178781421805],"enabled":true}
+ER chart office {"zone":"first_campus_2f","position":[12.495623943194035,1.6999999999999995,-4.657518483227431],"enabled":true}
+ER bedside {"zone":"first_campus_2f","position":[13.994531948685884,1.7000000000000004,4.359752035238201],"enabled":true}
+ER nurse station {"zone":"first_campus_2f","position":[3.653868814255343,1.6999999999999995,2.0713857933480475],"enabled":true}
+travel elevator first_campus_2f -> first_campus_8f {"zone":"first_campus_8f","position":[-9.5,1.7,0],"enabled":true}
+first_to_bridge {"zone":"skybridge","position":[1.6,1.7,0],"enabled":true}
+bridge_to_first {"zone":"first_campus_8f","position":[-1.6,1.7,0],"enabled":true}
+bridge_to_second {"zone":"second_campus_2f","position":[61.6,1.7,0],"enabled":true}
+second_to_bridge {"zone":"skybridge","position":[58.4,1.7,0],"enabled":true}
+room in/out 201 {"zone":"second_campus_2f","position":[65.99993658743676,1.7,-0.15201472411266823],"enabled":true}
+room in/out 202 {"zone":"second_campus_2f","position":[73.99993757886355,1.7,-0.14951399714804323],"enabled":true}
+travel elevator second_campus_2f -> second_campus_3f {"zone":"second_campus_3f","position":[77.5,1.7000000000000002,-1.3],"enabled":true}
+second 3F station staff entry {"zone":"second_campus_3f","position":[73.00514497218398,1.7000000000000002,4.3494824832521175],"enabled":true}
+room in/out B3-01 {"zone":"second_campus_3f","position":[72.0001030007949,1.7,-0.15200932130750153],"enabled":true}
+room in/out B3-02 {"zone":"second_campus_3f","position":[79.99990018980729,1.7,-0.15041637297327862],"enabled":true}
+room in/out B3-03 {"zone":"second_campus_3f","position":[87.99989955320882,1.7,-0.15480098696892386],"enabled":true}
+travel elevator second_campus_3f -> second_campus_4f {"zone":"second_campus_4f","position":[77.5,1.7000000000000002,-1.3],"enabled":true}
+second 4F station staff entry {"zone":"second_campus_4f","position":[73.00522296633031,1.7000000000000002,4.348308958308893],"enabled":true}
+room in/out B4-01 {"zone":"second_campus_4f","position":[72.00010339378458,1.7,-0.1528459507230379],"enabled":true}
+room in/out B4-02 {"zone":"second_campus_4f","position":[79.99989741385127,1.7,-0.15102955139580876],"enabled":true}
+room in/out B4-03 {"zone":"second_campus_4f","position":[87.99990520033766,1.7,-0.14771084255130984],"enabled":true}
+travel elevator second_campus_4f -> second_campus_5f {"zone":"second_campus_5f","position":[77.5,1.7000000000000002,-1.3],"enabled":true}
+second 5F station staff entry {"zone":"second_campus_5f","position":[73.0050099444429,1.7000000000000002,4.3474894420670145],"enabled":true}
+room in/out B5-01 {"zone":"second_campus_5f","position":[72.00010360904122,1.7,-0.1541450328162187],"enabled":true}
+room in/out B5-02 {"zone":"second_campus_5f","position":[79.99990667972575,1.7,-0.1489166452759497],"enabled":true}
+room in/out B5-03 {"zone":"second_campus_5f","position":[87.99990051029185,1.7,-0.1474201605367969],"enabled":true}
+travel elevator second_campus_5f -> second_campus_6f {"zone":"second_campus_6f","position":[77.5,1.7000000000000002,-1.3],"enabled":true}
+second 6F station staff entry {"zone":"second_campus_6f","position":[73.00503976354484,1.7000000000000002,4.350057782737261],"enabled":true}
+room in/out B6-01 {"zone":"second_campus_6f","position":[72.00010377445545,1.7,-0.15329443370762175],"enabled":true}
+room in/out B6-02 {"zone":"second_campus_6f","position":[79.99989682185812,1.7,-0.15179924714876825],"enabled":true}
+room in/out B6-03 {"zone":"second_campus_6f","position":[87.99989799602739,1.7,-0.15491171284287314],"enabled":true}
+travel elevator second_campus_6f -> second_campus_7f {"zone":"second_campus_7f","position":[77.5,1.7000000000000002,-1.3],"enabled":true}
+second 7F station staff entry {"zone":"second_campus_7f","position":[73.00501480484063,1.7000000000000002,4.349114158028383],"enabled":true}
+room in/out B7-01 {"zone":"second_campus_7f","position":[72.00010405674378,1.7,-0.1545725445426531],"enabled":true}
+room in/out B7-02 {"zone":"second_campus_7f","position":[79.99989707435208,1.7,-0.15656732137515275],"enabled":true}
+room in/out B7-03 {"zone":"second_campus_7f","position":[87.99990489261022,1.7,-0.1482937884036749],"enabled":true}
+travel elevator second_campus_7f -> second_campus_8f {"zone":"second_campus_8f","position":[77.5,1.7000000000000002,-1.3],"enabled":true}
+second 8F station staff entry {"zone":"second_campus_8f","position":[73.00500440089561,1.7000000000000002,4.349105993553523],"enabled":true}
+room in/out B8-01 {"zone":"second_campus_8f","position":[72.00010117732435,1.7,-0.15409488887639572],"enabled":true}
+room in/out B8-02 {"zone":"second_campus_8f","position":[79.99990208900796,1.7,-0.15509165426789986],"enabled":true}
+room in/out B8-03 {"zone":"second_campus_8f","position":[87.99989861768319,1.7,-0.15391262636959668],"enabled":true}
+travel elevator second_campus_8f -> second_campus_2f {"zone":"second_campus_2f","position":[78,1.7000000000000004,-1.8],"enabled":true}
+travel stairs second_campus_2f -> second_campus_1f {"zone":"second_campus_1f","position":[74,1.6999999999999993,0.2],"enabled":true}
+travel stairs second_campus_1f -> second_campus_2f {"zone":"second_campus_2f","position":[78,1.7000000000000004,-1.8],"enabled":true}
+travel stairs second_campus_2f -> second_campus_1f {"zone":"second_campus_1f","position":[74,1.6999999999999993,0.2],"enabled":true}
+second_to_hill {"zone":"hillside_route","position":[70.3,1.27,-18.5],"enabled":true}
+hill_to_second {"zone":"second_campus_1f","position":[72,1.55,-15.5],"enabled":true}
+hill_to_er {"zone":"first_campus_2f","position":[28.2,1.7,0],"enabled":true}
+er_to_hill {"zone":"hillside_route","position":[11.5,1.27,-34.55],"enabled":true}
+hill_to_pond {"zone":"ecology_pond","position":[53,1.1199999999999992,-36.8],"enabled":true}
+pond_to_hill {"zone":"hillside_route","position":[48.8,1.1950000000000003,-33.5],"enabled":true}
+travel elevator second_campus_1f -> second_campus_2f {"zone":"second_campus_2f","position":[78,1.7000000000000004,-1.8],"enabled":true}
+travel elevator first_campus_8f -> first_campus_3f {"zone":"first_campus_3f","position":[-9.5,1.7,0],"enabled":true}
+Full loop returns to 3F {"zone":"first_campus_3f","position":[-9.5,1.7,0],"enabled":true}

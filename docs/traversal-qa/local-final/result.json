@@ -1,0 +1,1044 @@
+{
+  "url": "http://localhost:4173/",
+  "started": "2026-09-18T00:21:56.265Z",
+  "method": "Continuous production route; controller movement inputs and camera aim are automated. No direct loadZone, teleport, or player-position writes. E interactions and floor buttons use browser keyboard/DOM.",
+  "zones": [
+    "first_campus_3f",
+    "first_campus_4f",
+    "first_campus_1f",
+    "first_campus_2f",
+    "first_campus_8f",
+    "skybridge",
+    "second_campus_2f",
+    "second_campus_3f",
+    "second_campus_4f",
+    "second_campus_5f",
+    "second_campus_6f",
+    "second_campus_7f",
+    "second_campus_8f",
+    "second_campus_1f",
+    "hillside_route",
+    "ecology_pond"
+  ],
+  "rooms": [
+    "3F_ADMIN",
+    "3F_STAIRS",
+    "4A",
+    "4B",
+    "4C",
+    "4D",
+    "4F_PHYSICIAN",
+    "4F_STAIRS",
+    "OPD",
+    "GROUP",
+    "PHARM",
+    "PHYS",
+    "MEET",
+    "EEG",
+    "XRAY",
+    "CLINIC",
+    "BLOOD",
+    "201",
+    "202",
+    "B3-01",
+    "B3-02",
+    "B3-03",
+    "B4-01",
+    "B4-02",
+    "B4-03",
+    "B5-01",
+    "B5-02",
+    "B5-03",
+    "B6-01",
+    "B6-02",
+    "B6-03",
+    "B7-01",
+    "B7-02",
+    "B7-03",
+    "B8-01",
+    "B8-02",
+    "B8-03"
+  ],
+  "steps": [
+    {
+      "label": "Act1 production start",
+      "zone": "first_campus_3f",
+      "position": [
+        2.1,
+        1.7,
+        0.4
+      ],
+      "enabled": true
+    },
+    {
+      "label": "3F lift locked before handoff",
+      "zone": "first_campus_3f",
+      "position": [
+        -10.0479049300186,
+        1.6999999999999997,
+        0.9926498839094436
+      ],
+      "enabled": true
+    },
+    {
+      "label": "316 key log HIS completed",
+      "zone": "first_campus_3f",
+      "position": [
+        8.545560707512287,
+        1.7000000000000002,
+        4.905585074001897
+      ],
+      "enabled": true
+    },
+    {
+      "label": "room in/out 3F_ADMIN",
+      "zone": "first_campus_3f",
+      "position": [
+        18.99983828370702,
+        1.7,
+        -0.15546782589919375
+      ],
+      "enabled": true
+    },
+    {
+      "label": "room in/out 3F_STAIRS",
+      "zone": "first_campus_3f",
+      "position": [
+        18.999999823440838,
+        1.7,
+        0.14884941719987851
+      ],
+      "enabled": true
+    },
+    {
+      "label": "Travel cancel button preserves zone and resumes controls",
+      "zone": "first_campus_3f",
+      "position": [
+        18.999976213841787,
+        1.6999999999999997,
+        5.345282943741563
+      ],
+      "enabled": true
+    },
+    {
+      "label": "Travel Escape preserves zone and resumes controls",
+      "zone": "first_campus_3f",
+      "position": [
+        18.999976213841787,
+        1.6999999999999997,
+        5.345282943741563
+      ],
+      "enabled": true
+    },
+    {
+      "label": "travel stairs first_campus_3f -> first_campus_4f",
+      "zone": "first_campus_4f",
+      "position": [
+        37,
+        1.7,
+        4.6
+      ],
+      "enabled": true
+    },
+    {
+      "label": "Duty room entry exit close reopen",
+      "zone": "first_campus_4f",
+      "position": [
+        5.399954165742146,
+        1.7000000000000002,
+        -1.1536611893177517
+      ],
+      "enabled": true
+    },
+    {
+      "label": "Ward gate closed blocks actual W movement",
+      "zone": "first_campus_4f",
+      "position": [
+        13.604562006314346,
+        1.7,
+        0.005450917347241637
+      ],
+      "enabled": true
+    },
+    {
+      "label": "Inside ward reader close and reopen",
+      "zone": "first_campus_4f",
+      "position": [
+        15.352119435352392,
+        1.7,
+        -0.004687069704477856
+      ],
+      "enabled": true
+    },
+    {
+      "label": "Ward gate reopened allows passage",
+      "zone": "first_campus_4f",
+      "position": [
+        22.856351940838916,
+        1.7,
+        -0.00008803595460332296
+      ],
+      "enabled": true
+    },
+    {
+      "label": "room in/out 4A",
+      "zone": "first_campus_4f",
+      "position": [
+        24.999840484504908,
+        1.7,
+        -0.1517490907931398
+      ],
+      "enabled": true
+    },
+    {
+      "label": "room in/out 4B",
+      "zone": "first_campus_4f",
+      "position": [
+        24.999999832320448,
+        1.7,
+        0.14565064520713336
+      ],
+      "enabled": true
+    },
+    {
+      "label": "room in/out 4C",
+      "zone": "first_campus_4f",
+      "position": [
+        30.999841628762017,
+        1.7,
+        -0.1439482888127398
+      ],
+      "enabled": true
+    },
+    {
+      "label": "room in/out 4D",
+      "zone": "first_campus_4f",
+      "position": [
+        30.99999982381583,
+        1.7,
+        0.15239044659948348
+      ],
+      "enabled": true
+    },
+    {
+      "label": "room in/out 4F_PHYSICIAN",
+      "zone": "first_campus_4f",
+      "position": [
+        36.99983974547088,
+        1.7,
+        -0.14964126790299484
+      ],
+      "enabled": true
+    },
+    {
+      "label": "room in/out 4F_STAIRS",
+      "zone": "first_campus_4f",
+      "position": [
+        36.999999822319175,
+        1.7,
+        0.1516060691210588
+      ],
+      "enabled": true
+    },
+    {
+      "label": "travel stairs first_campus_4f -> first_campus_3f",
+      "zone": "first_campus_3f",
+      "position": [
+        19,
+        1.7,
+        4.6
+      ],
+      "enabled": true
+    },
+    {
+      "label": "travel elevator first_campus_3f -> first_campus_1f",
+      "zone": "first_campus_1f",
+      "position": [
+        -11.5,
+        1.7,
+        0
+      ],
+      "enabled": true
+    },
+    {
+      "label": "room in/out OPD",
+      "zone": "first_campus_1f",
+      "position": [
+        20.99983151777137,
+        1.7,
+        -0.14938793820369978
+      ],
+      "enabled": true
+    },
+    {
+      "label": "room in/out GROUP",
+      "zone": "first_campus_1f",
+      "position": [
+        20.999999830416424,
+        1.7,
+        0.14415131066531012
+      ],
+      "enabled": true
+    },
+    {
+      "label": "room in/out PHARM",
+      "zone": "first_campus_1f",
+      "position": [
+        26.999822312939404,
+        1.7,
+        -0.15363937584090692
+      ],
+      "enabled": true
+    },
+    {
+      "label": "Lobby main entrance exit",
+      "zone": "first_campus_1f",
+      "position": [
+        0.995369854357218,
+        1.7,
+        -10.8501768589059
+      ],
+      "enabled": true
+    },
+    {
+      "label": "travel elevator first_campus_1f -> first_campus_2f",
+      "zone": "first_campus_2f",
+      "position": [
+        -9.5,
+        1.7,
+        0
+      ],
+      "enabled": true
+    },
+    {
+      "label": "room in/out PHYS",
+      "zone": "first_campus_2f",
+      "position": [
+        -3.20015334791533,
+        1.7,
+        17.853573963708204
+      ],
+      "enabled": true
+    },
+    {
+      "label": "room in/out MEET",
+      "zone": "first_campus_2f",
+      "position": [
+        -3.2000001655791177,
+        1.7,
+        18.15568122514388
+      ],
+      "enabled": true
+    },
+    {
+      "label": "room in/out EEG",
+      "zone": "first_campus_2f",
+      "position": [
+        2.7998407056291272,
+        1.7,
+        17.84629988870355
+      ],
+      "enabled": true
+    },
+    {
+      "label": "room in/out XRAY",
+      "zone": "first_campus_2f",
+      "position": [
+        2.7999998255736456,
+        1.7,
+        18.153389091993176
+      ],
+      "enabled": true
+    },
+    {
+      "label": "room in/out CLINIC",
+      "zone": "first_campus_2f",
+      "position": [
+        8.79983008607373,
+        1.7,
+        17.84864609850371
+      ],
+      "enabled": true
+    },
+    {
+      "label": "room in/out BLOOD",
+      "zone": "first_campus_2f",
+      "position": [
+        8.799999836029826,
+        1.7,
+        18.13968782356769
+      ],
+      "enabled": true
+    },
+    {
+      "label": "ER treatment ECT",
+      "zone": "first_campus_2f",
+      "position": [
+        2.0102291894435007,
+        1.7,
+        -6.347178781421805
+      ],
+      "enabled": true
+    },
+    {
+      "label": "ER chart office",
+      "zone": "first_campus_2f",
+      "position": [
+        12.495623943194035,
+        1.6999999999999995,
+        -4.657518483227431
+      ],
+      "enabled": true
+    },
+    {
+      "label": "ER bedside",
+      "zone": "first_campus_2f",
+      "position": [
+        13.994531948685884,
+        1.7000000000000004,
+        4.359752035238201
+      ],
+      "enabled": true
+    },
+    {
+      "label": "ER nurse station",
+      "zone": "first_campus_2f",
+      "position": [
+        3.653868814255343,
+        1.6999999999999995,
+        2.0713857933480475
+      ],
+      "enabled": true
+    },
+    {
+      "label": "travel elevator first_campus_2f -> first_campus_8f",
+      "zone": "first_campus_8f",
+      "position": [
+        -9.5,
+        1.7,
+        0
+      ],
+      "enabled": true
+    },
+    {
+      "label": "first_to_bridge",
+      "zone": "skybridge",
+      "position": [
+        1.6,
+        1.7,
+        0
+      ],
+      "enabled": true
+    },
+    {
+      "label": "bridge_to_first",
+      "zone": "first_campus_8f",
+      "position": [
+        -1.6,
+        1.7,
+        0
+      ],
+      "enabled": true
+    },
+    {
+      "label": "bridge_to_second",
+      "zone": "second_campus_2f",
+      "position": [
+        61.6,
+        1.7,
+        0
+      ],
+      "enabled": true
+    },
+    {
+      "label": "second_to_bridge",
+      "zone": "skybridge",
+      "position": [
+        58.4,
+        1.7,
+        0
+      ],
+      "enabled": true
+    },
+    {
+      "label": "room in/out 201",
+      "zone": "second_campus_2f",
+      "position": [
+        65.99993658743676,
+        1.7,
+        -0.15201472411266823
+      ],
+      "enabled": true
+    },
+    {
+      "label": "room in/out 202",
+      "zone": "second_campus_2f",
+      "position": [
+        73.99993757886355,
+        1.7,
+        -0.14951399714804323
+      ],
+      "enabled": true
+    },
+    {
+      "label": "travel elevator second_campus_2f -> second_campus_3f",
+      "zone": "second_campus_3f",
+      "position": [
+        77.5,
+        1.7000000000000002,
+        -1.3
+      ],
+      "enabled": true
+    },
+    {
+      "label": "second 3F station staff entry",
+      "zone": "second_campus_3f",
+      "position": [
+        73.00514497218398,
+        1.7000000000000002,
+        4.3494824832521175
+      ],
+      "enabled": true
+    },
+    {
+      "label": "room in/out B3-01",
+      "zone": "second_campus_3f",
+      "position": [
+        72.0001030007949,
+        1.7,
+        -0.15200932130750153
+      ],
+      "enabled": true
+    },
+    {
+      "label": "room in/out B3-02",
+      "zone": "second_campus_3f",
+      "position": [
+        79.99990018980729,
+        1.7,
+        -0.15041637297327862
+      ],
+      "enabled": true
+    },
+    {
+      "label": "room in/out B3-03",
+      "zone": "second_campus_3f",
+      "position": [
+        87.99989955320882,
+        1.7,
+        -0.15480098696892386
+      ],
+      "enabled": true
+    },
+    {
+      "label": "travel elevator second_campus_3f -> second_campus_4f",
+      "zone": "second_campus_4f",
+      "position": [
+        77.5,
+        1.7000000000000002,
+        -1.3
+      ],
+      "enabled": true
+    },
+    {
+      "label": "second 4F station staff entry",
+      "zone": "second_campus_4f",
+      "position": [
+        73.00522296633031,
+        1.7000000000000002,
+        4.348308958308893
+      ],
+      "enabled": true
+    },
+    {
+      "label": "room in/out B4-01",
+      "zone": "second_campus_4f",
+      "position": [
+        72.00010339378458,
+        1.7,
+        -0.1528459507230379
+      ],
+      "enabled": true
+    },
+    {
+      "label": "room in/out B4-02",
+      "zone": "second_campus_4f",
+      "position": [
+        79.99989741385127,
+        1.7,
+        -0.15102955139580876
+      ],
+      "enabled": true
+    },
+    {
+      "label": "room in/out B4-03",
+      "zone": "second_campus_4f",
+      "position": [
+        87.99990520033766,
+        1.7,
+        -0.14771084255130984
+      ],
+      "enabled": true
+    },
+    {
+      "label": "travel elevator second_campus_4f -> second_campus_5f",
+      "zone": "second_campus_5f",
+      "position": [
+        77.5,
+        1.7000000000000002,
+        -1.3
+      ],
+      "enabled": true
+    },
+    {
+      "label": "second 5F station staff entry",
+      "zone": "second_campus_5f",
+      "position": [
+        73.0050099444429,
+        1.7000000000000002,
+        4.3474894420670145
+      ],
+      "enabled": true
+    },
+    {
+      "label": "room in/out B5-01",
+      "zone": "second_campus_5f",
+      "position": [
+        72.00010360904122,
+        1.7,
+        -0.1541450328162187
+      ],
+      "enabled": true
+    },
+    {
+      "label": "room in/out B5-02",
+      "zone": "second_campus_5f",
+      "position": [
+        79.99990667972575,
+        1.7,
+        -0.1489166452759497
+      ],
+      "enabled": true
+    },
+    {
+      "label": "room in/out B5-03",
+      "zone": "second_campus_5f",
+      "position": [
+        87.99990051029185,
+        1.7,
+        -0.1474201605367969
+      ],
+      "enabled": true
+    },
+    {
+      "label": "travel elevator second_campus_5f -> second_campus_6f",
+      "zone": "second_campus_6f",
+      "position": [
+        77.5,
+        1.7000000000000002,
+        -1.3
+      ],
+      "enabled": true
+    },
+    {
+      "label": "second 6F station staff entry",
+      "zone": "second_campus_6f",
+      "position": [
+        73.00503976354484,
+        1.7000000000000002,
+        4.350057782737261
+      ],
+      "enabled": true
+    },
+    {
+      "label": "room in/out B6-01",
+      "zone": "second_campus_6f",
+      "position": [
+        72.00010377445545,
+        1.7,
+        -0.15329443370762175
+      ],
+      "enabled": true
+    },
+    {
+      "label": "room in/out B6-02",
+      "zone": "second_campus_6f",
+      "position": [
+        79.99989682185812,
+        1.7,
+        -0.15179924714876825
+      ],
+      "enabled": true
+    },
+    {
+      "label": "room in/out B6-03",
+      "zone": "second_campus_6f",
+      "position": [
+        87.99989799602739,
+        1.7,
+        -0.15491171284287314
+      ],
+      "enabled": true
+    },
+    {
+      "label": "travel elevator second_campus_6f -> second_campus_7f",
+      "zone": "second_campus_7f",
+      "position": [
+        77.5,
+        1.7000000000000002,
+        -1.3
+      ],
+      "enabled": true
+    },
+    {
+      "label": "second 7F station staff entry",
+      "zone": "second_campus_7f",
+      "position": [
+        73.00501480484063,
+        1.7000000000000002,
+        4.349114158028383
+      ],
+      "enabled": true
+    },
+    {
+      "label": "room in/out B7-01",
+      "zone": "second_campus_7f",
+      "position": [
+        72.00010405674378,
+        1.7,
+        -0.1545725445426531
+      ],
+      "enabled": true
+    },
+    {
+      "label": "room in/out B7-02",
+      "zone": "second_campus_7f",
+      "position": [
+        79.99989707435208,
+        1.7,
+        -0.15656732137515275
+      ],
+      "enabled": true
+    },
+    {
+      "label": "room in/out B7-03",
+      "zone": "second_campus_7f",
+      "position": [
+        87.99990489261022,
+        1.7,
+        -0.1482937884036749
+      ],
+      "enabled": true
+    },
+    {
+      "label": "travel elevator second_campus_7f -> second_campus_8f",
+      "zone": "second_campus_8f",
+      "position": [
+        77.5,
+        1.7000000000000002,
+        -1.3
+      ],
+      "enabled": true
+    },
+    {
+      "label": "second 8F station staff entry",
+      "zone": "second_campus_8f",
+      "position": [
+        73.00500440089561,
+        1.7000000000000002,
+        4.349105993553523
+      ],
+      "enabled": true
+    },
+    {
+      "label": "room in/out B8-01",
+      "zone": "second_campus_8f",
+      "position": [
+        72.00010117732435,
+        1.7,
+        -0.15409488887639572
+      ],
+      "enabled": true
+    },
+    {
+      "label": "room in/out B8-02",
+      "zone": "second_campus_8f",
+      "position": [
+        79.99990208900796,
+        1.7,
+        -0.15509165426789986
+      ],
+      "enabled": true
+    },
+    {
+      "label": "room in/out B8-03",
+      "zone": "second_campus_8f",
+      "position": [
+        87.99989861768319,
+        1.7,
+        -0.15391262636959668
+      ],
+      "enabled": true
+    },
+    {
+      "label": "travel elevator second_campus_8f -> second_campus_2f",
+      "zone": "second_campus_2f",
+      "position": [
+        78,
+        1.7000000000000004,
+        -1.8
+      ],
+      "enabled": true
+    },
+    {
+      "label": "travel stairs second_campus_2f -> second_campus_1f",
+      "zone": "second_campus_1f",
+      "position": [
+        74,
+        1.6999999999999993,
+        0.2
+      ],
+      "enabled": true
+    },
+    {
+      "label": "travel stairs second_campus_1f -> second_campus_2f",
+      "zone": "second_campus_2f",
+      "position": [
+        78,
+        1.7000000000000004,
+        -1.8
+      ],
+      "enabled": true
+    },
+    {
+      "label": "travel stairs second_campus_2f -> second_campus_1f",
+      "zone": "second_campus_1f",
+      "position": [
+        74,
+        1.6999999999999993,
+        0.2
+      ],
+      "enabled": true
+    },
+    {
+      "label": "second_to_hill",
+      "zone": "hillside_route",
+      "position": [
+        70.3,
+        1.27,
+        -18.5
+      ],
+      "enabled": true
+    },
+    {
+      "label": "hill_to_second",
+      "zone": "second_campus_1f",
+      "position": [
+        72,
+        1.55,
+        -15.5
+      ],
+      "enabled": true
+    },
+    {
+      "label": "hill_to_er",
+      "zone": "first_campus_2f",
+      "position": [
+        28.2,
+        1.7,
+        0
+      ],
+      "enabled": true
+    },
+    {
+      "label": "er_to_hill",
+      "zone": "hillside_route",
+      "position": [
+        11.5,
+        1.27,
+        -34.55
+      ],
+      "enabled": true
+    },
+    {
+      "label": "hill_to_pond",
+      "zone": "ecology_pond",
+      "position": [
+        53,
+        1.1199999999999992,
+        -36.8
+      ],
+      "enabled": true
+    },
+    {
+      "label": "pond_to_hill",
+      "zone": "hillside_route",
+      "position": [
+        48.8,
+        1.1950000000000003,
+        -33.5
+      ],
+      "enabled": true
+    },
+    {
+      "label": "travel elevator second_campus_1f -> second_campus_2f",
+      "zone": "second_campus_2f",
+      "position": [
+        78,
+        1.7000000000000004,
+        -1.8
+      ],
+      "enabled": true
+    },
+    {
+      "label": "travel elevator first_campus_8f -> first_campus_3f",
+      "zone": "first_campus_3f",
+      "position": [
+        -9.5,
+        1.7,
+        0
+      ],
+      "enabled": true
+    },
+    {
+      "label": "Full loop returns to 3F",
+      "zone": "first_campus_3f",
+      "position": [
+        -9.5,
+        1.7,
+        0
+      ],
+      "enabled": true
+    }
+  ],
+  "screenshots": [
+    "316-his.jpg",
+    "3F_ADMIN.jpg",
+    "3F_STAIRS.jpg",
+    "first_campus_3f.jpg",
+    "first4-duty-room.jpg",
+    "first_campus_4f.jpg",
+    "ward-gate-closed.jpg",
+    "4A.jpg",
+    "4B.jpg",
+    "4C.jpg",
+    "4D.jpg",
+    "4F_PHYSICIAN.jpg",
+    "4F_STAIRS.jpg",
+    "OPD.jpg",
+    "GROUP.jpg",
+    "PHARM.jpg",
+    "first_campus_1f.jpg",
+    "PHYS.jpg",
+    "MEET.jpg",
+    "EEG.jpg",
+    "XRAY.jpg",
+    "CLINIC.jpg",
+    "BLOOD.jpg",
+    "er-ect.jpg",
+    "first_campus_2f.jpg",
+    "first_campus_8f.jpg",
+    "skybridge.jpg",
+    "201.jpg",
+    "202.jpg",
+    "second_campus_2f.jpg",
+    "second_campus_3f.jpg",
+    "B3-01.jpg",
+    "B3-02.jpg",
+    "B3-03.jpg",
+    "second_campus_4f.jpg",
+    "B4-01.jpg",
+    "B4-02.jpg",
+    "B4-03.jpg",
+    "second_campus_5f.jpg",
+    "B5-01.jpg",
+    "B5-02.jpg",
+    "B5-03.jpg",
+    "second_campus_6f.jpg",
+    "B6-01.jpg",
+    "B6-02.jpg",
+    "B6-03.jpg",
+    "second_campus_7f.jpg",
+    "B7-01.jpg",
+    "B7-02.jpg",
+    "B7-03.jpg",
+    "second_campus_8f.jpg",
+    "B8-01.jpg",
+    "B8-02.jpg",
+    "B8-03.jpg",
+    "second_campus_1f.jpg",
+    "hillside_route.jpg",
+    "ecology_pond.jpg"
+  ],
+  "errors": [],
+  "tasks": [
+    {
+      "id": "task-key",
+      "completed": true
+    },
+    {
+      "id": "task-log",
+      "completed": true
+    },
+    {
+      "id": "task-handoff",
+      "completed": true
+    }
+  ],
+  "wardGate": {
+    "closedBlocks": true,
+    "openAllows": true,
+    "closedProbe": {
+      "zone": "first_campus_4f",
+      "x": 13.604562006314346,
+      "enabled": true,
+      "support": -1.210346788847269e-18
+    }
+  },
+  "returnedKey": {
+    "visible": false,
+    "targetVisible": false,
+    "interactable": false
+  },
+  "assets": [
+    "http://localhost:4173/assets/index-ZbrF-CgS.js",
+    "http://localhost:4173/assets/index-j4MJrLLq.css",
+    "http://localhost:4173/assets/models/officeChair.glb",
+    "http://localhost:4173/assets/models/workDesk.glb",
+    "http://localhost:4173/assets/models/storageCabinet.glb",
+    "http://localhost:4173/assets/models/hospitalBed.glb",
+    "http://localhost:4173/assets/models/bench.glb",
+    "http://localhost:4173/assets/models/printer.glb",
+    "http://localhost:4173/assets/models/plant.glb",
+    "http://localhost:4173/assets/models/shrub_02/shrub_02_2k.gltf",
+    "http://localhost:4173/assets/models/fern_02/fern_02_2k.gltf",
+    "http://localhost:4173/assets/models/campusTree.glb",
+    "http://localhost:4173/assets/textures/Plastic010_2K-JPG_Color.jpg",
+    "http://localhost:4173/assets/textures/Plastic010_2K-JPG_NormalGL.jpg",
+    "http://localhost:4173/assets/textures/Plastic010_2K-JPG_Roughness.jpg",
+    "http://localhost:4173/assets/textures/Terrazzo001_2K-JPG_Color.jpg",
+    "http://localhost:4173/assets/textures/Terrazzo001_2K-JPG_NormalGL.jpg",
+    "http://localhost:4173/assets/textures/Terrazzo001_2K-JPG_Roughness.jpg",
+    "http://localhost:4173/assets/textures/Wood051_2K-JPG_Color.jpg",
+    "http://localhost:4173/assets/textures/Wood051_2K-JPG_NormalGL.jpg",
+    "http://localhost:4173/assets/textures/Wood051_2K-JPG_Roughness.jpg",
+    "http://localhost:4173/assets/textures/Ground037_2K-JPG_Color.jpg",
+    "http://localhost:4173/assets/textures/Ground037_2K-JPG_NormalGL.jpg",
+    "http://localhost:4173/assets/textures/Ground037_2K-JPG_Roughness.jpg",
+    "http://localhost:4173/assets/textures/Asphalt033_2K-JPG_Color.jpg",
+    "http://localhost:4173/assets/textures/Asphalt033_2K-JPG_NormalGL.jpg",
+    "http://localhost:4173/assets/textures/Asphalt033_2K-JPG_Roughness.jpg",
+    "http://localhost:4173/assets/models/shrub_02/shrub_02.bin",
+    "http://localhost:4173/assets/models/shrub_02/textures/shrub_02_diff_2k.jpg",
+    "http://localhost:4173/assets/models/shrub_02/textures/shrub_02_arm_2k.jpg",
+    "http://localhost:4173/assets/models/shrub_02/textures/shrub_02_nor_gl_2k.jpg",
+    "http://localhost:4173/assets/models/fern_02/fern_02.bin",
+    "http://localhost:4173/assets/models/fern_02/textures/fern_02_diff_2k.jpg",
+    "http://localhost:4173/assets/models/fern_02/textures/fern_02_arm_2k.jpg",
+    "http://localhost:4173/assets/models/fern_02/textures/fern_02_nor_gl_2k.jpg",
+    "http://localhost:4173/assets/models/fern_02/textures/fern_02_alpha_2k.png",
+    "http://localhost:4173/assets/models/shrub_02/textures/shrub_02_alpha_2k.png"
+  ],
+  "verdict": "PASS",
+  "ended": "2026-09-18T00:29:03.965Z"
+}

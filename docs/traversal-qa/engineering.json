@@ -1,0 +1,110 @@
+{
+  "verdict": "PASS",
+  "results": [
+    {
+      "command": [
+        "test_art_resources_qa.js"
+      ],
+      "status": 0
+    },
+    {
+      "command": [
+        "test_duty_room_door_qa.js"
+      ],
+      "status": 0
+    },
+    {
+      "command": [
+        "test_entry_boundary_qa.js"
+      ],
+      "status": 0
+    },
+    {
+      "command": [
+        "test_er_boundary_qa.js"
+      ],
+      "status": 0
+    },
+    {
+      "command": [
+        "test_first_campus_rooms_qa.js"
+      ],
+      "status": 0
+    },
+    {
+      "command": [
+        "test_first_upper_rooms_qa.js"
+      ],
+      "status": 0
+    },
+    {
+      "command": [
+        "test_ground_movement_qa.js"
+      ],
+      "status": 0
+    },
+    {
+      "command": [
+        "test_hillside_surface_qa.js"
+      ],
+      "status": 0
+    },
+    {
+      "command": [
+        "test_key_revisit_qa.js"
+      ],
+      "status": 0
+    },
+    {
+      "command": [
+        "test_modeling_qa.js"
+      ],
+      "status": 0
+    },
+    {
+      "command": [
+        "test_playable_world_qa.js"
+      ],
+      "status": 0
+    },
+    {
+      "command": [
+        "test_second_rooms_qa.js"
+      ],
+      "status": 0
+    },
+    {
+      "command": [
+        "test_ward_gate_qa.js"
+      ],
+      "status": 0
+    },
+    {
+      "command": [
+        "test_world_traversal_qa.js"
+      ],
+      "status": 0
+    },
+    {
+      "command": [
+        "node_modules/vite/bin/vite.js",
+        "build"
+      ],
+      "status": 0
+    },
+    {
+      "command": [
+        "scripts/test-browser-resources.mjs",
+        "../docs/traversal-qa/resources.json"
+      ],
+      "status": 0
+    },
+    {
+      "command": [
+        "scripts/test-playable-walkthrough.mjs",
+        "../docs/traversal-qa/local-final"
+      ],
+      "status": 0
+    }
+  ]
+}
