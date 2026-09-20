@@ -28,14 +28,16 @@ const gf=new GeometryFactory();
   assert.equal(CollisionFactory.testPoint(zone.colliders,0,1.7,0,.25).collided,false,'Authorized 2F gate must clear entry');
 
   const routes=[
-    [[-4,1.7,0],[3.5,1.7,2.0],'triage/nursing station'],
-    [[-4,1.7,0],[3.5,1.7,-3.0],'treatment-room threshold'],
-    [[8,1.7,0],[12.5,1.7,-3.0],'doctor-office threshold'],
-    [[8,1.7,0],[14.5,1.7,3.0],'observation area threshold'],
+    {label:'triage/nursing station',points:[[-4,1.7,0],[1,1.7,0],[3.5,1.7,0],[3.5,1.7,2.65]]},
+    {label:'treatment-room threshold',points:[[-4,1.7,0],[1,1.7,0],[3.5,1.7,0],[3.5,1.7,-3.0]]},
+    {label:'doctor-office threshold',points:[[8,1.7,0],[12.5,1.7,0],[12.5,1.7,-3.0]]},
+    {label:'observation area threshold',points:[[8,1.7,0],[14.5,1.7,0],[14.5,1.7,3.0]]},
   ];
-  for(const [a,b,label] of routes){
-    const result=CollisionFactory.testTraversal(zone.colliders,a,b,.30,80);
-    assert.equal(result.passable,true,`2F authorized route blocked: ${label}`);
+  for(const route of routes){
+    for(let i=1;i<route.points.length;i++){
+      const result=CollisionFactory.testTraversal(zone.colliders,route.points[i-1],route.points[i],.30,60);
+      assert.equal(result.passable,true,`2F authorized route blocked: ${route.label} segment ${i}`);
+    }
   }
   zone.cleanup(); assert.equal(scene.children.length,0);
 }
