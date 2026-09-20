@@ -123,23 +123,25 @@ controller.onInteract = (interactable) => {
     controller.enabled = false;
     uiManager.openWorkstation();
     checkElevatorReady();
-  } else if (interactable.type === 'elevator' || interactable.type === 'travel_selector') {
-    if (worldRouter.activeZoneId !== 'first_campus_3f' || gameState.areRequiredTasksComplete()) {
-      controller.enabled = false;
-      uiManager.openTravelSelector(worldRouter.floorDestinations(interactable.kind),worldRouter.activeZoneId,destination=>{
-        if(destination.zoneId==='first_campus_4f')gameState.markTaskComplete('WARD_ENTRY');
-        worldRouter.loadZone(destination.zoneId,destination.spawn);
-        controller.enabled=true;
-      },interactable.kind);
+  } else if (interactable.type === 'exit_door' || interactable.type === 'closed_door') {
+    soundManager.playClick();
+    if (interactable.id === '1F_MAIN_DOOR') {
+      uiManager.showSubtitle('李醫師', '「值班時間都會關起來，出不去。」', 3500);
+    } else if (interactable.id === '1F_PHARM_GATE') {
+      uiManager.showSubtitle('李醫師', '「夜間門診藥局已打烊，非急診調劑時段不開放。」', 3500);
+    } else if (interactable.id === '2F_ACUTE_GATE') {
+      uiManager.showSubtitle('李醫師', '「2F 急診封閉式病房區，夜間門禁管制鎖定中。」', 3500);
     } else {
-      soundManager.playClick();
-      const missing=[];
-      if(!gameState.isTaskComplete('KEY_PICKUP'))missing.push('值班室鑰匙');
-      if(!gameState.isTaskComplete('DUTY_LOG'))missing.push('簽到值班本');
-      if(!gameState.isTaskComplete('E_HANDOFF'))missing.push('電腦電子交班');
-      uiManager.showSubtitle('李醫師','「還沒完成 3F 報到交班手續，還缺：'+missing.join('、')+'。」',5000);
+      uiManager.showSubtitle('李醫師', interactable.subtitle || '「夜間門禁管制時間，此區域暫不開放。」', 3000);
     }
-  } else if(interactable.type==='ward_gate') {
+  } else if (interactable.type === 'elevator' || interactable.type === 'travel_selector') {
+    controller.enabled = false;
+    uiManager.openTravelSelector(worldRouter.floorDestinations(interactable.kind), worldRouter.activeZoneId, destination => {
+      if (destination.zoneId === 'first_campus_4f') gameState.markTaskComplete('WARD_ENTRY');
+      worldRouter.loadZone(destination.zoneId, destination.spawn);
+      controller.enabled = true;
+    }, interactable.kind);
+  } else if (interactable.type === 'ward_gate') {
     const changed = worldRouter.activeZoneInstance.toggleWardGate(controller.position);
     if (changed) soundManager.playClick();
     else uiManager.showSubtitle('門禁', '請先離開門口，再刷卡關門。', 2500);
@@ -182,6 +184,18 @@ const camPreset = urlParams.get('cam');
 
 if (zoneParam || spawnParam) {
   worldRouter.loadZone(zoneParam || 'first_campus_3f', spawnParam);
+  if (urlParams.has('x') && urlParams.has('z')) {
+    controller.teleport(
+      parseFloat(urlParams.get('x')),
+      parseFloat(urlParams.get('y') || controller.eyeHeight),
+      parseFloat(urlParams.get('z')),
+      parseFloat(urlParams.get('yaw') || 0)
+    );
+    if (urlParams.has('pitch')) {
+      controller.pitch = parseFloat(urlParams.get('pitch'));
+      controller.updateCameraRotation();
+    }
+  }
 } else if (camPreset === '316_entrance') {
   worldRouter.loadZone('first_campus_3f');
   controller.teleport(2.1, controller.eyeHeight, 0.4, Math.PI);

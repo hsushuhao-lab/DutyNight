@@ -31,23 +31,69 @@ export class FirstCampus1F {
     this.gf.buildCeiling(this.zoneGroup, 2, lobbyHeight, 0, 32, 16);
 
     // Outer perimeter walls
-    for(const z of [-4.6,4.6]) this.gf.buildWall(this.zoneGroup,this.colliders,18,lobbyHeight/2,z,.4,lobbyHeight,6.8);
-    this.roomWing = buildRoomWing(this,{x:18,z:0,height:lobbyHeight,rooms:[
-      {code:'OPD',label:'門診區',kind:'clinic'},
-      {code:'GROUP',label:'團體治療室',kind:'meeting'},
-      {code:'PHARM',label:'藥局',kind:'pharmacy'}
-    ]});
+    // Outer perimeter walls
+    this.gf.buildWall(this.zoneGroup, this.colliders, 18, lobbyHeight / 2, 0, 0.4, lobbyHeight, 16); // East perimeter wall
     this.gf.buildWall(this.zoneGroup, this.colliders, 2, lobbyHeight / 2, 8, 32, lobbyHeight, 0.4);  // North wall
+
+    // Shuttered Outpatient and Pharmacy facades on East wall (x = 18.0)
+    // 1. Pharmacy facade (z = -4.0)
+    const pharmShutter = new THREE.Mesh(new THREE.BoxGeometry(0.08, 2.6, 3.2), this.gf.materials.metal);
+    pharmShutter.position.set(17.85, 1.3, -4.0);
+    this.zoneGroup.add(pharmShutter);
+    pharmShutter.userData = {
+      interactable: true,
+      id: '1F_PHARM_GATE',
+      type: 'exit_door',
+      label: '檢視已打烊的門診藥局'
+    };
+    this.interactables.push(pharmShutter);
+
+    SignAnchor.buildWallPlaque({
+      scene: this.zoneGroup,
+      x: 17.78,
+      y: 2.8,
+      z: -4.0,
+      rotationY: -Math.PI / 2,
+      code: 'PHARM',
+      title: '【夜間未開放】門診藥局',
+      subtitle: 'PHARMACY CLOSED AT NIGHT',
+      header: '松德醫療中心 ｜ 藥劑科'
+    });
+
+    // 2. Outpatient clinic facade (z = 4.0)
+    const opdShutter = new THREE.Mesh(new THREE.BoxGeometry(0.08, 2.6, 3.2), this.gf.materials.metal);
+    opdShutter.position.set(17.85, 1.3, 4.0);
+    this.zoneGroup.add(opdShutter);
+    opdShutter.userData = {
+      interactable: true,
+      id: '1F_OPD_GATE',
+      type: 'exit_door',
+      label: '檢視夜間閉館的門診區',
+      subtitle: '「門診區日間營業結束，夜間暫停開放。」'
+    };
+    this.interactables.push(opdShutter);
+
+    SignAnchor.buildWallPlaque({
+      scene: this.zoneGroup,
+      x: 17.78,
+      y: 2.8,
+      z: 4.0,
+      rotationY: -Math.PI / 2,
+      code: 'OPD',
+      title: '【夜間未開放】門診診間區',
+      subtitle: 'OUTPATIENT CLINICS CLOSED',
+      header: '松德醫療中心 ｜ 門診部'
+    });
 
     // West wall with elevator / stairs core
     this.gf.buildWall(this.zoneGroup, this.colliders, -14, lobbyHeight / 2, 0, 0.4, lobbyHeight, 16);
 
-    // Elevator doors at west wall (x = -13.6, z = 0)
-    const elFrame = new THREE.Mesh(new THREE.BoxGeometry(0.2, 2.8, 2.6), this.gf.materials.metal);
-    elFrame.position.set(-13.6, 1.4, 0);
+    // Standardized Elevator doors at west wall (x = -13.6, z = 0)
+    const elFrame = new THREE.Mesh(new THREE.BoxGeometry(0.2, 2.6, 2.6), this.gf.materials.metal);
+    elFrame.position.set(-13.6, 1.3, 0);
     this.zoneGroup.add(elFrame);
-    const elDoors = new THREE.Mesh(new THREE.BoxGeometry(0.08, 2.6, 2.2), this.gf.materials.stainless);
-    elDoors.position.set(-13.5, 1.4, 0);
+    const elDoors = new THREE.Mesh(new THREE.BoxGeometry(0.08, 2.4, 2.2), this.gf.materials.stainless);
+    elDoors.position.set(-13.5, 1.2, 0);
     this.zoneGroup.add(elDoors);
 
     SignAnchor.buildHangingSign({
@@ -61,16 +107,12 @@ export class FirstCampus1F {
     });
 
     // South wall with main entrance (z = -8)
-    // Left wall segment (x: -14 to -2)
-    this.gf.buildWall(this.zoneGroup, this.colliders, -8.0, lobbyHeight / 2, -8, 12, lobbyHeight, 0.4);
-    // Right wall segment (x: 4 to 18)
-    this.gf.buildWall(this.zoneGroup, this.colliders, 11.0, lobbyHeight / 2, -8, 14, lobbyHeight, 0.4);
+    // Left wall segment (x: -14 to -1)
+    this.gf.buildWall(this.zoneGroup, this.colliders, -7.5, lobbyHeight / 2, -8, 13, lobbyHeight, 0.4);
+    // Right wall segment (x: 3 to 18)
+    this.gf.buildWall(this.zoneGroup, this.colliders, 10.5, lobbyHeight / 2, -8, 15, lobbyHeight, 0.4);
 
-    // Authorized boundary repair: connect the perimeter to the existing 4m doorway.
-    this.gf.buildWall(this.zoneGroup, this.colliders, -1.5, lobbyHeight / 2, -8, 1, lobbyHeight, 0.4);
-    this.gf.buildWall(this.zoneGroup, this.colliders, 3.5, lobbyHeight / 2, -8, 1, lobbyHeight, 0.4);
-
-    // Main entrance sliding doors opening (x: -1 to 3, width 4m, height 3m)
+    // Main entrance doorway (x: -1 to 3, width 4m, height 3m, lintel: 3.0 to 4.0m)
     Doorway.build({
       scene: this.zoneGroup,
       colliders: this.colliders,
@@ -83,17 +125,64 @@ export class FirstCampus1F {
       wallThickness: 0.4,
       isAlongX: true,
       isOpen: true,
-      frameMaterial: this.gf.materials.stainless
+      doorMaterial: this.gf.materials.glass
     });
 
-    // Exterior entrance plaza threshold (z: -8 to -14)
-    this.gf.buildFloor(this.zoneGroup, this.walkables, 1.0, 0, -11.0, 10, 6, this.gf.materials.pathGravel);
-    // Canopy over exterior entrance
-    this.gf.buildCeiling(this.zoneGroup, 1.0, 3.6, -11.0, 10, 6, this.gf.materials.wallDark);
-    // Boundary containment to prevent walking off the plaza
-    CollisionFactory.addBox(this.colliders, 1.0, 1.0, -14.2, 10, 2.0, 0.4);
-    CollisionFactory.addBox(this.colliders, -4.2, 1.0, -11.0, 0.4, 2.0, 6.0);
-    CollisionFactory.addBox(this.colliders, 6.2, 1.0, -11.0, 0.4, 2.0, 6.0);
+    // Left and right glass leaves (visual representation)
+    const glassDoorL = new THREE.Mesh(new THREE.BoxGeometry(1.95, 2.8, 0.08), this.gf.materials.glass);
+    glassDoorL.position.set(0.05, 1.45, -7.95);
+    this.zoneGroup.add(glassDoorL);
+
+    const glassDoorR = new THREE.Mesh(new THREE.BoxGeometry(1.95, 2.8, 0.08), this.gf.materials.glass);
+    glassDoorR.position.set(1.95, 1.45, -7.95);
+    this.zoneGroup.add(glassDoorR);
+
+    // Keycard / Intercom access terminal on right frame
+    const intercom = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.28, 0.08), this.gf.materials.metal);
+    intercom.position.set(3.08, 1.3, -7.78);
+    this.zoneGroup.add(intercom);
+
+    // Main entrance closed signage
+    SignAnchor.buildWallPlaque({
+      scene: this.zoneGroup,
+      x: 1.0,
+      y: 3.2,
+      z: -7.78,
+      rotationY: Math.PI,
+      code: 'NIGHT',
+      title: '夜間正門已關閉 ｜ 門禁管制',
+      subtitle: 'MAIN ENTRANCE CLOSED AT NIGHT',
+      header: '松德醫療中心 ｜ 總務保全課'
+    });
+
+    SignAnchor.buildWallPlaque({
+      scene: this.zoneGroup,
+      x: 1.0,
+      y: 1.6,
+      z: -7.78,
+      rotationY: Math.PI,
+      width: 1.1,
+      height: 0.45,
+      code: 'CLOSED',
+      title: '【夜間大門已關閉】',
+      subtitle: '夜間到勤／急診洽公請由 2F 急診夜間出入口進出',
+      header: ''
+    });
+
+    // Make the door interactable to trigger dialogue: 「值班時間都會關起來，出不去。」
+    const mainDoorHitbox = new THREE.Mesh(
+      new THREE.BoxGeometry(3.6, 2.6, 0.5),
+      new THREE.MeshBasicMaterial({ visible: false })
+    );
+    mainDoorHitbox.position.set(1.0, 1.3, -7.8);
+    mainDoorHitbox.userData = {
+      interactable: true,
+      id: '1F_MAIN_DOOR',
+      type: 'exit_door',
+      label: '檢視夜間鎖閉的正門玻璃門'
+    };
+    this.zoneGroup.add(mainDoorHitbox);
+    this.interactables.push(mainDoorHitbox);
 
     // ==========================================
     // 2. CENTRAL INFORMATION & REGISTRATION RECEPTION (x: -1 to 5, z: -2 to 1)
@@ -164,6 +253,23 @@ export class FirstCampus1F {
     const exterior=buildCampusBackdrop(this.zoneGroup);
     exterior.position.y=11.5;
     return this;
+  }
+
+  setEntranceClosed(closed) {
+    this.entranceClosed = closed;
+    if (closed) {
+      if (!this.entranceCollider) {
+        this.entranceCollider = new THREE.Box3(
+          new THREE.Vector3(-1.0, 0, -8.2),
+          new THREE.Vector3(3.0, 3.0, -7.8)
+        );
+        this.colliders.push(this.entranceCollider);
+      }
+    } else if (this.entranceCollider) {
+      const idx = this.colliders.indexOf(this.entranceCollider);
+      if (idx !== -1) this.colliders.splice(idx, 1);
+      this.entranceCollider = null;
+    }
   }
 
   cleanup() {

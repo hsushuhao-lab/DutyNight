@@ -47,6 +47,7 @@ const zones = {
   'first_campus_8f': FirstCampus8FBridgeEntry,
   'skybridge': Skybridge,
   'second_campus_2f': SecondCampus2F,
+  'second_campus_5f': SecondCampusStandardFloor,
   'second_campus_std': SecondCampusStandardFloor,
   'second_campus_1f': SecondCampus1F,
   'hillside_route': HillsideRoute,

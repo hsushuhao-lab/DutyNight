@@ -168,8 +168,8 @@ export const DEBUG_SPAWN_POINTS = {
     milestone: 'M9'
   },
   'm8_second_campus_std': {
-    zoneId: 'second_campus_std',
-    name: '第二院區 標準病房層（電梯對護理站）',
+    zoneId: 'second_campus_5f',
+    name: '第二院區 5F 病房層（電梯對護理站）',
     pos: [76.0, 1.7, 0.0],
     yaw: Math.PI,
     pitch: 0.0,
@@ -219,6 +219,14 @@ export const DEBUG_SPAWN_POINTS = {
     pos: [61.0, 1.23, -42.5],
     yaw: 0.0,
     pitch: -0.08,
+    milestone: 'M12'
+  },
+  'm12_pond_waterside': {
+    zoneId: 'ecology_pond',
+    name: '生態池 親水棧道平台',
+    pos: [61.5, 0.84, -50.8],
+    yaw: Math.PI,
+    pitch: -0.05,
     milestone: 'M12'
   }
 };

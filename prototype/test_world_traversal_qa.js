@@ -511,7 +511,7 @@ const wallTests = [
   { id: 'W11_second_campus_north', zone: 'second_campus_2f', inside: [70.0, 1.7, 2.0], outside: [70.0, 1.7, 4.5] },
   // Hillside & pond containment
   { id: 'W12_hillside_north_boundary', zone: 'hillside_route', inside: [50.0, 1.7, -18.0], outside: [50.0, 1.7, -13.0] },
-  { id: 'W13_pond_water_boundary', zone: 'ecology_pond', inside: [61.0, 1.23, -42.5], outside: [61.0, 1.23, -47.5] }
+  { id: 'W13_pond_water_boundary', zone: 'ecology_pond', inside: [58.0, 1.23, -42.5], outside: [58.0, 1.23, -47.5] }
 ];
 
 let wallPassed = 0;

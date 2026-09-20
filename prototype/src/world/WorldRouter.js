@@ -38,28 +38,28 @@ export class WorldRouter {
       'first_campus_8f': FirstCampus8FBridgeEntry,
       'skybridge': Skybridge,
       'second_campus_2f': SecondCampus2F,
+      'second_campus_5f': SecondCampusStandardFloor,
       'second_campus_std': SecondCampusStandardFloor,
       'second_campus_1f': SecondCampus1F,
       'hillside_route': HillsideRoute,
       'ecology_pond': EcologyPond
     };
 
-    for(const floor of [3,4,5,6,7,8])this.zones[`second_campus_${floor}f`]=SecondCampusStandardFloor;
     this.zoneLabels = {
       'first_campus_3f': '1. 第一院區 3F 行政與總醫師室 (M0)',
-      'first_campus_4f': '2. 第一院區 4F 病房、值班室與護理站 (M1-M3)',
-      'first_campus_2f': '3. 第一院區 2F 急診與處置室 (M4)',
+      'first_campus_4f': '2. 第一院區 4F 病房 (M1-M3)',
+      'first_campus_2f': '3. 第一院區 2F 急診與封閉病房 (M4)',
       'first_campus_1f': '4. 第一院區 1F 公共服務大廳 (M5)',
-      'first_campus_8f': '5. 第一院區 8F 連通道前廳 (M6)',
+      'first_campus_8f': '5. 第一院區 8F 院史展天橋前廳 (M6)',
       'skybridge': '6. 跨院區空中連通道 (M7)',
-      'second_campus_2f': '7. 第二院區 2F 連通道抵達大廳 (M9)',
-      'second_campus_std': '8. 第二院區 標準病房層 (M8)',
-      'second_campus_1f': '9. 第二院區 1F 山側後門出口 (M10)',
+      'second_campus_2f': '7. 第二院區 2F 連通道管制台 (M9)',
+      'second_campus_5f': '8. 第二院區 5F 病房護理站 (M8)',
+      'second_campus_std': '8. 第二院區 5F 病房護理站 (M8)',
+      'second_campus_1f': '9. 第二院區 1F 警衛台與山側後門 (M10)',
       'hillside_route': '10. 山側景觀步道與叉路 (M11)',
       'ecology_pond': '11. 生態池觀景木棧台 (M12)'
     };
 
-    for(const floor of [3,4,5,6,7,8])this.zoneLabels[`second_campus_${floor}f`]=`第二院區 ${floor}F 病房護理站`;
     this.lightingGroup = new THREE.Group();
     this.lightingGroup.name = 'WorldRouter_BaselineLighting';
     this.scene.add(this.lightingGroup);
@@ -85,22 +85,32 @@ export class WorldRouter {
     }
 
     console.info(`[WorldRouter] Loading Zone: ${zoneId}`);
-    applyZoneLighting(this.lightingGroup, this.scene, /^second_campus_[3-8]f$/.test(zoneId)?'second_campus_std':zoneId);
+    applyZoneLighting(this.lightingGroup, this.scene, zoneId.startsWith('second_campus_5f') ? 'second_campus_std' : zoneId);
     const ZoneClass = this.zones[zoneId];
-    this.activeZoneInstance = new ZoneClass(this.scene, this.gf, {floor:Number(zoneId.match(/_([0-9])f$/)?.[1] || 3)});
+    this.activeZoneInstance = new ZoneClass(this.scene, this.gf, { floor: Number(zoneId.match(/_([0-9])f$/)?.[1] || 5) });
     this.activeZoneInstance.build();
-    addTravelFixtures(this.activeZoneInstance,zoneId);
+    addTravelFixtures(this.activeZoneInstance, zoneId);
     this.activeZoneInstance.zoneGroup.updateMatrixWorld(true);
-    const corridorLights=new Set();
-    for(const room of this.activeZoneInstance.roomAreas || []) {
-      for(const point of [room.point,room.corridor].filter(Boolean)) {
-        const key=point[0]+':'+point[2];if(corridorLights.has(key))continue;corridorLights.add(key);
-        const light=new THREE.RectAreaLight(0xfff0d9,3.5,2,1.2);light.position.set(point[0],3,point[2]);light.lookAt(point[0],0,point[2]);this.lightingGroup.add(light);
+
+    const corridorLights = new Set();
+    for (const room of this.activeZoneInstance.roomAreas || []) {
+      for (const point of [room.point, room.corridor].filter(Boolean)) {
+        const key = point[0] + ':' + point[2];
+        if (corridorLights.has(key)) continue;
+        corridorLights.add(key);
+        const light = new THREE.RectAreaLight(0xfff0d9, 3.5, 2, 1.2);
+        light.position.set(point[0], 3, point[2]);
+        light.lookAt(point[0], 0, point[2]);
+        this.lightingGroup.add(light);
       }
     }
+
     if (zoneId === 'first_campus_4f') {
       this.activeZoneInstance.setDutyDoorClosed(this.dutyDoorClosed);
       this.activeZoneInstance.setWardGateClosed(this.wardGateClosed);
+    }
+    if (zoneId === 'first_campus_1f') {
+      this.activeZoneInstance.setEntranceClosed(true);
     }
     this.activeZoneId = zoneId;
 
@@ -155,20 +165,37 @@ export class WorldRouter {
   updateHUDLocation() {
     const locTag = document.querySelector('.hud-location');
     if (locTag && this.zoneLabels[this.activeZoneId]) {
-      locTag.textContent = this.zoneLabels[this.activeZoneId].replace(/^[0-9]+[.] /,'').split(' (M')[0];
+      locTag.textContent = this.zoneLabels[this.activeZoneId].replace(/^[0-9]+[.] /, '').split(' (M')[0];
     }
   }
 
   update() {
-    if(!this.controller?.enabled)return;
-    const portal=ROUTE_PORTALS.find(p=>p.from===this.activeZoneId && new THREE.Box3(new THREE.Vector3(...p.bounds[0]),new THREE.Vector3(...p.bounds[1])).containsPoint(this.controller.position));
-    if(portal)this.teleportToSpawn(portal.spawn);
+    if (!this.controller?.enabled) return;
+    const portal = ROUTE_PORTALS.find(p => p.from === this.activeZoneId && new THREE.Box3(new THREE.Vector3(...p.bounds[0]), new THREE.Vector3(...p.bounds[1])).containsPoint(this.controller.position));
+    if (portal) this.teleportToSpawn(portal.spawn);
   }
 
-  floorDestinations(kind='elevator') {
-    const campus=this.activeZoneId.startsWith('first')?'first':'second';
-    const floors=campus==='first'?FIRST_FLOORS:SECOND_FLOORS;
-    return floors.filter(f=>kind!=='stairs'||(campus==='first'?[3,4].includes(f):f<=2)).map(f=>({zoneId:`${campus}_campus_${f}f`,spawn:`${campus}_${f}f_${kind==='stairs'&&campus==='first'&&[3,4].includes(f)?'stairs':'lift'}`,label:`${f}F${campus==='first'&&f===8?' 連通天橋':''}`}));
+  floorDestinations(kind = 'elevator') {
+    const campus = this.activeZoneId.startsWith('first') ? 'first' : 'second';
+    const floors = campus === 'first' ? FIRST_FLOORS : SECOND_FLOORS;
+    return floors.map(f => {
+      let zoneId = `${campus}_campus_${f}f`;
+      if (campus === 'second' && f === 5) zoneId = 'second_campus_5f';
+      const spawn = kind === 'stairs' ? `${campus}_${f}f_stairs` : `${campus}_${f}f_lift`;
+      let label = `${f}F`;
+      if (campus === 'first') {
+        if (f === 1) label = '1F 公共服務大廳';
+        else if (f === 2) label = '2F 急診與封閉病房';
+        else if (f === 3) label = '3F 醫師行政區';
+        else if (f === 4) label = '4F 病房';
+        else if (f === 8) label = '8F 院史展天橋';
+      } else {
+        if (f === 1) label = '1F 警衛台出入口';
+        else if (f === 2) label = '2F 連通道管制台';
+        else if (f === 5) label = '5F 病房護理站';
+      }
+      return { floorNum: f, zoneId, spawn, label };
+    });
   }
 
   /**
@@ -222,44 +249,5 @@ export class WorldRouter {
 
     panel.appendChild(select);
     document.body.appendChild(panel);
-  }
-
-  /**
-   * Automated QA verification runner for all modeling milestones.
-   */
-  runAutomatedModelingQA() {
-    console.log('=== STARTING AUTOMATED MODELING QA VERIFICATION ===');
-    const results = {};
-
-    Object.keys(DEBUG_SPAWN_POINTS).forEach((spawnKey) => {
-      const sp = DEBUG_SPAWN_POINTS[spawnKey];
-      // Test 1: Spawn inside collider
-      const testZoneClass = this.zones[sp.zoneId];
-      const dummyScene = new THREE.Scene();
-      const testZone = new testZoneClass(dummyScene, this.gf);
-      testZone.build();
-
-      const pointCheck = CollisionFactory.testPoint(
-        testZone.colliders,
-        sp.pos[0],
-        sp.pos[1],
-        sp.pos[2],
-        0.35
-      );
-
-      results[spawnKey] = {
-        milestone: sp.milestone,
-        name: sp.name,
-        zoneId: sp.zoneId,
-        coords: sp.pos,
-        noSpawnCollision: !pointCheck.collided,
-        colliderCount: testZone.colliders.length,
-        walkableCount: testZone.walkables.length,
-        status: !pointCheck.collided ? 'PASS' : 'FAIL'
-      };
-    });
-
-    console.table(results);
-    return results;
   }
 }

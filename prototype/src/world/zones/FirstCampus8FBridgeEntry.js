@@ -98,8 +98,66 @@ export class FirstCampus8FBridgeEntry {
       z: 0,
       ceilingY: 3.2,
       rotationY: Math.PI / 2,
-      text: '🌉 空中連通道 (Skybridge) ｜ 往 第二院區'
+      text: '🌉 松德院史長廊 ｜ 歷任院長與重大貢獻者紀念展 ▶'
     });
+
+    // Gallery introductory exhibition plaque
+    SignAnchor.buildWallPlaque({
+      scene: this.zoneGroup,
+      x: -3.5,
+      y: 1.8,
+      z: 1.78,
+      rotationY: Math.PI,
+      width: 1.1,
+      height: 0.55,
+      code: 'HERITAGE',
+      title: '松德院史長廊 ｜ 創立與傳承',
+      subtitle: 'HOSPITAL HERITAGE & ARCHIVAL GALLERY',
+      header: '松德醫療中心 ｜ 8F 空中連通道'
+    });
+
+    // Archival vintage B&W portraits on vestibule walls
+    const buildPortrait = (x, y, z, rotY, title, role, period) => {
+      const cv = document.createElement('canvas');
+      cv.width = 256; cv.height = 320;
+      const ctx = cv.getContext('2d');
+      ctx.fillStyle = '#181714'; ctx.fillRect(0, 0, 256, 320);
+      const rad = ctx.createRadialGradient(128, 120, 30, 128, 120, 110);
+      rad.addColorStop(0, '#5a574f'); rad.addColorStop(0.7, '#383630'); rad.addColorStop(1, '#151412');
+      ctx.fillStyle = rad; ctx.fillRect(16, 16, 224, 210);
+      ctx.fillStyle = '#1c1b18'; ctx.beginPath(); ctx.arc(128, 95, 34, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(128, 185, 65, 48, 0, 0, Math.PI, true); ctx.fill();
+      ctx.strokeStyle = '#827f72'; ctx.lineWidth = 2.5;
+      ctx.beginPath(); ctx.moveTo(114, 130); ctx.lineTo(128, 158); ctx.lineTo(142, 130); ctx.stroke();
+      ctx.fillStyle = '#0f0e0c'; ctx.fillRect(16, 236, 224, 68);
+      ctx.strokeStyle = '#7c6d48'; ctx.lineWidth = 1.8; ctx.strokeRect(18, 238, 220, 64);
+      ctx.fillStyle = '#cfc29f'; ctx.font = 'bold 15px sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText(title, 128, 260);
+      ctx.font = '12px sans-serif'; ctx.fillStyle = '#99917d';
+      ctx.fillText(role, 128, 277); ctx.fillText(period, 128, 292);
+      const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace;
+      const grp = new THREE.Group(); grp.position.set(x, y, z); grp.rotation.y = rotY;
+      const frame = new THREE.Mesh(new THREE.BoxGeometry(0.72, 0.92, 0.04), new THREE.MeshStandardMaterial({ color: 0x2b1c11, roughness: 0.7 }));
+      frame.position.z = -0.02; grp.add(frame);
+      grp.add(new THREE.Mesh(new THREE.PlaneGeometry(0.66, 0.86), new THREE.MeshBasicMaterial({ map: tex })));
+      this.zoneGroup.add(grp);
+    };
+
+    // North wall archival portraits
+    buildPortrait(-2.0, 1.75, 1.78, Math.PI, '首任院長 陳○○ 醫師', '精神醫學奠基先驅', '1979 - 1986');
+    buildPortrait(-0.8, 1.75, 1.78, Math.PI, '第二任院長 林○○ 醫師', '專科醫療體系確立', '1986 - 1994');
+
+    // South wall archival portraits
+    buildPortrait(-2.0, 1.75, -1.78, 0, '首任精神部主任 葉○○', '急重症精神醫療先鋒', '1979 - 1989');
+    buildPortrait(-0.8, 1.75, -1.78, 0, '首任總護理長 許○○', '人性化病房照護制度', '1980 - 1995');
+
+    // Heritage vitrine display case with historical records
+    const vitrineBase = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.8, 0.45), this.gf.materials.wallDark);
+    vitrineBase.position.set(-2.0, 0.4, 1.55);
+    this.zoneGroup.add(vitrineBase);
+    const vitrineGlass = new THREE.Mesh(new THREE.BoxGeometry(0.96, 0.5, 0.42), this.gf.materials.glass);
+    vitrineGlass.position.set(-2.0, 1.05, 1.55);
+    this.zoneGroup.add(vitrineGlass);
 
     this.gf.buildCeilingLight(this.zoneGroup, -2, 3.15, 0);
 

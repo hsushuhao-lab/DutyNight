@@ -51,14 +51,6 @@ export class FirstCampus4F {
     doorLeafs.position.set(-11.65, 1.25, 0);
     this.zoneGroup.add(doorLeafs);
 
-    // 4F Elevator call button panel
-    const btnBox = new THREE.Mesh(
-      new THREE.BoxGeometry(0.08, 0.35, 0.18),
-      this.gf.materials.metal
-    );
-    btnBox.position.set(-11.65, 1.2, 1.5);
-    this.zoneGroup.add(btnBox);
-
     // Lobby overhead sign
     SignAnchor.buildHangingSign({
       scene: this.zoneGroup,
@@ -67,7 +59,7 @@ export class FirstCampus4F {
       z: 0,
       ceilingY: 3.2,
       rotationY: Math.PI / 2,
-      text: '4F 醫師值班室 ｜ 4A 護理站・病房'
+      text: '4F 醫師值班室 ｜ 4F病房'
     });
 
     this.gf.buildCeilingLight(this.zoneGroup, -8, 3.15, 0);
@@ -243,32 +235,31 @@ export class FirstCampus4F {
     this.zoneGroup.add(counterTop);
     CollisionFactory.addBox(this.colliders, 8.75, 0.55, 2.5, 5.7, 1.15, 0.75);
 
-    // Upper glass partition (humane hospital observation window with frosted privacy stripe)
-    const glassUpper = new THREE.Mesh(new THREE.PlaneGeometry(5.4, 1.1), this.gf.materials.glass);
-    glassUpper.position.set(8.75, 1.72, 2.5);
+    // Upper protective clear reinforced glass partition (no frosted patterns, clear view into ward)
+    const glassUpper = new THREE.Mesh(new THREE.PlaneGeometry(5.4, 1.2), this.gf.materials.glass);
+    glassUpper.position.set(8.75, 1.75, 2.5);
     this.zoneGroup.add(glassUpper);
 
-    // Frosted privacy stripe across center of glass
-    const frostStripe = new THREE.Mesh(
-      new THREE.PlaneGeometry(5.4, 0.28),
-      new THREE.MeshStandardMaterial({
-        color: 0xdfede6,
-        transparent: true,
-        opacity: 0.65,
-        roughness: 0.6
-      })
-    );
-    frostStripe.position.set(8.75, 1.65, 2.502);
-    this.zoneGroup.add(frostStripe);
+    // Nursing station secure access door at staff passage (x = 5.2, z = 2.5)
+    const nsDoorFrame = new THREE.Mesh(new THREE.BoxGeometry(0.12, 2.2, 0.95), this.gf.materials.metal);
+    nsDoorFrame.position.set(5.2, 1.1, 2.5);
+    this.zoneGroup.add(nsDoorFrame);
+    const nsDoor = new THREE.Mesh(new THREE.BoxGeometry(0.06, 2.14, 0.88), this.gf.materials.doorWood);
+    nsDoor.position.set(5.2, 1.07, 2.5);
+    this.zoneGroup.add(nsDoor);
+    // Door vision safety panel
+    const doorGlass = new THREE.Mesh(new THREE.PlaneGeometry(0.35, 0.65), this.gf.materials.glass);
+    doorGlass.position.set(5.2, 1.45, 2.502);
+    this.zoneGroup.add(doorGlass);
 
     // Nursing station inner work desk
     [7.48, 10.02].forEach(x => asset(this.art, 'workDesk', [x, 0, 4.5], [2.45 / 1.405, 1, 1 / .725]));
     CollisionFactory.addBox(this.colliders, 8.75, 0.4, 4.5, 5.0, 0.8, 1.0);
 
-    // Desktop monitors & chart binder racks
+    // Desktop monitors facing NORTH toward back wall (yaw = 0), completely shielded from public corridor
     monitor(this.art, this.gf.materials, 7.5, .76, 4.5, 0);
     monitor(this.art, this.gf.materials, 9.8, .76, 4.5, 0);
-    [7.5, 9.8].forEach(x => asset(this.art, 'officeChair', [x, 0, 5.5], [1, 1, 1], Math.PI));
+    [7.5, 9.8].forEach(x => asset(this.art, 'officeChair', [x, 0, 3.8], [1, 1, 1], 0));
     asset(this.art, 'printer', [11, .76, 4.5]);
 
     // Wall chart rack on back wall
@@ -276,7 +267,7 @@ export class FirstCampus4F {
     chartRack.position.set(8.0, 1.8, 7.3);
     this.zoneGroup.add(chartRack);
 
-    // Nursing Station Signboard
+    // Nursing Station Signboard - Clean standard naming
     SignAnchor.buildWallPlaque({
       scene: this.zoneGroup,
       x: 8.75,
@@ -286,7 +277,7 @@ export class FirstCampus4F {
       code: '4A',
       title: '護理站',
       subtitle: 'NURSING STATION',
-      header: '松德醫療中心 ｜ 急性精神病房'
+      header: '松德醫療中心 ｜ 4F 病房'
     });
 
     this.gf.buildCeilingLight(this.zoneGroup, 8.0, 3.15, 5.0, 0.8, 6.0);
@@ -346,7 +337,7 @@ export class FirstCampus4F {
     cardReader.userData = {
       interactable: true,
       id: 'WARD_GATE_ACCESS',
-      label: '4F 閉鎖病房區門禁（感應刷卡）',
+      label: '4F病房門禁（感應刷卡）',
       type: 'ward_gate'
     };
     this.interactables.push(cardReader);
@@ -365,7 +356,7 @@ export class FirstCampus4F {
       z: 0,
       ceilingY: 3.2,
       rotationY: Math.PI / 2,
-      text: '4F 閉鎖病房區 ｜ 門禁管制區域（請刷卡）'
+      text: '4F病房 ｜ 門禁管制區域（請刷卡）'
     });
 
     this.buildArtDetails();
@@ -524,7 +515,7 @@ export class FirstCampus4F {
     if (closed && index === -1) this.colliders.push(this.wardGateCollider);
     if (!closed && index !== -1) this.colliders.splice(index, 1);
     this.wardGatePivot.updateWorldMatrix(true, true);
-    for (const reader of this.wardGateReaders) reader.userData.label = closed ? '刷卡開啟病房門' : '刷卡關閉病房門';
+    for (const reader of this.wardGateReaders) reader.userData.label = closed ? '刷卡開啟4F病房門' : '刷卡關閉4F病房門';
   }
 
   toggleWardGate(playerPosition) {

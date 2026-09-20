@@ -385,7 +385,13 @@ export class Level3FBlockout {
   }
 
   buildWorkstations() {
-    // Workstation alcove: desk on the east side of office (x = 9.5, z = 5.5)
+    // Workstation desktop modesty privacy panel (shields monitor casing and user screen sightline)
+    const partitionMat = new THREE.MeshStandardMaterial({ color: 0x4a5d52, roughness: 0.7 });
+    const partition = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.5, 2.6), partitionMat);
+    partition.position.set(9.42, 1.05, 5.5);
+    this.scene.add(partition);
+
+    // Workstation desk on the east side of office (x = 10.0, z = 5.5)
     const deskGeo = new THREE.BoxGeometry(1.2, 0.08, 2.6);
     const desk = new THREE.Mesh(deskGeo, this.materials.wood);
     desk.position.set(10.0, 0.78, 5.5);
@@ -402,25 +408,25 @@ export class Level3FBlockout {
       new THREE.Vector3(10.7, 1.0, 6.9)
     ));
 
-    // Two PC monitors
+    // Two PC monitors - oriented INWARD (facing East toward inner desk, backs facing doorway/corridor)
     [-0.6, 0.6].forEach((offsetZ, idx) => {
-      // Monitor stand
+      // Monitor stand on desk
       const stand = new THREE.Mesh(
         new THREE.CylinderGeometry(0.08, 0.1, 0.22),
         new THREE.MeshStandardMaterial({ color: 0x222222, metalness: 0.5 })
       );
-      stand.position.set(10.2, 0.93, 5.5 + offsetZ);
+      stand.position.set(9.65, 0.93, 5.5 + offsetZ);
       this.scene.add(stand);
 
-      // Monitor Screen casing
+      // Monitor Screen casing: back faces West toward door, screen faces East toward desk interior
       const casing = new THREE.Mesh(
         new THREE.BoxGeometry(0.06, 0.42, 0.62),
         new THREE.MeshStandardMaterial({ color: 0x1f2326, roughness: 0.4 })
       );
-      casing.position.set(10.2, 1.25, 5.5 + offsetZ);
+      casing.position.set(9.65, 1.25, 5.5 + offsetZ);
       this.scene.add(casing);
 
-      // HIS-like monitor content for a more grounded workstation look.
+      // HIS-like monitor content on inner screen surface (facing East +X)
       const screenCanvas = document.createElement('canvas');
       screenCanvas.width = 320;
       screenCanvas.height = 220;
@@ -445,25 +451,26 @@ export class Level3FBlockout {
       screenTex.colorSpace = THREE.SRGBColorSpace;
       const displayGeo = new THREE.PlaneGeometry(0.58, 0.38);
       const display = new THREE.Mesh(displayGeo, new THREE.MeshBasicMaterial({ map: screenTex }));
-      display.rotation.y = -Math.PI / 2;
-      display.position.set(10.16, 1.25, 5.5 + offsetZ);
+      // Rotation PI / 2 faces screen toward +X (inner desk / east wall), zero visibility from entrance!
+      display.rotation.y = Math.PI / 2;
+      display.position.set(9.69, 1.25, 5.5 + offsetZ);
       this.scene.add(display);
 
-      // Keyboard & mouse
+      // Keyboard & mouse on inner desk surface
       const kb = new THREE.Mesh(
         new THREE.BoxGeometry(0.16, 0.02, 0.44),
         new THREE.MeshStandardMaterial({ color: 0x111111 })
       );
-      kb.position.set(9.8, 0.83, 5.5 + offsetZ);
+      kb.position.set(10.0, 0.83, 5.5 + offsetZ);
       this.scene.add(kb);
 
       if (idx === 0) {
-        // Main eligible workstation terminal
+        // Main eligible workstation terminal hitbox
         const wsHitbox = new THREE.Mesh(
           new THREE.BoxGeometry(0.8, 0.7, 0.9),
           new THREE.MeshBasicMaterial({ visible: false })
         );
-        wsHitbox.position.set(9.9, 1.2, 5.5 + offsetZ);
+        wsHitbox.position.set(9.8, 1.2, 5.5 + offsetZ);
         wsHitbox.userData = {
           interactable: true,
           id: 'E_HANDOFF',

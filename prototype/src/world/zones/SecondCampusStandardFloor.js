@@ -57,37 +57,57 @@ export class SecondCampusStandardFloor {
     this.gf.buildWall(this.zoneGroup, this.colliders, 72.0, 1.6, 5.5, 0.4, 3.2, 5.0);
     this.gf.buildWall(this.zoneGroup, this.colliders, 84.0, 1.6, 5.5, 0.4, 3.2, 5.0);
 
-    // Front Counter (at z = 3.0, height 1.1m, facing elevator lobby)
+    // Front enclosure (z = 3.0)
+    // Left wall stub (x: 72.0 to 73.3)
+    this.gf.buildWall(this.zoneGroup, this.colliders, 72.65, 1.6, 3.0, 1.3, 3.2, 0.4);
+
+    // Nursing station secure staff access door (x: 73.85, z: 3.0)
+    const nsDoorFrame = new THREE.Mesh(new THREE.BoxGeometry(1.05, 2.25, 0.15), this.gf.materials.metal);
+    nsDoorFrame.position.set(73.85, 1.125, 3.0);
+    this.zoneGroup.add(nsDoorFrame);
+    const nsDoor = new THREE.Mesh(new THREE.BoxGeometry(0.95, 2.18, 0.08), this.gf.materials.doorWood);
+    nsDoor.position.set(73.85, 1.09, 3.0);
+    this.zoneGroup.add(nsDoor);
+    const nsDoorGlass = new THREE.Mesh(new THREE.PlaneGeometry(0.35, 0.65), this.gf.materials.glass);
+    nsDoorGlass.position.set(73.85, 1.45, 2.95);
+    this.zoneGroup.add(nsDoorGlass);
+
+    // Protected Nursing Station Counter (x: 74.5 to 83.8, z = 3.0)
     const counterBody = new THREE.Mesh(
-      new THREE.BoxGeometry(8.0, 1.05, 0.7),
+      new THREE.BoxGeometry(9.2, 1.05, 0.65),
       this.gf.materials.wallDark
     );
-    counterBody.position.set(78.0, 0.525, 3.0);
+    counterBody.position.set(79.1, 0.525, 3.0);
     this.zoneGroup.add(counterBody);
 
     const counterTop = new THREE.Mesh(
-      new THREE.BoxGeometry(8.2, 0.08, 0.85),
+      new THREE.BoxGeometry(9.4, 0.08, 0.8),
       this.gf.materials.counterTop
     );
-    counterTop.position.set(78.0, 1.08, 3.0);
+    counterTop.position.set(79.1, 1.08, 3.0);
     this.zoneGroup.add(counterTop);
-    CollisionFactory.addBox(this.colliders, 78.0, 0.55, 3.0, 8.2, 1.15, 0.85);
+    CollisionFactory.addBox(this.colliders, 79.1, 0.55, 3.0, 9.4, 1.15, 0.8);
 
-    // Humane upper glass panel
-    const glassPanel = new THREE.Mesh(new THREE.PlaneGeometry(7.8, 1.1), this.gf.materials.glass);
-    glassPanel.position.set(78.0, 1.72, 3.0);
+    // Protective clear reinforced glass panel (transparent, no frosted stripes, visible interior)
+    const glassPanel = new THREE.Mesh(new THREE.PlaneGeometry(9.1, 1.2), this.gf.materials.glass);
+    glassPanel.position.set(79.1, 1.75, 3.0);
     this.zoneGroup.add(glassPanel);
 
-    // Floor-specific care station identity
+    // Wall chart rack on back wall
+    const chartRack = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.8, 0.12), this.gf.materials.metal);
+    chartRack.position.set(78.5, 1.8, 7.78);
+    this.zoneGroup.add(chartRack);
+
+    // Floor-specific care station identity (faces corridor)
     SignAnchor.buildWallPlaque({
       scene: this.zoneGroup,
-      x: 78.0,
+      x: 79.1,
       y: 2.6,
-      z: 3.05,
-      rotationY: 0,
+      z: 2.92,
+      rotationY: Math.PI,
       code: `${this.floor}F-ST`,
       title: `${this.floor}F 病房護理站`,
-      subtitle: 'INPATIENT CARE STATION',
+      subtitle: 'INPATIENT NURSING STATION',
       header: `松德醫療中心 ｜ 第二院區 ${this.floor}F`
     });
 
@@ -159,18 +179,29 @@ export class SecondCampusStandardFloor {
     this.gf.buildCeilingLight(this.zoneGroup, 88, 3.15, 0);
     this.gf.buildCeilingLight(this.zoneGroup, 78, 3.15, 5.5, 0.8, 6.0);
 
-    const art=artRoot(this.zoneGroup,'SecondCampusStandardFloor');
+    const art = artRoot(this.zoneGroup, 'SecondCampusStandardFloor');
 
-    counterFront(art,this.gf.materials,78,2.62,8,1.05);
-    solid(art,this.gf.materials.doorWood,[78,2.5,3],[8.2,.45,.15]);
-    for(const x of [74,78,82])solid(art,this.gf.materials.doorWood,[x,1.76,3],[.065,1.45,.10]);
-    for(const child of this.zoneGroup.children){
-      if(child.name.startsWith(`Plaque_${this.floor}F-ST`)) {child.rotation.y=Math.PI;child.position.z=2.90;}
-      if(child.geometry?.parameters.width===30 && child.geometry?.parameters.height===.08)child.visible=false;
+    for (const child of this.zoneGroup.children) {
+      if (child.geometry?.parameters.width === 30 && child.geometry?.parameters.height === .08) child.visible = false;
     }
-    for(const [x,w] of [[68.5,6.5],[89.5,10.5]])solid(art,this.gf.materials.handrail,[x,1.05,2.78],[w,.08,.08]);
-    for(const x of [75.2,77.1,80.8]) monitor(art,this.gf.materials,x,1.12,3,Math.PI);
-    for(const x of [73,83])asset(art,'storageCabinet',[x,0,7.25]);
+    for (const [x, w] of [[68.5, 6.5], [89.5, 10.5]]) solid(art, this.gf.materials.handrail, [x, 1.05, 2.78], [w, .08, .08]);
+
+    // Inner nursing station work desks facing North wall (x: 77.0, 80.5, z: 5.6)
+    asset(art, 'workDesk', [77.0, 0, 5.6]);
+    asset(art, 'workDesk', [80.5, 0, 5.6]);
+    CollisionFactory.addBox(this.colliders, 78.75, 0.4, 5.6, 6.0, 0.8, 1.0);
+
+    // Office chairs facing North toward work desks
+    asset(art, 'officeChair', [77.0, 0, 4.9], [1, 1, 1], 0);
+    asset(art, 'officeChair', [80.5, 0, 4.9], [1, 1, 1], 0);
+
+    // Desktop monitors facing North (yaw = 0): screens face North wall, back casings face corridor
+    monitor(art, this.gf.materials, 77.0, 0.76, 5.6, 0);
+    monitor(art, this.gf.materials, 80.5, 0.76, 5.6, 0);
+
+    // Medicine / supply storage cabinets on back wall
+    asset(art, 'storageCabinet', [75.0, 0, 7.6]);
+    asset(art, 'storageCabinet', [82.5, 0, 7.6]);
 
 
     wallTrim(this.zoneGroup,this.gf.materials);

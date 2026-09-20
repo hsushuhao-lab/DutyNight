@@ -195,8 +195,18 @@ export function applyPondArt(zone) {
   water.name='PondWater/SceneReflection';water.rotation.x=-Math.PI/2;water.position.set(66.5,-1.035,-52.5);
   water.material.fragmentShader=water.material.fragmentShader.replace('texture2DProj( tDiffuse, vUv )','texture2DProj( tDiffuse, vUv + vec4(sin(vUv.y*95.0)*0.0008*vUv.w, cos(vUv.x*83.0)*0.0006*vUv.w, 0.0, 0.0) )');
   water.material.addEventListener('dispose',()=>water.getRenderTarget().dispose());root.add(water);
-  railing(root,55,-46.4,66,-46.4,-.36,mats);railing(root,65.9,-46.5,65.9,-40.5,-.36,mats);railing(root,55.1,-46.5,55.1,-42.5,-.36,mats);
+  railing(root,55,-46.4,60.5,-46.4,-.36,mats);
+  railing(root,63.5,-46.4,66,-46.4,-.36,mats);
+  railing(root,65.9,-46.5,65.9,-40.5,-.36,mats);
+  railing(root,55.1,-46.5,55.1,-42.5,-.36,mats);
+  // Lower waterside deck railings and ramp barriers
+  railing(root,58,-52.5,65,-52.5,-.75,mats);
+  railing(root,58,-49,58,-52.5,-.75,mats);
+  railing(root,65,-49,65,-52.5,-.75,mats);
+  railing(root,60.5,-46.4,60.5,-49,-.55,mats);
+  railing(root,63.5,-46.4,63.5,-49,-.55,mats);
   for(let x=55.18;x<66;x+=.24)box(root,x,-.353,-43.5,.226,.018,5.88,materialForSurface('floorWood',.23,5.88));
+  for(let x=58.15;x<64.9;x+=.24)box(root,x,-.75,-50.8,.226,.018,3.48,materialForSurface('floorWood',.23,3.48));
   for(let x=56.88;x<59.18;x+=.19)box(root,x,.028,-45.2,.16,.075,.58,mats.wood);
   for(const x of [57.05,58.95])box(root,x,-.20,-45.2,.10,.40,.48,mats.metal);
   for(let y=.30;y<.66;y+=.14)box(root,58,y,-45.45,2.35,.105,.045,mats.wood);

@@ -29,33 +29,63 @@ export class FirstCampus2FER {
     this.gf.buildFloor(this.zoneGroup, this.walkables, -8, 0, 0, 8, 7, this.gf.materials.floorTile);
     this.gf.buildCeiling(this.zoneGroup, -8, 3.2, 0, 8, 7);
 
-    this.gf.buildWall(this.zoneGroup, this.colliders, -12, 1.6, 0, 0.4, 3.2, 7);
-    for(const x of [-10.6,-5.4]) this.gf.buildWall(this.zoneGroup,this.colliders,x,1.6,3.5,2.8,3.2,.4);
-    Doorway.build({scene:this.zoneGroup,colliders:this.colliders,x:-8,z:3.5,width:2.4,height:2.4,wallHeight:3.2,isAlongX:true,isOpen:true});
-    this.gf.buildFloor(this.zoneGroup,this.walkables,-8,0,11.65,3.6,16.3,this.gf.materials.floor);
-    this.gf.buildCeiling(this.zoneGroup,-8,3.2,11.65,3.6,16.3);
-    this.gf.buildWall(this.zoneGroup,this.colliders,-9.8,1.6,11.65,.3,3.2,16.3);
-    this.gf.buildWall(this.zoneGroup,this.colliders,-8,1.6,19.8,3.6,3.2,.3);
-    this.gf.buildWall(this.zoneGroup,this.colliders,-6.2,1.6,10.15,.3,3.2,13.3);
-    this.gf.buildWall(this.zoneGroup,this.colliders,-6.2,1.6,19.5,.3,3.2,.6);
-    for(const z of [7,12,17])this.gf.buildCeilingLight(this.zoneGroup,-8,3.15,z);
-    this.roomWing = buildRoomWing(this,{x:-6.2,z:18,rooms:[
-      {code:'PHYS',label:'醫師辦公室',kind:'office'},
-      {code:'MEET',label:'會議室',kind:'meeting'},
-      {code:'EEG',label:'腦波室',kind:'treatment'},
-      {code:'XRAY',label:'X 光室',kind:'treatment'},
-      {code:'CLINIC',label:'診察室',kind:'clinic'},
-      {code:'BLOOD',label:'抽血檢驗室',kind:'treatment'}
-    ]});
-    this.gf.buildWall(this.zoneGroup, this.colliders, -8, 1.6, -3.5, 8, 3.2, 0.4);
+    this.gf.buildWall(this.zoneGroup, this.colliders, -12, 1.6, 0, 0.4, 3.2, 7); // West perimeter wall
+    this.gf.buildWall(this.zoneGroup, this.colliders, -8, 1.6, 3.5, 8, 3.2, 0.4);  // North wall of arrival lobby
+    this.gf.buildWall(this.zoneGroup, this.colliders, -8, 1.6, -3.5, 8, 3.2, 0.4); // South wall of arrival lobby
 
-    // Elevator doors
+    // Heavy steel elevator doors at West wall (x = -11.75, z = 0)
     const elFrame = new THREE.Mesh(new THREE.BoxGeometry(0.2, 2.5, 2.4), this.gf.materials.metal);
     elFrame.position.set(-11.75, 1.25, 0);
     this.zoneGroup.add(elFrame);
     const elDoors = new THREE.Mesh(new THREE.BoxGeometry(0.08, 2.3, 2.0), this.gf.materials.stainless);
     elDoors.position.set(-11.65, 1.25, 0);
     this.zoneGroup.add(elDoors);
+
+    // Enclosed Acute Ward Gate Partition at x = 0 (separates outer arrival corridor from inner acute ward)
+    // South partition wall (z: -3.5 to -1.0)
+    this.gf.buildWall(this.zoneGroup, this.colliders, 0, 1.6, -2.25, 0.4, 3.2, 2.5);
+    // North partition wall (z: 1.0 to 3.5)
+    this.gf.buildWall(this.zoneGroup, this.colliders, 0, 1.6, 2.25, 0.4, 3.2, 2.5);
+
+    // Iron security gate doorway (width 2.0m, height 2.4m)
+    Doorway.build({
+      scene: this.zoneGroup,
+      colliders: this.colliders,
+      x: 0,
+      y: 0,
+      z: 0,
+      width: 2.0,
+      height: 2.4,
+      wallHeight: 3.2,
+      wallThickness: 0.4,
+      isAlongX: false,
+      isOpen: true,
+      doorMaterial: this.gf.materials.metal
+    });
+
+    // Magnetic card swipe reader on outer wall
+    const cardReader = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.24, 0.14), this.gf.materials.metal);
+    cardReader.position.set(-0.25, 1.3, -1.2);
+    this.zoneGroup.add(cardReader);
+    cardReader.userData = {
+      interactable: true,
+      id: '2F_ACUTE_GATE',
+      type: 'exit_door',
+      label: '2F 急診封閉病房門禁（感應刷卡）'
+    };
+    this.interactables.push(cardReader);
+
+    SignAnchor.buildWallPlaque({
+      scene: this.zoneGroup,
+      x: -0.25,
+      y: 2.35,
+      z: 1.2,
+      rotationY: -Math.PI / 2,
+      code: '2F-WARD',
+      title: '2F 急診急性病房 (封閉式門禁)',
+      subtitle: 'RESTRICTED ACUTE PSYCHIATRIC WARD',
+      header: '松德醫療中心 ｜ 急診醫學部'
+    });
 
     SignAnchor.buildHangingSign({
       scene: this.zoneGroup,
@@ -108,6 +138,11 @@ export class FirstCampus2FER {
     triageCounter.position.set(3.5, 0.55, 3.5);
     this.zoneGroup.add(triageCounter);
     CollisionFactory.addBox(this.colliders, 3.5, 0.55, 3.5, 4.8, 1.1, 0.7);
+
+    // Protective reinforced clear glass partition over triage counter
+    const triageGlass = new THREE.Mesh(new THREE.PlaneGeometry(4.6, 1.2), this.gf.materials.glass);
+    triageGlass.position.set(3.5, 1.75, 3.5);
+    this.zoneGroup.add(triageGlass);
 
     SignAnchor.buildWallPlaque({
       scene: this.zoneGroup,

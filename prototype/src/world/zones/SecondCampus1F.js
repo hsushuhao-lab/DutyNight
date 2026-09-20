@@ -47,7 +47,7 @@ export class SecondCampus1F {
       z: -2.0,
       ceilingY: 3.2,
       rotationY: 0,
-      text: '第二院區 1F ｜ 護理站・山側步道・生態池'
+      text: '第二院區 1F ｜ 警衛室・山側步道・生態池'
     });
 
     // South wall (z = -8.0) with heavy exterior exit doors
@@ -122,9 +122,13 @@ export class SecondCampus1F {
     solid(art, this.gf.materials.wallDark, [74, .55, -4.5], [2.6, 1.1, .8]);
     solid(art, this.gf.materials.counterTop, [74, 1.14, -4.5], [2.7, .08, .9]);
     counterFront(art, this.gf.materials, 74, -4.04, 2.6, 1.1);
+    // Security CCTV multi-view monitor facing inward
     monitor(art, this.gf.materials, 74, 1.18, -4.5, Math.PI);
+    // Guard logbook and security transceiver
+    solid(art, this.gf.materials.doorWood, [75, 1.19, -4.5], [0.35, 0.04, 0.28]);
+    solid(art, this.gf.materials.metal, [73.2, 1.25, -4.5], [0.08, 0.22, 0.08]);
     CollisionFactory.addBox(this.colliders, 74, .6, -4.5, 2.7, 1.2, .9);
-    SignAnchor.buildWallPlaque({scene:this.zoneGroup,x:74,y:.73,z:-4.02,rotationY:0,code:'1F-ST',title:'1F 護理站',subtitle:'NURSING STATION',header:'第二院區'});
+    SignAnchor.buildWallPlaque({scene:this.zoneGroup,x:74,y:.73,z:-4.02,rotationY:0,code:'SEC-1',title:'1F 警衛駐守台',subtitle:'SECURITY POST',header:'松德醫療中心 ｜ 第二院區'});
 
     asset(art,'bench',[76.5,0,-2],[1,1,1],-Math.PI/2);
     asset(art,'plant',[67.3,0,1]);

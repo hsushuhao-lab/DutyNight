@@ -137,26 +137,114 @@ export class UIManager {
     if (this.onTerminalClose) this.onTerminalClose();
   }
 
-  openTravelSelector(destinations, currentZone, onSelect, kind='elevator') {
+  openTravelSelector(destinations, currentZone, onSelect, kind = 'elevator') {
     document.exitPointerLock();
-    this.elevatorCutscene.dataset.selecting='true';
+    this.elevatorCutscene.dataset.selecting = 'true';
     this.elevatorCutscene.classList.add('active');
-    this.elevatorCutscene.querySelector('.floor-digit').textContent=kind==='stairs'?'樓梯':'電梯';
-    const info=document.getElementById('elevator-status-text');info.replaceChildren();
-    const title=document.createElement('p');title.textContent='請選擇前往樓層';info.appendChild(title);
-    for(const destination of destinations) {
-      const button=document.createElement('button');button.className='btn-primary';button.dataset.floor=destination.zoneId;
-      button.textContent=destination.label+(destination.zoneId===currentZone?'（目前樓層）':'');
-      button.disabled=destination.zoneId===currentZone;
-      button.style.margin='6px';
-      button.addEventListener('click',()=>{this.closeTravelSelector();soundManager.playElevatorChime();onSelect(destination);});
-      info.appendChild(button);
+
+    const isStairs = kind === 'stairs';
+    this.elevatorCutscene.querySelector('.floor-digit').textContent = isStairs ? '樓梯' : '電梯';
+
+    const info = document.getElementById('elevator-status-text');
+    info.replaceChildren();
+
+    const titleBox = document.createElement('div');
+    titleBox.style.marginBottom = '12px';
+
+    const header = document.createElement('h2');
+    header.style.color = '#79d2a6';
+    header.style.margin = '0 0 6px 0';
+    header.textContent = isStairs ? '🚪 安全逃生梯間' : '🛗 客用電梯';
+    titleBox.appendChild(header);
+
+    // Current floor number parsing
+    const curFloorMatch = currentZone.match(/_([0-9])f/);
+    const curFloor = curFloorMatch ? Number(curFloorMatch[1]) : (currentZone === 'first_campus_3f' ? 3 : 0);
+
+    const locText = document.createElement('p');
+    locText.style.color = '#a0b4aa';
+    locText.style.fontSize = '14px';
+    locText.style.margin = '0';
+    const curLocLabel = window.worldRouter?.zoneLabels?.[currentZone] || currentZone;
+    locText.textContent = `目前所在位置：${curLocLabel.replace(/^[0-9]+[.] /, '').split(' (M')[0]}`;
+    titleBox.appendChild(locText);
+    info.appendChild(titleBox);
+
+    const btnGrid = document.createElement('div');
+    btnGrid.style.display = 'flex';
+    btnGrid.style.flexDirection = 'column';
+    btnGrid.style.gap = '8px';
+    btnGrid.style.margin = '14px 0';
+
+    for (const destination of destinations) {
+      const destFloor = destination.floorNum || Number(destination.zoneId.match(/_([0-9])f/)?.[1] || 0);
+      const isCurrent = destination.zoneId === currentZone;
+
+      let directionBadge = '';
+      if (isCurrent) {
+        directionBadge = '【目前樓層】';
+      } else if (destFloor > curFloor && curFloor > 0) {
+        directionBadge = '▲ 上樓';
+      } else if (destFloor < curFloor && curFloor > 0) {
+        directionBadge = '▼ 下樓';
+      }
+
+      const button = document.createElement('button');
+      button.className = 'btn-primary';
+      button.dataset.floor = destination.zoneId;
+      button.style.display = 'flex';
+      button.style.justifyContent = 'space-between';
+      button.style.alignItems = 'center';
+      button.style.padding = '8px 16px';
+      button.style.fontSize = '14px';
+
+      // Mission gating: 4F is special scene requiring 3F duty tasks
+      let isLocked = false;
+      if (destination.zoneId === 'first_campus_4f' && !isCurrent) {
+        if (!this.gameState.areRequiredTasksComplete()) {
+          isLocked = true;
+        }
+      }
+
+      if (isLocked) {
+        button.innerHTML = `<span>🔒 ${destination.label}</span> <span style="font-size:12px;color:#e89078;">需先完成 3F 交班手續</span>`;
+        button.disabled = true;
+        button.style.opacity = '0.5';
+        button.style.cursor = 'not-allowed';
+      } else {
+        button.innerHTML = `<span>${destination.label}</span> <span style="font-size:12px;color:#79d2a6;">${directionBadge}</span>`;
+        button.disabled = isCurrent;
+        if (isCurrent) {
+          button.style.opacity = '0.6';
+          button.style.cursor = 'default';
+        } else {
+          button.addEventListener('click', () => {
+            this.closeTravelSelector();
+            if (isStairs) {
+              soundManager.playClick();
+            } else {
+              soundManager.playElevatorChime();
+            }
+            onSelect(destination);
+          });
+        }
+      }
+      btnGrid.appendChild(button);
     }
-    const cancel=document.createElement('button');cancel.id='btn-cancel-travel';cancel.className='btn-secondary';cancel.textContent='取消';cancel.addEventListener('click',()=>this.closeTravelSelector());info.appendChild(cancel);
+    info.appendChild(btnGrid);
+
+    const cancel = document.createElement('button');
+    cancel.id = 'btn-cancel-travel';
+    cancel.className = 'btn-secondary';
+    cancel.textContent = '關閉 / 取消 (Esc)';
+    cancel.style.marginTop = '6px';
+    cancel.addEventListener('click', () => this.closeTravelSelector());
+    info.appendChild(cancel);
   }
 
   closeTravelSelector() {
-    this.elevatorCutscene.dataset.selecting='false';this.elevatorCutscene.classList.remove('active');
+    this.elevatorCutscene.dataset.selecting = 'false';
+    this.elevatorCutscene.classList.remove('active');
     this.onElevatorTransitionComplete?.();
   }
 
