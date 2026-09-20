@@ -6,7 +6,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: floorplan-validation
+  group: floorplan-validation-cancellable
   cancel-in-progress: true
 jobs:
   verify:
@@ -38,7 +38,7 @@ jobs:
         working-directory: prototype
         run: node scripts/test-floorplan-browser.mjs
       - name: Capture fixed viewpoints
-        if: always() && steps.build.outcome == 'success'
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         working-directory: prototype
         run: node scripts/capture-floorplan.mjs
       - name: Record source
