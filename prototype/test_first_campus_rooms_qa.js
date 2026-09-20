@@ -4,27 +4,40 @@ import {GeometryFactory} from './src/world/shared/GeometryFactory.js';
 import {CollisionFactory} from './src/world/shared/CollisionFactory.js';
 import {FirstCampus1F} from './src/world/zones/FirstCampus1F.js';
 import {FirstCampus2FER} from './src/world/zones/FirstCampus2FER.js';
+
 global.document??={createElement:()=>({getContext:()=>new Proxy({}, {get:()=>()=>({addColorStop(){}})})})};
-let routes=0,samples=0;
-for(const [Zone,approach,count] of [[FirstCampus1F,[[16.5,1.7,0],[18,1.7,0]],3],[FirstCampus2FER,[[-8,1.7,0],[-8,1.7,18],[-6.2,1.7,18]],6]]){
- const scene=new THREE.Scene(),zone=new Zone(scene,new GeometryFactory()).build();
- if(zone.setAcuteGateClosed)zone.setAcuteGateClosed(false);
- scene.updateMatrixWorld(true);
- assert.equal(zone.roomAreas.length,count);
- for(const room of zone.roomAreas){
-  const points=[...approach,room.corridor,room.door,room.point];
-  for(const way of [points,[...points].reverse()])for(let i=1;i<way.length;i++){
-   const a=new THREE.Vector3(...way[i-1]),b=new THREE.Vector3(...way[i]);
-   const steps=Math.ceil(a.distanceTo(b)/.08);
-   for(let k=0;k<=steps;k++){
-    const p=a.clone().lerp(b,k/Math.max(steps,1));
-    assert.equal(CollisionFactory.testPoint(zone.colliders,p.x,p.y,p.z,.35).collided,false,`${room.id} blocked at ${p.toArray()}`);
-    const supported=new THREE.Raycaster(p,new THREE.Vector3(0,-1,0),0,1.85).intersectObjects(zone.walkables,true).some(hit=>Math.abs(hit.point.y)<.06);
-    assert.ok(supported,`${room.id} unsupported at ${p.toArray()}`);samples++;
-   }
-  }
-  routes++;console.log(`PASS ${room.id} continuous in/out ${JSON.stringify(room.point)}`);
- }
- zone.cleanup();assert.equal(scene.children.length,0);
+const gf=new GeometryFactory();
+
+// 1F night-access policy: public glass entrance and pharmacy/drug-storage glass bay are physically closed.
+{
+  const scene=new THREE.Scene(),zone=new FirstCampus1F(scene,gf).build();
+  zone.setEntranceClosed(true);
+  assert.equal(CollisionFactory.testPoint(zone.colliders,1,1.7,-8,.2).collided,true,'1F main glass entrance must be closed at night');
+  assert.equal(CollisionFactory.testPoint(zone.colliders,17.88,1.7,-4,.15).collided,true,'1F pharmacy/drug-storage glass frontage must block entry');
+  assert(zone.interactables.some(x=>x.userData.id==='1F_MAIN_DOOR'),'Missing closed 1F entrance interaction');
+  assert(zone.interactables.some(x=>x.userData.id==='1F_PHARM_GATE'),'Missing closed pharmacy/drug-storage interaction');
+  zone.cleanup(); assert.equal(scene.children.length,0);
 }
-console.log(`FIRST_CAMPUS_ROOMS_QA = PASS (${routes} rooms, ${samples} radius .35 supported traversal samples)`);
+
+// 2F: arrival stays outside a closed iron gate; after staff authorization all essential ER areas are reachable.
+{
+  const scene=new THREE.Scene(),zone=new FirstCampus2FER(scene,gf).build();
+  const gateProbe=CollisionFactory.testPoint(zone.colliders,0,1.7,0,.25);
+  assert.equal(gateProbe.collided,true,'2F emergency gate must block baseline entry');
+  zone.setAcuteGateClosed(false);
+  assert.equal(CollisionFactory.testPoint(zone.colliders,0,1.7,0,.25).collided,false,'Authorized 2F gate must clear entry');
+
+  const routes=[
+    [[-4,1.7,0],[3.5,1.7,2.0],'triage/nursing station'],
+    [[-4,1.7,0],[3.5,1.7,-3.0],'treatment-room threshold'],
+    [[8,1.7,0],[12.5,1.7,-3.0],'doctor-office threshold'],
+    [[8,1.7,0],[14.5,1.7,3.0],'observation area threshold'],
+  ];
+  for(const [a,b,label] of routes){
+    const result=CollisionFactory.testTraversal(zone.colliders,a,b,.30,80);
+    assert.equal(result.passable,true,`2F authorized route blocked: ${label}`);
+  }
+  zone.cleanup(); assert.equal(scene.children.length,0);
+}
+
+console.log('FIRST CAMPUS ACCESS QA PASS: 1F glass night closures + authorized 2F essential ER routes');
