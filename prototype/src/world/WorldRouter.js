@@ -26,7 +26,8 @@ export class WorldRouter {
     this.gf = new GeometryFactory();
 
     this.dutyDoorClosed = false;
-    this.wardGateClosed = false;
+    this.wardGateClosed = true;
+    this.acuteGateClosed = true;
     this.activeZoneId = null;
     this.activeZoneInstance = null;
 
@@ -38,6 +39,7 @@ export class WorldRouter {
       'first_campus_8f': FirstCampus8FBridgeEntry,
       'skybridge': Skybridge,
       'second_campus_2f': SecondCampus2F,
+      'second_campus_4f_story': SecondCampusStandardFloor,
       'second_campus_5f': SecondCampusStandardFloor,
       'second_campus_std': SecondCampusStandardFloor,
       'second_campus_1f': SecondCampus1F,
@@ -48,11 +50,12 @@ export class WorldRouter {
     this.zoneLabels = {
       'first_campus_3f': '1. 第一院區 3F 行政與總醫師室 (M0)',
       'first_campus_4f': '2. 第一院區 4F 病房 (M1-M3)',
-      'first_campus_2f': '3. 第一院區 2F 急診與封閉病房 (M4)',
+      'first_campus_2f': '3. 第一院區 2F 急診 (M4)',
       'first_campus_1f': '4. 第一院區 1F 公共服務大廳 (M5)',
       'first_campus_8f': '5. 第一院區 8F 院史展天橋前廳 (M6)',
       'skybridge': '6. 跨院區空中連通道 (M7)',
       'second_campus_2f': '7. 第二院區 2F 連通道管制台 (M9)',
+      'second_campus_4f_story': '第二院區 4F 劇情專用場景（一般電梯不顯示）',
       'second_campus_5f': '8. 第二院區 5F 病房護理站 (M8)',
       'second_campus_std': '8. 第二院區 5F 病房護理站 (M8)',
       'second_campus_1f': '9. 第二院區 1F 警衛台與山側後門 (M10)',
@@ -80,14 +83,19 @@ export class WorldRouter {
         this.dutyDoorClosed = this.activeZoneInstance.dutyDoorClosed;
         this.wardGateClosed = this.activeZoneInstance.wardGateClosed;
       }
+      if (this.activeZoneId === 'first_campus_2f' && typeof this.activeZoneInstance.acuteGateClosed === 'boolean') {
+        this.acuteGateClosed = this.activeZoneInstance.acuteGateClosed;
+      }
       this.activeZoneInstance.cleanup();
       this.activeZoneInstance = null;
     }
 
     console.info(`[WorldRouter] Loading Zone: ${zoneId}`);
-    applyZoneLighting(this.lightingGroup, this.scene, zoneId.startsWith('second_campus_5f') ? 'second_campus_std' : zoneId);
+    const lightingZone = (zoneId === 'second_campus_4f_story' || zoneId === 'second_campus_5f') ? 'second_campus_std' : zoneId;
+    applyZoneLighting(this.lightingGroup, this.scene, lightingZone);
     const ZoneClass = this.zones[zoneId];
-    this.activeZoneInstance = new ZoneClass(this.scene, this.gf, { floor: Number(zoneId.match(/_([0-9])f$/)?.[1] || 5) });
+    const floorMatch = zoneId.match(/_([0-9])f(?:_|$)/);
+    this.activeZoneInstance = new ZoneClass(this.scene, this.gf, { floor: Number(floorMatch?.[1] || 5) });
     this.activeZoneInstance.build();
     addTravelFixtures(this.activeZoneInstance, zoneId);
     this.activeZoneInstance.zoneGroup.updateMatrixWorld(true);
@@ -108,6 +116,9 @@ export class WorldRouter {
     if (zoneId === 'first_campus_4f') {
       this.activeZoneInstance.setDutyDoorClosed(this.dutyDoorClosed);
       this.activeZoneInstance.setWardGateClosed(this.wardGateClosed);
+    }
+    if (zoneId === 'first_campus_2f' && this.activeZoneInstance.setAcuteGateClosed) {
+      this.activeZoneInstance.setAcuteGateClosed(this.acuteGateClosed);
     }
     if (zoneId === 'first_campus_1f') {
       this.activeZoneInstance.setEntranceClosed(true);
@@ -185,7 +196,7 @@ export class WorldRouter {
       let label = `${f}F`;
       if (campus === 'first') {
         if (f === 1) label = '1F 公共服務大廳';
-        else if (f === 2) label = '2F 急診與封閉病房';
+        else if (f === 2) label = '2F 急診';
         else if (f === 3) label = '3F 醫師行政區';
         else if (f === 4) label = '4F 病房';
         else if (f === 8) label = '8F 院史展天橋';
