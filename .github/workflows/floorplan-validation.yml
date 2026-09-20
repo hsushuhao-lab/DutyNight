@@ -4,15 +4,14 @@ on:
     branches: [fix/floorplan-access-20260920]
   workflow_dispatch:
 permissions:
-  contents: write
+  contents: read
 concurrency:
   group: floorplan-validation
   cancel-in-progress: true
 jobs:
   verify:
-    if: github.ref == 'refs/heads/fix/floorplan-access-20260920'
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -20,24 +19,10 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: prototype/package-lock.json
-      - name: Recover exact staged source edits on feature branch
-        run: |
-          python tools/apply-floorplan-stage.py
-          git add prototype/src
-          if ! git diff --cached --quiet; then
-            git config user.name 'github-actions[bot]'
-            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-            git commit -m 'fix(floorplan): materialize hash-verified hospital floorplan and access revision'
-            git push origin HEAD:fix/floorplan-access-20260920
-          fi
-          echo "DUTYNIGHT_SOURCE_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
-          git rev-parse HEAD > SOURCE_COMMIT.txt
       - name: Install locked dependencies
         working-directory: prototype
         run: npm ci
       - name: All Node regressions
-        id: nodeqa
-        continue-on-error: true
         working-directory: prototype
         run: node scripts/run-floorplan-regressions.mjs
       - name: Build exact source
@@ -49,25 +34,14 @@ jobs:
         working-directory: prototype
         run: npx playwright install --with-deps chromium
       - name: Continuous production browser walkthrough
-        id: browserqa
-        continue-on-error: true
         working-directory: prototype
         run: node scripts/test-floorplan-browser.mjs
       - name: Capture fixed viewpoints
-        if: always()
-        continue-on-error: true
         working-directory: prototype
         run: node scripts/capture-floorplan.mjs
-      - name: Package independent workspace
+      - name: Record source
         if: always()
-        run: |
-          tar --exclude='prototype/dist' --exclude='prototype/test-results' --exclude='prototype/qa-results' -czf /tmp/dutynight-workspace.tgz prototype SOURCE_COMMIT.txt
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: floorplan-workspace
-          path: /tmp/dutynight-workspace.tgz
-          retention-days: 7
+        run: git rev-parse HEAD > SOURCE_COMMIT.txt
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -76,8 +50,3 @@ jobs:
             SOURCE_COMMIT.txt
             prototype/qa-results/
           retention-days: 14
-      - name: Enforce all validation results
-        if: always()
-        run: |
-          test '${{ steps.nodeqa.outcome }}' = 'success'
-          test '${{ steps.browserqa.outcome }}' = 'success'

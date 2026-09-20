@@ -103,7 +103,10 @@ export class WorldRouter {
     this.activeZoneInstance.zoneGroup.updateMatrixWorld(true);
 
     const corridorLights = new Set();
-    for (const room of this.activeZoneInstance.roomAreas || []) {
+    // The new wards have an authored light plan. Do not multiply shader lights
+    // by both room and corridor count when expanding from four to nine rooms.
+    const authoredWard = ['first_campus_4f','second_campus_5f','second_campus_4f_story','second_campus_std'].includes(zoneId);
+    for (const room of (authoredWard ? [] : this.activeZoneInstance.roomAreas || [])) {
       for (const point of [room.point, room.corridor].filter(Boolean)) {
         const key = point[0] + ':' + point[2];
         if (corridorLights.has(key)) continue;
