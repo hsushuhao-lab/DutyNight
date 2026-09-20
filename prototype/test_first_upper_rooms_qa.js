@@ -4,7 +4,7 @@ import {GeometryFactory} from './src/world/shared/GeometryFactory.js';
 import {FirstCampus3F} from './src/world/zones/FirstCampus3F.js';
 import {FirstCampus4F} from './src/world/zones/FirstCampus4F.js';
 global.document={createElement:()=>({getContext:()=>new Proxy({},{get:()=>()=>({addColorStop(){}})})})};
-for(const [Zone,start,ids] of [[FirstCampus3F,[14,1.7,0],['3F_ADMIN','3F_STAIRS']],[FirstCampus4F,[12,1.7,0],['4A','4B','4C','4D','4F_PHYSICIAN','4F_STAIRS']]]) {
+for(const [Zone,start,ids] of [[FirstCampus3F,[14,1.7,0],['3F_ADMIN']],[FirstCampus4F,[12,1.7,0],['4A','4B','4C','4D','4F_PHYSICIAN']]]) {
  const zone=new Zone(new THREE.Scene(),new GeometryFactory()).build();
  if(zone.setWardGateClosed)zone.setWardGateClosed(false);
  zone.zoneGroup.updateMatrixWorld(true);
@@ -18,4 +18,4 @@ for(const [Zone,start,ids] of [[FirstCampus3F,[14,1.7,0],['3F_ADMIN','3F_STAIRS'
  for(const room of zone.roomAreas){walk(start,room.corridor);walk(room.corridor,room.point);walk(room.point,room.corridor);walk(room.corridor,start);console.log('PASS room in/out '+room.id+' '+JSON.stringify(room.point));}
  zone.cleanup();
 }
-console.log('FIRST UPPER ROOMS: 8/8 in/out floor-supported routes PASS');
+console.log('FIRST UPPER ROOMS: 6/6 in/out floor-supported routes PASS; stair travel is door-menu only');
