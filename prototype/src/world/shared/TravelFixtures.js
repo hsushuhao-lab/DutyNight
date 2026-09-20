@@ -92,6 +92,13 @@ export function addTravelFixtures(zone, zoneId) {
       label: label || '推開安全梯門前往其他樓層'
     };
     zone.interactables.push(doorLeaf);
+
+    // Indoor stairs are intentionally not modeled as walkable stairs. The fire door
+    // is a real collision boundary; interacting with it opens the floor selector.
+    root.updateMatrixWorld(true);
+    const stairDoorCollider = new THREE.Box3().setFromObject(doorLeaf).expandByScalar(0.015);
+    zone.colliders.push(stairDoorCollider);
+    doorLeaf.userData.stairDoorCollider = stairDoorCollider;
   }
 
   // Mount elevator call panels on walls
