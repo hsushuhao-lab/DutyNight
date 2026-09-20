@@ -130,8 +130,9 @@ export class SecondCampus2F {
     elDoors.position.set(79.65, 1.25, -1.8);
     this.zoneGroup.add(elDoors);
 
-    // Stairwell door to 1F exit (opening from z = 1.2 to 2.4)
-    Doorway.build({
+    // Stairwell opening is only a threshold for the menu-driven stair door. No
+    // physical staircase is modeled or walkable behind it.
+    const stairOpening = Doorway.build({
       scene: this.zoneGroup,
       colliders: this.colliders,
       x: 80.0,
@@ -145,6 +146,10 @@ export class SecondCampus2F {
       isOpen: true,
       doorMaterial: this.gf.materials.metal
     });
+    for (const child of stairOpening.children) {
+      const p = child.geometry?.parameters;
+      if (p?.width === 1.12 && p?.height === 2.35) child.visible = false;
+    }
 
     SignAnchor.buildWallPlaque({
       scene: this.zoneGroup,
@@ -169,12 +174,9 @@ export class SecondCampus2F {
     solid(art,this.gf.materials.metal,[79.58,1.25,-1.8],[.03,2.3,.012]);
     for(const z of [-2.8,-.8])solid(art,this.gf.materials.metal,[79.55,1.25,z],[.08,2.5,.06]);
 
-    solid(art,this.gf.materials.floorTile,[82,-.08,1.8],[4,.16,2.4]);
-    solid(art,this.gf.materials.ceiling,[82,3.2,1.8],[4,.16,2.4]);
-    for(const z of [.6,3])solid(art,this.gf.materials.wall,[82,1.6,z],[4,3.2,.25]);
-    solid(art,this.gf.materials.wall,[84,1.6,1.8],[.25,3.2,2.4]);
-    for(let i=0;i<6;i++)solid(art,this.gf.materials.floorTile,[82+i*.28,(i+1)*.075,1.8],[.28,(i+1)*.15,2]);
-    solid(art,this.gf.materials.lightWarm,[82,3.09,1.8],[1.1,.03,.32]);
+    // Opaque backing immediately behind the fire door: stairs are abstracted into
+    // the travel UI and never represented as a walkable flight.
+    solid(art, this.gf.materials.wallDark, [80.20, 1.25, 1.8], [.08, 2.5, 2.2]);
     wallTrim(this.zoneGroup,this.gf.materials);
     return this;
   }
