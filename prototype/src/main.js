@@ -17,6 +17,7 @@ import { applyAct1CollisionHotfix } from './world/CollisionHotfix.js';
 import { FPSController } from './player/FPSController.js';
 import { UIManager } from './ui/UIManager.js';
 import { soundManager } from './audio/SoundManager.js';
+import { NormalDutyGame } from './gameplay/NormalDutyGame.js';
 
 // Setup Three.js Scene & Renderer
 const container = document.getElementById('canvas-container');
@@ -98,6 +99,7 @@ controller.onHoverChange = (interactable) => {
 
 controller.onInteract = (interactable) => {
   console.log('Interacting with:', interactable);
+  if (normalDuty.handleInteract(interactable)) return;
 
   if (interactable.type === 'duty_door') {
     worldRouter.activeZoneInstance.toggleDutyDoor(camera.position);
@@ -180,6 +182,7 @@ function animate() {
   requestAnimationFrame(animate);
   const delta = Math.min(clock.getDelta(), 0.1);
 
+  normalDuty.update(delta);
   controller.update(delta);
   worldRouter.update();
   composer.render();
@@ -238,5 +241,6 @@ if (import.meta.env.DEV || urlParams.get('debug') === '1') {
   window.renderResourceStats = () => ({ ...renderer.info.memory });
 }
 
+const normalDuty = new NormalDutyGame(worldRouter, gameState, uiManager, soundManager);
 animate();
 console.log('Songde Night Duty - Full World Modeling System Initialized.');

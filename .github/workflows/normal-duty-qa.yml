@@ -1,0 +1,63 @@
+name: Normal Duty P1 QA
+on:
+  push:
+    branches: [feat/normal-duty-p1]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: normal-duty-p1-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: prototype/package-lock.json
+      - name: Install pinned dependencies
+        working-directory: prototype
+        run: npm ci
+      - name: Verify frozen world and movement sources
+        run: git diff --exit-code 1f78ffb4c3bf1f528e5ada5189564e8de3f9bb5a HEAD -- prototype/src/world prototype/src/player prototype/src/art
+      - name: Replay published baseline release gates
+        shell: bash
+        run: |
+          mkdir -p /tmp/dutynight-baseline
+          git archive 1f78ffb4c3bf1f528e5ada5189564e8de3f9bb5a prototype | tar -x -C /tmp/dutynight-baseline
+          ln -s "$GITHUB_WORKSPACE/prototype/node_modules" /tmp/dutynight-baseline/prototype/node_modules
+          cd /tmp/dutynight-baseline/prototype
+          for test in test_hospital_access_policy_qa.js test_acute_gate_qa.js test_ward_gate_qa.js test_first_campus_rooms_qa.js test_first_upper_rooms_qa.js test_world_traversal_qa.js test_playable_world_qa.js; do node "$test"; done
+      - name: Current release gates and normal duty core
+        working-directory: prototype
+        run: |
+          node test_hospital_access_policy_qa.js
+          node test_acute_gate_qa.js
+          node test_ward_gate_qa.js
+          node test_first_campus_rooms_qa.js
+          node test_first_upper_rooms_qa.js
+          node test_world_traversal_qa.js
+          node test_playable_world_qa.js
+          node test_normal_duty_qa.js
+      - name: Production build
+        working-directory: prototype
+        run: npm run build
+      - name: Install browser
+        working-directory: prototype
+        run: npx playwright install --with-deps chromium
+      - name: Continuous normal duty browser playthrough
+        working-directory: prototype
+        run: node scripts/test-normal-duty-browser.mjs ../docs/normal-duty-qa/browser
+      - name: Preserve browser evidence even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: normal-duty-p1-${{ github.sha }}
+          path: docs/normal-duty-qa/
+          if-no-files-found: warn
