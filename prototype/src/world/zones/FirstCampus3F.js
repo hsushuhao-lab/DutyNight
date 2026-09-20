@@ -33,7 +33,6 @@ export class FirstCampus3F {
 
     buildRoomWing(this,{x:16,z:0,rooms:[
       {code:'3F_ADMIN',label:'行政辦公室',kind:'office'},
-      {code:'3F_STAIRS',label:'樓梯前室',kind:'foyer'},
     ]});
 
     // References for gameplay state
