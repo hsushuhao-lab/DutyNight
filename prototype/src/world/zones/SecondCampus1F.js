@@ -28,17 +28,9 @@ export class SecondCampus1F {
     this.gf.buildCeiling(this.zoneGroup, 72, 3.2, -3, 12, 10);
 
     // Interior walls
-    this.gf.buildWall(this.zoneGroup, this.colliders, 72, 1.6, 2.0, 12, 3.2, 0.4);  // North wall
+    for(const x of [68.2,75.8])this.gf.buildWall(this.zoneGroup,this.colliders,x,1.6,2,4.4,3.2,.4);  // North wall
     this.gf.buildWall(this.zoneGroup, this.colliders, 66.0, 1.6, -3.0, 0.4, 3.2, 10.0); // West wall
     this.gf.buildWall(this.zoneGroup, this.colliders, 78.0, 1.6, -3.0, 0.4, 3.2, 10.0); // East wall
-
-    // Elevator doors on North wall
-    const elFrame = new THREE.Mesh(new THREE.BoxGeometry(2.4, 2.5, 0.2), this.gf.materials.metal);
-    elFrame.position.set(74.0, 1.25, 1.75);
-    this.zoneGroup.add(elFrame);
-    const elDoors = new THREE.Mesh(new THREE.BoxGeometry(2.0, 2.3, 0.08), this.gf.materials.stainless);
-    elDoors.position.set(74.0, 1.25, 1.65);
-    this.zoneGroup.add(elDoors);
 
     SignAnchor.buildHangingSign({
       scene: this.zoneGroup,

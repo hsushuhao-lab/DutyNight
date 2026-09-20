@@ -1,0 +1,54 @@
+name: Floorplan validation
+on:
+  push:
+    branches: [fix/floorplan-access-20260920]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: floorplan-validation-cancellable
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: prototype/package-lock.json
+      - name: Install locked dependencies
+        working-directory: prototype
+        run: npm ci
+      - name: All Node regressions
+        working-directory: prototype
+        run: node scripts/run-floorplan-regressions.mjs
+      - name: Build exact source
+        id: build
+        working-directory: prototype
+        run: |
+          node scripts/write-build-info.mjs
+          npm run build
+      - name: Install Chromium
+        working-directory: prototype
+        run: npx playwright install --with-deps chromium
+      - name: Continuous production browser walkthrough
+        working-directory: prototype
+        run: node scripts/test-floorplan-browser.mjs
+      - name: Capture fixed viewpoints
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        working-directory: prototype
+        run: node scripts/capture-floorplan.mjs
+      - name: Record source
+        if: always()
+        run: git rev-parse HEAD > SOURCE_COMMIT.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: floorplan-evidence
+          path: |
+            SOURCE_COMMIT.txt
+            prototype/qa-results/
+          retention-days: 14

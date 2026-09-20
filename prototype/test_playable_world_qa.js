@@ -37,7 +37,18 @@ const probes={
  er_to_hill:[[28.2,1.7,0],[29.1,1.7,0]],hill_to_er:[[11.5,1.27,-34.55],[10.7,1.27,-34.79]],
  hill_to_pond:[[48.8,1.195,-33.5],[49.5,1.17,-34.375]],pond_to_hill:[[53,1.12,-36.8],[53,1.12,-35.85]],
 };
-for(const portal of ROUTE_PORTALS){router.loadZone(portal.from);controller.teleport(...probes[portal.id][0]);walk(probes[portal.id][1]);router.update();assert.equal(router.activeZoneId,WORLD_SPAWNS[portal.spawn].zoneId,`${portal.id} transition failed`);router.update();assert.equal(router.activeZoneId,WORLD_SPAWNS[portal.spawn].zoneId,`${portal.id} arrival immediately bounces`);}
+for(const portal of ROUTE_PORTALS){
+ router.loadZone(portal.from);controller.teleport(...probes[portal.id][0]);
+ if(portal.gated){
+  const door=Object.values(router.activeZoneInstance.accessDoors).find(d=>d.portal===portal.spawn);
+  assert(door?.closed,`${portal.id}: missing closed access door`);
+  router.update();assert.equal(router.activeZoneId,portal.from,`${portal.id}: proximity bypassed card access`);
+  // Unit routing only: browser QA separately presses E on this door's real reader.
+  router.teleportToSpawn(door.portal);
+ }else{walk(probes[portal.id][1]);router.update();}
+ assert.equal(router.activeZoneId,WORLD_SPAWNS[portal.spawn].zoneId,`${portal.id} transition failed`);
+ router.update();assert.equal(router.activeZoneId,WORLD_SPAWNS[portal.spawn].zoneId,`${portal.id} arrival immediately bounces`);
+}
 router.loadZone('ecology_pond','pond_from_hill');walk([53,1.12,-41.5]);walk([56,1.34,-41.5]);walk([61,1.34,-42]);walk([56,1.34,-41.5]);walk([53,1.12,-41.5]);
 router.activeZoneInstance.cleanup();
-console.log(`PLAYABLE_WORLD PASS: ${canonical.length} canonical zones, ${spawns} supported spawns, ${rooms} actual-controller room round trips, ${ROUTE_PORTALS.length} physical portal transitions, pond deck in/out`);
+console.log(`PLAYABLE_WORLD PASS: ${canonical.length} canonical zones, ${spawns} supported spawns, ${rooms} actual-controller room round trips, ${ROUTE_PORTALS.filter(p=>!p.gated).length} automatic + ${ROUTE_PORTALS.filter(p=>p.gated).length} card-controlled portal routing checks, pond deck in/out`);

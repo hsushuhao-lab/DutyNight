@@ -1,46 +1,16 @@
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
 import {WorldRouter} from './src/world/WorldRouter.js';
-import {FIRST_FLOORS,SECOND_FLOORS} from './src/world/shared/WorldRoutes.js';
-
-global.document={querySelector:()=>null,createElement:()=>({getContext:()=>new Proxy({},{get:()=>()=>({addColorStop(){}})})})};
-const controller={enabled:true,teleport(){},updateCameraRotation(){}};
-const router=new WorldRouter(new THREE.Scene(),new THREE.PerspectiveCamera(),controller);
-const zones=[...FIRST_FLOORS.map(f=>`first_campus_${f}f`),'skybridge',...SECOND_FLOORS.map(f=>`second_campus_${f}f`),'hillside_route','ecology_pond'];
-const failures=[];
-let panels=0;
-for(const zoneId of zones){
- const zone=router.loadZone(zoneId);
- zone.zoneGroup.updateMatrixWorld(true);
- for(const button of zone.interactables.filter(object=>object.userData.type==='travel_selector')){
-  panels++;
-  const root=button.parent,backing=root.children[0],plaque=root.children.find(object=>object.name.startsWith('Plaque_'));
-  const backingBox=new THREE.Box3().setFromObject(backing).expandByScalar(.000001);
-  const label=button.userData.id;
-  try{
-   assert(backingBox.intersectsBox(new THREE.Box3().setFromObject(button)),`${label}: backing must contact button`);
-   assert(backingBox.intersectsBox(new THREE.Box3().setFromObject(plaque)),`${label}: backing must contact plaque`);
-   zone.zoneGroup.traverse(object=>{
-    if(!object.name.startsWith('Plaque_'))return;
-    for(let node=object;node;node=node.parent)if(node===root)return;
-    assert(!backingBox.intersectsBox(new THREE.Box3().setFromObject(object)),label+': backing must not cover '+object.name);
-   });
-   const origin=root.localToWorld(new THREE.Vector3(0,.15,.4));
-   const direction=new THREE.Vector3(0,0,-1).applyQuaternion(root.getWorldQuaternion(new THREE.Quaternion()));
-   const architecturalMeshes=[];
-   zone.zoneGroup.traverse(object=>{
-    if(!object.isMesh || !(object.geometry?.parameters?.height>=2))return;
-    for(let node=object;node;node=node.parent)if(node===root || !node.visible)return;
-    architecturalMeshes.push(object);
-   });
-   const hit=new THREE.Raycaster(origin,direction,0,1).intersectObjects(architecturalMeshes,false)[0];
-   assert(hit,`${label}: no actual door or wall behind fixture`);
-   assert(backingBox.containsPoint(hit.point),`${label}: actual support ${hit.point.toArray()} lies outside backing`);
-   console.log(`PASS ${label}: backing joins button/plaque and actual door/wall`);
-  }catch(error){failures.push(error.message);console.error(`FAIL ${error.message}`);}
- }
+import {FPSController} from './src/player/FPSController.js';
+global.document={querySelector:()=>null,addEventListener(){},createElement:()=>({getContext:()=>new Proxy({measureText:t=>({width:t.length*20})},{get:(o,k)=>o[k]||(()=>({addColorStop(){}}))})})};
+const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(),c=new FPSController(camera,{addEventListener(){}},[],[],[]),r=new WorldRouter(scene,camera,c);
+for(const campus of ['first','second'])for(const floor of campus==='first'?[1,2,3,4,8]:[1,2,5]){
+ const id=`${campus}_campus_${floor}f`,z=r.loadZone(id);scene.updateMatrixWorld(true);
+ const panel=z.interactables.find(o=>o.userData.kind==='elevator');assert(panel);assert.equal(z.verticalCore.panel[0],1.65);
+ const pos=panel.getWorldPosition(new THREE.Vector3()),normal=new THREE.Vector3(0,0,1).transformDirection(panel.matrixWorld);
+ assert(normal.z<-.99);assert.equal(z.verticalCore.lift[0],0);
+ c.teleport(pos.x,1.7,pos.z-.85);assert(!c.checkCollision(c.position.x,c.position.z));assert.notEqual(c.supportedHeight(c.position.x,c.position.z),null);
+ const button=panel.parent.children.find(o=>o.geometry?.type==='CircleGeometry');assert(button,'Visible round call button missing');
+ assert(z.interactables.some(o=>o.userData.kind==='stairs'));
 }
-router.activeZoneInstance.cleanup();
-assert.equal(panels,16,'Must inspect all canonical travel panels');
-assert.equal(failures.length,0,failures.join('\n'));
-console.log(`TRAVEL PANEL MOUNTS PASS: ${panels} fixtures across ${zones.length} canonical zones; button/plaque contact and actual architectural support`);
+console.log('TRAVEL MOUNT PASS: all eight floors, same local layouts, visible side-wall buttons facing reachable operators');

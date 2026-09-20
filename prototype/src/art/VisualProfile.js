@@ -7,13 +7,13 @@ export const VisualProfile = Object.freeze({
 
 const zones = {
   first_campus_3f: { lamps: [[-8, 0], [-1.5, 0], [6.5, 0], [14, 0], [6, 5.5]], intensity: 4.2 },
-  first_campus_4f: { lamps: [[-8, 0], [0, 0], [8, 0], [6, -5.5], [8, 5]], intensity: 4.0 },
+  first_campus_4f: { lamps: [[0, 6], [-11, 6], [0, -3], [-2, -9], [0, -15], [8, -3]], intensity: 4.0 },
   first_campus_2f: { lamps: [[-8, 0], [0, 0], [8, 0], [16, 0], [3.5, 6], [14.5, 6.5], [3.5, -6.5], [12.5, -6.5]], intensity: 4.8, color: 0xf1f4ed },
   first_campus_1f: { lamps: [[-7, 0], [2, -3], [2, 3], [12, 0]], intensity: 6.0, y: 3.65, width: 5 },
   first_campus_8f: { lamps: [[-8, 0], [-2, 0]], intensity: 3.8 },
   skybridge: { lamps: [[4, 0], [14, 0], [27, 0], [41, 0], [55, 0]], intensity: 3.4, width: 5.5, color: 0xe1e9e6 },
   second_campus_2f: { lamps: [[65, 0], [75, 0]], intensity: 3.7, width: 4 },
-  second_campus_std: { lamps: [[70, 0], [78, 0], [88, 0], [78, 5.5]], intensity: 3.8 },
+  second_campus_std: { lamps: [[72, 6], [76, -2], [72, -9], [72, -15], [81, -8], [65, -8], [83, 6]], intensity: 3.8 },
   second_campus_1f: { lamps: [[72, -4], [72, -11]], intensity: 3.5 },
   hillside_route: { lamps: [], intensity: 0 },
   ecology_pond: { lamps: [], intensity: 0 }
@@ -49,7 +49,7 @@ export function applyZoneLighting(group, scene, zoneId) {
   }
   if (zoneId === 'first_campus_4f') {
     const readingLight=new THREE.PointLight(0xffdcaa,9,3.3,2);
-    readingLight.position.set(4.65,1.0,-7.2);
+    readingLight.position.set(-11.25,1.0,8.1);
     group.add(readingLight);
   }
   for (const [x, z] of zone.lamps) {

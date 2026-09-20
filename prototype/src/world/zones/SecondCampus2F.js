@@ -1,3 +1,4 @@
+import { AccessDoor } from '../shared/AccessDoor.js';
 // SecondCampus2F.js - Milestone M9: Second Campus 2F Special Bridge Landing & Gallery
 import * as THREE from 'three';
 import { artRoot, solid, asset, monitor, counterFront, wallTrim } from '../../art/ArtDetails.js';
@@ -29,7 +30,8 @@ export class SecondCampus2F {
     this.gf.buildCeiling(this.zoneGroup, 70, 3.2, 0, 20, 9);
 
     // North wall
-    this.gf.buildWall(this.zoneGroup, this.colliders, 70, 1.6, 4.5, 20, 3.2, 0.4);
+    this.gf.buildWall(this.zoneGroup,this.colliders,65.2,1.6,4.5,10.4,3.2,.4);
+    this.gf.buildWall(this.zoneGroup,this.colliders,76.8,1.6,4.5,6.4,3.2,.4);
     // South wall
     for (const [x, width] of [[62.65,5.3],[70,6.6],[77.35,5.3]]) {
       this.gf.buildWall(this.zoneGroup, this.colliders, x, 1.6, -4.5, width, 3.2, .4);
@@ -117,51 +119,7 @@ export class SecondCampus2F {
     // ==========================================
     // 3. ELEVATOR & STAIR CORE (at East wall x = 80)
     // ==========================================
-    // Wall segment south of stair door (z: -4.5 to 1.2)
-    this.gf.buildWall(this.zoneGroup, this.colliders, 80.0, 1.6, -1.65, 0.4, 3.2, 5.7);
-    // Wall segment north of stair door (z: 2.4 to 4.5)
-    this.gf.buildWall(this.zoneGroup, this.colliders, 80.0, 1.6, 3.45, 0.4, 3.2, 2.1);
-
-    // Elevator doors
-    const elFrame = new THREE.Mesh(new THREE.BoxGeometry(0.2, 2.5, 2.4), this.gf.materials.metal);
-    elFrame.position.set(79.75, 1.25, -1.8);
-    this.zoneGroup.add(elFrame);
-    const elDoors = new THREE.Mesh(new THREE.BoxGeometry(0.08, 2.3, 2.0), this.gf.materials.stainless);
-    elDoors.position.set(79.65, 1.25, -1.8);
-    this.zoneGroup.add(elDoors);
-
-    // Stairwell opening is only a threshold for the menu-driven stair door. No
-    // physical staircase is modeled or walkable behind it.
-    const stairOpening = Doorway.build({
-      scene: this.zoneGroup,
-      colliders: this.colliders,
-      x: 80.0,
-      y: 0,
-      z: 1.8,
-      width: 1.2,
-      height: 2.4,
-      wallHeight: 3.2,
-      wallThickness: 0.4,
-      isAlongX: false,
-      isOpen: true,
-      doorMaterial: this.gf.materials.metal
-    });
-    for (const child of stairOpening.children) {
-      const p = child.geometry?.parameters;
-      if (p?.width === 1.12 && p?.height === 2.35) child.visible = false;
-    }
-
-    SignAnchor.buildWallPlaque({
-      scene: this.zoneGroup,
-      x: 79.79,
-      y: 2.3,
-      z: 3.0,
-      rotationY: -Math.PI / 2,
-      code: 'STAIR',
-      title: '安全梯（通往 1F 山側出口）',
-      subtitle: 'STAIRWELL TO 1F EXIT',
-      header: '第二院區'
-    });
+    this.gf.buildWall(this.zoneGroup,this.colliders,80,1.6,0,.4,3.2,9);
 
     // Ceiling lights
     this.gf.buildCeilingLight(this.zoneGroup, 65, 3.15, 0, 0.8, 7.5);
@@ -171,12 +129,9 @@ export class SecondCampus2F {
     counterFront(art, this.gf.materials, 67, 2.78, 4.2, 1.1);
     asset(art, 'bench', [70, 0, -3.85]);
     asset(art,'plant',[61.4,0,3.65]);
-    solid(art,this.gf.materials.metal,[79.58,1.25,-1.8],[.03,2.3,.012]);
-    for(const z of [-2.8,-.8])solid(art,this.gf.materials.metal,[79.55,1.25,z],[.08,2.5,.06]);
-
-    // Opaque backing immediately behind the fire door: stairs are abstracted into
-    // the travel UI and never represented as a walkable flight.
-    solid(art, this.gf.materials.wallDark, [80.20, 1.25, 1.8], [.08, 2.5, 2.2]);
+    const oldBridgeDoor=this.zoneGroup.getObjectByName('Doorway_60_0');
+    for(const leaf of oldBridgeDoor.children)if(leaf.geometry?.parameters.height===2.35||leaf.geometry?.parameters.height===2.45)leaf.visible=false;
+    new AccessDoor(this,{id:'BRIDGE_ACCESS',x:60,z:0,yaw:Math.PI/2,width:2.8,title:'天橋感應門',portal:'bridge_from_second'});
     wallTrim(this.zoneGroup,this.gf.materials);
     return this;
   }

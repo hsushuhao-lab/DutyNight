@@ -140,6 +140,8 @@ export class UIManager {
   openTravelSelector(destinations, currentZone, onSelect, kind = 'elevator') {
     document.exitPointerLock();
     this.elevatorCutscene.dataset.selecting = 'true';
+    this.elevatorCutscene.dataset.travelling = 'false';
+    this.elevatorCutscene.querySelector('.floor-arrow').textContent = '↕';
     this.elevatorCutscene.classList.add('active');
 
     const isStairs = kind === 'stairs';
@@ -154,7 +156,7 @@ export class UIManager {
     const header = document.createElement('h2');
     header.style.color = '#79d2a6';
     header.style.margin = '0 0 6px 0';
-    header.textContent = isStairs ? '🚪 安全逃生梯間' : '🛗 客用電梯';
+    header.textContent = isStairs ? '安全梯' : '電梯';
     titleBox.appendChild(header);
 
     // Current floor number parsing
@@ -219,13 +221,7 @@ export class UIManager {
           button.style.cursor = 'default';
         } else {
           button.addEventListener('click', () => {
-            this.closeTravelSelector();
-            if (isStairs) {
-              soundManager.playClick();
-            } else {
-              soundManager.playElevatorChime();
-            }
-            onSelect(destination);
+            this.runTravelTransition(destination,curFloor,onSelect,kind);
           });
         }
       }
@@ -242,7 +238,38 @@ export class UIManager {
     info.appendChild(cancel);
   }
 
+  runTravelTransition(destination,fromFloor,onSelect,kind) {
+    if(this.elevatorCutscene.dataset.travelling==='true')return;
+    this.elevatorCutscene.dataset.selecting='false';
+    this.elevatorCutscene.dataset.travelling='true';
+    const up=destination.floorNum>fromFloor;
+    this.elevatorCutscene.querySelector('.floor-arrow').textContent=up?'▲':'▼';
+    this.elevatorCutscene.querySelector('.floor-digit').textContent=up?'上行':'下行';
+    document.getElementById('elevator-status-text').textContent=`${kind==='stairs'?'安全梯':'電梯'} ${fromFloor}F → ${destination.floorNum}F`;
+    if(kind==='stairs')soundManager.playClick();else soundManager.playElevatorMotor();
+    this.travelTimer=setTimeout(()=>{
+      try {onSelect(destination);soundManager.playElevatorChime();}
+      finally {this.elevatorCutscene.dataset.travelling='false';this.closeTravelSelector();}
+    },kind==='stairs'?1100:1700);
+  }
+
+  runDoorTransition(onArrival) {
+    document.exitPointerLock();
+    this.elevatorCutscene.dataset.selecting='false';
+    this.elevatorCutscene.dataset.travelling='true';
+    this.elevatorCutscene.classList.add('active');
+    this.elevatorCutscene.querySelector('.floor-arrow').textContent='';
+    this.elevatorCutscene.querySelector('.floor-digit').textContent='感應通過';
+    document.getElementById('elevator-status-text').textContent='門禁確認中';
+    soundManager.playClick();
+    this.travelTimer=setTimeout(()=>{
+      try {onArrival();}
+      finally {this.elevatorCutscene.dataset.travelling='false';this.closeTravelSelector();}
+    },650);
+  }
+
   closeTravelSelector() {
+    if(this.elevatorCutscene.dataset.travelling==='true')return;
     this.elevatorCutscene.dataset.selecting = 'false';
     this.elevatorCutscene.classList.remove('active');
     this.onElevatorTransitionComplete?.();

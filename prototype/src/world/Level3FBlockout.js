@@ -115,64 +115,11 @@ export class Level3FBlockout {
     // West wall (behind elevator)
     this.buildWall(-12, 1.6, 0, 0.4, 3.2, 7);
     // North wall of elevator lobby
-    this.buildWall(-8, 1.6, 3.5, 8, 3.2, 0.4);
+    for(const x of [-10.8,-5.2])this.buildWall(x,1.6,3.5,2.4,3.2,.4);
     // South wall of elevator lobby
     this.buildWall(-8, 1.6, -3.5, 8, 3.2, 0.4);
 
-    // Elevator Doors
-    const doorFrame = new THREE.Mesh(
-      new THREE.BoxGeometry(0.3, 2.5, 2.6),
-      new THREE.MeshStandardMaterial({ color: 0x444444, metalness: 0.8, roughness: 0.3 })
-    );
-    doorFrame.position.set(-11.7, 1.25, 0);
-    this.scene.add(doorFrame);
-
-    const leftDoor = new THREE.Mesh(
-      new THREE.BoxGeometry(0.1, 2.3, 1.1),
-      this.materials.elevatorDoor
-    );
-    leftDoor.position.set(-11.6, 1.25, -0.6);
-    this.scene.add(leftDoor);
-
-    const rightDoor = new THREE.Mesh(
-      new THREE.BoxGeometry(0.1, 2.3, 1.1),
-      this.materials.elevatorDoor
-    );
-    rightDoor.position.set(-11.6, 1.25, 0.6);
-    this.scene.add(rightDoor);
-
-    // Floor Indicator Panel over elevator
-    const panelGeo = new THREE.BoxGeometry(0.1, 0.35, 0.8);
-    const panelMat = new THREE.MeshStandardMaterial({ color: 0x222222 });
-    const panel = new THREE.Mesh(panelGeo, panelMat);
-    panel.position.set(-11.6, 2.65, 0);
-    this.scene.add(panel);
-
-    // Elevator Call Button Panel
-    const buttonBox = new THREE.Mesh(
-      new THREE.BoxGeometry(0.08, 0.4, 0.2),
-      new THREE.MeshStandardMaterial({ color: 0x333333, metalness: 0.7 })
-    );
-    buttonBox.position.set(-11.6, 1.2, 1.6);
-    this.scene.add(buttonBox);
-
-    // Glowing call button
-    const btnGeo = new THREE.CylinderGeometry(0.04, 0.04, 0.05, 16);
-    btnGeo.rotateZ(Math.PI / 2);
-    const btnMat = new THREE.MeshBasicMaterial({ color: 0xffaa00 });
-    const callButton = new THREE.Mesh(btnGeo, btnMat);
-    callButton.position.set(-11.55, 1.2, 1.6);
-    this.scene.add(callButton);
-
-    callButton.userData = {
-      interactable: true,
-      id: 'ELEVATOR_BUTTON',
-      label: '電梯選擇樓層',
-      type: 'elevator'
-    };
-    this.interactables.push(callButton);
-    this.elevatorLight = callButton;
-
+    // Shared vertical core installs the call light after this legacy room is built.
     // Overhead wayfinding sign in elevator lobby, facing approaching corridor traffic (+X)
     this.createSignMesh(-6.8, 2.65, 0, '◀ 3F 電梯大廳 ｜ 2F 急診・4F 病房區 ▶', Math.PI / 2);
     const rodMat = new THREE.MeshStandardMaterial({ color: 0x888888, metalness: 0.85, roughness: 0.3 });
@@ -385,12 +332,7 @@ export class Level3FBlockout {
   }
 
   buildWorkstations() {
-    // Workstation desktop modesty privacy panel (shields monitor casing and user screen sightline)
-    const partitionMat = new THREE.MeshStandardMaterial({ color: 0x4a5d52, roughness: 0.7 });
-    const partition = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.5, 2.6), partitionMat);
-    partition.position.set(9.42, 1.05, 5.5);
-    this.scene.add(partition);
-
+    // Latest user direction: visible monitor faces point toward the operator chairs.
     // Workstation desk on the east side of office (x = 10.0, z = 5.5)
     const deskGeo = new THREE.BoxGeometry(1.2, 0.08, 2.6);
     const desk = new THREE.Mesh(deskGeo, this.materials.wood);
@@ -451,9 +393,9 @@ export class Level3FBlockout {
       screenTex.colorSpace = THREE.SRGBColorSpace;
       const displayGeo = new THREE.PlaneGeometry(0.58, 0.38);
       const display = new THREE.Mesh(displayGeo, new THREE.MeshBasicMaterial({ map: screenTex }));
-      // Rotation PI / 2 faces screen toward +X (inner desk / east wall), zero visibility from entrance!
-      display.rotation.y = Math.PI / 2;
-      display.position.set(9.69, 1.25, 5.5 + offsetZ);
+      // Screen normal points -X toward the operator chair (latest user instruction).
+      display.rotation.y = -Math.PI / 2;
+      display.position.set(9.61, 1.25, 5.5 + offsetZ);
       this.scene.add(display);
 
       // Keyboard & mouse on inner desk surface
@@ -461,7 +403,7 @@ export class Level3FBlockout {
         new THREE.BoxGeometry(0.16, 0.02, 0.44),
         new THREE.MeshStandardMaterial({ color: 0x111111 })
       );
-      kb.position.set(10.0, 0.83, 5.5 + offsetZ);
+      kb.position.set(9.44, 0.83, 5.5 + offsetZ);
       this.scene.add(kb);
 
       if (idx === 0) {

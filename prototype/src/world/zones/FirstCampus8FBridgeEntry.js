@@ -1,3 +1,4 @@
+import { AccessDoor } from '../shared/AccessDoor.js';
 // FirstCampus8FBridgeEntry.js - Milestone M6: First Campus 8F Skybridge Transition Vestibule
 import * as THREE from 'three';
 import { artRoot, solid, asset, wallTrim } from '../../art/ArtDetails.js';
@@ -27,20 +28,12 @@ export class FirstCampus8FBridgeEntry {
     this.gf.buildCeiling(this.zoneGroup, -8, 3.2, 0, 8, 7);
 
     this.gf.buildWall(this.zoneGroup, this.colliders, -12, 1.6, 0, 0.4, 3.2, 7);
-    this.gf.buildWall(this.zoneGroup, this.colliders, -8, 1.6, 3.5, 8, 3.2, 0.4);
+    for(const x of [-10.8,-5.2])this.gf.buildWall(this.zoneGroup,this.colliders,x,1.6,3.5,2.4,3.2,.4);
     this.gf.buildWall(this.zoneGroup, this.colliders, -8, 1.6, -3.5, 8, 3.2, 0.4);
 
     // Authorized boundary repair: close the two arrival-core narrowing returns.
     this.gf.buildWall(this.zoneGroup, this.colliders, -4, 1.6, -2.75, 0.4, 3.2, 1.5);
     this.gf.buildWall(this.zoneGroup, this.colliders, -4, 1.6, 2.75, 0.4, 3.2, 1.5);
-
-    // Elevator doors
-    const elFrame = new THREE.Mesh(new THREE.BoxGeometry(0.2, 2.5, 2.4), this.gf.materials.metal);
-    elFrame.position.set(-11.75, 1.25, 0);
-    this.zoneGroup.add(elFrame);
-    const elDoors = new THREE.Mesh(new THREE.BoxGeometry(0.08, 2.3, 2.0), this.gf.materials.stainless);
-    elDoors.position.set(-11.65, 1.25, 0);
-    this.zoneGroup.add(elDoors);
 
     SignAnchor.buildHangingSign({
       scene: this.zoneGroup,
@@ -175,6 +168,9 @@ export class FirstCampus8FBridgeEntry {
     for(const x of [5,12,18])solid(art,this.gf.materials.lightWarm,[x,3.10,0],[1.2,.04,.35]);
     asset(art,'bench',[-8,0,2.8],[1,1,1],Math.PI);
     asset(art,'plant',[-10.5,0,-2.7]);
+    const oldBridgeDoor=this.zoneGroup.getObjectByName('Doorway_0_0');
+    for(const leaf of oldBridgeDoor.children)if(leaf.geometry?.parameters.height===2.35||leaf.geometry?.parameters.height===2.45)leaf.visible=false;
+    new AccessDoor(this,{id:'BRIDGE_ACCESS',x:0,z:0,yaw:Math.PI/2,width:2.4,title:'天橋感應門',portal:'bridge_from_first'});
     wallTrim(this.zoneGroup,this.gf.materials);
     return this;
   }

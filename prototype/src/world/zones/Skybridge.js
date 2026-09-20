@@ -1,3 +1,4 @@
+import { AccessDoor } from '../shared/AccessDoor.js';
 // Skybridge.js - Milestone M7: Enclosed Long Structural Connector Bridge
 import * as THREE from 'three';
 import { artRoot, solid, wallTrim } from '../../art/ArtDetails.js';
@@ -237,6 +238,8 @@ export class Skybridge {
     }
     for(let x=10;x<60;x+=10) solid(art,this.gf.materials.wallDark,[x,.004,0],[.025,.008,3.98]);
     wallTrim(this.zoneGroup,this.gf.materials);
+    new AccessDoor(this,{id:'BRIDGE_FIRST',x:0,z:0,yaw:Math.PI/2,width:2.4,title:'第一院區感應門',portal:'first_bridge_return'});
+    new AccessDoor(this,{id:'BRIDGE_SECOND',x:60,z:0,yaw:Math.PI/2,width:2.4,title:'第二院區感應門',portal:'second_bridge_return'});
     return this;
   }
 

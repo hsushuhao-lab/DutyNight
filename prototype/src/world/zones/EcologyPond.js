@@ -73,7 +73,8 @@ export class EcologyPond {
     const rampGeo = new THREE.BoxGeometry(3.0, 0.2, 2.6);
     const ramp = new THREE.Mesh(rampGeo, this.gf.materials.floorWood);
     ramp.position.set(62.0, -0.66, -47.7);
-    ramp.rotation.x = 0.15;
+    // North end meets the upper deck; south end meets the lower waterside deck.
+    ramp.rotation.x = -0.15;
     this.zoneGroup.add(ramp);
     this.walkables.push(ramp);
 
