@@ -48,8 +48,8 @@ export class WardFloorplan {
       room(7,[6,-17,12,-10],'west',-13.5);
       room(8,[6,-10,12,-6],'west',-8);
       room(9,[6,-6,12,0],'west',-3);
-      // Leave a real 2 m passage on the west of the station for 501/502.
-      nursingStation(this,{x:o-1,z:-6.3,yaw:0,id:'second_station'});
+      // Keep 3 m on the west: open ward leaves project into this circulation lane.
+      nursingStation(this,{x:o,z:-6.3,yaw:0,id:'second_station'});
       this.wardDoor=new AccessDoor(this,{id:'second_ward',x:o+4.4,z:0,width:2.4,title:`${this.floor}F 病房`});
       this.wardGateCollider=this.wardDoor.closedBox;this.wardGateClosed=true;
       this.entryPoint=[o+4.4,1.7,1.2];this.hallPoint=[o+4.4,1.7,-8];
