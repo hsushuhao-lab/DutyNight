@@ -22,8 +22,8 @@ add('pond_from_hill','ecology_pond',[53,1.12,-36.8],0,'生態池步道入口');
 add('hill_from_pond','hillside_route',[48.8,1.195,-33.5],.67,'返回山路叉路');
 add('first_1f_stairs','first_campus_1f',[-11.5,1.7,4.0],-Math.PI/2,'1F 樓梯門前');
 add('first_2f_stairs','first_campus_2f',[-8.0,1.7,2.0],Math.PI,'2F 樓梯門前');
-add('first_3f_stairs','first_campus_3f',[15.0,1.7,1.3],-Math.PI/2,'3F 樓梯門前');
-add('first_4f_stairs','first_campus_4f',[20.0,1.7,1.3],-Math.PI/2,'4F 樓梯門前');
+add('first_3f_stairs','first_campus_3f',[19.0,1.7,0.9],0,'3F 樓梯門前');
+add('first_4f_stairs','first_campus_4f',[37.0,1.7,0.9],0,'4F 樓梯門前');
 add('first_8f_stairs','first_campus_8f',[-9.5,1.7,1.2],-Math.PI/2,'8F 樓梯門前');
 add('second_1f_stairs','second_campus_1f',[75.5,1.7,0.0],-Math.PI/2,'第二院區 1F 樓梯門前');
 add('second_2f_stairs','second_campus_2f',[77.5,1.7,1.8],-Math.PI/2,'第二院區 2F 樓梯門前');
@@ -58,8 +58,8 @@ export const LIFT_PANELS={
 export const STAIR_DOORS={
  first_campus_1f:{position:[-13.5,0,4.0],yaw:-Math.PI/2,label:'1F 逃生安全梯'},
  first_campus_2f:{position:[-8.0,0,3.3],yaw:Math.PI,label:'2F 逃生安全梯'},
- first_campus_3f:{position:[16.0,0,2.5],yaw:-Math.PI/2,label:'3F 逃生安全梯'},
- first_campus_4f:{position:[22.0,0,2.5],yaw:-Math.PI/2,label:'4F 逃生安全梯'},
+ first_campus_3f:{position:[19.0,0,1.72],yaw:0,label:'3F 逃生安全梯'},
+ first_campus_4f:{position:[37.0,0,1.72],yaw:0,label:'4F 逃生安全梯'},
  first_campus_8f:{position:[-11.65,0,2.5],yaw:-Math.PI/2,label:'8F 逃生安全梯'},
  second_campus_1f:{position:[77.8,0,0.0],yaw:-Math.PI/2,label:'第二院區 1F 逃生安全梯'},
  second_campus_2f:{position:[79.8,0,1.8],yaw:-Math.PI/2,label:'第二院區 2F 逃生安全梯'},
