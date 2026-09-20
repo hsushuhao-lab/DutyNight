@@ -322,8 +322,8 @@ export class FirstCampus4F {
       wallHeight: 3.2,
       wallThickness: 0.4,
       isAlongX: false,
-      isOpen: true, // Gate doorway open for traversal
-      doorMaterial: this.gf.materials.doorWood
+      isOpen: true, // aperture stays valid; controlled metal gate state is managed below
+      doorMaterial: this.gf.materials.metal
     });
 
     // Card swipe reader box
@@ -505,7 +505,7 @@ export class FirstCampus4F {
     solid(this.wardGatePivot, this.gf.materials.stainless, [1.68, 1.1, -.06], [.28, .035, .04]);
     solid(this.art, this.gf.materials.wallDark, [14.336, 1.32, 1.2], [.018, .13, .085]);
     this.wardGateCollider = new THREE.Box3(new THREE.Vector3(13.955, 0, -.96), new THREE.Vector3(14.045, 2.35, .96));
-    this.setWardGateClosed(false);
+    this.setWardGateClosed(true);
   }
 
   setWardGateClosed(closed) {
