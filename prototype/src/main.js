@@ -123,6 +123,15 @@ controller.onInteract = (interactable) => {
     controller.enabled = false;
     uiManager.openWorkstation();
     checkElevatorReady();
+  } else if (interactable.type === 'acute_gate') {
+    const changed = worldRouter.activeZoneInstance.toggleAcuteGate(controller.position);
+    if (changed) {
+      soundManager.playClick();
+    } else {
+      uiManager.showSubtitle('門禁', '請先離開鐵門門幅，再刷卡關門。', 2500);
+    }
+    controller.currentInteractable = null;
+    uiManager.showPrompt(null);
   } else if (interactable.type === 'exit_door' || interactable.type === 'closed_door') {
     soundManager.playClick();
     if (interactable.id === '1F_MAIN_DOOR') {
