@@ -15,6 +15,7 @@ export class FirstCampus2FER {
     this.colliders = [];
     this.walkables = [];
     this.interactables = [];
+    this.acuteGateClosed = true;
     this.zoneGroup = new THREE.Group();
     this.zoneGroup.name = 'FirstCampus2FER_Zone';
   }
@@ -48,7 +49,7 @@ export class FirstCampus2FER {
     this.gf.buildWall(this.zoneGroup, this.colliders, 0, 1.6, 2.25, 0.4, 3.2, 2.5);
 
     // Iron security gate doorway (width 2.0m, height 2.4m)
-    Doorway.build({
+    const acuteDoorway = Doorway.build({
       scene: this.zoneGroup,
       colliders: this.colliders,
       x: 0,
@@ -62,6 +63,12 @@ export class FirstCampus2FER {
       isOpen: true,
       doorMaterial: this.gf.materials.metal
     });
+    // Doorway supplies the aperture/frame only; hide its generic propped leaf because
+    // the actual ward threshold is the controlled iron gate built below.
+    for (const child of acuteDoorway.children) {
+      const p = child.geometry?.parameters;
+      if (p?.width === 1.92 && p?.height === 2.35) child.visible = false;
+    }
 
     // Magnetic card swipe reader on outer wall
     const cardReader = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.24, 0.14), this.gf.materials.metal);
@@ -70,10 +77,16 @@ export class FirstCampus2FER {
     cardReader.userData = {
       interactable: true,
       id: '2F_ACUTE_GATE',
-      type: 'exit_door',
-      label: '2F 急診封閉病房門禁（感應刷卡）'
+      type: 'acute_gate',
+      label: '刷卡開啟 2F 急診門禁'
     };
     this.interactables.push(cardReader);
+    const insideReader = cardReader.clone();
+    insideReader.position.set(0.25, 1.3, 1.2);
+    insideReader.userData = { ...cardReader.userData, id: '2F_ACUTE_GATE_INSIDE' };
+    this.zoneGroup.add(insideReader);
+    this.interactables.push(insideReader);
+    this.acuteGateReaders = [cardReader, insideReader];
 
     SignAnchor.buildWallPlaque({
       scene: this.zoneGroup,
@@ -81,10 +94,10 @@ export class FirstCampus2FER {
       y: 2.35,
       z: 1.2,
       rotationY: -Math.PI / 2,
-      code: '2F-WARD',
-      title: '2F 急診急性病房 (封閉式門禁)',
-      subtitle: 'RESTRICTED ACUTE PSYCHIATRIC WARD',
-      header: '松德醫療中心 ｜ 急診醫學部'
+      code: '2F-ER',
+      title: '2F 急診',
+      subtitle: 'EMERGENCY / ACUTE WARD — ACCESS CONTROL',
+      header: '松德醫療中心 ｜ 2F 急診'
     });
 
     SignAnchor.buildHangingSign({
@@ -286,8 +299,9 @@ export class FirstCampus2FER {
 
     // Charting desk & computer
     asset(this.art, 'workDesk', [13, 0, -6.5], [2 / 1.405, 1, 1 / .725]);
-    monitor(this.art, this.gf.materials, 13, .76, -6.5);
-    asset(this.art, 'officeChair', [13, 0, -5.55], [1, 1, 1], Math.PI);
+    // Privacy: the doctor's screen faces the inner/back wall, never the doorway.
+    monitor(this.art, this.gf.materials, 13, .76, -6.5, Math.PI);
+    asset(this.art, 'officeChair', [13, 0, -7.45], [1, 1, 1], 0);
     CollisionFactory.addBox(this.colliders, 13.0, 0.4, -6.5, 2.0, 0.8, 1.0);
 
     // ==========================================
@@ -337,6 +351,7 @@ export class FirstCampus2FER {
     });
 
     this.buildArtDetails();
+    this.buildAcuteGate();
     const exterior=buildCampusBackdrop(this.zoneGroup);
     exterior.position.y=11.5;
     // Only cached backdrop vegetation intersecting the newly occupied clinical wing is hidden.
@@ -408,6 +423,56 @@ export class FirstCampus2FER {
     for(let x=22.2;x<30;x+=.18) {
       [-3.65,3.65].forEach(z=>add(m.wallDark,[x,.018,z],[.008,.006,.07]));
     }
+  }
+
+  buildAcuteGate() {
+    const doorway = this.zoneGroup.getObjectByName('Doorway_0_0');
+    this.acuteGatePivot = new THREE.Group();
+    this.acuteGatePivot.name = 'AcuteWardIronGate';
+    this.acuteGatePivot.position.set(0, 0, -0.96);
+    doorway.add(this.acuteGatePivot);
+
+    // Institutional steel gate: solid perimeter frame with vertical bars and three
+    // horizontal rails. It is closed at baseline and only moves after card access.
+    const metal = this.gf.materials.stainless;
+    for (let z = 0.08; z <= 1.84; z += 0.22) {
+      solid(this.acuteGatePivot, metal, [0, 1.15, z], [0.055, 2.22, 0.045]);
+    }
+    for (const y of [0.16, 1.12, 2.18]) {
+      solid(this.acuteGatePivot, metal, [0, y, 0.96], [0.065, 0.065, 1.92]);
+    }
+
+    this.acuteGateCollider = new THREE.Box3(
+      new THREE.Vector3(-0.055, 0, -0.96),
+      new THREE.Vector3(0.055, 2.35, 0.96)
+    );
+    this.setAcuteGateClosed(true);
+  }
+
+  setAcuteGateClosed(closed) {
+    this.acuteGateClosed = closed;
+    this.acuteGatePivot.rotation.y = closed ? 0 : -Math.PI / 2;
+    const index = this.colliders.indexOf(this.acuteGateCollider);
+    if (closed && index === -1) this.colliders.push(this.acuteGateCollider);
+    if (!closed && index !== -1) this.colliders.splice(index, 1);
+    this.acuteGatePivot.updateWorldMatrix(true, true);
+    for (const reader of this.acuteGateReaders || []) {
+      reader.userData.label = closed ? '刷卡開啟 2F 急診門禁' : '刷卡關閉 2F 急診門禁';
+    }
+  }
+
+  toggleAcuteGate(playerPosition) {
+    if (this.acuteGateClosed) {
+      this.setAcuteGateClosed(false);
+      return true;
+    }
+    const player = new THREE.Box3(
+      new THREE.Vector3(playerPosition.x - 0.35, 0, playerPosition.z - 0.35),
+      new THREE.Vector3(playerPosition.x + 0.35, 1.9, playerPosition.z + 0.35)
+    );
+    if (player.intersectsBox(this.acuteGateCollider)) return false;
+    this.setAcuteGateClosed(true);
+    return true;
   }
 
   cleanup() {
