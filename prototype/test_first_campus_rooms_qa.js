@@ -7,7 +7,9 @@ import {FirstCampus2FER} from './src/world/zones/FirstCampus2FER.js';
 global.document??={createElement:()=>({getContext:()=>new Proxy({}, {get:()=>()=>({addColorStop(){}})})})};
 let routes=0,samples=0;
 for(const [Zone,approach,count] of [[FirstCampus1F,[[16.5,1.7,0],[18,1.7,0]],3],[FirstCampus2FER,[[-8,1.7,0],[-8,1.7,18],[-6.2,1.7,18]],6]]){
- const scene=new THREE.Scene(),zone=new Zone(scene,new GeometryFactory()).build();scene.updateMatrixWorld(true);
+ const scene=new THREE.Scene(),zone=new Zone(scene,new GeometryFactory()).build();
+ if(zone.setAcuteGateClosed)zone.setAcuteGateClosed(false);
+ scene.updateMatrixWorld(true);
  assert.equal(zone.roomAreas.length,count);
  for(const room of zone.roomAreas){
   const points=[...approach,room.corridor,room.door,room.point];
