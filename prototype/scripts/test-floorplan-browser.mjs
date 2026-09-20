@@ -7,17 +7,16 @@ const out=process.argv[2]||'qa-results/browser';
 const url=process.argv[3]||'http://127.0.0.1:4177/';
 await mkdir(out,{recursive:true});
 const server=process.argv[3]?null:await preview({root:fileURLToPath(new URL('..',import.meta.url)),preview:{host:'127.0.0.1',port:4177,strictPort:true}});
-// Match the repository's previously successful browser profile: full Chrome,
-// CI half-density surface. This changes test rendering resolution, not game state.
 const browser=await chromium.launch({channel:'chrome',headless:true,args:['--no-sandbox','--disable-dev-shm-usage','--enable-unsafe-swiftshader']});
 const surface={viewport:{width:1280,height:720},deviceScaleFactor:process.env.CI?.5:1};
 const page=await browser.newPage(surface);page.setDefaultTimeout(45000);
-const report={url,source:process.env.DUTYNIGHT_SOURCE_SHA||process.env.GITHUB_SHA||'local',surface,method:'One production session. Routes use actual FPSController.moveWithCollision at <=0.04m increments; card readers use real raycast + keyboard E; floor selection uses DOM buttons. No direct task completion, loadZone, teleport, or player-coordinate assignment. Camera aim is automated. Separate screenshot presets are not traversal evidence.',steps:[],zones:[],rooms:[],errors:[],screenshots:[],movementSteps:0};
+const report={url,source:process.env.DUTYNIGHT_SOURCE_SHA||process.env.GITHUB_SHA||'local',surface,method:'One production session. Routes use FPSController.moveWithCollision at <=0.04m increments; card readers use real raycast + keyboard E; floor selection uses DOM buttons. No direct task completion, loadZone, teleport or player-coordinate assignment. Camera aim is automated. Separate screenshot presets are not traversal evidence.',steps:[],zones:[],rooms:[],errors:[],screenshots:[],travelEvidence:[],movementSteps:0};
 page.on('pageerror',e=>report.errors.push(e.message));page.on('console',m=>{if(m.type()==='error')report.errors.push(m.text());});
 const state=()=>page.evaluate(()=>({zone:window.worldRouter.activeZoneId,pos:window.worldRouter.controller.position.toArray(),enabled:window.worldRouter.controller.enabled}));
 async function log(label){const s=await state();report.steps.push({label,...s});if(!report.zones.includes(s.zone))report.zones.push(s.zone);console.log(label,JSON.stringify(s));await writeFile(`${out}/progress.json`,JSON.stringify(report,null,2));}
 async function cameraSettled(){await page.waitForFunction(()=>{const c=window.worldRouter.controller;return Math.hypot(c.camera.position.x-c.position.x,c.camera.position.z-c.position.z)<.02;});}
 async function shot(name,yaw){if(yaw!==undefined)await page.evaluate(yaw=>{const c=window.worldRouter.controller;c.yaw=yaw;c.pitch=-.06;c.updateCameraRotation();},yaw);await page.waitForTimeout(250);await page.screenshot({path:`${out}/${name}.jpg`,quality:85,timeout:90000});report.screenshots.push(name+'.jpg');}
+// The grid plans a route only. The production controller performs each actual step.
 async function go(x,z){
  const n=await page.evaluate(({x,z})=>{
   const r=window.worldRouter,c=r.controller;if(!c.enabled)throw Error('Movement disabled');c.cancelAutoMove();
@@ -51,8 +50,23 @@ async function travel(dest,kind='elevator'){
  const id=current+'_'+(kind==='elevator'?'elevator':'stairs');await use(id);await page.waitForSelector('#elevator-cutscene.active');
  const buttons=await page.locator('[data-floor]').evaluateAll(nodes=>nodes.map(n=>n.dataset.floor));assert.equal(buttons.length,current.startsWith('first')?5:3);assert(!buttons.includes('second_campus_4f_story'));assert(await page.locator(`[data-floor="${current}"]`).isDisabled());
  if(!cancelled){await page.locator('#btn-cancel-travel').click();await page.waitForFunction(()=>window.worldRouter.controller.enabled);assert.equal((await state()).zone,current);await use(id);await page.keyboard.press('Escape');await page.waitForFunction(()=>window.worldRouter.controller.enabled);await use(id);cancelled=true;}
- await page.locator(`[data-floor="${dest}"]`).click();const up=Number(dest.match(/_(\d)f/)[1])>Number(current.match(/_(\d)f/)[1]);assert.equal(await page.locator('.floor-arrow').innerText(),up?'▲':'▼');assert.equal((await state()).zone,current,'Direction must display BEFORE arrival');await shot(`travel-${current}-${dest}-${kind}`);
- await page.waitForFunction(dest=>window.worldRouter.activeZoneId===dest&&window.worldRouter.controller.enabled,dest);await log(`${kind} ${current} -> ${dest}`);
+ // Read-only event-time observation AFTER the real button handler, BEFORE its timer.
+ // Independent protocol requests can exceed the 1.7s ride on software WebGL.
+ await page.evaluate(dest=>{
+  window.__travelStartEvidence=null;
+  document.querySelector(`[data-floor="${dest}"]`).addEventListener('click',()=>{
+   window.__travelStartEvidence={zone:window.worldRouter.activeZoneId,enabled:window.worldRouter.controller.enabled,
+    arrow:document.querySelector('.floor-arrow').textContent,status:document.getElementById('elevator-status-text').textContent,
+    travelling:document.getElementById('elevator-cutscene').dataset.travelling};
+  },{once:true});
+ },dest);
+ await page.locator(`[data-floor="${dest}"]`).click();
+ const up=Number(dest.match(/_(\d)f/)[1])>Number(current.match(/_(\d)f/)[1]);
+ const proof=await page.evaluate(()=>window.__travelStartEvidence);
+ assert.equal(proof.arrow,up?'▲':'▼');assert.equal(proof.zone,current,'Direction must display BEFORE arrival');
+ assert.equal(proof.enabled,false);assert.equal(proof.travelling,'true');report.travelEvidence.push({from:current,to:dest,kind,...proof});
+ await page.waitForFunction(dest=>window.worldRouter.activeZoneId===dest&&window.worldRouter.controller.enabled,dest);
+ await shot(`arrival-${current}-${dest}-${kind}`);await log(`${kind} ${current} -> ${dest}`);
 }
 async function roomTour(){const rooms=await page.evaluate(()=>window.worldRouter.activeZoneInstance.roomAreas||[]);for(const room of rooms){await go(room.corridor[0],room.corridor[2]);await go(room.point[0],room.point[2]);await log('room '+room.id);report.rooms.push(room.id);await go(room.corridor[0],room.corridor[2]);}}
 try{

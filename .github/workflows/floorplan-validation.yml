@@ -26,6 +26,7 @@ jobs:
         working-directory: prototype
         run: node scripts/run-floorplan-regressions.mjs
       - name: Build exact source
+        id: build
         working-directory: prototype
         run: |
           node scripts/write-build-info.mjs
@@ -37,6 +38,7 @@ jobs:
         working-directory: prototype
         run: node scripts/test-floorplan-browser.mjs
       - name: Capture fixed viewpoints
+        if: always() && steps.build.outcome == 'success'
         working-directory: prototype
         run: node scripts/capture-floorplan.mjs
       - name: Record source
