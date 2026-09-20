@@ -7,19 +7,17 @@ const out=process.argv[2]||'qa-results/browser';
 const url=process.argv[3]||'http://127.0.0.1:4177/';
 await mkdir(out,{recursive:true});
 const server=process.argv[3]?null:await preview({root:fileURLToPath(new URL('..',import.meta.url)),preview:{host:'127.0.0.1',port:4177,strictPort:true}});
-const browser=await chromium.launch({...(process.env.CHROME_PATH?{executablePath:process.env.CHROME_PATH}:{}),headless:true,args:['--no-sandbox','--disable-dev-shm-usage','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
-const page=await browser.newPage({viewport:{width:1280,height:720},deviceScaleFactor:1});
-page.setDefaultTimeout(45000);
-const report={url,source:process.env.DUTYNIGHT_SOURCE_SHA||process.env.GITHUB_SHA||'local',method:'One production session. Routes use actual FPSController.moveWithCollision at <=0.04m increments; card readers use real raycast + keyboard E; floor selection uses DOM buttons. No direct task completion, loadZone, teleport, or player-coordinate assignment in this browser test. Camera aim is automated. Separate screenshot presets are not traversal evidence.',steps:[],zones:[],rooms:[],errors:[],screenshots:[],movementSteps:0};
-page.on('pageerror',e=>report.errors.push(e.message));
-page.on('console',m=>{if(m.type()==='error')report.errors.push(m.text());});
+// Match the repository's previously successful browser profile: full Chrome,
+// CI half-density surface. This changes test rendering resolution, not game state.
+const browser=await chromium.launch({channel:'chrome',headless:true,args:['--no-sandbox','--disable-dev-shm-usage','--enable-unsafe-swiftshader']});
+const surface={viewport:{width:1280,height:720},deviceScaleFactor:process.env.CI?.5:1};
+const page=await browser.newPage(surface);page.setDefaultTimeout(45000);
+const report={url,source:process.env.DUTYNIGHT_SOURCE_SHA||process.env.GITHUB_SHA||'local',surface,method:'One production session. Routes use actual FPSController.moveWithCollision at <=0.04m increments; card readers use real raycast + keyboard E; floor selection uses DOM buttons. No direct task completion, loadZone, teleport, or player-coordinate assignment. Camera aim is automated. Separate screenshot presets are not traversal evidence.',steps:[],zones:[],rooms:[],errors:[],screenshots:[],movementSteps:0};
+page.on('pageerror',e=>report.errors.push(e.message));page.on('console',m=>{if(m.type()==='error')report.errors.push(m.text());});
 const state=()=>page.evaluate(()=>({zone:window.worldRouter.activeZoneId,pos:window.worldRouter.controller.position.toArray(),enabled:window.worldRouter.controller.enabled}));
 async function log(label){const s=await state();report.steps.push({label,...s});if(!report.zones.includes(s.zone))report.zones.push(s.zone);console.log(label,JSON.stringify(s));await writeFile(`${out}/progress.json`,JSON.stringify(report,null,2));}
-// Controller movement is updated by the game loop before aiming. Waiting for that
-// actual camera update avoids calculating a ray from the preceding frame's position.
 async function cameraSettled(){await page.waitForFunction(()=>{const c=window.worldRouter.controller;return Math.hypot(c.camera.position.x-c.position.x,c.camera.position.z-c.position.z)<.02;});}
-async function shot(name,yaw){if(yaw!==undefined)await page.evaluate(yaw=>{const c=window.worldRouter.controller;c.yaw=yaw;c.pitch=-.06;c.updateCameraRotation();},yaw);await page.waitForTimeout(250);await page.screenshot({path:`${out}/${name}.jpg`,quality:85});report.screenshots.push(name+'.jpg');}
-// Grid search only plans routes; every actual step still goes through gameplay collision and ground support.
+async function shot(name,yaw){if(yaw!==undefined)await page.evaluate(yaw=>{const c=window.worldRouter.controller;c.yaw=yaw;c.pitch=-.06;c.updateCameraRotation();},yaw);await page.waitForTimeout(250);await page.screenshot({path:`${out}/${name}.jpg`,quality:85,timeout:90000});report.screenshots.push(name+'.jpg');}
 async function go(x,z){
  const n=await page.evaluate(({x,z})=>{
   const r=window.worldRouter,c=r.controller;if(!c.enabled)throw Error('Movement disabled');c.cancelAutoMove();
@@ -41,13 +39,9 @@ async function go(x,z){
  },{x,z});report.movementSteps+=n;await cameraSettled();
 }
 async function straight(x,z,expected){const from=(await state()).zone;const n=await page.evaluate(({x,z,expected})=>{const r=window.worldRouter,c=r.controller,origin=r.activeZoneId;let n=0;c.cancelAutoMove();for(let i=0;i<5000;i++){if(r.activeZoneId!==origin){if(r.activeZoneId!==expected)throw Error('Wrong portal destination');return n;}const dx=x-c.position.x,dz=z-c.position.z,d=Math.hypot(dx,dz);if(d<.02){r.update();return n;}const before=c.position.clone();c.moveWithCollision(dx/d*Math.min(.04,d),dz/d*Math.min(.04,d));n++;r.update();if(r.activeZoneId===origin&&c.position.distanceTo(before)<.001)throw Error(`Unsupported/blocked route ${origin} ${c.position.toArray()} -> ${x},${z}`);}throw Error('Movement exhausted');},{x,z,expected});report.movementSteps+=n;await cameraSettled();if(expected)assert.equal((await state()).zone,expected,from+' portal');}
-async function use(id){
- console.log('USE',id);await cameraSettled();
- await page.evaluate(id=>{const r=window.worldRouter,c=r.controller,o=r.activeZoneInstance.interactables.find(o=>o.userData.id===id);if(!o)throw Error('Missing interactable '+id);const p=o.getWorldPosition(c.position.clone()),d=p.sub(c.camera.position);c.yaw=Math.atan2(-d.x,-d.z);c.pitch=Math.atan2(d.y,Math.hypot(d.x,d.z));c.updateCameraRotation();},id);
- try{await page.waitForFunction(id=>window.worldRouter.controller.currentInteractable?.id===id,id,{timeout:20000});}
- catch(e){console.error('RAY_DIAGNOSTIC',await page.evaluate(id=>{const r=window.worldRouter,c=r.controller,o=r.activeZoneInstance.interactables.find(o=>o.userData.id===id);return {id,position:c.position.toArray(),camera:c.camera.position.toArray(),target:o?.getWorldPosition(c.position.clone()).toArray(),current:c.currentInteractable?.id,yaw:c.yaw,pitch:c.pitch};},id));throw e;}
- await page.keyboard.press('KeyE');await page.waitForTimeout(180);
-}
+async function use(id){console.log('USE',id);await cameraSettled();await page.evaluate(id=>{const r=window.worldRouter,c=r.controller,o=r.activeZoneInstance.interactables.find(o=>o.userData.id===id);if(!o)throw Error('Missing interactable '+id);const p=o.getWorldPosition(c.position.clone()),d=p.sub(c.camera.position);c.yaw=Math.atan2(-d.x,-d.z);c.pitch=Math.atan2(d.y,Math.hypot(d.x,d.z));c.updateCameraRotation();},id);
+ try{await page.waitForFunction(id=>window.worldRouter.controller.currentInteractable?.id===id,id,{timeout:20000});}catch(e){console.error('RAY_DIAGNOSTIC',await page.evaluate(id=>{const r=window.worldRouter,c=r.controller,o=r.activeZoneInstance.interactables.find(o=>o.userData.id===id);return {id,position:c.position.toArray(),camera:c.camera.position.toArray(),target:o?.getWorldPosition(c.position.clone()).toArray(),current:c.currentInteractable?.id,yaw:c.yaw,pitch:c.pitch};},id));throw e;}
+ await page.keyboard.press('KeyE');await page.waitForTimeout(180);}
 async function card(id,closed=false){const d=await page.evaluate(id=>{const r=window.worldRouter,c=r.controller,d=r.activeZoneInstance.accessDoors[id];if(!d)throw Error('Door missing '+id);return {closed:d.closed,reader:d.readers.map(o=>({id:o.userData.id,distance:o.getWorldPosition(c.position.clone()).distanceTo(c.position)})).sort((a,b)=>a.distance-b.distance)[0].id};},id);if(d.closed!==closed)await use(d.reader);assert.equal(await page.evaluate(id=>window.worldRouter.activeZoneInstance.accessDoors[id].closed,id),closed);}
 async function portal(id,dest){const rid=await page.evaluate(id=>{const r=window.worldRouter,c=r.controller,d=r.activeZoneInstance.accessDoors[id];if(!d?.closed)throw Error('Portal should be opaque and closed');return d.readers.map(o=>({id:o.userData.id,d:o.getWorldPosition(c.position.clone()).distanceTo(c.position)})).sort((a,b)=>a.d-b.d)[0].id;},id);await use(rid);await page.waitForFunction(dest=>window.worldRouter.activeZoneId===dest&&window.worldRouter.controller.enabled,dest);await log(`card portal ${id} -> ${dest}`);}
 let cancelled=false;
@@ -57,10 +51,7 @@ async function travel(dest,kind='elevator'){
  const id=current+'_'+(kind==='elevator'?'elevator':'stairs');await use(id);await page.waitForSelector('#elevator-cutscene.active');
  const buttons=await page.locator('[data-floor]').evaluateAll(nodes=>nodes.map(n=>n.dataset.floor));assert.equal(buttons.length,current.startsWith('first')?5:3);assert(!buttons.includes('second_campus_4f_story'));assert(await page.locator(`[data-floor="${current}"]`).isDisabled());
  if(!cancelled){await page.locator('#btn-cancel-travel').click();await page.waitForFunction(()=>window.worldRouter.controller.enabled);assert.equal((await state()).zone,current);await use(id);await page.keyboard.press('Escape');await page.waitForFunction(()=>window.worldRouter.controller.enabled);await use(id);cancelled=true;}
- await page.locator(`[data-floor="${dest}"]`).click();
- const up=Number(dest.match(/_(\d)f/)[1])>Number(current.match(/_(\d)f/)[1]);
- assert.equal(await page.locator('.floor-arrow').innerText(),up?'▲':'▼');assert.equal((await state()).zone,current,'Direction must display BEFORE arrival');
- await shot(`travel-${current}-${dest}-${kind}`);
+ await page.locator(`[data-floor="${dest}"]`).click();const up=Number(dest.match(/_(\d)f/)[1])>Number(current.match(/_(\d)f/)[1]);assert.equal(await page.locator('.floor-arrow').innerText(),up?'▲':'▼');assert.equal((await state()).zone,current,'Direction must display BEFORE arrival');await shot(`travel-${current}-${dest}-${kind}`);
  await page.waitForFunction(dest=>window.worldRouter.activeZoneId===dest&&window.worldRouter.controller.enabled,dest);await log(`${kind} ${current} -> ${dest}`);
 }
 async function roomTour(){const rooms=await page.evaluate(()=>window.worldRouter.activeZoneInstance.roomAreas||[]);for(const room of rooms){await go(room.corridor[0],room.corridor[2]);await go(room.point[0],room.point[2]);await log('room '+room.id);report.rooms.push(room.id);await go(room.corridor[0],room.corridor[2]);}}
@@ -78,7 +69,6 @@ try{
  for(const [x,z] of [[65,-20],[55,-22],[42,-25],[46,-30]])await straight(x,z);await straight(49.6,-34.5,'ecology_pond');await log('Pond reached');
  for(const [x,z] of [[53,-41.5],[56,-41.5],[62,-42],[62,-46],[62,-47.7],[62,-50.8],[62,-51.8]])await straight(x,z);await shot('pond-waterfront',0);assert((await state()).pos[2]<-51.5);await log('Close waterfront deck reached with ground support');
  for(const [x,z] of [[62,-50.8],[62,-47.7],[62,-46],[62,-42],[56,-41.5],[53,-41.5]])await straight(x,z);await straight(53,-35.85,'hillside_route');for(const [x,z] of [[46,-30],[42,-25],[55,-22],[65,-20]])await straight(x,z);await straight(71.3,-18.2,'second_campus_1f');await straight(72,-10);await go(72,-3);await travel('second_campus_2f','stairs');await go(61.6,0);await portal('BRIDGE_ACCESS','skybridge');await straight(1.6,0);await portal('BRIDGE_FIRST','first_campus_8f');await travel('first_campus_3f');await log('Full circuit returned to 3F');
- const key=await page.evaluate(()=>window.worldRouter.activeZoneInstance.keyMesh.userData.interactable);assert.equal(key,false,'Key remains collected');
- assert.equal(report.zones.length,11);assert(report.rooms.includes('402'));assert.equal(report.errors.length,0,JSON.stringify(report.errors));report.verdict='PASS';
+ const key=await page.evaluate(()=>window.worldRouter.activeZoneInstance.keyMesh.userData.interactable);assert.equal(key,false,'Key remains collected');assert.equal(report.zones.length,11);assert(report.rooms.includes('402'));assert.equal(report.errors.length,0,JSON.stringify(report.errors));report.verdict='PASS';
 }catch(e){report.verdict='FAIL';report.failure=e.stack;report.last=await state().catch(()=>null);await page.screenshot({path:`${out}/failure.jpg`,timeout:15000}).catch(()=>{});process.exitCode=1;console.error(e.stack);
 }finally{await writeFile(`${out}/result.json`,JSON.stringify(report,null,2));await browser.close();if(server)await new Promise(r=>server.httpServer.close(r));}

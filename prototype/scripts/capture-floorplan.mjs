@@ -1,8 +1,10 @@
 import {chromium} from 'playwright';import {preview} from 'vite';import fs from 'node:fs/promises';import {fileURLToPath} from 'node:url';
 const output=process.argv[2]||'qa-results/screens';await fs.mkdir(output,{recursive:true});
 const server=await preview({root:fileURLToPath(new URL('..',import.meta.url)),preview:{host:'127.0.0.1',port:4175,strictPort:true}});
-const browser=await chromium.launch({...(process.env.CHROME_PATH?{executablePath:process.env.CHROME_PATH}:{}),headless:true,args:['--no-sandbox','--disable-dev-shm-usage','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
-try{const p=await browser.newPage({viewport:{width:1280,height:720},deviceScaleFactor:1});p.on('pageerror',e=>console.error('BROWSER_ERROR',e));
+const browser=await chromium.launch({channel:'chrome',headless:true,args:['--no-sandbox','--disable-dev-shm-usage','--enable-unsafe-swiftshader']});
+const surface={viewport:{width:1280,height:720},deviceScaleFactor:process.env.CI?.5:1};
+const captures=[],errors=[];
+try{const p=await browser.newPage(surface);p.setDefaultTimeout(90000);p.on('pageerror',e=>errors.push(e.message));
 const views=[
  ['3f-workstations','first_campus_3f',8,1.7,5.1,-Math.PI/2,0],
  ['4f-lobby','first_campus_4f',0,1.7,7.5,0,0],
@@ -16,5 +18,6 @@ const views=[
  ['second2-bridge-gate','second_campus_2f',63,1.7,0,Math.PI/2,0],
  ['second-core','second_campus_2f',72,1.7,8.5,Math.PI,0]
  ];
-for(const [name,zone,x,y,z,yaw,pitch] of views){await p.goto(`http://127.0.0.1:4175/?zone=${zone}&x=${x}&y=${y}&z=${z}&yaw=${yaw}&pitch=${pitch}`,{waitUntil:'load',timeout:120000});await p.waitForFunction(()=>window.worldRouter?.activeZoneInstance,null,{timeout:120000});await p.waitForTimeout(400);await p.screenshot({path:`${output}/${name}.png`});console.log('CAPTURE',name);}
-}finally{await browser.close();await new Promise(res=>server.httpServer.close(res));}
+for(const [name,zone,x,y,z,yaw,pitch] of views){await p.goto(`http://127.0.0.1:4175/?zone=${zone}&x=${x}&y=${y}&z=${z}&yaw=${yaw}&pitch=${pitch}`,{waitUntil:'load',timeout:120000});await p.waitForFunction(()=>window.worldRouter?.activeZoneInstance,null,{timeout:120000});await p.waitForTimeout(400);await p.screenshot({path:`${output}/${name}.png`,timeout:90000});captures.push({name,zone});console.log('CAPTURE',name);}
+if(errors.length)throw Error(JSON.stringify(errors));
+}finally{await fs.writeFile(`${output}/manifest.json`,JSON.stringify({surface,captures,errors,method:'Fixed URL viewpoints; not traversal proof'},null,2));await browser.close();await new Promise(res=>server.httpServer.close(res));}
