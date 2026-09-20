@@ -30,21 +30,49 @@ export class FirstCampus1F {
     this.gf.buildFloor(this.zoneGroup, this.walkables, 2, 0, 0, 32, 16, this.gf.materials.floorTile);
     this.gf.buildCeiling(this.zoneGroup, 2, lobbyHeight, 0, 32, 16);
 
-    // Outer perimeter walls
-    // Outer perimeter walls
-    this.gf.buildWall(this.zoneGroup, this.colliders, 18, lobbyHeight / 2, 0, 0.4, lobbyHeight, 16); // East perimeter wall
+    // Outer perimeter walls. The east wall is segmented so the closed glass-fronted
+    // pharmacy/drug-storage and outpatient areas read as real locked rooms rather than
+    // decorative panels placed on a solid wall.
+    this.gf.buildWall(this.zoneGroup, this.colliders, 18, lobbyHeight / 2, -6.8, 0.4, lobbyHeight, 2.4);
+    this.gf.buildWall(this.zoneGroup, this.colliders, 18, lobbyHeight / 2, 0.0, 0.4, lobbyHeight, 4.8);
+    this.gf.buildWall(this.zoneGroup, this.colliders, 18, lobbyHeight / 2, 6.8, 0.4, lobbyHeight, 2.4);
     this.gf.buildWall(this.zoneGroup, this.colliders, 2, lobbyHeight / 2, 8, 32, lobbyHeight, 0.4);  // North wall
 
-    // Shuttered Outpatient and Pharmacy facades on East wall (x = 18.0)
-    // 1. Pharmacy facade (z = -4.0)
-    const pharmShutter = new THREE.Mesh(new THREE.BoxGeometry(0.08, 2.6, 3.2), this.gf.materials.metal);
-    pharmShutter.position.set(17.85, 1.3, -4.0);
-    this.zoneGroup.add(pharmShutter);
+    const buildClosedGlassBay = (z, title) => {
+      const glass = new THREE.Mesh(new THREE.BoxGeometry(0.08, 2.6, 3.2), this.gf.materials.glass);
+      glass.position.set(17.85, 1.3, z);
+      this.zoneGroup.add(glass);
+      CollisionFactory.addBox(this.colliders, 17.88, 1.3, z, 0.16, 2.6, 3.2);
+
+      // Stainless perimeter and center mullion make the locked glass door legible.
+      for (const zOff of [-1.56, 0, 1.56]) {
+        const mullion = new THREE.Mesh(new THREE.BoxGeometry(0.12, 2.7, 0.07), this.gf.materials.stainless);
+        mullion.position.set(17.80, 1.35, z + zOff);
+        this.zoneGroup.add(mullion);
+      }
+      for (const y of [0.08, 2.62]) {
+        const rail = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.08, 3.2), this.gf.materials.stainless);
+        rail.position.set(17.80, y, z);
+        this.zoneGroup.add(rail);
+      }
+
+      // A shallow sealed room behind the glass prevents exterior/void views while
+      // remaining non-walkable during night duty.
+      this.gf.buildFloor(this.zoneGroup, null, 19.0, 0.02, z, 2.0, 3.2, this.gf.materials.floorTile);
+      this.gf.buildCeiling(this.zoneGroup, 19.0, lobbyHeight, z, 2.0, 3.2);
+      this.gf.buildWall(this.zoneGroup, this.colliders, 20.0, lobbyHeight / 2, z, 0.4, lobbyHeight, 3.2);
+      this.gf.buildWall(this.zoneGroup, this.colliders, 19.0, lobbyHeight / 2, z - 1.6, 2.0, lobbyHeight, 0.2);
+      this.gf.buildWall(this.zoneGroup, this.colliders, 19.0, lobbyHeight / 2, z + 1.6, 2.0, lobbyHeight, 0.2);
+      return glass;
+    };
+
+    // 1. Pharmacy / drug-storage facade (z = -4.0), closed behind glass at night.
+    const pharmShutter = buildClosedGlassBay(-4.0, '門診藥局／藥庫');
     pharmShutter.userData = {
       interactable: true,
       id: '1F_PHARM_GATE',
       type: 'exit_door',
-      label: '檢視已打烊的門診藥局'
+      label: '檢視夜間鎖閉的門診藥局／藥庫'
     };
     this.interactables.push(pharmShutter);
 
@@ -55,15 +83,13 @@ export class FirstCampus1F {
       z: -4.0,
       rotationY: -Math.PI / 2,
       code: 'PHARM',
-      title: '【夜間未開放】門診藥局',
-      subtitle: 'PHARMACY CLOSED AT NIGHT',
+      title: '【夜間未開放】門診藥局／藥庫',
+      subtitle: 'PHARMACY / DRUG STORAGE CLOSED AT NIGHT',
       header: '松德醫療中心 ｜ 藥劑科'
     });
 
-    // 2. Outpatient clinic facade (z = 4.0)
-    const opdShutter = new THREE.Mesh(new THREE.BoxGeometry(0.08, 2.6, 3.2), this.gf.materials.metal);
-    opdShutter.position.set(17.85, 1.3, 4.0);
-    this.zoneGroup.add(opdShutter);
+    // 2. Outpatient clinic facade (z = 4.0), also a visibly locked glass frontage.
+    const opdShutter = buildClosedGlassBay(4.0, '門診診間區');
     opdShutter.userData = {
       interactable: true,
       id: '1F_OPD_GATE',
@@ -113,7 +139,7 @@ export class FirstCampus1F {
     this.gf.buildWall(this.zoneGroup, this.colliders, 10.5, lobbyHeight / 2, -8, 15, lobbyHeight, 0.4);
 
     // Main entrance doorway (x: -1 to 3, width 4m, height 3m, lintel: 3.0 to 4.0m)
-    Doorway.build({
+    const mainEntranceDoorway = Doorway.build({
       scene: this.zoneGroup,
       colliders: this.colliders,
       x: 1.0,
@@ -127,6 +153,12 @@ export class FirstCampus1F {
       isOpen: true,
       doorMaterial: this.gf.materials.glass
     });
+    // Hide Doorway's generic propped-open leaf; the real night state is represented
+    // by the two closed glass leaves below.
+    for (const child of mainEntranceDoorway.children) {
+      const p = child.geometry?.parameters;
+      if (p?.width === 0.05 && p?.height === 2.95) child.visible = false;
+    }
 
     // Left and right glass leaves (visual representation)
     const glassDoorL = new THREE.Mesh(new THREE.BoxGeometry(1.95, 2.8, 0.08), this.gf.materials.glass);
