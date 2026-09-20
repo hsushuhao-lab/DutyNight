@@ -68,6 +68,7 @@ export class SecondCampusStandardFloor {
     const nsDoor = new THREE.Mesh(new THREE.BoxGeometry(0.95, 2.18, 0.08), this.gf.materials.doorWood);
     nsDoor.position.set(73.85, 1.09, 3.0);
     this.zoneGroup.add(nsDoor);
+    CollisionFactory.addBox(this.colliders, 73.85, 1.09, 3.0, 0.95, 2.18, 0.10);
     const nsDoorGlass = new THREE.Mesh(new THREE.PlaneGeometry(0.35, 0.65), this.gf.materials.glass);
     nsDoorGlass.position.set(73.85, 1.45, 2.95);
     this.zoneGroup.add(nsDoorGlass);
