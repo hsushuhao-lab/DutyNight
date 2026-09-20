@@ -1,0 +1,35 @@
+name: Floorplan validation
+on:
+  push:
+    branches: [fix/floorplan-access-20260920]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: floorplan-validation
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: prototype/package-lock.json
+      - name: Install locked dependencies
+        working-directory: prototype
+        run: npm ci
+      - name: Build
+        working-directory: prototype
+        run: npm run build
+      - name: Package development workspace for independent testing
+        run: |
+          git rev-parse HEAD > SOURCE_COMMIT.txt
+          tar --exclude='prototype/dist' --exclude='prototype/test-results' -czf /tmp/dutynight-workspace.tgz prototype SOURCE_COMMIT.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: floorplan-workspace
+          path: /tmp/dutynight-workspace.tgz
+          retention-days: 3
