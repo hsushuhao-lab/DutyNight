@@ -1,0 +1,20 @@
+import {chromium} from 'playwright';import {preview} from 'vite';import fs from 'node:fs/promises';import {fileURLToPath} from 'node:url';
+const output=process.argv[2]||'qa-results/screens';await fs.mkdir(output,{recursive:true});
+const server=await preview({root:fileURLToPath(new URL('..',import.meta.url)),preview:{host:'127.0.0.1',port:4175,strictPort:true}});
+const browser=await chromium.launch({...(process.env.CHROME_PATH?{executablePath:process.env.CHROME_PATH}:{}),headless:true,args:['--no-sandbox','--disable-dev-shm-usage','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+try{const p=await browser.newPage({viewport:{width:1280,height:720},deviceScaleFactor:1});p.on('pageerror',e=>console.error('BROWSER_ERROR',e));
+const views=[
+ ['3f-workstations','first_campus_3f',8,1.7,5.1,-Math.PI/2,0],
+ ['4f-lobby','first_campus_4f',0,1.7,7.5,0,0],
+ ['4f-duty','first_campus_4f',-9.5,1.7,6,Math.PI/2,-.1],
+ ['4f-station','first_campus_4f',2.4,1.7,-3,-Math.PI/2,0],
+ ['second5-station','second_campus_5f',71,1.7,-9,Math.PI,0],
+ ['second5-hall','second_campus_5f',76.5,1.7,-7,0,0],
+ ['2f-beds-gate','first_campus_2f',14.5,1.7,1.7,Math.PI,0],
+ ['2f-hillside-gate','first_campus_2f',24,1.7,0,Math.PI/2,0],
+ ['8f-bridge-gate','first_campus_8f',-2.8,1.7,0,-Math.PI/2,0],
+ ['second2-bridge-gate','second_campus_2f',63,1.7,0,Math.PI/2,0],
+ ['second-core','second_campus_2f',72,1.7,8.5,Math.PI,0]
+ ];
+for(const [name,zone,x,y,z,yaw,pitch] of views){await p.goto(`http://127.0.0.1:4175/?zone=${zone}&x=${x}&y=${y}&z=${z}&yaw=${yaw}&pitch=${pitch}`,{waitUntil:'load',timeout:120000});await p.waitForFunction(()=>window.worldRouter?.activeZoneInstance,null,{timeout:120000});await p.waitForTimeout(400);await p.screenshot({path:`${output}/${name}.png`});console.log('CAPTURE',name);}
+}finally{await browser.close();await new Promise(res=>server.httpServer.close(res));}
