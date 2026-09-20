@@ -7,6 +7,9 @@ for(const f of FIRST_FLOORS)add(`first_${f}f_lift`,`first_campus_${f}f`,[f===1?-
 add('second_1f_lift','second_campus_1f',[74,1.7,.2],0,'第二院區 1F 電梯');
 add('second_2f_lift','second_campus_2f',[78,1.7,-1.8],Math.PI/2,'第二院區 2F 電梯');
 add('second_5f_lift','second_campus_5f',[77.5,1.7,-1.3],Math.PI,'第二院區 5F 電梯');
+// Story-only 4F exists for scripted scenes but is deliberately absent from
+// SECOND_FLOORS, LIFT_PANELS and STAIR_DOORS, so players never see a 4F button.
+add('second_4f_story','second_campus_4f_story',[77.5,1.7,-1.3],Math.PI,'第二院區 4F 劇情專用場景');
 add('first_bridge_return','first_campus_8f',[-1.6,1.7,0],Math.PI/2,'返回第一院區 8F');
 add('bridge_from_first','skybridge',[1.6,1.7,0],-Math.PI/2,'天橋第一院區端');
 add('bridge_from_second','skybridge',[58.4,1.7,0],Math.PI/2,'天橋第二院區端');
