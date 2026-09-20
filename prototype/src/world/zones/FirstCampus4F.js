@@ -247,6 +247,7 @@ export class FirstCampus4F {
     const nsDoor = new THREE.Mesh(new THREE.BoxGeometry(0.06, 2.14, 0.88), this.gf.materials.doorWood);
     nsDoor.position.set(5.2, 1.07, 2.5);
     this.zoneGroup.add(nsDoor);
+    CollisionFactory.addBox(this.colliders, 5.2, 1.07, 2.5, 0.08, 2.14, 0.88);
     // Door vision safety panel
     const doorGlass = new THREE.Mesh(new THREE.PlaneGeometry(0.35, 0.65), this.gf.materials.glass);
     doorGlass.position.set(5.2, 1.45, 2.502);
