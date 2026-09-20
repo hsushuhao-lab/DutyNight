@@ -1,66 +1,77 @@
 name: Deploy GitHub Pages
-
 on:
   push:
-    branches:
-      - master
+    branches: [master]
   workflow_dispatch:
-
 permissions:
   contents: read
   pages: write
   id-token: write
-
 concurrency:
-  group: "pages"
+  group: pages
   cancel-in-progress: true
-
 jobs:
   build-and-deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
+    timeout-minutes: 35
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: 22
           cache: npm
           cache-dependency-path: prototype/package-lock.json
-
-      - name: Install dependencies
+      - name: Install locked dependencies
         working-directory: prototype
         run: npm ci
-
-      - name: Hospital access and traversal QA
+      - name: All Node regression suites
+        working-directory: prototype
+        run: node scripts/run-floorplan-regressions.mjs
+      - name: Build and embed exact release SHA
         working-directory: prototype
         run: |
-          node test_hospital_access_policy_qa.js
-          node test_acute_gate_qa.js
-          node test_ward_gate_qa.js
-          node test_first_campus_rooms_qa.js
-          node test_first_upper_rooms_qa.js
-          node test_world_traversal_qa.js
-          node test_playable_world_qa.js
-
-      - name: Build prototype
+          node scripts/write-build-info.mjs
+          npm run build
+      - name: Install browser dependencies
         working-directory: prototype
-        run: npm run build
-
+        run: npx playwright install --with-deps chromium
+      - name: Validate production build through continuous browser walkthrough
+        working-directory: prototype
+        run: node scripts/test-floorplan-browser.mjs qa-results/pre-release
+      - name: Capture reviewed floorplan viewpoints
+        working-directory: prototype
+        run: node scripts/capture-floorplan.mjs qa-results/screens
       - name: Setup Pages
         uses: actions/configure-pages@v5
         with:
           enablement: true
-
-      - name: Upload artifact
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: prototype/dist
-
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+      - name: Verify public build fingerprint and module
+        working-directory: prototype
+        run: node scripts/verify-live-build.mjs '${{ steps.deployment.outputs.page_url }}'
+      - name: Test the publicly deployed game
+        working-directory: prototype
+        run: node scripts/test-floorplan-browser.mjs qa-results/live '${{ steps.deployment.outputs.page_url }}'
+      - name: Record source and release evidence
+        if: always()
+        run: git rev-parse HEAD > SOURCE_COMMIT.txt
+      - name: Upload release QA evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-evidence
+          path: |
+            SOURCE_COMMIT.txt
+            prototype/qa-results/
+          retention-days: 30
