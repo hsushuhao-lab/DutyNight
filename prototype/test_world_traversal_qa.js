@@ -62,6 +62,10 @@ function buildZone(zoneId) {
   if (!ZoneClass) throw new Error(`Unknown zone ${zoneId}`);
   const instance = new ZoneClass(scene, gf);
   instance.build();
+  // Traversal QA represents an authorized staff route after card access. Dedicated
+  // gate tests separately verify that 2F/4F start closed and block passage.
+  if (zoneId === 'first_campus_2f' && instance.setAcuteGateClosed) instance.setAcuteGateClosed(false);
+  if (zoneId === 'first_campus_4f' && instance.setWardGateClosed) instance.setWardGateClosed(false);
   return { scene, instance, colliders: instance.colliders };
 }
 
