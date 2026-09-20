@@ -36,7 +36,9 @@ export class FirstCampus1F {
     this.gf.buildWall(this.zoneGroup, this.colliders, 18, lobbyHeight / 2, -6.8, 0.4, lobbyHeight, 2.4);
     this.gf.buildWall(this.zoneGroup, this.colliders, 18, lobbyHeight / 2, 0.0, 0.4, lobbyHeight, 4.8);
     this.gf.buildWall(this.zoneGroup, this.colliders, 18, lobbyHeight / 2, 6.8, 0.4, lobbyHeight, 2.4);
-    this.gf.buildWall(this.zoneGroup, this.colliders, 2, lobbyHeight / 2, 8, 32, lobbyHeight, 0.4);  // North wall
+    this.gf.buildWall(this.zoneGroup,this.colliders,-11.8,lobbyHeight/2,8,4.4,lobbyHeight,.4);
+    this.gf.buildWall(this.zoneGroup,this.colliders,5.8,lobbyHeight/2,8,24.4,lobbyHeight,.4);
+    this.gf.buildWall(this.zoneGroup,this.colliders,-8,3.6,8,3.2,.8,.4);  // North wall
 
     const buildClosedGlassBay = (z, title) => {
       const glass = new THREE.Mesh(new THREE.BoxGeometry(0.08, 2.6, 3.2), this.gf.materials.glass);
@@ -113,14 +115,6 @@ export class FirstCampus1F {
 
     // West wall with elevator / stairs core
     this.gf.buildWall(this.zoneGroup, this.colliders, -14, lobbyHeight / 2, 0, 0.4, lobbyHeight, 16);
-
-    // Standardized Elevator doors at west wall (x = -13.6, z = 0)
-    const elFrame = new THREE.Mesh(new THREE.BoxGeometry(0.2, 2.6, 2.6), this.gf.materials.metal);
-    elFrame.position.set(-13.6, 1.3, 0);
-    this.zoneGroup.add(elFrame);
-    const elDoors = new THREE.Mesh(new THREE.BoxGeometry(0.08, 2.4, 2.2), this.gf.materials.stainless);
-    elDoors.position.set(-13.5, 1.2, 0);
-    this.zoneGroup.add(elDoors);
 
     SignAnchor.buildHangingSign({
       scene: this.zoneGroup,

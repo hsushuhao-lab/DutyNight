@@ -32,7 +32,7 @@ export const DEBUG_SPAWN_POINTS = {
   'm1_4f_lobby': {
     zoneId: 'first_campus_4f',
     name: '4F 電梯大廳抵達',
-    pos: [-8.0, 1.7, 0.0],
+    pos: [0, 1.7, 7.5],
     yaw: -Math.PI / 2, // Facing East toward corridor
     pitch: 0.0,
     milestone: 'M1'
@@ -40,23 +40,23 @@ export const DEBUG_SPAWN_POINTS = {
   'm2_4f_duty_room': {
     zoneId: 'first_campus_4f',
     name: '4F 獨立值班室套房',
-    pos: [5.4, 1.7, -3.4],
+    pos: [-9.5, 1.7, 6],
     yaw: 0.0, // Looking South into the private duty room suite
     pitch: -0.05,
     milestone: 'M2'
   },
   'm3_4f_nursing_station': {
     zoneId: 'first_campus_4f',
-    name: '4A 護理站工作區',
-    pos: [8.0, 1.7, 5.8],
+    name: '4F 護理站前',
+    pos: [3.5, 1.7, -3],
     yaw: 0.0, // Facing corridor from behind counter
     pitch: 0.0,
     milestone: 'M3'
   },
   'm3_4f_ward_gate': {
     zoneId: 'first_campus_4f',
-    name: '4A 閉鎖病房門禁門前',
-    pos: [12.5, 1.7, 0.0],
+    name: '4F 病房門前',
+    pos: [0, 1.7, 1.2],
     yaw: -Math.PI / 2, // Facing East into ward gate
     pitch: 0.0,
     milestone: 'M3'
@@ -170,7 +170,7 @@ export const DEBUG_SPAWN_POINTS = {
   'm8_second_campus_std': {
     zoneId: 'second_campus_5f',
     name: '第二院區 5F 病房層（電梯對護理站）',
-    pos: [76.0, 1.7, 0.0],
+    pos: [72, 1.7, 7.5],
     yaw: Math.PI,
     pitch: 0.0,
     milestone: 'M8'

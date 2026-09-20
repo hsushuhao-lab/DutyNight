@@ -36,6 +36,7 @@ export function applyFirstFloorArt(level) {
   asset('officeChair',6,0,7.3,[1,1,1],Math.PI);
   asset('workDesk',10,0,5.5,[2.6/1.4,.82/.76,1.2/.72],Math.PI/2);
   asset('printer',10,.82,6.45,[1,1,1],-Math.PI/2);
+  for(const z of [4.9,6.1])asset('officeChair',8.6,0,z,[1,1,1],-Math.PI/2);
   asset('bench',9.35,0,1.94,[1.45,1,1],Math.PI);
   asset('plant',13.6,0,-1.95);
   // Low filing units sit inside the existing desk footprint.
@@ -127,9 +128,5 @@ export function applyFirstFloorArt(level) {
   // Desk lamp has a connected articulated stem, not a floating shade.
   box(5.1,.98,6.5,.022,.27,.022,m.metal);
   box(5.1,1.11,6.5,.18,.018,.022,m.metal);
-  // Elevator threshold and door reveals add depth without changing the entry footprint.
-  box(-11.52,.015,0,.26,.03,2.6,m.metal);
-  [-1.24,1.24].forEach(z=>box(-11.51,1.28,z,.05,2.56,.07,m.metal));
-  box(-11.51,2.53,0,.05,.07,2.55,m.metal);
   return root;
 }

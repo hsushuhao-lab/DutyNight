@@ -1,3 +1,5 @@
+import { AccessDoor } from '../shared/AccessDoor.js';
+import { PlanWalls } from '../shared/PlanArchitecture.js';
 // FirstCampus2FER.js - Milestone M4: First Campus 2F Emergency / Acute Floor
 import * as THREE from 'three';
 import { buildCampusBackdrop } from '../../art/CampusBackdrop.js';
@@ -31,16 +33,8 @@ export class FirstCampus2FER {
     this.gf.buildCeiling(this.zoneGroup, -8, 3.2, 0, 8, 7);
 
     this.gf.buildWall(this.zoneGroup, this.colliders, -12, 1.6, 0, 0.4, 3.2, 7); // West perimeter wall
-    this.gf.buildWall(this.zoneGroup, this.colliders, -8, 1.6, 3.5, 8, 3.2, 0.4);  // North wall of arrival lobby
+    for(const x of [-10.8,-5.2])this.gf.buildWall(this.zoneGroup,this.colliders,x,1.6,3.5,2.4,3.2,.4);  // North wall of arrival lobby
     this.gf.buildWall(this.zoneGroup, this.colliders, -8, 1.6, -3.5, 8, 3.2, 0.4); // South wall of arrival lobby
-
-    // Heavy steel elevator doors at West wall (x = -11.75, z = 0)
-    const elFrame = new THREE.Mesh(new THREE.BoxGeometry(0.2, 2.5, 2.4), this.gf.materials.metal);
-    elFrame.position.set(-11.75, 1.25, 0);
-    this.zoneGroup.add(elFrame);
-    const elDoors = new THREE.Mesh(new THREE.BoxGeometry(0.08, 2.3, 2.0), this.gf.materials.stainless);
-    elDoors.position.set(-11.65, 1.25, 0);
-    this.zoneGroup.add(elDoors);
 
     // Enclosed Acute Ward Gate Partition at x = 0 (separates outer arrival corridor from inner acute ward)
     // South partition wall (z: -3.5 to -1.0)
@@ -69,24 +63,6 @@ export class FirstCampus2FER {
       const p = child.geometry?.parameters;
       if (p?.width === 1.92 && p?.height === 2.35) child.visible = false;
     }
-
-    // Magnetic card swipe reader on outer wall
-    const cardReader = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.24, 0.14), this.gf.materials.metal);
-    cardReader.position.set(-0.25, 1.3, -1.2);
-    this.zoneGroup.add(cardReader);
-    cardReader.userData = {
-      interactable: true,
-      id: '2F_ACUTE_GATE',
-      type: 'acute_gate',
-      label: '刷卡開啟 2F 急診門禁'
-    };
-    this.interactables.push(cardReader);
-    const insideReader = cardReader.clone();
-    insideReader.position.set(0.25, 1.3, 1.2);
-    insideReader.userData = { ...cardReader.userData, id: '2F_ACUTE_GATE_INSIDE' };
-    this.zoneGroup.add(insideReader);
-    this.interactables.push(insideReader);
-    this.acuteGateReaders = [cardReader, insideReader];
 
     SignAnchor.buildWallPlaque({
       scene: this.zoneGroup,
@@ -300,8 +276,9 @@ export class FirstCampus2FER {
     // Charting desk & computer
     asset(this.art, 'workDesk', [13, 0, -6.5], [2 / 1.405, 1, 1 / .725]);
     // Privacy: the doctor's screen faces the inner/back wall, never the doorway.
-    monitor(this.art, this.gf.materials, 13, .76, -6.5, Math.PI);
-    asset(this.art, 'officeChair', [13, 0, -7.45], [1, 1, 1], 0);
+    const doctorScreen=monitor(this.art,this.gf.materials,13,.76,-6.5,0);
+    this.workstations=[{id:'ER_DOCTOR',screen:doctorScreen,chair:[13,0,-5.45],yaw:0}];
+    asset(this.art,'officeChair',[13,0,-5.45],[1,1,1],Math.PI);
     CollisionFactory.addBox(this.colliders, 13.0, 0.4, -6.5, 2.0, 0.8, 1.0);
 
     // ==========================================
@@ -352,6 +329,14 @@ export class FirstCampus2FER {
 
     this.buildArtDetails();
     this.buildAcuteGate();
+    const bedWalls=new PlanWalls(this);
+    bedWalls.line('x',3.5,9,20);bedWalls.cut('x',3.5,14.5,2.4);bedWalls.build();
+    this.gf.buildWall(this.zoneGroup,this.colliders,14.5,2.8,3.5,2.4,.8,.22);
+    new AccessDoor(this,{id:'ER_BEDS',x:14.5,z:3.5,width:2.4,title:'急診留觀區'});
+    // Clear the old fixed-open ambulance leaf, retaining its header/frame.
+    const oldEntrance=this.zoneGroup.getObjectByName('Doorway_22_0');
+    for(const child of oldEntrance.children)if(child.geometry?.parameters.height===2.55)child.visible=false;
+    new AccessDoor(this,{id:'ER_HILLSIDE',x:22,z:0,yaw:Math.PI/2,width:1.8,title:'急診山側感應門'});
     const exterior=buildCampusBackdrop(this.zoneGroup);
     exterior.position.y=11.5;
     // Only cached backdrop vegetation intersecting the newly occupied clinical wing is hidden.
@@ -426,54 +411,13 @@ export class FirstCampus2FER {
   }
 
   buildAcuteGate() {
-    const doorway = this.zoneGroup.getObjectByName('Doorway_0_0');
-    this.acuteGatePivot = new THREE.Group();
-    this.acuteGatePivot.name = 'AcuteWardIronGate';
-    this.acuteGatePivot.position.set(0, 0, -0.96);
-    doorway.add(this.acuteGatePivot);
-
-    // Institutional steel gate: solid perimeter frame with vertical bars and three
-    // horizontal rails. It is closed at baseline and only moves after card access.
-    const metal = this.gf.materials.stainless;
-    for (let z = 0.08; z <= 1.84; z += 0.22) {
-      solid(this.acuteGatePivot, metal, [0, 1.15, z], [0.055, 2.22, 0.045]);
-    }
-    for (const y of [0.16, 1.12, 2.18]) {
-      solid(this.acuteGatePivot, metal, [0, y, 0.96], [0.065, 0.065, 1.92]);
-    }
-
-    this.acuteGateCollider = new THREE.Box3(
-      new THREE.Vector3(-0.055, 0, -0.96),
-      new THREE.Vector3(0.055, 2.35, 0.96)
-    );
+    this.acuteGateDoor=new AccessDoor(this,{id:'ER_MAIN',x:0,z:0,yaw:Math.PI/2,width:1.92,title:'2F 急診'});
+    this.acuteGateCollider=this.acuteGateDoor.closedBox;
+    this.acuteGateReaders=this.acuteGateDoor.readers;
     this.setAcuteGateClosed(true);
   }
-
-  setAcuteGateClosed(closed) {
-    this.acuteGateClosed = closed;
-    this.acuteGatePivot.rotation.y = closed ? 0 : -Math.PI / 2;
-    const index = this.colliders.indexOf(this.acuteGateCollider);
-    if (closed && index === -1) this.colliders.push(this.acuteGateCollider);
-    if (!closed && index !== -1) this.colliders.splice(index, 1);
-    this.acuteGatePivot.updateWorldMatrix(true, true);
-    for (const reader of this.acuteGateReaders || []) {
-      reader.userData.label = closed ? '刷卡開啟 2F 急診門禁' : '刷卡關閉 2F 急診門禁';
-    }
-  }
-
-  toggleAcuteGate(playerPosition) {
-    if (this.acuteGateClosed) {
-      this.setAcuteGateClosed(false);
-      return true;
-    }
-    const player = new THREE.Box3(
-      new THREE.Vector3(playerPosition.x - 0.35, 0, playerPosition.z - 0.35),
-      new THREE.Vector3(playerPosition.x + 0.35, 1.9, playerPosition.z + 0.35)
-    );
-    if (player.intersectsBox(this.acuteGateCollider)) return false;
-    this.setAcuteGateClosed(true);
-    return true;
-  }
+  setAcuteGateClosed(closed){this.acuteGateDoor.setClosed(closed);this.acuteGateClosed=closed;}
+  toggleAcuteGate(p){const ok=this.acuteGateDoor.toggle(p);this.acuteGateClosed=this.acuteGateDoor.closed;return ok;}
 
   cleanup() {
     if (this.zoneGroup) {

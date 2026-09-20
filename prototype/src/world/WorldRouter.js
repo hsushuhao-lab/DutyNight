@@ -28,6 +28,7 @@ export class WorldRouter {
     this.dutyDoorClosed = false;
     this.wardGateClosed = true;
     this.acuteGateClosed = true;
+    this.doorStates = {};
     this.activeZoneId = null;
     this.activeZoneInstance = null;
 
@@ -86,6 +87,7 @@ export class WorldRouter {
       if (this.activeZoneId === 'first_campus_2f' && typeof this.activeZoneInstance.acuteGateClosed === 'boolean') {
         this.acuteGateClosed = this.activeZoneInstance.acuteGateClosed;
       }
+      this.doorStates[this.activeZoneId]=Object.fromEntries(Object.entries(this.activeZoneInstance.accessDoors||{}).map(([id,d])=>[id,d.closed]));
       this.activeZoneInstance.cleanup();
       this.activeZoneInstance = null;
     }
@@ -122,6 +124,9 @@ export class WorldRouter {
     }
     if (zoneId === 'first_campus_1f') {
       this.activeZoneInstance.setEntranceClosed(true);
+    }
+    for(const [id,closed] of Object.entries(this.doorStates[zoneId]||{})){
+      this.activeZoneInstance.accessDoors?.[id]?.setClosed(closed);
     }
     this.activeZoneId = zoneId;
 
@@ -182,7 +187,7 @@ export class WorldRouter {
 
   update() {
     if (!this.controller?.enabled) return;
-    const portal = ROUTE_PORTALS.find(p => p.from === this.activeZoneId && new THREE.Box3(new THREE.Vector3(...p.bounds[0]), new THREE.Vector3(...p.bounds[1])).containsPoint(this.controller.position));
+    const portal = ROUTE_PORTALS.find(p => !p.gated && p.from === this.activeZoneId && new THREE.Box3(new THREE.Vector3(...p.bounds[0]), new THREE.Vector3(...p.bounds[1])).containsPoint(this.controller.position));
     if (portal) this.teleportToSpawn(portal.spawn);
   }
 

@@ -99,7 +99,23 @@ controller.onHoverChange = (interactable) => {
 controller.onInteract = (interactable) => {
   console.log('Interacting with:', interactable);
 
-  if (interactable.type === 'duty_door') {
+  if (interactable.type === 'access_door') {
+    const door=worldRouter.activeZoneInstance.accessDoors?.[interactable.doorId];
+    if(!door)return;
+    if(door.portal){
+      controller.enabled=false;controller.cancelAutoMove();
+      uiManager.runDoorTransition(()=>worldRouter.teleportToSpawn(door.portal));
+    }else{
+      const changed=door.toggle(controller.position);
+      if(changed)soundManager.playClick();
+      else uiManager.showSubtitle('門禁','請離開門幅後再關門。',2500);
+      const zone=worldRouter.activeZoneInstance;
+      if(door===zone.wardDoor)zone.wardGateClosed=door.closed;
+      if(door===zone.dutyDoor)zone.dutyDoorClosed=door.closed;
+      if(door===zone.acuteGateDoor)zone.acuteGateClosed=door.closed;
+    }
+    controller.currentInteractable=null;uiManager.showPrompt(null);
+  } else if (interactable.type === 'duty_door') {
     worldRouter.activeZoneInstance.toggleDutyDoor(camera.position);
     controller.currentInteractable = null;
     uiManager.showPrompt(null);
