@@ -9,6 +9,8 @@ const canonical=[...FIRST_FLOORS.map(f=>`first_campus_${f}f`),'skybridge',...SEC
 let spawns=0,rooms=0;
 for(const id of canonical){
  const zone=router.loadZone(id);
+ if(id==='first_campus_2f'&&zone.setAcuteGateClosed)zone.setAcuteGateClosed(false);
+ if(id==='first_campus_4f'&&zone.setWardGateClosed)zone.setWardGateClosed(false);
  for(const [key,spawn] of Object.entries(WORLD_SPAWNS).filter(([,v])=>v.zoneId===id)){
   router.teleportToSpawn(key);
   assert(!controller.checkCollision(controller.position.x,controller.position.z),`Spawn collider: ${key}`);
