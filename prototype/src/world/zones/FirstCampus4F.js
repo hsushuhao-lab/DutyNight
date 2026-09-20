@@ -302,7 +302,6 @@ export class FirstCampus4F {
       {code:'4C',label:'4C 病房區',kind:'ward'},
       {code:'4D',label:'4D 病房區',kind:'ward'},
       {code:'4F_PHYSICIAN',label:'醫師辦公室',kind:'office'},
-      {code:'4F_STAIRS',label:'樓梯前室',kind:'foyer'},
     ]});
 
     // Ward Gate Partition Wall at x = 14:
