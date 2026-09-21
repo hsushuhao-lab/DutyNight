@@ -334,6 +334,10 @@ export class FirstCampus2FER {
       text: '急診救護車道 ｜ 戶外山側通道 (Ambulance Bay)'
     });
 
+    this.interactables.push(
+      {type:'p1_action',action:'ER_ASSESS',label:'進行精神科評估',position:new THREE.Vector3(10.5,1.2,7.5),radius:1.8},
+      {type:'p1_action',action:'ER_NOTE',label:'完成急診評估紀錄',position:new THREE.Vector3(13,1.2,-6.5),radius:1.8}
+    );
     this.buildArtDetails();
     this.buildAcuteGate();
     const bedWalls=new PlanWalls(this);
