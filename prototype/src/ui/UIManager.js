@@ -315,29 +315,83 @@ export class UIManager {
     if (this.timeEl) this.timeEl.textContent = `${this.gameState.gameTime} ｜ 第一線值班：李住院醫師`;
   }
 
-  updateTasks() {
-    const t01 = this.gameState.isTaskComplete('KEY_PICKUP');
-    const t02 = this.gameState.isTaskComplete('DUTY_LOG');
-    const t03 = this.gameState.isTaskComplete('E_HANDOFF');
-    const readyFor4F = t01 && t02 && t03;
-    const enteredWard = this.gameState.isTaskComplete('WARD_ENTRY');
-    const normalFlowDone = this.gameState.isTaskComplete('ACT1_NORMAL_FLOW');
+  renderTaskBoard(header, items) {
+    const headerEl = document.querySelector('#task-panel .task-header');
+    const listEl = document.querySelector('#task-panel .task-list');
+    if (!headerEl || !listEl) return;
+    headerEl.textContent = header;
+    listEl.replaceChildren();
 
-    document.getElementById('task-key').className = t01 ? 'task-item completed' : 'task-item pending';
-    document.getElementById('task-log').className = t02 ? 'task-item completed' : 'task-item pending';
-    document.getElementById('task-handoff').className = t03 ? 'task-item completed' : 'task-item pending';
-    document.getElementById('task-elevator').className = enteredWard ? 'task-item completed' : readyFor4F ? 'task-item ready' : 'task-item locked';
-
-    const elevatorLabel = document.getElementById('task-elevator-label');
-    if (normalFlowDone) {
-      elevatorLabel.textContent = '21:00 正常值班流程完成';
-    } else if (enteredWard) {
-      elevatorLabel.textContent = '已抵達 4F 病房區｜依值班流程完成後續任務';
-    } else if (readyFor4F) {
-      elevatorLabel.textContent = '搭乘電梯前往 4F 病房區';
-    } else {
-      elevatorLabel.textContent = '搭乘電梯前往 4F 病房區（待交班完成）';
+    for (const item of items) {
+      const row = document.createElement('div');
+      row.id = item.id;
+      row.className = `task-item ${item.state}`;
+      const box = document.createElement('span');
+      box.className = 'status-box';
+      const label = document.createElement('span');
+      label.className = 'task-text';
+      label.textContent = item.text;
+      row.append(box, label);
+      listEl.appendChild(row);
     }
+  }
+
+  updateTasks() {
+    const done = (id) => this.gameState.isTaskComplete(id);
+    const sequential = (defs) => {
+      let unlocked = true;
+      return defs.map((item) => {
+        const isDone = done(item.task);
+        const state = isDone ? 'completed' : unlocked ? 'ready' : 'locked';
+        if (!isDone) unlocked = false;
+        return { id:item.id, text:item.text, state };
+      });
+    };
+
+    const readyFor4F = done('KEY_PICKUP') && done('DUTY_LOG') && done('E_HANDOFF');
+
+    if (!done('WARD_ENTRY')) {
+      this.renderTaskBoard('今日夜班手續（17:00 交接）', [
+        {id:'task-key',text:'領取 4F 值班室鑰匙（316 總醫師辦公室）',state:done('KEY_PICKUP')?'completed':'pending'},
+        {id:'task-log',text:'簽署 3F 值班簽到簿（316 總醫師辦公室）',state:done('DUTY_LOG')?'completed':'pending'},
+        {id:'task-handoff',text:'完成電子交班工作站（HIS 終端機）',state:done('E_HANDOFF')?'completed':'pending'},
+        {id:'task-elevator',text:readyFor4F?'搭乘電梯前往 4F 病房區':'搭乘電梯前往 4F（待完成交班手續）',state:readyFor4F?'ready':'locked'}
+      ]);
+      return;
+    }
+
+    if (done('ACT1_NORMAL_FLOW')) {
+      this.renderTaskBoard('夜班進度（21:00）', [
+        {id:'task-normal-flow-complete',text:'正常值班流程完成｜目前可在值班室休息',state:'completed'}
+      ]);
+      return;
+    }
+
+    if (done('P1_RETURN_4F')) {
+      this.renderTaskBoard('4F 病房｜20:40–21:00', sequential([
+        {id:'task-return-4f',task:'P1_RETURN_4F',text:'20:40 已返回 4F 病房'},
+        {id:'task-end-shift',task:'ACT1_NORMAL_FLOW',text:'21:00 回值班室休息'}
+      ]));
+      return;
+    }
+
+    if (done('P1_REST_DONE')) {
+      this.renderTaskBoard('2F 急診會診｜20:00–20:40', sequential([
+        {id:'task-er-assess',task:'P1_ER_ASSESSMENT_DONE',text:'20:05 前往 2F 急診完成精神科評估'},
+        {id:'task-er-note',task:'P1_ER_NOTE_DONE',text:'20:30 完成急診評估紀錄'},
+        {id:'task-return-4f',task:'P1_RETURN_4F',text:'返回 4F 病房'}
+      ]));
+      return;
+    }
+
+    this.renderTaskBoard('4F 病房值班｜17:15–20:00', sequential([
+      {id:'task-4f-report',task:'P1_4F_REPORT',text:'17:15 向護理站報到並確認交班重點'},
+      {id:'task-duty-room',task:'P1_DUTY_ROOM_READY',text:'17:30 開啟值班室、放置物品並確認值班電話'},
+      {id:'task-round',task:'P1_ROUND_COMPLETE',text:'18:00 完成 401–409 晚間巡房'},
+      {id:'task-403',task:'P1_INSOMNIA_DONE',text:'18:30 評估 403 睡眠問題'},
+      {id:'task-normal-event',task:'P1_NORMAL_EVENT_DONE',text:'19:30 處理一般病房事件'},
+      {id:'task-rest',task:'P1_REST_DONE',text:'20:00 回值班室短暫休息並等待急診通知'}
+    ]));
   }
 
   toggleDebug() {
