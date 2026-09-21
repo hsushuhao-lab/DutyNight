@@ -144,7 +144,10 @@ export class FPSController {
     }
 
     this.clickRaycaster.setFromCamera(ndc, this.camera);
-    const clickTargets = [...this.interactables, ...this.walkables];
+    const clickTargets = [
+      ...this.interactables.filter(o => o?.isObject3D),
+      ...this.walkables.filter(o => o?.isObject3D)
+    ];
     const hits = this.clickRaycaster.intersectObjects(clickTargets, true);
     if (hits.length === 0) return;
 
@@ -306,11 +309,18 @@ export class FPSController {
 
   updateRaycast() {
     this.raycaster.setFromCamera(new THREE.Vector2(0, 0), this.camera);
-    const hits = this.raycaster.intersectObjects(this.interactables, true);
+
+    // THREE.Raycaster accepts Object3D only.
+    // P1 action anchors are lightweight proximity records and must not be
+    // passed into intersectObjects().
+    const rayTargets = this.interactables.filter(o => o?.isObject3D);
+    const hits = this.raycaster.intersectObjects(rayTargets, true);
 
     let foundInteractable = null;
+
     if (hits.length > 0) {
       let cur = hits[0].object;
+
       while (cur) {
         if (cur.userData?.interactable) {
           foundInteractable = cur.userData;
@@ -318,6 +328,36 @@ export class FPSController {
         }
         cur = cur.parent;
       }
+    }
+
+    // P1 normal-duty actions intentionally use proximity anchors rather than
+    // visible collision geometry. Only use one when no physical raycast
+    // interactable is currently under the crosshair.
+    if (!foundInteractable) {
+      let nearest = null;
+      let nearestDistance = Infinity;
+
+      for (const item of this.interactables) {
+        if (
+          item?.isObject3D ||
+          item?.type !== 'p1_action' ||
+          !item.position
+        ) continue;
+
+        const distance = Math.hypot(
+          item.position.x - this.position.x,
+          item.position.z - this.position.z
+        );
+
+        const radius = item.radius ?? 1.5;
+
+        if (distance <= radius && distance < nearestDistance) {
+          nearest = item;
+          nearestDistance = distance;
+        }
+      }
+
+      foundInteractable = nearest;
     }
 
     if (foundInteractable !== this.currentInteractable) {

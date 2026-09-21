@@ -72,9 +72,6 @@ async function use(id){
  await page.keyboard.press('KeyE');
  await page.waitForTimeout(180);
 }
-
-try{await page.waitForFunction(id=>window.worldRouter.controller.currentInteractable?.id===id,id,{timeout:20000});}catch(e){console.error('RAY_DIAGNOSTIC',await page.evaluate(id=>{const r=window.worldRouter,c=r.controller,o=r.activeZoneInstance.interactables.find(o=>o.userData.id===id);return {id,position:c.position.toArray(),camera:c.camera.position.toArray(),target:o?.getWorldPosition(c.position.clone()).toArray(),current:c.currentInteractable?.id,yaw:c.yaw,pitch:c.pitch};},id));throw e;}
- await page.keyboard.press('KeyE');await page.waitForTimeout(180);}
 async function card(id,closed=false){const d=await page.evaluate(id=>{const r=window.worldRouter,c=r.controller,d=r.activeZoneInstance.accessDoors[id];if(!d)throw Error('Door missing '+id);return {closed:d.closed,reader:d.readers.map(o=>({id:o.userData.id,distance:o.getWorldPosition(c.position.clone()).distanceTo(c.position)})).sort((a,b)=>a.distance-b.distance)[0].id};},id);if(d.closed!==closed)await use(d.reader);assert.equal(await page.evaluate(id=>window.worldRouter.activeZoneInstance.accessDoors[id].closed,id),closed);}
 async function portal(id,dest){const rid=await page.evaluate(id=>{const r=window.worldRouter,c=r.controller,d=r.activeZoneInstance.accessDoors[id];if(!d?.closed)throw Error('Portal should be opaque and closed');return d.readers.map(o=>({id:o.userData.id,d:o.getWorldPosition(c.position.clone()).distanceTo(c.position)})).sort((a,b)=>a.d-b.d)[0].id;},id);await use(rid);await page.waitForFunction(dest=>window.worldRouter.activeZoneId===dest&&window.worldRouter.controller.enabled,dest);await log(`card portal ${id} -> ${dest}`);}
 let cancelled=false;
@@ -102,14 +99,173 @@ async function travel(dest,kind='elevator'){
  await page.waitForFunction(dest=>window.worldRouter.activeZoneId===dest&&window.worldRouter.controller.enabled,dest);
  await shot(`arrival-${current}-${dest}-${kind}`);await log(`${kind} ${current} -> ${dest}`);
 }
-async function roomTour(){const rooms=await page.evaluate(()=>window.worldRouter.activeZoneInstance.roomAreas||[]);for(const room of rooms){await go(room.corridor[0],room.corridor[2]);await go(room.point[0],room.point[2]);await log('room '+room.id);report.rooms.push(room.id);await go(room.corridor[0],room.corridor[2]);}}
-try{
+async function roomTour(){
+ const rooms=await page.evaluate(()=>window.worldRouter.activeZoneInstance.roomAreas||[]);
+
+ for(const room of rooms){
+  await go(room.corridor[0],room.corridor[2]);
+
+  // Second-campus doctor office is a controlled AccessDoor and must
+  // remain normally closed. Exercise the real card reader before entry.
+  const accessId=room.id==='DOCTOR'?'doctor_office':null;
+
+  if(accessId){
+   const startsClosed=await page.evaluate(
+    id=>window.worldRouter.activeZoneInstance.accessDoors?.[id]?.closed,
+    accessId
+   );
+
+   assert.equal(
+    startsClosed,
+    true,
+    accessId+' must start closed'
+   );
+
+   await card(accessId);
+  }
+
+  await go(room.point[0],room.point[2]);
+  await log('room '+room.id);
+  report.rooms.push(room.id);
+
+  await go(room.corridor[0],room.corridor[2]);
+
+  // Restore normally-closed state after the visit.
+  if(accessId){
+   await card(accessId,true);
+  }
+ }
+}try{
  await page.goto(url,{waitUntil:'load',timeout:180000});await page.waitForFunction(()=>window.worldRouter?.activeZoneInstance,null,{timeout:180000});await page.waitForTimeout(700);assert.equal(await page.locator('#debug-zone-selector').count(),0);await log('Production initial 3F');
  await go(5.6,5);await use('KEY_PICKUP');await go(6.4,5);await use('DUTY_LOG');await page.locator('#btn-sign-log').click();await page.waitForFunction(()=>window.worldRouter.controller.enabled);
- await go(8.7,4.9);await use('E_HANDOFF');await shot('his');await page.locator('#btn-sign-handoff').click();await page.waitForFunction(()=>window.worldRouter.controller.enabled);await log('key / log / HIS via real UI');
+ await go(8.7,4.9);
+await use('E_HANDOFF');
+await shot('his');
+
+console.log('HIS_GEOMETRY', await page.evaluate(() => {
+  const body = document.querySelector('.his-body');
+  const footer = document.querySelector('.his-footer');
+  const btn = document.querySelector('#btn-sign-handoff');
+  const win = document.querySelector('.workstation-window');
+
+  const rect = el => {
+    const r = el.getBoundingClientRect();
+    return {
+      left:r.left,
+      top:r.top,
+      right:r.right,
+      bottom:r.bottom,
+      width:r.width,
+      height:r.height
+    };
+  };
+
+  const b = rect(btn);
+  const cx = b.left + b.width / 2;
+  const cy = b.top + b.height / 2;
+
+  return {
+    window: rect(win),
+    body: rect(body),
+    footer: rect(footer),
+    button: b,
+    buttonCenter: [cx, cy],
+    elementAtButtonCenter: document.elementFromPoint(cx,cy)?.outerHTML?.slice(0,300),
+    bodyStyle: {
+      display:getComputedStyle(body).display,
+      position:getComputedStyle(body).position,
+      zIndex:getComputedStyle(body).zIndex,
+      overflow:getComputedStyle(body).overflow,
+      gridRow:getComputedStyle(body).gridRow
+    },
+    footerStyle: {
+      display:getComputedStyle(footer).display,
+      position:getComputedStyle(footer).position,
+      zIndex:getComputedStyle(footer).zIndex,
+      gridRow:getComputedStyle(footer).gridRow
+    },
+    windowStyle: {
+      display:getComputedStyle(win).display,
+      gridTemplateRows:getComputedStyle(win).gridTemplateRows,
+      height:getComputedStyle(win).height
+    }
+  };
+}));
+
+const handoffButton = page.locator('#btn-sign-handoff');
+const handoffBox = await handoffButton.boundingBox();
+if (!handoffBox) throw Error('HIS handoff button has no bounding box');
+
+const handoffX = handoffBox.x + handoffBox.width / 2;
+const handoffY = handoffBox.y + handoffBox.height / 2;
+
+const handoffHit = await page.evaluate(({x,y}) => {
+  const hit = document.elementFromPoint(x,y);
+  return {
+    id: hit?.id,
+    tag: hit?.tagName,
+    text: hit?.textContent?.trim()
+  };
+},{x:handoffX,y:handoffY});
+
+console.log('HIS_CLICK_TARGET',handoffHit);
+
+if (handoffHit.id !== 'btn-sign-handoff') {
+  throw Error('HIS button center is not actually clickable: '+JSON.stringify(handoffHit));
+}
+
+await page.evaluate(() => {
+  window.__handoffEvents = [];
+
+  const btn = document.getElementById('btn-sign-handoff');
+
+  for (const type of ['pointerdown','mousedown','pointerup','mouseup','click']) {
+    btn.addEventListener(type, () => {
+      window.__handoffEvents.push('BUTTON:' + type);
+    });
+  }
+
+  document.addEventListener('click', e => {
+    window.__handoffEvents.push(
+      'DOCUMENT:click:' + (e.target?.id || e.target?.className || e.target?.tagName)
+    );
+  }, {capture:true, once:true});
+});
+
+console.log('HIS_PRE_CLICK', await page.evaluate(() => ({
+  enabled: window.worldRouter.controller.enabled,
+  pointerLock: document.pointerLockElement
+    ? (document.pointerLockElement.id || document.pointerLockElement.tagName)
+    : null,
+  modalActive: document.getElementById('workstation-modal').classList.contains('active'),
+  taskCompleted: document.getElementById('task-handoff').classList.contains('completed')
+})));
+
+await page.mouse.move(handoffX,handoffY);
+await page.mouse.down();
+await page.mouse.up();
+await page.waitForTimeout(500);
+
+const handoffAfterMouse = await page.evaluate(() => ({
+  enabled: window.worldRouter.controller.enabled,
+  pointerLock: document.pointerLockElement
+    ? (document.pointerLockElement.id || document.pointerLockElement.tagName)
+    : null,
+  modalActive: document.getElementById('workstation-modal').classList.contains('active'),
+  taskCompleted: document.getElementById('task-handoff').classList.contains('completed'),
+  events: window.__handoffEvents
+}));
+
+console.log('HIS_POST_MOUSE', handoffAfterMouse);
+
+if (!handoffAfterMouse.enabled) {
+  throw Error('HANDOFF_MOUSE_DIAGNOSTIC ' + JSON.stringify(handoffAfterMouse));
+}
+await page.waitForFunction(()=>window.worldRouter.controller.enabled);
+await log('key / log / HIS via real UI');
  assert(await page.locator('#task-key,#task-log,#task-handoff').evaluateAll(ns=>ns.length===3&&ns.every(n=>n.classList.contains('completed'))));
  await travel('first_campus_4f');await shot('4f-lobby',0);await go(-6.5,6);assert.equal(await page.evaluate(()=>window.worldRouter.activeZoneInstance.dutyDoor?.closed),true,'Duty-room keyed knob door must start closed');await shot('duty-door-closed',Math.PI/2);await use('duty_room');assert.equal(await page.evaluate(()=>window.worldRouter.activeZoneInstance.dutyDoor?.closed),false,'316 key must open duty-room knob lock');await go(-9.5,6);await shot('duty-room',Math.PI/2);await go(-6.5,6);
- await go(0,3.2);await page.evaluate(()=>{const c=window.worldRouter.controller;c.yaw=0;c.pitch=0;c.updateCameraRotation();});await page.keyboard.down('KeyW');await page.waitForTimeout(1200);await page.keyboard.up('KeyW');assert((await state()).pos[2]>2.4,'Actual W must not cross closed gate');await go(.8,3.2);await card('first_ward');await go(0,-2);await shot('first-ward-hall',0);await roomTour();await go(3.5,-3);await shot('first-station',-Math.PI/2);await go(0,3.2);
+ await go(0,3.2);await page.evaluate(()=>{const c=window.worldRouter.controller;c.yaw=0;c.pitch=0;c.updateCameraRotation();});await page.keyboard.down('KeyW');await page.waitForTimeout(1200);await page.keyboard.up('KeyW');assert((await state()).pos[2]>2.4,'Actual W must not cross closed gate');await go(.8,3.2);await card('first_ward');await go(0,-2);await shot('first-ward-hall',0);await roomTour();await go(1.6,-3);await shot('first-station',-Math.PI/2);await go(0,3.2);
  await travel('first_campus_3f','stairs');await travel('first_campus_1f');await go(1,-6.8);await use('1F_MAIN_DOOR');assert((await page.locator('#subtitle-text').innerText()).includes('出不去'));await shot('1f-locked-glass',Math.PI);
  for(const [z,id] of [[-4,'1F_PHARM_GATE'],[4,'1F_OPD_GATE']]){await go(16.5,z);await use(id);await shot(`locked-${id}`,-Math.PI/2);assert.equal(await page.evaluate(id=>window.worldRouter.activeZoneInstance.interactables.find(o=>o.userData.id===id).userData.locked,id),true);}
  await go(-8,6.3);await shot('1f-clear-lift-opening',Math.PI);await travel('first_campus_2f');
@@ -122,3 +278,7 @@ try{
  const key=await page.evaluate(()=>window.worldRouter.activeZoneInstance.keyMesh.userData.interactable);assert.equal(key,false,'Key remains collected');assert.equal(report.zones.length,11);assert(report.rooms.includes('402'));assert.equal(report.errors.length,0,JSON.stringify(report.errors));report.verdict='PASS';
 }catch(e){report.verdict='FAIL';report.failure=e.stack;report.last=await state().catch(()=>null);await page.screenshot({path:`${out}/failure.jpg`,timeout:15000}).catch(()=>{});process.exitCode=1;console.error(e.stack);
 }finally{await writeFile(`${out}/result.json`,JSON.stringify(report,null,2));await browser.close();if(server)await new Promise(r=>server.httpServer.close(r));}
+
+
+
+

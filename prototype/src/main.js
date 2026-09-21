@@ -79,7 +79,17 @@ uiManager = new UIManager(
     // On modal close, resume player controls
     controller.enabled = true;
     setTimeout(() => {
-      renderer.domElement.requestPointerLock();
+      const overlayActive =
+        document.querySelector('.modal-overlay.active') ||
+        document.querySelector('.cutscene-overlay.active');
+
+      if (
+        controller.enabled &&
+        !overlayActive &&
+        document.pointerLockElement !== renderer.domElement
+      ) {
+        renderer.domElement.requestPointerLock();
+      }
     }, 100);
   },
   () => {
