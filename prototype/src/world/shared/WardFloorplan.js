@@ -29,9 +29,9 @@ export class WardFloorplan {
       room(7,[7.5,-22,12,-17],'south',9.75);
       room(8,[5,-14,12,-10],'west',-12);
       room(9,[5,-10,12,-6],'west',-8);
-      // Same protected station module as second campus; on right of the activity hall.
-      nursingStation(this,{x:5,z:-3,yaw:Math.PI/2,id:'first_station'});
-      walls.line('x',-6,5,12);walls.line('z',11,-6,0);
+      // Protected station sits directly against the ward hall. No extra parallel strip beside it.
+      nursingStation(this,{x:3.2,z:-3,yaw:Math.PI/2,id:'first_station'});
+      walls.line('x',-6,3.8,12);
       this.buildDutyRoom();
       this.wardDoor=new AccessDoor(this,{id:'first_ward',x:0,z:2,width:2.4,title:'4F 病房'});
       this.wardGateCollider=this.wardDoor.closedBox;this.wardGateClosed=true;
@@ -83,7 +83,7 @@ export class WardFloorplan {
     wallClock(this.zoneGroup,this.gf.materials,-10,2.1,2.15);
     this.dutyRoom={door:[-8,1.7,6],inside:[-9.5,1.7,6],outside:[-6.5,1.7,6],bounds:[-14,2,-8,10]};
     this.interactables.push(
-      {type:'p1_action',action:'NURSE_REPORT',label:'向護理站報到',position:new THREE.Vector3(4.6,1.4,-3.0),radius:1.8},
+      {type:'p1_action',action:'NURSE_REPORT',label:'向護理站報到',position:new THREE.Vector3(3.8,1.4,-3.0),radius:1.8},
       {type:'p1_action',action:'DUTY_ROOM_PREP',label:'整理值班室',position:new THREE.Vector3(-10.0,1.2,6.0),radius:1.8},
       {type:'p1_action',action:'WARD_ROUND',label:'完成晚間巡房',position:new THREE.Vector3(0,1.4,-10.0),radius:2.0},
       {type:'p1_action',action:'INSOMNIA_403',label:'評估 403 睡眠問題',position:new THREE.Vector3(-6.2,1.2,-11.5),radius:1.8},
