@@ -16,6 +16,7 @@ export class UIManager {
     this.dutyLogModal = document.getElementById('dutylog-modal');
     this.elevatorCutscene = document.getElementById('elevator-cutscene');
     this.debugPanel = document.getElementById('debug-panel');
+    this.timeEl = document.querySelector('.hud-time');
 
     this.initEvents();
     this.updateTasks();
@@ -26,7 +27,9 @@ export class UIManager {
         this.updateTasks();
         this.updateDebug();
       }
+      if (evt === 'time_changed') this.updateTime();
     });
+    this.updateTime();
   }
 
   initEvents() {
@@ -308,12 +311,17 @@ export class UIManager {
     }, 3600);
   }
 
+  updateTime() {
+    if (this.timeEl) this.timeEl.textContent = `${this.gameState.gameTime} ｜ 第一線值班：李住院醫師`;
+  }
+
   updateTasks() {
     const t01 = this.gameState.isTaskComplete('KEY_PICKUP');
     const t02 = this.gameState.isTaskComplete('DUTY_LOG');
     const t03 = this.gameState.isTaskComplete('E_HANDOFF');
     const readyFor4F = t01 && t02 && t03;
     const enteredWard = this.gameState.isTaskComplete('WARD_ENTRY');
+    const normalFlowDone = this.gameState.isTaskComplete('ACT1_NORMAL_FLOW');
 
     document.getElementById('task-key').className = t01 ? 'task-item completed' : 'task-item pending';
     document.getElementById('task-log').className = t02 ? 'task-item completed' : 'task-item pending';
@@ -321,8 +329,10 @@ export class UIManager {
     document.getElementById('task-elevator').className = enteredWard ? 'task-item completed' : readyFor4F ? 'task-item ready' : 'task-item locked';
 
     const elevatorLabel = document.getElementById('task-elevator-label');
-    if (enteredWard) {
-      elevatorLabel.textContent = '已抵達 4F 病房區';
+    if (normalFlowDone) {
+      elevatorLabel.textContent = '21:00 正常值班流程完成';
+    } else if (enteredWard) {
+      elevatorLabel.textContent = '已抵達 4F 病房區｜依值班流程完成後續任務';
     } else if (readyFor4F) {
       elevatorLabel.textContent = '搭乘電梯前往 4F 病房區';
     } else {

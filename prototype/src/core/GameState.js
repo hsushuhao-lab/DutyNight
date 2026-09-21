@@ -5,6 +5,7 @@ export class GameState {
     this.evidence = 0;
     this.identity = 3;
     this.fatigue = 0;
+    this.gameTime = '17:00';
 
     this.requiredTasks = [
       'KEY_PICKUP',
@@ -19,6 +20,7 @@ export class GameState {
     // Initial state
     this.flags.set('ACT1_STARTED', true);
     this.flags.set('CURRENT_FLOOR', '3F');
+    this.flags.set('SUPERNATURAL_ENABLED', false);
   }
 
   addListener(fn) {
@@ -50,6 +52,12 @@ export class GameState {
       if (!this.completedTasks.has(task)) return false;
     }
     return true;
+  }
+
+  setGameTime(time) {
+    if (this.gameTime === time) return;
+    this.gameTime = time;
+    this.notify('time_changed', time);
   }
 
   setFlag(flag, val = true) {
