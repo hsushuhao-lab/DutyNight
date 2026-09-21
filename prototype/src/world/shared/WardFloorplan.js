@@ -3,6 +3,7 @@ import { solid, asset, wallClock } from '../../art/ArtDetails.js';
 import { disposeZoneArt } from '../../art/ArtResources.js';
 import { PlanWalls, ordinaryRoom, nursingStation, workstation } from './PlanArchitecture.js';
 import { AccessDoor } from './AccessDoor.js';
+import { KeyedKnobDoor } from './KeyedKnobDoor.js';
 import { CollisionFactory } from './CollisionFactory.js';
 import { SignAnchor } from './SignAnchor.js';
 
@@ -67,7 +68,7 @@ export class WardFloorplan {
     const w=new PlanWalls(this);w.rect(-14,2,-8,10);w.cut('z',-8,6,1.4);
     this.gf.buildFloor(this.zoneGroup,this.walkables,-11,0,6,6,8,this.gf.materials.floorWood);
     this.gf.buildCeiling(this.zoneGroup,-11,3.2,6,6,8);
-    this.dutyDoor=new AccessDoor(this,{id:'duty_room',x:-8,z:6,yaw:Math.PI/2,width:1.4,title:'醫師值班室',material:this.gf.materials.doorWood,readers:false});
+    this.dutyDoor=new KeyedKnobDoor(this,{id:'duty_room',x:-8,z:6,yaw:Math.PI/2,width:1.4,title:'醫師值班室'});
     this.dutyDoor.setClosed(true);this.dutyDoorClosed=true;
     asset(this.zoneGroup,'hospitalBed',[-12.5,0,7.8],[1.2,.95,.97]);CollisionFactory.addBox(this.colliders,-12.5,.45,7.8,1.4,.9,2.2);
     solid(this.zoneGroup,this.gf.materials.doorWood,[-11.25,.28,8.1],[.5,.56,.5]);
@@ -83,7 +84,7 @@ export class WardFloorplan {
     wallClock(this.zoneGroup,this.gf.materials,-10,2.1,2.15);
     this.dutyRoom={door:[-8,1.7,6],inside:[-9.5,1.7,6],outside:[-6.5,1.7,6],bounds:[-14,2,-8,10]};
     this.interactables.push(
-      {type:'p1_action',action:'NURSE_REPORT',label:'向護理站報到',position:new THREE.Vector3(3.8,1.4,-3.0),radius:1.8},
+      {type:'p1_action',action:'NURSE_REPORT',label:'向護理站報到',position:new THREE.Vector3(1.6,1.4,-3.0),radius:1.8},
       {type:'p1_action',action:'DUTY_ROOM_PREP',label:'整理值班室',position:new THREE.Vector3(-10.0,1.2,6.0),radius:1.8},
       {type:'p1_action',action:'WARD_ROUND',label:'完成晚間巡房',position:new THREE.Vector3(0,1.4,-10.0),radius:2.0},
       {type:'p1_action',action:'INSOMNIA_403',label:'評估 403 睡眠問題',position:new THREE.Vector3(-6.2,1.2,-11.5),radius:1.8},
@@ -97,7 +98,7 @@ export class WardFloorplan {
     this.gf.buildFloor(this.zoneGroup,this.walkables,o+11,0,6,6,8,this.gf.materials.floor);
     this.gf.buildCeiling(this.zoneGroup,o+11,3.2,6,6,8);
     workstation(this,{x:o+11,z:3.5,id:'second_doctor'});
-    new AccessDoor(this,{id:'doctor_office',x:o+8,z:6,yaw:Math.PI/2,width:1.4,title:'醫師辦公室',material:this.gf.materials.doorWood,readers:false}).setClosed(true);
+    new AccessDoor(this,{id:'doctor_office',x:o+8,z:6,yaw:Math.PI/2,width:1.4,title:'醫師辦公室'}).setClosed(true);
     w.build();this.gf.buildCeilingLight(this.zoneGroup,o+11,3.15,6,.75,7);
     this.roomAreas.push({id:'DOCTOR',label:'醫師辦公室',point:[o+9.5,1.7,6],door:[o+8,1.7,6],corridor:[o+6.5,1.7,6],protectedArea:false,kind:'office'});
   }
