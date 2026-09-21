@@ -191,7 +191,7 @@ controller.onInteract = (interactable) => {
     const action=interactable.action;
     if(action==='NURSE_REPORT'){
       if(!gameState.isTaskComplete('WARD_ENTRY')) return uiManager.showSubtitle('李醫師','「先正式抵達 4F 再報到。」',2500);
-      dutyEvents.complete('P1_4F_REPORT','17:20');
+      dutyEvents.complete('P1_4F_REPORT','17:15');
       uiManager.showSubtitle('晚班護理師','「醫師晚安，今天目前都還算穩定。403 昨晚比較睡不好，406 下午有點焦慮，408 晚點再追一下血壓。」');
     } else if(action==='DUTY_ROOM_PREP'){
       if(!gameState.isTaskComplete('P1_4F_REPORT')) return uiManager.showSubtitle('李醫師','「先去護理站報到。」',2500);
