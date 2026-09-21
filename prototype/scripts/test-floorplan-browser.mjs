@@ -38,8 +38,42 @@ async function go(x,z){
  },{x,z});report.movementSteps+=n;await cameraSettled();
 }
 async function straight(x,z,expected){const from=(await state()).zone;const n=await page.evaluate(({x,z,expected})=>{const r=window.worldRouter,c=r.controller,origin=r.activeZoneId;let n=0;c.cancelAutoMove();for(let i=0;i<5000;i++){if(r.activeZoneId!==origin){if(r.activeZoneId!==expected)throw Error('Wrong portal destination');return n;}const dx=x-c.position.x,dz=z-c.position.z,d=Math.hypot(dx,dz);if(d<.02){r.update();return n;}const before=c.position.clone();c.moveWithCollision(dx/d*Math.min(.04,d),dz/d*Math.min(.04,d));n++;r.update();if(r.activeZoneId===origin&&c.position.distanceTo(before)<.001)throw Error(`Unsupported/blocked route ${origin} ${c.position.toArray()} -> ${x},${z}`);}throw Error('Movement exhausted');},{x,z,expected});report.movementSteps+=n;await cameraSettled();if(expected)assert.equal((await state()).zone,expected,from+' portal');}
-async function use(id){console.log('USE',id);await cameraSettled();await page.evaluate(id=>{const r=window.worldRouter,c=r.controller,o=r.activeZoneInstance.interactables.find(o=>o.userData.id===id);if(!o)throw Error('Missing interactable '+id);const p=o.getWorldPosition(c.position.clone()),d=p.sub(c.camera.position);c.yaw=Math.atan2(-d.x,-d.z);c.pitch=Math.atan2(d.y,Math.hypot(d.x,d.z));c.updateCameraRotation();},id);
- try{await page.waitForFunction(id=>window.worldRouter.controller.currentInteractable?.id===id,id,{timeout:20000});}catch(e){console.error('RAY_DIAGNOSTIC',await page.evaluate(id=>{const r=window.worldRouter,c=r.controller,o=r.activeZoneInstance.interactables.find(o=>o.userData.id===id);return {id,position:c.position.toArray(),camera:c.camera.position.toArray(),target:o?.getWorldPosition(c.position.clone()).toArray(),current:c.currentInteractable?.id,yaw:c.yaw,pitch:c.pitch};},id));throw e;}
+async function use(id){
+ console.log('USE',id);
+ await cameraSettled();
+ await page.evaluate(id=>{
+  const r=window.worldRouter,c=r.controller;
+  const matches=r.activeZoneInstance.interactables
+   .filter(o=>o.userData?.id===id)
+   .map(o=>({o,p:o.getWorldPosition(c.position.clone())}))
+   .sort((a,b)=>a.p.distanceTo(c.position)-b.p.distanceTo(c.position));
+  const o=matches[0]?.o;
+  if(!o)throw Error('Missing interactable '+id);
+  const p=o.getWorldPosition(c.position.clone()),d=p.sub(c.camera.position);
+  c.yaw=Math.atan2(-d.x,-d.z);
+  c.pitch=Math.atan2(d.y,Math.hypot(d.x,d.z));
+  c.updateCameraRotation();
+  c.camera.updateMatrixWorld(true);
+  c.updateRaycast();
+ },id);
+ try{
+  await page.waitForFunction(id=>window.worldRouter.controller.currentInteractable?.id===id,id,{timeout:20000});
+ }catch(e){
+  console.error('RAY_DIAGNOSTIC',await page.evaluate(id=>{
+   const r=window.worldRouter,c=r.controller;
+   const candidates=r.activeZoneInstance.interactables
+    .filter(o=>o.userData?.id===id)
+    .map(o=>({id:o.userData.id,world:o.getWorldPosition(c.position.clone()).toArray(),distance:o.getWorldPosition(c.position.clone()).distanceTo(c.position)}))
+    .sort((a,b)=>a.distance-b.distance);
+   return {id,position:c.position.toArray(),camera:c.camera.position.toArray(),candidates,current:c.currentInteractable?.id,yaw:c.yaw,pitch:c.pitch};
+  },id));
+  throw e;
+ }
+ await page.keyboard.press('KeyE');
+ await page.waitForTimeout(180);
+}
+
+try{await page.waitForFunction(id=>window.worldRouter.controller.currentInteractable?.id===id,id,{timeout:20000});}catch(e){console.error('RAY_DIAGNOSTIC',await page.evaluate(id=>{const r=window.worldRouter,c=r.controller,o=r.activeZoneInstance.interactables.find(o=>o.userData.id===id);return {id,position:c.position.toArray(),camera:c.camera.position.toArray(),target:o?.getWorldPosition(c.position.clone()).toArray(),current:c.currentInteractable?.id,yaw:c.yaw,pitch:c.pitch};},id));throw e;}
  await page.keyboard.press('KeyE');await page.waitForTimeout(180);}
 async function card(id,closed=false){const d=await page.evaluate(id=>{const r=window.worldRouter,c=r.controller,d=r.activeZoneInstance.accessDoors[id];if(!d)throw Error('Door missing '+id);return {closed:d.closed,reader:d.readers.map(o=>({id:o.userData.id,distance:o.getWorldPosition(c.position.clone()).distanceTo(c.position)})).sort((a,b)=>a.distance-b.distance)[0].id};},id);if(d.closed!==closed)await use(d.reader);assert.equal(await page.evaluate(id=>window.worldRouter.activeZoneInstance.accessDoors[id].closed,id),closed);}
 async function portal(id,dest){const rid=await page.evaluate(id=>{const r=window.worldRouter,c=r.controller,d=r.activeZoneInstance.accessDoors[id];if(!d?.closed)throw Error('Portal should be opaque and closed');return d.readers.map(o=>({id:o.userData.id,d:o.getWorldPosition(c.position.clone()).distanceTo(c.position)})).sort((a,b)=>a.d-b.d)[0].id;},id);await use(rid);await page.waitForFunction(dest=>window.worldRouter.activeZoneId===dest&&window.worldRouter.controller.enabled,dest);await log(`card portal ${id} -> ${dest}`);}
