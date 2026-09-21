@@ -265,7 +265,7 @@ await page.waitForFunction(()=>window.worldRouter.controller.enabled);
 await log('key / log / HIS via real UI');
  assert(await page.locator('#task-key,#task-log,#task-handoff').evaluateAll(ns=>ns.length===3&&ns.every(n=>n.classList.contains('completed'))));
  await travel('first_campus_4f');await shot('4f-lobby',0);await go(-6.5,6);assert.equal(await page.evaluate(()=>window.worldRouter.activeZoneInstance.dutyDoor?.closed),true,'Duty-room keyed knob door must start closed');await shot('duty-door-closed',Math.PI/2);await use('duty_room');assert.equal(await page.evaluate(()=>window.worldRouter.activeZoneInstance.dutyDoor?.closed),false,'316 key must open duty-room knob lock');await go(-9.5,6);await shot('duty-room',Math.PI/2);await go(-6.5,6);
- await go(0,3.2);await page.evaluate(()=>{const c=window.worldRouter.controller;c.yaw=0;c.pitch=0;c.updateCameraRotation();});await page.keyboard.down('KeyW');await page.waitForTimeout(1200);await page.keyboard.up('KeyW');assert((await state()).pos[2]>2.4,'Actual W must not cross closed gate');await go(.8,3.2);await card('first_ward');await go(0,-2);await shot('first-ward-hall',0);await roomTour();await go(1.6,-3);await shot('first-station',-Math.PI/2);await go(0,3.2);
+ await go(0,3.2);await page.evaluate(()=>{const c=window.worldRouter.controller;c.yaw=0;c.pitch=0;c.updateCameraRotation();});await page.keyboard.down('KeyW');await page.waitForTimeout(1200);await page.keyboard.up('KeyW');assert((await state()).pos[2]>2.4,'Actual W must not cross closed gate');await go(.8,3.2);await card('first_ward');await go(0,-2);await shot('first-ward-hall',0);await roomTour();await go(-1.0,-3);await shot('first-station',-Math.PI/2);await go(0,3.2);
  await travel('first_campus_3f','stairs');await travel('first_campus_1f');await go(1,-6.8);await use('1F_MAIN_DOOR');assert((await page.locator('#subtitle-text').innerText()).includes('出不去'));await shot('1f-locked-glass',Math.PI);
  for(const [z,id] of [[-4,'1F_PHARM_GATE'],[4,'1F_OPD_GATE']]){await go(16.5,z);await use(id);await shot(`locked-${id}`,-Math.PI/2);assert.equal(await page.evaluate(id=>window.worldRouter.activeZoneInstance.interactables.find(o=>o.userData.id===id).userData.locked,id),true);}
  await go(-8,6.3);await shot('1f-clear-lift-opening',Math.PI);await travel('first_campus_2f');
@@ -278,7 +278,3 @@ await log('key / log / HIS via real UI');
  const key=await page.evaluate(()=>window.worldRouter.activeZoneInstance.keyMesh.userData.interactable);assert.equal(key,false,'Key remains collected');assert.equal(report.zones.length,11);assert(report.rooms.includes('402'));assert.equal(report.errors.length,0,JSON.stringify(report.errors));report.verdict='PASS';
 }catch(e){report.verdict='FAIL';report.failure=e.stack;report.last=await state().catch(()=>null);await page.screenshot({path:`${out}/failure.jpg`,timeout:15000}).catch(()=>{});process.exitCode=1;console.error(e.stack);
 }finally{await writeFile(`${out}/result.json`,JSON.stringify(report,null,2));await browser.close();if(server)await new Promise(r=>server.httpServer.close(r));}
-
-
-
-

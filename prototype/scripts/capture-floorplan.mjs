@@ -16,7 +16,7 @@ const views=[
  ['er-staff-entry','first_campus_2f',6.4,1.7,2.3,Math.PI,0],
  ['er-glass-link','first_campus_2f',6.0,1.7,6,-Math.PI/2,0],
  ['4f-duty','first_campus_4f',-9.5,1.7,6,Math.PI/2,-.1],
- ['4f-station','first_campus_4f',2.4,1.7,-3,-Math.PI/2,0],
+ ['4f-station','first_campus_4f',-1.0,1.7,-3,-Math.PI/2,0],
  ['second5-station','second_campus_5f',72,1.7,-7,Math.PI,0],
  ['second5-hall','second_campus_5f',76.5,1.7,-7,0,0],
  ['2f-beds-gate','first_campus_2f',14.5,1.7,1.7,Math.PI,0],
