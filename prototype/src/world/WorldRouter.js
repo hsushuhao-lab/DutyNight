@@ -25,7 +25,7 @@ export class WorldRouter {
     this.controller = controller;
     this.gf = new GeometryFactory();
 
-    this.dutyDoorClosed = false;
+    this.dutyDoorClosed = true;
     this.wardGateClosed = true;
     this.acuteGateClosed = true;
     this.doorStates = {};

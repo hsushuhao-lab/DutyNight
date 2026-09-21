@@ -27,12 +27,13 @@ for(const id of Object.keys(CORE_ORIGINS).filter(s=>s!=='second_campus_std')){
   check(id+' closed gate blocks actual controller',()=>{c.teleport(center.x,1.7,center.z+1);c.moveWithCollision(0,-3);assert(c.position.z>center.z);});
   z.setWardGateClosed(false);
   check(id+' authorized gate traversable both ways',()=>{walk([center.x,1.7,center.z+1.2],[center.x,1.7,center.z-1.2]);walk([center.x,1.7,center.z-1.2],[center.x,1.7,center.z+1.2]);});
+  for(const d of Object.values(z.accessDoors||{})) if(d!==gate&&!d.portal) d.setClosed(false);
   const roomIds=z.roomAreas.filter(x=>x.kind==='ward').map(x=>x.id);
   check(id+' exact nine user-approved rooms',()=>assert.deepEqual(roomIds,Array.from({length:9},(_,i)=>String((second?500:400)+i+1))));
   for(const room of z.roomAreas)check(id+' room '+room.id+' in and out',()=>{walk(room.corridor,room.point);walk(room.point,room.corridor);});
   check(id+' same protected station module',()=>assert.equal(z.station.module,'NursingStation_STANDARD_6x6'));
   for(const w of z.workstations)check(id+' screen faces chair '+w.id,()=>{const p=w.screen.getWorldPosition(new THREE.Vector3()),n=new THREE.Vector3(0,0,1).transformDirection(w.screen.matrixWorld),dir=new THREE.Vector3(...w.chair).sub(p);dir.y=0;assert(n.dot(dir.normalize())>.98);});
-  if(!second)check('Duty room near lift outside ward gate',()=>{walk([0,1.7,6],z.dutyRoom.outside);walk(z.dutyRoom.outside,z.dutyRoom.inside);assert(Math.hypot(-8,6-9.8)<10);});
+  if(!second)check('Duty room near lift outside ward gate',()=>{z.setDutyDoorClosed(false);walk([0,1.7,6],z.dutyRoom.outside);walk(z.dutyRoom.outside,z.dutyRoom.inside);assert(Math.hypot(-8,6-9.8)<10);});
   check(id+' door state survives round-trip',()=>{z.setWardGateClosed(true);r.loadZone('first_campus_3f');assert(r.loadZone(id).wardDoor.closed);});
  }
 }
