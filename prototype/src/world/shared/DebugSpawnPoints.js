@@ -48,8 +48,8 @@ export const DEBUG_SPAWN_POINTS = {
   'm3_4f_nursing_station': {
     zoneId: 'first_campus_4f',
     name: '4F 護理站前',
-    pos: [3.5, 1.7, -3],
-    yaw: 0.0, // Facing corridor from behind counter
+    pos: [1.6, 1.7, -3],
+    yaw: -Math.PI / 2, // Facing the nursing station from the ward hall
     pitch: 0.0,
     milestone: 'M3'
   },
