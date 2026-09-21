@@ -1,0 +1,60 @@
+name: Access layout validation
+on:
+  push:
+    branches: [fix/access-layout-20260921]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: access-layout-validation
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Export exact source for independent local verification
+        run: |
+          git rev-parse HEAD > SOURCE_COMMIT.txt
+          tar -czf /tmp/dutynight-source.tgz prototype SOURCE_COMMIT.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: access-layout-source
+          path: /tmp/dutynight-source.tgz
+          retention-days: 7
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: prototype/package-lock.json
+      - name: Install locked dependencies
+        working-directory: prototype
+        run: npm ci
+      - name: All Node regressions
+        working-directory: prototype
+        run: node scripts/run-floorplan-regressions.mjs
+      - name: Production build
+        id: build
+        working-directory: prototype
+        run: |
+          node scripts/write-build-info.mjs
+          npm run build
+      - name: Browser dependencies
+        working-directory: prototype
+        run: npx playwright install --with-deps chromium
+      - name: Continuous browser walkthrough
+        working-directory: prototype
+        run: node scripts/test-floorplan-browser.mjs
+      - name: Fixed review viewpoints
+        if: always() && steps.build.outcome == 'success'
+        working-directory: prototype
+        run: node scripts/capture-floorplan.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: access-layout-evidence
+          path: |
+            SOURCE_COMMIT.txt
+            prototype/qa-results/
+          retention-days: 30
