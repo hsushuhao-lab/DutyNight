@@ -32,7 +32,7 @@ export class AccessDoor {
       const led=new THREE.Mesh(new THREE.CircleGeometry(.037,16),new THREE.MeshBasicMaterial({color:0xdda634}));
       led.position.z=.042; if(readers)reader.add(led);
       else solid(reader,m.stainless,[0,0,.07],[.09,.04,.04]);
-      panel.userData={interactable:true,id:`${id}_${side===1?'front':'back'}`,type:'access_door',doorId:id,label:`感應開啟${title}`};
+      panel.userData={interactable:true,id:`${id}_${side===1?'front':'back'}`,type:'access_door',doorId:id,label:readers?`感應開啟${title}`:`鑰匙開啟${title}`};
       zone.interactables.push(panel); this.readers.push(panel);
     }
     SignAnchor.buildWallPlaque({scene:this.root,x:0,y:2.69,z:.14,width:Math.min(2.5,width+.25),height:.3,code:'',title,subtitle:'',header:''});
@@ -47,7 +47,7 @@ export class AccessDoor {
     const i=this.zone.colliders.indexOf(this.closedBox);
     if(closed&&i<0)this.zone.colliders.push(this.closedBox);
     if(!closed&&i>=0)this.zone.colliders.splice(i,1);
-    for(const panel of this.readers) panel.userData.label=closed?'感應開門':'感應關門';
+    for(const panel of this.readers) panel.userData.label=this.id==='duty_room'?(closed?'鑰匙開門':'關門'):(closed?'感應開門':'感應關門');
     this.root.updateWorldMatrix(true,true);
   }
   toggle(position) {
