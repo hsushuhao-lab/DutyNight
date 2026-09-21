@@ -166,7 +166,7 @@ export class FirstCampus8FBridgeEntry {
     }
     solid(art,this.gf.materials.wall,[20,1.6,0],[.3,3.2,4]);
     for(const x of [5,12,18])solid(art,this.gf.materials.lightWarm,[x,3.10,0],[1.2,.04,.35]);
-    asset(art,'bench',[-8,0,2.8],[1,1,1],Math.PI);
+    // Keep the 8F transfer lobby and bridge approach clear of loose seating/furniture.
     asset(art,'plant',[-10.5,0,-2.7]);
     const oldBridgeDoor=this.zoneGroup.getObjectByName('Doorway_0_0');
     for(const leaf of oldBridgeDoor.children)if(leaf.geometry?.parameters.height===2.35||leaf.geometry?.parameters.height===2.45)leaf.visible=false;
