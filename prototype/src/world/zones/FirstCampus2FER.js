@@ -55,14 +55,10 @@ export class FirstCampus2FER {
       wallThickness: 0.4,
       isAlongX: false,
       isOpen: true,
+      includeLeaf: false,
       doorMaterial: this.gf.materials.metal
     });
-    // Doorway supplies the aperture/frame only; hide its generic propped leaf because
-    // the actual ward threshold is the controlled iron gate built below.
-    for (const child of acuteDoorway.children) {
-      const p = child.geometry?.parameters;
-      if (p?.width === 1.92 && p?.height === 2.35) child.visible = false;
-    }
+    // The controlled AccessDoor below is the only door assembly in this aperture.
 
     SignAnchor.buildWallPlaque({
       scene: this.zoneGroup,
@@ -100,7 +96,7 @@ export class FirstCampus2FER {
     });
 
     // Close the same nonwalkable shaft from the room side; no room/route footprint changes.
-    this.gf.buildWall(this.zoneGroup, this.colliders, 9, 1.6, 6.5, .4, 3.2, 6);
+    for(const [z,d] of [[4.3,1.6],[8.25,2.5]])this.gf.buildWall(this.zoneGroup,this.colliders,9,1.6,z,.4,3.2,d);
     this.gf.buildWall(this.zoneGroup, this.colliders, 9, 1.6, -6.5, .4, 3.2, 6);
 
     // Corridor handrails
@@ -120,7 +116,7 @@ export class FirstCampus2FER {
 
     this.gf.buildWall(this.zoneGroup, this.colliders, 3.5, 1.6, 8.5, 7, 3.2, 0.4); // North back wall
     this.gf.buildWall(this.zoneGroup, this.colliders, 0.0, 1.6, 6.0, 0.4, 3.2, 5.0); // West wall
-    this.gf.buildWall(this.zoneGroup, this.colliders, 7.0, 1.6, 6.0, 0.4, 3.2, 5.0); // East wall
+    for(const [z,d] of [[4.3,1.6],[7.7,1.6]])this.gf.buildWall(this.zoneGroup,this.colliders,7,1.6,z,.4,3.2,d); // East wall, one staff-to-beds aperture
 
     // Triage Counter (at z = 3.5)
     const triageCounter = new THREE.Mesh(new THREE.BoxGeometry(4.8, 1.1, 0.7), this.gf.materials.wallDark);
@@ -132,6 +128,16 @@ export class FirstCampus2FER {
     const triageGlass = new THREE.Mesh(new THREE.PlaneGeometry(4.6, 1.2), this.gf.materials.glass);
     triageGlass.position.set(3.5, 1.75, 3.5);
     this.zoneGroup.add(triageGlass);
+    CollisionFactory.addBox(this.colliders,3.5,1.8,3.5,4.8,2.8,.12);
+    this.gf.buildWall(this.zoneGroup,this.colliders,.55,1.6,3.5,1.1,3.2,.22);
+    const clearGlass=this.gf.materials.glass.clone();
+    clearGlass.transparent=true;clearGlass.opacity=.23;clearGlass.depthWrite=false;clearGlass.side=THREE.DoubleSide;
+    new AccessDoor(this,{id:'ER_NURSE_ENTRY',x:6.4,z:3.5,width:1.0,title:'護理站',material:clearGlass,readerSide:-1});
+    // Transparent card-controlled link directly from protected station to observation beds.
+    this.gf.buildFloor(this.zoneGroup,this.walkables,8,0,6,2.4,1.8,this.gf.materials.floor);
+    this.gf.buildCeiling(this.zoneGroup,8,3.2,6,2.4,1.8);
+    for(const z of [5.1,6.9])this.gf.buildWall(this.zoneGroup,this.colliders,8,1.6,z,2,3.2,.18);
+    new AccessDoor(this,{id:'ER_NURSE_BEDS',x:8,z:6,yaw:Math.PI/2,width:1.6,title:'留觀區感應玻璃門',material:clearGlass});
 
     SignAnchor.buildWallPlaque({
       scene: this.zoneGroup,
@@ -300,7 +306,8 @@ export class FirstCampus2FER {
       wallHeight: 3.2,
       wallThickness: 0.4,
       isAlongX: false,
-      isOpen: true, // Sliding glass open threshold to exterior
+      isOpen: true,
+      includeLeaf: false, // only the controlled steel leaves below exist
       frameMaterial: this.gf.materials.stainless
     });
 
@@ -333,9 +340,7 @@ export class FirstCampus2FER {
     bedWalls.line('x',3.5,9,20);bedWalls.cut('x',3.5,14.5,2.4);bedWalls.build();
     this.gf.buildWall(this.zoneGroup,this.colliders,14.5,2.8,3.5,2.4,.8,.22);
     new AccessDoor(this,{id:'ER_BEDS',x:14.5,z:3.5,width:2.4,title:'急診留觀區'});
-    // Clear the old fixed-open ambulance leaf, retaining its header/frame.
-    const oldEntrance=this.zoneGroup.getObjectByName('Doorway_22_0');
-    for(const child of oldEntrance.children)if(child.geometry?.parameters.height===2.55)child.visible=false;
+    // No generic fixed-open leaf is built at the ambulance entrance.
     new AccessDoor(this,{id:'ER_HILLSIDE',x:22,z:0,yaw:Math.PI/2,width:1.8,title:'急診山側感應門'});
     const exterior=buildCampusBackdrop(this.zoneGroup);
     exterior.position.y=11.5;

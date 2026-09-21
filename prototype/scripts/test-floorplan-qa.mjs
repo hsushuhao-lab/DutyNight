@@ -17,7 +17,7 @@ for(const id of Object.keys(CORE_ORIGINS).filter(s=>s!=='second_campus_std')){
  check(id+' identical core layout',()=>assert.equal(z.verticalCore.layout,id.startsWith('first')?'FIRST_CORE_V1':'SECOND_CORE_V1'));
  const [x,z0]=z.verticalCore.origin;
  check(id+' lift button beside door',()=>assert.deepEqual(z.verticalCore.panel,[1.65,3.72]));
- check(id+' core entrance reachable',()=>walk([x,1.7,z0+1.5],[x,1.7,z0-4.6]));
+ check(id+' core entrance reachable',()=>walk([x,1.7,z0+1.5],[x,1.7,z0-(z.wardDoor?2.8:4.6)]));
  for(const [key,spawn] of Object.entries(WORLD_SPAWNS).filter(([,v])=>v.zoneId===id))check(key+' collision and ground',()=>{c.teleport(...spawn.pos);assert(!c.checkCollision(c.position.x,c.position.z));assert.notEqual(c.supportedHeight(c.position.x,c.position.z),null);});
  check(id+' menu-only stair physically closed',()=>{const leaf=z.interactables.find(o=>o.userData.kind==='stairs');const p=leaf.getWorldPosition(new THREE.Vector3());assert(c.checkCollision(p.x,p.z));});
  if(id==='first_campus_4f'||id==='second_campus_5f'){

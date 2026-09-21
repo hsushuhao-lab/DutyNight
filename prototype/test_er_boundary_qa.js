@@ -32,6 +32,16 @@ for (const gap of gaps) {
 for (const [name, start, end] of [['observation west return', 3.5, 9.5], ['charting west return', -9.5, -3.5]]) {
   try {
     for(let z=start+.25;z<end;z+=.25) {
+      // Explicitly authorized staff-to-beds glass link replaces only this wall aperture.
+      if(name==='observation west return' && z>5.1 && z<6.9){
+        const gate=zone.accessDoors.ER_NURSE_BEDS;assert(gate.closed);
+        if(z>5.3 && z<6.7){
+          const ray=new THREE.Raycaster(new THREE.Vector3(9.8,1.6,z),new THREE.Vector3(-1,0,0),0,2.1);
+          zone.zoneGroup.updateMatrixWorld(true);
+          assert(ray.intersectObjects(gate.leaves,true).length>0,'Closed glass link must be visible from bed side');
+        }
+        continue;
+      }
       const probe=new THREE.Box3(new THREE.Vector3(8.85,.15,z-.1),new THREE.Vector3(9.15,1.9,z+.1));
       assert(zone.colliders.some(box=>box.intersectsBox(probe)), 'No west return collision at x=9, z='+z);
       const ray=new THREE.Raycaster(new THREE.Vector3(9.8,1.6,z),new THREE.Vector3(-1,0,0),0,1.1);

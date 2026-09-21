@@ -40,8 +40,8 @@ export class FirstCampus1F {
     this.gf.buildWall(this.zoneGroup,this.colliders,5.8,lobbyHeight/2,8,24.4,lobbyHeight,.4);
     this.gf.buildWall(this.zoneGroup,this.colliders,-8,3.6,8,3.2,.8,.4);  // North wall
 
-    const buildClosedGlassBay = (z, title) => {
-      const glass = new THREE.Mesh(new THREE.BoxGeometry(0.08, 2.6, 3.2), this.gf.materials.glass);
+    const buildClosedSteelBay = (z, title) => {
+      const glass = new THREE.Mesh(new THREE.BoxGeometry(0.08, 2.6, 3.2), this.gf.materials.metal);
       glass.position.set(17.85, 1.3, z);
       this.zoneGroup.add(glass);
       CollisionFactory.addBox(this.colliders, 17.88, 1.3, z, 0.16, 2.6, 3.2);
@@ -65,15 +65,17 @@ export class FirstCampus1F {
       this.gf.buildWall(this.zoneGroup, this.colliders, 20.0, lobbyHeight / 2, z, 0.4, lobbyHeight, 3.2);
       this.gf.buildWall(this.zoneGroup, this.colliders, 19.0, lobbyHeight / 2, z - 1.6, 2.0, lobbyHeight, 0.2);
       this.gf.buildWall(this.zoneGroup, this.colliders, 19.0, lobbyHeight / 2, z + 1.6, 2.0, lobbyHeight, 0.2);
+      this.gf.buildWall(this.zoneGroup,this.colliders,18,3.3,z,.4,1.4,3.2);
       return glass;
     };
 
     // 1. Pharmacy / drug-storage facade (z = -4.0), closed behind glass at night.
-    const pharmShutter = buildClosedGlassBay(-4.0, '門診藥局／藥庫');
+    const pharmShutter = buildClosedSteelBay(-4.0, '門診藥局／藥庫');
     pharmShutter.userData = {
       interactable: true,
       id: '1F_PHARM_GATE',
-      type: 'exit_door',
+      type: 'closed_door',
+      locked: true,
       label: '檢視夜間鎖閉的門診藥局／藥庫'
     };
     this.interactables.push(pharmShutter);
@@ -91,11 +93,12 @@ export class FirstCampus1F {
     });
 
     // 2. Outpatient clinic facade (z = 4.0), also a visibly locked glass frontage.
-    const opdShutter = buildClosedGlassBay(4.0, '門診診間區');
+    const opdShutter = buildClosedSteelBay(4.0, '門診診間區');
     opdShutter.userData = {
       interactable: true,
       id: '1F_OPD_GATE',
-      type: 'exit_door',
+      type: 'closed_door',
+      locked: true,
       label: '檢視夜間閉館的門診區',
       subtitle: '「門診區日間營業結束，夜間暫停開放。」'
     };
@@ -273,8 +276,7 @@ export class FirstCampus1F {
     for (const z of [-3.5,0,3.5]) for(const x of [10.3,12.1,13.9]) asset(art,'bench',[x,0,z]);
     asset(art,'plant',[-10.5,0,6]);
     asset(art,'plant',[16.5,0,6]);
-    solid(art,this.gf.materials.metal,[-9,2.5,7.76],[2.8,.9,.055]);
-    for (let row=0;row<4;row++) solid(art,this.gf.materials.wall,[-9,2.76-row*.18,7.72],[2.6,.12,.008]);
+    // The shared elevator-core opening is clear; no legacy directory board across it.
     wallTrim(this.zoneGroup,this.gf.materials);
     const exterior=buildCampusBackdrop(this.zoneGroup);
     exterior.position.y=11.5;

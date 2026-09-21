@@ -178,7 +178,7 @@ export class UIManager {
     btnGrid.style.gap = '8px';
     btnGrid.style.margin = '14px 0';
 
-    for (const destination of destinations) {
+    for (const destination of [...destinations].sort((a,b) => b.floorNum-a.floorNum)) {
       const destFloor = destination.floorNum || Number(destination.zoneId.match(/_([0-9])f/)?.[1] || 0);
       const isCurrent = destination.zoneId === currentZone;
 

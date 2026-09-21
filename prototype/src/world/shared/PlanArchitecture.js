@@ -53,7 +53,7 @@ export function workstation(zone,{x,z,yaw=0,id}){
 }
 
 /** Identical protected staff-station module used by both wards. Front faces local -Z. */
-export function nursingStation(zone,{x,z,yaw=0,id}) {
+export function nursingStation(zone,{x,z,yaw=0,id,rearEntry=false}) {
   const sub={gf:zone.gf,zoneGroup:new THREE.Group(),colliders:[],walkables:[],interactables:[],workstations:[]};
   sub.zoneGroup.name='NursingStation_STANDARD_6x6';sub.zoneGroup.position.set(x,0,z);sub.zoneGroup.rotation.y=yaw;zone.zoneGroup.add(sub.zoneGroup);
   const m=zone.gf.materials;
@@ -66,9 +66,10 @@ export function nursingStation(zone,{x,z,yaw=0,id}) {
   solid(sub.zoneGroup,m.doorWood,[0,2.92,0],[6.1,.36,.25]);
   zone.gf.buildWall(sub.zoneGroup,sub.colliders,-3,1.6,3,.2,3.2,6);
   zone.gf.buildWall(sub.zoneGroup,sub.colliders,3,1.6,3,.2,3.2,6);
-  zone.gf.buildWall(sub.zoneGroup,sub.colliders,0,1.6,6,6.2,3.2,.2);
-  workstation(sub,{x:-1.5,z:3.8,yaw:0,id:id+'_A'});workstation(sub,{x:1.1,z:3.8,yaw:0,id:id+'_B'});
-  asset(sub.zoneGroup,'storageCabinet',[-1.7,0,5.6]);asset(sub.zoneGroup,'printer',[1.1,.8,3.8],[.7,.7,.7]);
+  // The ward perimeter owns the rear wall when it contains the admission aperture.
+  if(!rearEntry)zone.gf.buildWall(sub.zoneGroup,sub.colliders,0,1.6,6,6.2,3.2,.2);
+  workstation(sub,{x:-1.8,z:3.8,yaw:0,id:id+'_A'});workstation(sub,{x:1.8,z:3.8,yaw:0,id:id+'_B'});
+  asset(sub.zoneGroup,'storageCabinet',[-1.7,0,5.6],[1,1,1],Math.PI);asset(sub.zoneGroup,'printer',[1.8,.8,3.8],[.7,.7,.7]);
   SignAnchor.buildWallPlaque({scene:sub.zoneGroup,x:0,y:2.88,z:-.15,rotationY:Math.PI,width:1.5,height:.3,code:'',title:'護理站',subtitle:'',header:''});
   sub.zoneGroup.updateWorldMatrix(true,true);
   const matrix=sub.zoneGroup.matrixWorld;
@@ -76,6 +77,6 @@ export function nursingStation(zone,{x,z,yaw=0,id}) {
   for(const item of sub.workstations){const chair=new THREE.Vector3(...item.chair).applyMatrix4(matrix);zone.workstations.push({...item,chair:chair.toArray(),yaw:item.yaw+yaw});}
   // Door is created in world space after converting the module attachment point.
   const p=new THREE.Vector3(2.3,0,0).applyMatrix4(matrix);
-  new AccessDoor(zone,{id:id+'_staff',x:p.x,z:p.z,yaw,width:1.3,title:'護理站工作門',material:m.doorWood});
+  new AccessDoor(zone,{id:id+'_staff',x:p.x,z:p.z,yaw,width:1.3,title:'護理站工作門',material:m.metal,readerSide:-1});
   zone.station={id,module:'NursingStation_STANDARD_6x6',position:[x,z],yaw};
 }

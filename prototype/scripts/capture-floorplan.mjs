@@ -1,16 +1,23 @@
 import {chromium} from 'playwright';import {preview} from 'vite';import fs from 'node:fs/promises';import {fileURLToPath} from 'node:url';
 const output=process.argv[2]||'qa-results/screens';await fs.mkdir(output,{recursive:true});
 const server=await preview({root:fileURLToPath(new URL('..',import.meta.url)),preview:{host:'127.0.0.1',port:4175,strictPort:true}});
-const browser=await chromium.launch({channel:'chrome',headless:true,args:['--no-sandbox','--disable-dev-shm-usage','--enable-unsafe-swiftshader']});
+const browser=await chromium.launch({...(process.env.CHROME_PATH?{executablePath:process.env.CHROME_PATH}:{channel:'chrome'}),headless:true,args:['--no-sandbox','--disable-dev-shm-usage','--enable-unsafe-swiftshader']});
 const surface={viewport:{width:1280,height:720},deviceScaleFactor:process.env.CI?.5:1};
 const captures=[],errors=[];
 try{const p=await browser.newPage(surface);p.setDefaultTimeout(90000);p.on('pageerror',e=>errors.push(e.message));
 const views=[
  ['3f-workstations','first_campus_3f',8,1.7,5.1,-Math.PI/2,0],
  ['4f-lobby','first_campus_4f',0,1.7,7.5,0,0],
+ ['1f-steel-shutters','first_campus_1f',16,1.7,4,-Math.PI/2,0],
+ ['1f-clear-core-entry','first_campus_1f',-8,1.7,6,Math.PI,0],
+ ['4f-cabinet','first_campus_4f',-9,1.7,7.7,Math.PI,0],
+ ['second5-direct-entry','second_campus_5f',72,1.7,6,0,0],
+ ['second5-staff-exit','second_campus_5f',74.3,1.7,-5.4,Math.PI,0],
+ ['er-staff-entry','first_campus_2f',6.4,1.7,2.3,Math.PI,0],
+ ['er-glass-link','first_campus_2f',6.0,1.7,6,-Math.PI/2,0],
  ['4f-duty','first_campus_4f',-9.5,1.7,6,Math.PI/2,-.1],
  ['4f-station','first_campus_4f',2.4,1.7,-3,-Math.PI/2,0],
- ['second5-station','second_campus_5f',71,1.7,-9,Math.PI,0],
+ ['second5-station','second_campus_5f',72,1.7,-7,Math.PI,0],
  ['second5-hall','second_campus_5f',76.5,1.7,-7,0,0],
  ['2f-beds-gate','first_campus_2f',14.5,1.7,1.7,Math.PI,0],
  ['2f-hillside-gate','first_campus_2f',24,1.7,0,Math.PI/2,0],

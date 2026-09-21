@@ -34,6 +34,7 @@ export class Doorway {
       wallThickness = 0.35,
       isAlongX = true,
       isOpen = true,
+      includeLeaf = true,
       frameMaterial,
       doorMaterial
     } = options;
@@ -128,7 +129,7 @@ export class Doorway {
     const leafWidth = width - 0.08;
     const leafHeight = height - 0.05;
 
-    if (isOpen) {
+    if (includeLeaf && isOpen) {
       // Propped open against interior wall
       if (isAlongX) {
         const doorLeaf = new THREE.Mesh(
@@ -145,7 +146,7 @@ export class Doorway {
         doorLeaf.position.set(x + leafWidth / 2, leafHeight / 2, z - width / 2 + 0.12);
         group.add(doorLeaf);
       }
-    } else {
+    } else if (includeLeaf) {
       // Closed door leaf (with door collider)
       const leafW = isAlongX ? leafWidth : leafThickness;
       const leafD = isAlongX ? leafThickness : leafWidth;

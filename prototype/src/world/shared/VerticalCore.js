@@ -14,7 +14,7 @@ export function buildVerticalCore(zone,zoneId){
  const first=zoneId.startsWith('first'),[cx,cz]=origin,m=zone.gf.materials;
  const local={gf:zone.gf,colliders:[],walkables:[],interactables:[],zoneGroup:new THREE.Group()};
  const root=local.zoneGroup;root.name=`VerticalCore_${first?'first':'second'}`;root.position.set(cx,0,cz);zone.zoneGroup.add(root);
- const walls=new PlanWalls(local);walls.rect(-8,-4,8,4);walls.cut('x',-4,0,3.2);
+ const walls=new PlanWalls(local);walls.rect(-8,-4,8,4);walls.cut('x',-4,0,zone.wardDoor?2.4:3.2);
  if(zoneId==='first_campus_4f')walls.cut('z',-8,0,1.4);
  if(zoneId==='second_campus_5f'||zoneId==='second_campus_4f_story'||zoneId==='second_campus_std')walls.cut('z',8,0,1.4);
  walls.build();zone.gf.buildFloor(root,local.walkables,0,0,0,16,8,m.floorTile);zone.gf.buildCeiling(root,0,3.2,0,16,8);

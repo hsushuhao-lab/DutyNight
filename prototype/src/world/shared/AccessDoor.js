@@ -4,8 +4,8 @@ import { SignAnchor } from './SignAnchor.js';
 
 /** A pocket-sliding, normally closed staff door. Geometry and collision share the aperture. */
 export class AccessDoor {
-  constructor(zone, {id, x, z, yaw=0, width=2.4, title='感應門禁', material, portal=null, readers=true}) {
-    this.zone=zone; this.id=id; this.portal=portal; this.width=width;
+  constructor(zone, {id, x, z, yaw=0, width=2.4, title='感應門禁', material, portal=null, readers=true, readerSide=1}) {
+    this.zone=zone; this.id=id; this.portal=portal; this.width=width; this.readerSide=readerSide;
     const m=zone.gf.materials;
     this.root=new THREE.Group(); this.root.name=`AccessDoor_${id}`;
     this.root.position.set(x,0,z); this.root.rotation.y=yaw; zone.zoneGroup.add(this.root);
@@ -16,14 +16,17 @@ export class AccessDoor {
     solid(this.root,m.wall,[0,2.845,0],[width+.2,.71,.22]);
     this.leaves=[-1,1].map(side=>{
       const leaf=solid(this.root,material||m.metal,[side*width/4,1.175,0],[width/2,2.35,.10]);
-      solid(leaf,m.stainless,[-side*.14,-.12,-.07],[.035,.34,.05]);
+      if(!readers)solid(leaf,m.stainless,[-side*.14,-.12,-.07],[.035,.34,.05]);
       leaf.userData={interactable:!portal,id:`${id}_leaf_${side}`,type:'access_door',doorId:id,label:`開啟${title}`};
       if(!portal) zone.interactables.push(leaf);
       return leaf;
     });
     this.readers=[];
+    const mountX=readerSide*(width/2+.16);
+    const mount=solid(this.root,m.metal,[mountX,1.4,0],[.24,.42,.30]);
+    mount.userData.readerMount=true;this.readerMounts=[mount];
     for(const side of [-1,1]) {
-      const reader=new THREE.Group(); reader.position.set(width/2+.26,1.22,side*.18);
+      const reader=new THREE.Group(); reader.position.set(mountX,1.4,side*.20);
       reader.rotation.y=side===1?0:Math.PI; this.root.add(reader);
       const panel=solid(reader,m.metal,[0,0,0],[.17,.32,.07]);
       const led=new THREE.Mesh(new THREE.CircleGeometry(.037,16),new THREE.MeshBasicMaterial({color:0xdda634}));

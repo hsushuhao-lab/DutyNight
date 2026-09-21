@@ -15,8 +15,8 @@ export class WardFloorplan {
   build(){this.scene.add(this.zoneGroup);const second=this.campus==='second',o=second?72:0,walls=new PlanWalls(this);this.planOrigin=o;
     this.gf.buildFloor(this.zoneGroup,this.walkables,o,0,-10,24,24,this.gf.materials.floorTile);
     this.gf.buildCeiling(this.zoneGroup,o,3.2,-10,24,24);
-    walls.rect(o-12,-22,o+12,2);walls.cut('x',2,o,3.2);
-    walls.line('x',0,o-12,o+12);walls.cut('x',0,o+(second?4.4:0),2.4);
+    walls.rect(o-12,-22,o+12,2);walls.cut('x',2,o,2.4);
+    // A single admission boundary at z=2. The previous parallel z=0 wall made an unintended corridor.
     const room=(n,r,side,d,kind='ward',label)=>ordinaryRoom(this,walls,{id:String(this.floor*100+n),label,rect:[r[0]+o,r[1],r[2]+o,r[3]],side,door:d+(side==='north'||side==='south'?o:0),kind});
     if(!second){
       room(1,[-12,-4,-6,0],'east',-2);
@@ -33,9 +33,9 @@ export class WardFloorplan {
       nursingStation(this,{x:5,z:-3,yaw:Math.PI/2,id:'first_station'});
       walls.line('x',-6,5,12);walls.line('z',11,-6,0);
       this.buildDutyRoom();
-      this.wardDoor=new AccessDoor(this,{id:'first_ward',x:0,z:0,width:2.4,title:'4F 病房'});
+      this.wardDoor=new AccessDoor(this,{id:'first_ward',x:0,z:2,width:2.4,title:'4F 病房'});
       this.wardGateCollider=this.wardDoor.closedBox;this.wardGateClosed=true;
-      this.entryPoint=[0,1.7,1.2];this.hallPoint=[0,1.7,-3];
+      this.entryPoint=[0,1.7,3.2];this.hallPoint=[0,1.7,-3];
     }else{
       room(1,[-12,-5,-6,0],'east',-2.5);
       room(2,[-12,-12,-6,-5],'east',-8.5);
@@ -49,13 +49,15 @@ export class WardFloorplan {
       room(8,[6,-10,12,-6],'west',-8);
       room(9,[6,-6,12,0],'west',-3);
       // Keep 3 m on the west: open ward leaves project into this circulation lane.
-      nursingStation(this,{x:o,z:-6.3,yaw:0,id:'second_station'});
-      this.wardDoor=new AccessDoor(this,{id:'second_ward',x:o+4.4,z:0,width:2.4,title:`${this.floor}F 病房`});
+      nursingStation(this,{x:o,z:-4,yaw:0,id:'second_station',rearEntry:true});
+      this.wardDoor=new AccessDoor(this,{id:'second_ward',x:o,z:2,width:2.4,title:`${this.floor}F 病房`});
       this.wardGateCollider=this.wardDoor.closedBox;this.wardGateClosed=true;
-      this.entryPoint=[o+4.4,1.7,1.2];this.hallPoint=[o+4.4,1.7,-8];
+      this.entryPoint=[o,1.7,3.2];this.hallPoint=[o+4.4,1.7,-8];
       this.buildDoctorOffice(o);
     }
     walls.build();
+    // Solid sill spans the coplanar floor seam; no sub-pixel support crack at z=2.
+    this.gf.buildFloor(this.zoneGroup,this.walkables,o,.002,2,2.4,.36,this.gf.materials.stainless);
     for(const [x,z] of [[o,1],[o,-9],[o,-15],[o-4,-3],[o+4,-3]]) this.gf.buildCeilingLight(this.zoneGroup,x,3.15,z,.7,8);
     SignAnchor.buildHangingSign({scene:this.zoneGroup,x:o,y:2.7,z:1.6,ceilingY:3.2,rotationY:0,text:second?`${this.floor}F 病房`:'4F 病房'});
     SignAnchor.buildWallPlaque({scene:this.zoneGroup,x:o,y:2.6,z:-21.85,width:1.6,height:.35,code:'',title:'活動大廳',subtitle:'',header:''});
@@ -71,7 +73,8 @@ export class WardFloorplan {
     solid(this.zoneGroup,this.gf.materials.doorWood,[-11.25,.28,8.1],[.5,.56,.5]);
     solid(this.zoneGroup,this.gf.materials.lightWarm,[-11.25,.76,8.1],[.19,.24,.19]);
     workstation(this,{x:-10.0,z:3.1,id:'duty_desk'});
-    asset(this.zoneGroup,'storageCabinet',[-8.8,0,9.3]);
+    this.dutyCabinetAnchor=[-8.8,0,9.3];this.dutyCabinetYaw=Math.PI;
+    asset(this.zoneGroup,'storageCabinet',this.dutyCabinetAnchor,[1,1,1],this.dutyCabinetYaw);
     // Bathroom with a real doorway, not a sealed alcove.
     w.rect(-14,2,-11.5,5);w.cut('z',-11.5,4,1.2);
     solid(this.zoneGroup,this.gf.materials.bedSheet,[-13.4,.8,3],[.65,.25,.45]);
