@@ -67,6 +67,8 @@ for (const [spawnKey, sp] of Object.entries(DEBUG_SPAWN_POINTS)) {
   const dummyScene = new THREE.Scene();
   const zone = new ZoneClass(dummyScene, gf);
   zone.build();
+  // Production doors are normally closed; spatial spawn QA opens them so door state does not masquerade as bad geometry.
+  for (const door of Object.values(zone.accessDoors || {})) door.setClosed(false);
 
   // Spawn clearance test (player radius 0.35m)
   const pointCheck = CollisionFactory.testPoint(
