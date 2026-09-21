@@ -11,6 +11,7 @@ import { SignAnchor } from './SignAnchor.js';
 export class WardFloorplan {
   constructor(scene,gf,{campus='first',floor=4}={}){
     Object.assign(this,{scene,gf,campus,floor});this.colliders=[];this.walkables=[];this.interactables=[];this.roomAreas=[];this.workstations=[];this.accessDoors={};
+    this.layoutVersion='USER_PLAN_20260921_V2';this.activityHall=null;this.layoutPlan=null;
     this.zoneGroup=new THREE.Group();this.zoneGroup.name=`${campus}_${floor}F_PLAN_20260920`;
   }
   build(){this.scene.add(this.zoneGroup);const second=this.campus==='second',o=second?72:0,walls=new PlanWalls(this);this.planOrigin=o;
@@ -33,6 +34,11 @@ export class WardFloorplan {
       // Protected station sits directly against the ward hall. No extra parallel strip beside it.
       nursingStation(this,{x:3.2,z:-3,yaw:Math.PI/2,id:'first_station'});
       walls.line('x',-6,3.8,12);
+      // User-approved 4F plan: 401-403 + WC on west, 404-407 south,
+      // 408-409 east, with one open central activity hall and no side-strip corridor.
+      this.activityHall={id:'ACTIVITY_HALL',label:'活動大廳',bounds:[-5.2,-16.8,4.8,-6.3],center:[0,1.7,-11.6]};
+      this.layoutPlan={rooms:['401','402','403','WC','404','405','406','407','408','409'],entrySequence:['duty_room','first_ward','first_station','activity_hall'],dutyRoomOutsideWard:true,narrowStationStrip:false};
+      SignAnchor.buildHangingSign({scene:this.zoneGroup,x:0,y:2.66,z:-15.8,ceilingY:3.2,rotationY:0,text:'活動大廳'});
       this.buildDutyRoom();
       this.wardDoor=new AccessDoor(this,{id:'first_ward',x:0,z:2,width:2.4,title:'4F 病房'});
       this.wardGateCollider=this.wardDoor.closedBox;this.wardGateClosed=true;
@@ -50,7 +56,12 @@ export class WardFloorplan {
       room(8,[6,-10,12,-6],'west',-8);
       room(9,[6,-6,12,0],'west',-3);
       // Keep 3 m on the west: open ward leaves project into this circulation lane.
+      // User-approved 5F route is: ward gate -> protected nursing station -> staff card door
+      // -> activity hall -> 501-509. The north-west sealed block remains deliberately unnamed.
       nursingStation(this,{x:o,z:-4,yaw:0,id:'second_station',rearEntry:true});
+      this.activityHall={id:'ACTIVITY_HALL',label:'活動大廳',bounds:[o-5,-16.8,o+5,-6.3],center:[o,1.7,-11.6]};
+      this.layoutPlan={rooms:['501','502','503','504','505','506','507','508','509'],entrySequence:['second_ward','second_station','second_station_staff','activity_hall'],doctorOfficeOutsideWard:true,unnamedNorthwestBlock:true};
+      SignAnchor.buildHangingSign({scene:this.zoneGroup,x:o,y:2.66,z:-15.8,ceilingY:3.2,rotationY:0,text:'活動大廳'});
       this.wardDoor=new AccessDoor(this,{id:'second_ward',x:o,z:2,width:2.4,title:`${this.floor}F 病房`});
       this.wardGateCollider=this.wardDoor.closedBox;this.wardGateClosed=true;
       this.entryPoint=[o,1.7,3.2];this.hallPoint=[o+4.4,1.7,-8];
