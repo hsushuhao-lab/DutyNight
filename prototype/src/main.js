@@ -12,6 +12,7 @@ import { preloadMaterials } from './art/MaterialRegistry.js';
 RectAreaLightUniformsLib.init();
 await Promise.all([preloadAssets(), preloadMaterials()]);
 import { gameState } from './core/GameState.js';
+import { DutyEventManager } from './core/DutyEventManager.js';
 import { Level3FBlockout } from './world/Level3FBlockout.js';
 import { applyAct1CollisionHotfix } from './world/CollisionHotfix.js';
 import { FPSController } from './player/FPSController.js';
@@ -68,6 +69,7 @@ const controller = new FPSController(
 // Instantiate World Router
 const worldRouter = new WorldRouter(scene, camera, controller);
 window.worldRouter = worldRouter;
+const dutyEvents = new DutyEventManager(gameState);
 
 // Instantiate UI Manager
 let uiManager;
@@ -164,8 +166,50 @@ controller.onInteract = (interactable) => {
     uiManager.openTravelSelector(worldRouter.floorDestinations(interactable.kind), worldRouter.activeZoneId, destination => {
       if (destination.zoneId === 'first_campus_4f') gameState.markTaskComplete('WARD_ENTRY');
       worldRouter.loadZone(destination.zoneId, destination.spawn);
+      const dutyLine=dutyEvents.onZoneEntered(destination.zoneId);
+      if(dutyLine)uiManager.showSubtitle(dutyLine.speaker,dutyLine.text);
       controller.enabled = true;
     }, interactable.kind);
+  } else if (interactable.type === 'p1_action') {
+    const action=interactable.action;
+    if(action==='NURSE_REPORT'){
+      if(!gameState.isTaskComplete('WARD_ENTRY')) return uiManager.showSubtitle('李醫師','「先正式抵達 4F 再報到。」',2500);
+      dutyEvents.complete('P1_4F_REPORT','17:20');
+      uiManager.showSubtitle('晚班護理師','「醫師晚安，今天目前都還算穩定。403 昨晚比較睡不好，406 下午有點焦慮，408 晚點再追一下血壓。」');
+    } else if(action==='DUTY_ROOM_PREP'){
+      if(!gameState.isTaskComplete('P1_4F_REPORT')) return uiManager.showSubtitle('李醫師','「先去護理站報到。」',2500);
+      dutyEvents.complete('P1_DUTY_ROOM_READY','17:30');
+      uiManager.showSubtitle('李醫師','「東西放好了，床也整理一下。值班電話正常。」');
+    } else if(action==='WARD_ROUND'){
+      if(!gameState.isTaskComplete('P1_DUTY_ROOM_READY')) return uiManager.showSubtitle('李醫師','「先把值班室整理好再巡房。」',2500);
+      dutyEvents.complete('P1_ROUND_COMPLETE','18:00');
+      uiManager.showSubtitle('值班電話','☎ 護理站：「醫師，403 說睡不著，可以來看一下嗎？」');
+    } else if(action==='INSOMNIA_403'){
+      if(!gameState.isTaskComplete('P1_ROUND_COMPLETE')) return uiManager.showSubtitle('李醫師','「先完成晚間巡房。」',2500);
+      dutyEvents.complete('P1_INSOMNIA_DONE','18:30');
+      uiManager.showSubtitle('403 病人','「醫師，我一直睡不著。」');
+    } else if(action==='NORMAL_EVENT'){
+      if(!gameState.isTaskComplete('P1_INSOMNIA_DONE')) return uiManager.showSubtitle('李醫師','「先處理 403 的睡眠問題。」',2500);
+      dutyEvents.complete('P1_NORMAL_EVENT_DONE','19:30');
+      uiManager.showSubtitle('晚班護理師',`「19 點這位病人有些${dutyEvents.normalEvent.label}，目前處理完都穩定。」`);
+    } else if(action==='REST'){
+      if(!gameState.isTaskComplete('P1_NORMAL_EVENT_DONE')) return uiManager.showSubtitle('李醫師','「先把剛才的病房事件處理完。」',2500);
+      dutyEvents.complete('P1_REST_DONE','20:00');
+      uiManager.showSubtitle('值班電話','☎ 急診：「醫師您好，急診有一位病人需要精神科評估，可以麻煩下來嗎？」');
+    } else if(action==='ER_ASSESS'){
+      if(!gameState.isTaskComplete('P1_REST_DONE')) return uiManager.showSubtitle('李醫師','「目前沒有急診會診任務。」',2500);
+      dutyEvents.complete('P1_ER_ASSESSMENT_DONE','20:25');
+      uiManager.showSubtitle('急診病人','「最近壓力很大，兩天睡不好，今晚一直心悸，很焦慮。」');
+    } else if(action==='ER_NOTE'){
+      if(!gameState.isTaskComplete('P1_ER_ASSESSMENT_DONE')) return uiManager.showSubtitle('李醫師','「先完成病人評估。」',2500);
+      dutyEvents.complete('P1_ER_NOTE_DONE','20:30');
+      uiManager.showSubtitle('李醫師','「急診評估紀錄完成，回 4F。」');
+    } else if(action==='END_SHIFT'){
+      if(!gameState.isTaskComplete('P1_RETURN_4F')) return uiManager.showSubtitle('李醫師','「還沒到可以休息的時候。」',2500);
+      dutyEvents.complete('ACT1_NORMAL_FLOW','21:00');
+      uiManager.showSubtitle('李醫師','「目前都處理完了。先躺一下吧。」');
+    }
+    controller.currentInteractable=null;uiManager.showPrompt(null);
   } else if (interactable.type === 'ward_gate') {
     const changed = worldRouter.activeZoneInstance.toggleWardGate(controller.position);
     if (changed) soundManager.playClick();
