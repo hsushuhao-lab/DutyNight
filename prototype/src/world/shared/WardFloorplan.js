@@ -68,7 +68,7 @@ export class WardFloorplan {
     this.gf.buildFloor(this.zoneGroup,this.walkables,-11,0,6,6,8,this.gf.materials.floorWood);
     this.gf.buildCeiling(this.zoneGroup,-11,3.2,6,6,8);
     this.dutyDoor=new AccessDoor(this,{id:'duty_room',x:-8,z:6,yaw:Math.PI/2,width:1.4,title:'醫師值班室',material:this.gf.materials.doorWood,readers:false});
-    this.dutyDoor.setClosed(false);this.dutyDoorClosed=false;
+    this.dutyDoor.setClosed(true);this.dutyDoorClosed=true;
     asset(this.zoneGroup,'hospitalBed',[-12.5,0,7.8],[1.2,.95,.97]);CollisionFactory.addBox(this.colliders,-12.5,.45,7.8,1.4,.9,2.2);
     solid(this.zoneGroup,this.gf.materials.doorWood,[-11.25,.28,8.1],[.5,.56,.5]);
     solid(this.zoneGroup,this.gf.materials.lightWarm,[-11.25,.76,8.1],[.19,.24,.19]);
@@ -97,7 +97,7 @@ export class WardFloorplan {
     this.gf.buildFloor(this.zoneGroup,this.walkables,o+11,0,6,6,8,this.gf.materials.floor);
     this.gf.buildCeiling(this.zoneGroup,o+11,3.2,6,6,8);
     workstation(this,{x:o+11,z:3.5,id:'second_doctor'});
-    new AccessDoor(this,{id:'doctor_office',x:o+8,z:6,yaw:Math.PI/2,width:1.4,title:'醫師辦公室',material:this.gf.materials.doorWood,readers:false}).setClosed(false);
+    new AccessDoor(this,{id:'doctor_office',x:o+8,z:6,yaw:Math.PI/2,width:1.4,title:'醫師辦公室',material:this.gf.materials.doorWood,readers:false}).setClosed(true);
     w.build();this.gf.buildCeilingLight(this.zoneGroup,o+11,3.15,6,.75,7);
     this.roomAreas.push({id:'DOCTOR',label:'醫師辦公室',point:[o+9.5,1.7,6],door:[o+8,1.7,6],corridor:[o+6.5,1.7,6],protectedArea:false,kind:'office'});
   }
