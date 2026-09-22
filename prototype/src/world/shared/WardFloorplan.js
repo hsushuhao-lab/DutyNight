@@ -29,11 +29,11 @@ export class WardFloorplan {
     // 404/504–406/506 across the top, 407/507 upper-right -> 409/509 bottom-right.
     room(1,[-12,-6,-8,0],'east',-3);
     room(2,[-12,-12,-8,-6],'east',-9);
-    room(3,[-12,-22,-8,-12],'east',-17);
+    room(3,[-12,-22,-8,-12],'east',-13);
     room(4,[-8,-22,-3,-16],'south',-5.5);
     room(5,[-3,-22,2,-16],'south',-.5);
     room(6,[2,-22,7,-16],'south',4.5);
-    room(7,[7,-22,12,-12],'west',-17);
+    room(7,[7,-22,12,-12],'west',-13);
     room(8,[7,-12,12,-6],'west',-9);
     room(9,[7,-6,12,0],'west',-3);
 

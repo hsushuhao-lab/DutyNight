@@ -32,7 +32,7 @@ export function ordinaryRoom(zone,walls,{id,label=id+' 病房',rect,side,door,ki
   for(const child of opening.children)if(child.geometry?.parameters.height===2.35){opening.updateWorldMatrix(true,true);zone.colliders.push(new THREE.Box3().setFromObject(child));}
   const outward=side==='north'?[0,-1]:side==='south'?[0,1]:side==='west'?[-1,0]:[1,0];
   const corridor=[x+outward[0]*1.1,1.7,z+outward[1]*1.1];
-  const point=kind==='ward'?[cx,1.7,cz]:[x-outward[0]*1.25,1.7,z-outward[1]*1.25];
+  const point=kind==='ward'?(alongX?[x,1.7,cz]:[cx,1.7,z]):[x-outward[0]*1.25,1.7,z-outward[1]*1.25];
   const yaw=side==='north'?Math.PI:side==='south'?0:side==='west'?-Math.PI/2:Math.PI/2;
   SignAnchor.buildWallPlaque({scene:zone.zoneGroup,x:x+(alongX?-1.1:outward[0]*.15),y:1.75,z:z+(alongX?outward[1]*.15:-1.1),rotationY:yaw,width:1,height:.34,code:id,title:label.replace(id,'').trim(),subtitle:'',header:''});
   if(kind==='ward'){
