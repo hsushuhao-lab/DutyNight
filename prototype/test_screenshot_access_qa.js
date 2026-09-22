@@ -22,8 +22,8 @@ for(const id of ['first_campus_4f','second_campus_5f']){
  check(id+' staff reader is mounted on left post above counter',()=>{const d=zone.accessDoors[(o?'second':'first')+'_station_staff'];assert.equal(d.readerSide,-1);assert.equal(d.readers.length,2);for(const r of d.readers){const p=r.parent.position;assert(p.x<0);assert(p.y>=1.35);assert(d.readerMounts.includes(r.parent.parent.children.find(m=>m.userData?.readerMount)));}});
 }
 zone=router.loadZone('second_campus_5f');
-check('Second-campus ward entry opens into protected station',()=>{assert.equal(zone.station.position[1],-4);zone.setWardGateClosed(false);walk([72,1.7,3.2],[72,1.7,.6]);assert.equal(zone.accessDoors.second_station_staff.closed,true);});
-check('Station exit remains separate from main admission gate',()=>{assert(controller.checkCollision(74.3,-4));zone.accessDoors.second_station_staff.setClosed(false);walk([72,1.7,-2.5],[74.3,1.7,-2.5]);walk([74.3,1.7,-2.5],[74.3,1.7,-5.4]);});
+check('Second-campus V4 ward entry leads toward central nursing station',()=>{assert.equal(zone.station.position[1],-7);zone.setWardGateClosed(false);walk([72,1.7,3.2],[72,1.7,.6]);assert.equal(zone.accessDoors.second_station_staff.closed,true);});
+check('Central station staff door remains separate from main admission gate',()=>{const d=zone.accessDoors.second_station_staff;assert(d);assert(Math.abs(d.root.position.z+7)<.01);assert(controller.checkCollision(d.root.position.x,d.root.position.z));d.setClosed(false);const x=d.root.position.x,z=d.root.position.z;walk([x,1.7,z+1.2],[x,1.7,z-1.2]);});
 zone=router.loadZone('first_campus_4f');
 check('Duty-room cabinet doors face room, not wall',()=>{assert.equal(zone.dutyCabinetYaw,Math.PI);const source=zone.dutyCabinetAnchor;assert(source[2]<9.8);assert(!controller.checkCollision(source[0],source[2]-.9));});
 console.log(`SCREENSHOT ACCESS REGRESSION PASS ${assertions}/${assertions}`);

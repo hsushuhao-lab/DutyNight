@@ -19,91 +19,78 @@ export class WardFloorplan {
     this.gf.buildCeiling(this.zoneGroup,o,3.2,-10,24,24);
     walls.rect(o-12,-22,o+12,2);walls.cut('x',2,o,2.4);
     // A single admission boundary at z=2. The previous parallel z=0 wall made an unintended corridor.
-    const room=(n,r,side,d,kind='ward',label)=>ordinaryRoom(this,walls,{id:String(this.floor*100+n),label,rect:[r[0]+o,r[1],r[2]+o,r[3]],side,door:d+(side==='north'||side==='south'?o:0),kind});
-        if(!second){
+    const room=(n,r,side,d,kind='ward',label)=>ordinaryRoom(this,walls,{id:String(this.floor*100+n),label,rect:[r[0]+o,r[1],r[2]+o,r[3]],side,door:d+(side==='north'||side==='south'?o:0),kind});    if(!second){
 
       // =========================================================
-      // 第一院區 4F — USER PLAN V3
-      // 電梯 → 值班室(門禁外) → 病房門 → 護理站 → 活動大廳
+      // 第一院區 4F — IMAGE PLAN V4
+      // 外圈病房 + 上方儲藏室 + 中央護理站
       // =========================================================
 
-      // 西側：401、402、403、性別友善廁所
-      room(1,[-12,-4,-7,0],'east',-2);
-      room(2,[-12,-9,-7,-4],'east',-6.5);
-      room(3,[-12,-14,-7,-9],'east',-11.5);
+      // 左側：401–403
+      room(1,[-12,-5,-7,0],'east',-2.5);
+      room(2,[-12,-11,-7,-5],'east',-8);
+      room(3,[-12,-17,-7,-11],'east',-14);
 
+      // 左上儲藏室
       ordinaryRoom(this,walls,{
-        id:'WC',
-        label:'性別友善廁所',
-        rect:[-12,-22,-7,-14],
-        side:'east',
-        door:-16,
-        kind:'toilet'
+        id:'STORE_NW',
+        label:'儲藏室',
+        rect:[-12,-22,-7,-17],
+        side:'south',
+        door:-9.5,
+        kind:'storage'
       });
 
-      // 南側：404–407
+      // 上方中央：404–406
       room(4,[-7,-22,-2.5,-17],'south',-4.75);
       room(5,[-2.5,-22,2,-17],'south',-0.25);
       room(6,[2,-22,6.5,-17],'south',4.25);
-      room(7,[6.5,-22,12,-17],'south',9.25);
 
-      // 東側：408–409
-      room(8,[6,-14,12,-10],'west',-12);
-      room(9,[6,-10,12,-6],'west',-8);
+      // 右上儲藏室
+      ordinaryRoom(this,walls,{
+        id:'STORE_NE',
+        label:'儲藏室',
+        rect:[6.5,-22,12,-17],
+        side:'south',
+        door:9.25,
+        kind:'storage'
+      });
 
-      // 護理站直接面向主要走廊。
-      // 舊版 x=3.2 會讓護理站偏右並產生不自然的狹長通道。
+      // 右側：407–409
+      room(7,[7,-17,12,-11],'west',-14);
+      room(8,[7,-11,12,-5],'west',-8);
+      room(9,[7,-5,12,0],'west',-2.5);
+
+      // 中央護理站
       nursingStation(this,{
-        x:0.8,
-        z:-3,
-        yaw:Math.PI/2,
+        x:0,
+        z:-7,
+        yaw:Math.PI,
         id:'first_station'
       });
 
-      // 注意：
-      // 舊版的 walls.line('x',-6,3.8,12) 已移除。
-      // 不再生成護理站旁狹長平行走道。
-
-      // 真正保留中央開放空間作為活動大廳
+      // 保留中央環形公共動線 metadata，不顯示「活動大廳」招牌
       this.activityHall={
         id:'ACTIVITY_HALL',
-        label:'活動大廳',
-        bounds:[-5.5,-16.5,5.5,-6.3],
-        center:[0,1.7,-11.3]
+        label:'病房公共區',
+        bounds:[-6,-17,6,-2],
+        center:[0,1.7,-10]
       };
 
-      this.layoutVersion='USER_PLAN_20260922_V3';
+      this.layoutVersion='USER_PLAN_20260922_IMAGE_V4';
 
       this.layoutPlan={
-        rooms:[
-          '401','402','403','WC',
-          '404','405','406','407',
-          '408','409'
-        ],
-        entrySequence:[
-          'duty_room',
-          'first_ward',
-          'first_station',
-          'activity_hall'
-        ],
+        rooms:['401','402','403','404','405','406','407','408','409'],
+        storage:['STORE_NW','STORE_NE'],
+        centralStation:true,
         dutyRoomOutsideWard:true,
         narrowStationStrip:false
       };
 
-      SignAnchor.buildHangingSign({
-        scene:this.zoneGroup,
-        x:0,
-        y:2.66,
-        z:-15.7,
-        ceilingY:3.2,
-        rotationY:0,
-        text:'活動大廳'
-      });
-
-      // 值班室仍然位於病房門外
+      // 值班室在病房鐵門外
       this.buildDutyRoom();
 
-      // 4F 病房主門
+      // 中央感應鐵門
       this.wardDoor=new AccessDoor(this,{
         id:'first_ward',
         x:0,
@@ -116,97 +103,77 @@ export class WardFloorplan {
       this.wardGateClosed=true;
 
       this.entryPoint=[0,1.7,3.2];
-      this.hallPoint=[0,1.7,-9];
-
+      this.hallPoint=[0,1.7,-4];
 
     }else{
 
       // =========================================================
-      // 第二院區 5F — USER PLAN V3
-      // 與第一院區分開配置，不直接鏡射 4F
+      // 第二院區 5F — IMAGE PLAN V4
+      // 外圈病房 + 上方儲藏室 + 中央護理站
       // =========================================================
 
-      // 西側：501–503
-      room(1,[-12,-4.5,-7,0],'east',-2.25);
-      room(2,[-12,-9.5,-7,-4.5],'east',-7);
-      room(3,[-12,-14.5,-7,-9.5],'east',-12);
+      // 左側：501–503
+      room(1,[-12,-5,-7,0],'east',-2.5);
+      room(2,[-12,-11,-7,-5],'east',-8);
+      room(3,[-12,-17,-7,-11],'east',-14);
 
-      // 西南側未命名區
-      // 保持封閉，不自行命名成病房或其他用途
-      walls.rect(
-        o-12,
-        -22,
-        o-7,
-        -14.5
-      );
+      // 左上儲藏室
+      ordinaryRoom(this,walls,{
+        id:'STORE_NW',
+        label:'儲藏室',
+        rect:[o-12,-22,o-7,-17],
+        side:'south',
+        door:o-9.5,
+        kind:'storage'
+      });
 
-      // 南側：504–506
+      // 上方中央：504–506
       room(4,[-7,-22,-2.5,-17],'south',-4.75);
       room(5,[-2.5,-22,2,-17],'south',-0.25);
-      room(6,[2,-22,7,-17],'south',4.5);
+      room(6,[2,-22,6.5,-17],'south',4.25);
 
-      // 東側：507–509
+      // 右上儲藏室
+      ordinaryRoom(this,walls,{
+        id:'STORE_NE',
+        label:'儲藏室',
+        rect:[o+6.5,-22,o+12,-17],
+        side:'south',
+        door:o+9.25,
+        kind:'storage'
+      });
+
+      // 右側：507–509
       room(7,[7,-17,12,-11],'west',-14);
-      room(8,[7,-11,12,-5.5],'west',-8.25);
-      room(9,[7,-5.5,12,0],'west',-2.75);
+      room(8,[7,-11,12,-5],'west',-8);
+      room(9,[7,-5,12,0],'west',-2.5);
 
-      // 第二院區護理站：
-      // 病房入口後先進入護理站管制區，
-      // 再經 staff card door 進入病房核心。
+      // 中央護理站
       nursingStation(this,{
         x:o,
-        z:-4,
-        yaw:0,
+        z:-7,
+        yaw:Math.PI,
         id:'second_station',
         rearEntry:true
       });
 
-      // 中央活動大廳
       this.activityHall={
         id:'ACTIVITY_HALL',
-        label:'活動大廳',
-        bounds:[
-          o-6,
-          -16.5,
-          o+6,
-          -6
-        ],
-        center:[
-          o,
-          1.7,
-          -11
-        ]
+        label:'病房公共區',
+        bounds:[o-6,-17,o+6,-2],
+        center:[o,1.7,-10]
       };
 
-      this.layoutVersion='USER_PLAN_20260922_V3';
+      this.layoutVersion='USER_PLAN_20260922_IMAGE_V4';
 
       this.layoutPlan={
-        rooms:[
-          '501','502','503',
-          '504','505','506',
-          '507','508','509'
-        ],
-        entrySequence:[
-          'second_ward',
-          'second_station',
-          'second_station_staff',
-          'activity_hall'
-        ],
+        rooms:['501','502','503','504','505','506','507','508','509'],
+        storage:['STORE_NW','STORE_NE'],
+        centralStation:true,
         doctorOfficeOutsideWard:true,
-        unnamedNorthwestBlock:true
+        narrowStationStrip:false
       };
 
-      SignAnchor.buildHangingSign({
-        scene:this.zoneGroup,
-        x:o,
-        y:2.66,
-        z:-15.7,
-        ceilingY:3.2,
-        rotationY:0,
-        text:'活動大廳'
-      });
-
-      // 第二院區病房主門
+      // 中央感應鐵門
       this.wardDoor=new AccessDoor(this,{
         id:'second_ward',
         x:o,
@@ -218,27 +185,18 @@ export class WardFloorplan {
       this.wardGateCollider=this.wardDoor.closedBox;
       this.wardGateClosed=true;
 
-      this.entryPoint=[
-        o,
-        1.7,
-        3.2
-      ];
+      this.entryPoint=[o,1.7,3.2];
+      this.hallPoint=[o,1.7,-4];
 
-      this.hallPoint=[
-        o,
-        1.7,
-        -10
-      ];
-
-      // 醫師辦公室維持病房核心外的獨立房間
+      // 右下辦公室
       this.buildDoctorOffice(o);
     }
+
     walls.build();
     // Solid sill spans the coplanar floor seam; no sub-pixel support crack at z=2.
     this.gf.buildFloor(this.zoneGroup,this.walkables,o,.002,2,2.4,.36,this.gf.materials.stainless);
     for(const [x,z] of [[o,1],[o,-9],[o,-15],[o-4,-3],[o+4,-3]]) this.gf.buildCeilingLight(this.zoneGroup,x,3.15,z,.7,8);
     SignAnchor.buildHangingSign({scene:this.zoneGroup,x:o,y:2.7,z:1.6,ceilingY:3.2,rotationY:0,text:second?`${this.floor}F 病房`:'4F 病房'});
-    SignAnchor.buildWallPlaque({scene:this.zoneGroup,x:o,y:2.6,z:-21.85,width:1.6,height:.35,code:'',title:'活動大廳',subtitle:'',header:''});
     this.zoneGroup.updateWorldMatrix(true,true);return this;
   }
   buildDutyRoom(){
