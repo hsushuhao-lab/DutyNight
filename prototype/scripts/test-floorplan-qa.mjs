@@ -36,8 +36,9 @@ for(const id of Object.keys(CORE_ORIGINS).filter(s=>s!=='second_campus_std')){
   check(id+' exact nine V5 perimeter rooms',()=>assert.deepEqual(roomIds,Array.from({length:9},(_,i)=>String((second?500:400)+i+1))));
   check(id+' exactly 36 ward beds',()=>{assert.equal(z.bedAreas.length,36);assert.equal(z.bedAreas.find(b=>b.wardBedNumber===33)?.roomId,String((second?500:400)+9));});
   for(const room of z.roomAreas)check(id+' room '+room.id+' in and out',()=>{walk(room.corridor,room.point);walk(room.point,room.corridor);});
-  check(id+' V5 custom protected station',()=>assert.equal(z.station.module,'NursingStation_V5_CUSTOM'));
-  check(id+' station staff access is glass',()=>{const d=z.accessDoors[second?'second_station_staff':'first_station_staff'];assert(d);assert(d.leaves.every(l=>l.material.transparent));});
+  check(id+' V5.1 custom protected station',()=>assert.equal(z.station.module,'NursingStation_V5_1_CUSTOM'));
+  check(id+' glass bypass is transparent',()=>{const d=z.accessDoors[second?'second_ward_glass':'first_ward_glass'];assert(d);assert(d.leaves.every(l=>l.material.transparent));});
+  check(id+' station ward door faces x06',()=>{const d=z.accessDoors[second?'second_station_ward':'first_station_ward'];assert(d);assert.equal(z.station.facesRoom,String((second?500:400)+6));});
   for(const w of z.workstations)check(id+' screen faces chair '+w.id,()=>{const p=w.screen.getWorldPosition(new THREE.Vector3()),n=new THREE.Vector3(0,0,1).transformDirection(w.screen.matrixWorld),dir=new THREE.Vector3(...w.chair).sub(p);dir.y=0;assert(n.dot(dir.normalize())>.98);});
   if(!second)check('Duty room near lift outside ward gate',()=>{z.setDutyDoorClosed(false);walk([0,1.7,6],z.dutyRoom.outside);walk(z.dutyRoom.outside,z.dutyRoom.inside);assert(Math.hypot(-8,6-9.8)<10);});
   if(second)check('Second-campus external room is duty room',()=>{assert(z.roomAreas.some(room=>room.id==='SECOND_DUTY'&&room.label==='值班室'));assert(z.accessDoors.second_duty_room);});
