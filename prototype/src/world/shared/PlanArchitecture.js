@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { solid, asset, monitor } from '../../art/ArtDetails.js';
+import { solid, asset, monitor, counterFront } from '../../art/ArtDetails.js';
 import { AccessDoor } from './AccessDoor.js';
 import { Doorway } from './Doorway.js';
 import { CollisionFactory } from './CollisionFactory.js';
@@ -31,11 +31,24 @@ export function ordinaryRoom(zone,walls,{id,label=id+' 病房',rect,side,door,ki
   // Open leaves sit at the side of the aperture; register their actual footprints.
   for(const child of opening.children)if(child.geometry?.parameters.height===2.35){opening.updateWorldMatrix(true,true);zone.colliders.push(new THREE.Box3().setFromObject(child));}
   const outward=side==='north'?[0,-1]:side==='south'?[0,1]:side==='west'?[-1,0]:[1,0];
-  const corridor=[x+outward[0]*1.1,1.7,z+outward[1]*1.1],point=[x-outward[0]*1.25,1.7,z-outward[1]*1.25];
+  const corridor=[x+outward[0]*1.1,1.7,z+outward[1]*1.1];
+  const point=kind==='ward'?[cx,1.7,cz]:[x-outward[0]*1.25,1.7,z-outward[1]*1.25];
   const yaw=side==='north'?Math.PI:side==='south'?0:side==='west'?-Math.PI/2:Math.PI/2;
   SignAnchor.buildWallPlaque({scene:zone.zoneGroup,x:x+(alongX?-1.1:outward[0]*.15),y:1.75,z:z+(alongX?outward[1]*.15:-1.1),rotationY:yaw,width:1,height:.34,code:id,title:label.replace(id,'').trim(),subtitle:'',header:''});
-  if(kind==='ward'){const bx=side==='west'?x2-1.2:x1+1.2,bz=alongX?(side==='south'?z1+1.6:z2-1.6):z1+1.5;
-    asset(zone.zoneGroup,'hospitalBed',[bx,0,bz]);CollisionFactory.addBox(zone.colliders,bx,.5,bz,1.15,1,2.15);
+  if(kind==='ward'){
+    // Four physical beds per ward room. Nine rooms therefore provide 36 beds;
+    // ward bed 33 is the first bed in room 409/509.
+    const dx=Math.min(1.4,(x2-x1)*.28),dz=Math.min(2.2,(z2-z1)*.28);
+    const spots=[[cx-dx,cz-dz],[cx+dx,cz-dz],[cx-dx,cz+dz],[cx+dx,cz+dz]];
+    const roomOrdinal=Math.max(1,Number(id)%100);
+    zone.bedAreas??=[];
+    spots.forEach(([bx,bz],index)=>{
+      const bedInRoom=index+1,wardBedNumber=(roomOrdinal-1)*4+bedInRoom;
+      const model=asset(zone.zoneGroup,'hospitalBed',[bx,0,bz],[1,1,1]);
+      if(model){model.name=`Bed_${id}_${bedInRoom}`;model.userData={...model.userData,roomId:id,bedInRoom,wardBedNumber};}
+      CollisionFactory.addBox(zone.colliders,bx,.5,bz,1.15,1,2.15);
+      zone.bedAreas.push({id:`${id}-${bedInRoom}`,roomId:id,bedInRoom,wardBedNumber,position:[bx,0,bz]});
+    });
   }
   zone.roomAreas.push({id,label,rect,door:[x,1.7,z],point,corridor,protectedArea,kind});
   zone.gf.buildCeilingLight(zone.zoneGroup,cx,3.15,cz,.65,7);
@@ -52,12 +65,11 @@ export function workstation(zone,{x,z,yaw=0,id}){
   return face;
 }
 
-/** Identical protected staff-station module used by both wards. Front faces local -Z. */
+/** Identical protected staff-station module used by legacy wards. Front faces local -Z. */
 export function nursingStation(zone,{x,z,yaw=0,id,rearEntry=false}) {
   const sub={gf:zone.gf,zoneGroup:new THREE.Group(),colliders:[],walkables:[],interactables:[],workstations:[]};
   sub.zoneGroup.name='NursingStation_STANDARD_6x6';sub.zoneGroup.position.set(x,0,z);sub.zoneGroup.rotation.y=yaw;zone.zoneGroup.add(sub.zoneGroup);
   const m=zone.gf.materials;
-  // Counter / transparent reinforced glazing / visible posts. No decals or frosted stripes.
   solid(sub.zoneGroup,m.wallDark,[-.7,.53,0],[4.5,1.06,.6]);solid(sub.zoneGroup,m.counterTop,[-.7,1.1,0],[4.6,.08,.72]);
   CollisionFactory.addBox(sub.colliders,-.7,1.5,0,4.6,3,.72);
   const glass=m.glass.clone();glass.side=THREE.DoubleSide;glass.transparent=true;glass.opacity=.23;glass.depthWrite=false;
@@ -66,7 +78,6 @@ export function nursingStation(zone,{x,z,yaw=0,id,rearEntry=false}) {
   solid(sub.zoneGroup,m.doorWood,[0,2.92,0],[6.1,.36,.25]);
   zone.gf.buildWall(sub.zoneGroup,sub.colliders,-3,1.6,3,.2,3.2,6);
   zone.gf.buildWall(sub.zoneGroup,sub.colliders,3,1.6,3,.2,3.2,6);
-  // The ward perimeter owns the rear wall when it contains the admission aperture.
   if(!rearEntry)zone.gf.buildWall(sub.zoneGroup,sub.colliders,0,1.6,6,6.2,3.2,.2);
   workstation(sub,{x:-1.8,z:3.8,yaw:0,id:id+'_A'});workstation(sub,{x:1.8,z:3.8,yaw:0,id:id+'_B'});
   asset(sub.zoneGroup,'storageCabinet',[-1.7,0,5.6],[1,1,1],Math.PI);asset(sub.zoneGroup,'printer',[1.8,.8,3.8],[.7,.7,.7]);
@@ -75,8 +86,36 @@ export function nursingStation(zone,{x,z,yaw=0,id,rearEntry=false}) {
   const matrix=sub.zoneGroup.matrixWorld;
   for(const c of sub.colliders)zone.colliders.push(c.applyMatrix4(matrix));
   for(const item of sub.workstations){const chair=new THREE.Vector3(...item.chair).applyMatrix4(matrix);zone.workstations.push({...item,chair:chair.toArray(),yaw:item.yaw+yaw});}
-  // Door is created in world space after converting the module attachment point.
   const p=new THREE.Vector3(2.3,0,0).applyMatrix4(matrix);
   new AccessDoor(zone,{id:id+'_staff',x:p.x,z:p.z,yaw,width:1.3,title:'護理站工作門',material:m.metal,readerSide:-1});
   zone.station={id,module:'NursingStation_STANDARD_6x6',position:[x,z],yaw};
+}
+
+/** V5 custom central station: north-facing counter, two desks, south-east glass staff door. */
+export function nursingStationV5(zone,{x,z,id}){
+  const m=zone.gf.materials,halfW=4.6,north=z-4,south=z+4,staffX=x+3.0;
+  const stationWalls=new PlanWalls(zone);
+  stationWalls.line('z',x-halfW,north,south);
+  stationWalls.line('z',x+halfW,north,south);
+  stationWalls.cut('x',south,staffX,1.4);
+  stationWalls.build();
+
+  // Continuous protected glazed counter on the north face.
+  counterFront(zone.zoneGroup,m,x,north,8.6,1.1);
+  CollisionFactory.addBox(zone.colliders,x,1.55,north,8.6,3.1,.36);
+  const glass=m.glass.clone();glass.side=THREE.DoubleSide;glass.transparent=true;glass.opacity=.22;glass.depthWrite=false;
+  solid(zone.zoneGroup,glass,[x,1.95,north],[8.55,1.55,.035]);
+  for(const px of [x-halfW,x-1.55,x+1.55,x+halfW])solid(zone.zoneGroup,m.metal,[px,1.9,north],[.08,1.9,.10]);
+  solid(zone.zoneGroup,m.metal,[x,2.93,north],[9.2,.30,.18]);
+
+  workstation(zone,{x:x-1.75,z:z+1.0,yaw:Math.PI,id:id+'_A'});
+  workstation(zone,{x:x+1.75,z:z+1.0,yaw:Math.PI,id:id+'_B'});
+  asset(zone.zoneGroup,'storageCabinet',[x-3.6,0,z+2.7],[1,1,1],Math.PI/2);
+  asset(zone.zoneGroup,'printer',[x+1.75,.8,z+1.0],[.7,.7,.7]);
+  zone.gf.buildCeilingLight(zone.zoneGroup,x,3.15,z,.8,8);
+
+  SignAnchor.buildWallPlaque({scene:zone.zoneGroup,x,y:2.86,z:north-.12,rotationY:Math.PI,width:1.7,height:.32,code:'',title:'護理站',subtitle:'',header:''});
+  new AccessDoor(zone,{id:id+'_staff',x:staffX,z:south,width:1.4,title:'感應玻璃門',material:glass,readerSide:1});
+  zone.station={id,module:'NursingStation_V5_CUSTOM',position:[x,z],bounds:[x-halfW,north,x+halfW,south],staffDoor:[staffX,south],front:[x,north]};
+  return zone.station;
 }
