@@ -7,7 +7,8 @@ const keyed=readFileSync('./src/world/shared/KeyedKnobDoor.js','utf8');
 const router=readFileSync('./src/world/WorldRouter.js','utf8');
 const main=readFileSync('./src/main.js','utf8');
 
-assert.match(ward,/Protected station sits directly against the ward hall/);
+assert.match(ward,/narrowStationStrip:false/);
+assert.doesNotMatch(ward,/^\s*walls\.line\('x',-6,3\.8,12\);/m);
 assert.match(ward,/new KeyedKnobDoor\(this,\{id:'duty_room'/);
 assert.match(ward,/dutyDoor\.setClosed\(true\);this\.dutyDoorClosed=true/);
 assert.doesNotMatch(ward,/doctor_office[\s\S]{0,180}readers:false/);
@@ -18,3 +19,4 @@ assert.match(router,/this\.dutyDoorClosed = true/);
 assert.match(main,/值班室是鑰匙喇叭鎖/);
 assert.match(main,/KEY_PICKUP/);
 console.log('Door defaults QA PASS: no nursing side strip, all controlled doors closed, duty room uses keyed knob door');
+

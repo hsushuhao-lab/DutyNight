@@ -12,6 +12,6 @@ function walk(x,z){for(let i=0;i<2000;i++){
  assert(c.position.distanceTo(before)>.001,`Ward route blocked ${c.position.toArray()} -> ${x},${z}`);
  }throw Error('Route exhausted');}
 zone.accessDoors.second_station_staff.setClosed(false);
-for(const [x,z] of [[72,.6],[72,-2.5],[74.3,-2.5],[74.3,-6],[76.4,-9],[68.1,-9],[68.1,-2.5],[67.1,-2.5],[64.75,-2.5],
- [67.1,-2.5],[68.1,-2.5],[68.1,-8.5],[64.75,-8.5],[68.1,-8.5],[68.1,-10.5],[76.4,-10.5],[76.4,-6],[74.3,-6],[74.3,-2.5],[72,-2.5],[72,3.2]])walk(x,z);
+for(const [x,z] of [[72,.6],[72,-2.5],[74.3,-2.5],[74.3,-6],[76.4,-9],[68.1,-9],[68.1,-2.5],[66.1,-2.25],[63.75,-2.25],
+ [67.1,-2.5],[68.1,-2.5],[66.1,-7],[63.75,-7],[66.1,-7],[68.1,-10.5],[76.4,-10.5],[76.4,-6],[74.3,-6],[74.3,-2.5],[72,-2.5],[72,3.2]])walk(x,z);
 zone.cleanup();console.log('WARD CIRCULATION PASS: entry gate -> nursing station -> staff gate -> activity hall -> west lane -> 501/502 -> gate, with open door-leaf collision retained');
