@@ -118,6 +118,12 @@ controller.onInteract = (interactable) => {
       controller.enabled=false;controller.cancelAutoMove();
       uiManager.runDoorTransition(()=>worldRouter.teleportToSpawn(door.portal));
     }else{
+      if(!gameState.getFlag('STAFF_ACCESS_CARD')){
+        soundManager.playClick();
+        uiManager.showSubtitle('門禁','「需要先到 316 領取值班室鑰匙與感應卡。」',2800);
+        controller.currentInteractable=null;uiManager.showPrompt(null);
+        return;
+      }
       const changed=door.toggle(controller.position);
       if(changed)soundManager.playClick();
       else uiManager.showSubtitle('門禁','請離開門幅後再關門。',2500);
@@ -142,7 +148,7 @@ controller.onInteract = (interactable) => {
     if (!gameState.isTaskComplete('KEY_PICKUP')) {
       soundManager.playKeyPickup();
       gameState.markTaskComplete('KEY_PICKUP');
-      uiManager.showSubtitle('李醫師', '「拿到值班室鑰匙了。」');
+      uiManager.showSubtitle('李醫師', '「拿到值班室鑰匙與感應卡了。」');
       if (interactable.targetGroup) {
         interactable.targetGroup.visible = false;
       }

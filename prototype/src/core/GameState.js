@@ -21,6 +21,7 @@ export class GameState {
     this.flags.set('ACT1_STARTED', true);
     this.flags.set('CURRENT_FLOOR', '3F');
     this.flags.set('SUPERNATURAL_ENABLED', false);
+    this.flags.set('STAFF_ACCESS_CARD', false);
   }
 
   addListener(fn) {
@@ -37,6 +38,7 @@ export class GameState {
     if (!this.completedTasks.has(taskId)) {
       this.completedTasks.add(taskId);
       this.flags.set(taskId, true);
+      if (taskId === 'KEY_PICKUP') this.flags.set('STAFF_ACCESS_CARD', true);
       this.duty += 1;
       this.notify('task_completed', taskId);
       console.log('[GameState] Task Completed: ' + taskId + ' | Duty: ' + this.duty);

@@ -8,7 +8,10 @@ const duty=new DutyEventManager(state);
 
 assert.equal(state.gameTime,'17:00');
 assert.equal(state.getFlag('SUPERNATURAL_ENABLED'),false);
-for(const id of ['KEY_PICKUP','DUTY_LOG','E_HANDOFF']) state.markTaskComplete(id);
+assert.equal(state.getFlag('STAFF_ACCESS_CARD'),false);
+state.markTaskComplete('KEY_PICKUP');
+assert.equal(state.getFlag('STAFF_ACCESS_CARD'),true);
+for(const id of ['DUTY_LOG','E_HANDOFF']) state.markTaskComplete(id);
 state.markTaskComplete('WARD_ENTRY');
 
 duty.complete('P1_4F_REPORT','17:15');

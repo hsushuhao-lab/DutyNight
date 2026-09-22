@@ -251,7 +251,7 @@ export class Level3FBlockout {
     lampShade.position.set(5.1, 1.15, 6.5);
     this.scene.add(lampShade);
 
-    // INTERACTABLE 1: Duty-Room Key (值班室鑰匙)
+    // INTERACTABLE 1: Duty-Room Key + Staff Access Card (值班室鑰匙／感應卡)
     const keyGroup = new THREE.Group();
     // Key ring
     const ringGeo = new THREE.TorusGeometry(0.05, 0.008, 12, 24);
@@ -271,6 +271,14 @@ export class Level3FBlockout {
     tag.position.set(0.06, 0, -0.04);
     keyGroup.add(tag);
 
+    const cardMat = new THREE.MeshStandardMaterial({ color: 0x2f745b, roughness: 0.45 });
+    const card = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.008, 0.14), cardMat);
+    card.position.set(-0.075, 0, -0.035);
+    keyGroup.add(card);
+    const cardStripe = new THREE.Mesh(new THREE.BoxGeometry(0.055, 0.004, 0.012), this.materials.brass);
+    cardStripe.position.set(-0.075, 0.007, -0.055);
+    keyGroup.add(cardStripe);
+
     keyGroup.position.set(5.6, 0.83, 6.0);
     this.scene.add(keyGroup);
 
@@ -283,7 +291,7 @@ export class Level3FBlockout {
     keyHitbox.userData = {
       interactable: true,
       id: 'KEY_PICKUP',
-      label: '領取 4F 值班室鑰匙',
+      label: '領取 4F 值班室鑰匙與感應卡',
       type: 'key',
       targetGroup: keyGroup
     };
@@ -584,7 +592,7 @@ export class Level3FBlockout {
     actx.font = 'bold 36px sans-serif';
     actx.fillText('醫師值班提醒', 160, 54);
     actx.font = '24px sans-serif';
-    ['• 17:00 交接完成後再上樓', '• 夜間門禁請隨身攜帶鑰匙', '• 病況變化請先通知護理站'].forEach((line, i) => actx.fillText(line, 54, 125 + i * 56));
+    ['• 17:00 交接完成後再上樓', '• 夜間門禁請隨身攜帶鑰匙與感應卡', '• 病況變化請先通知護理站'].forEach((line, i) => actx.fillText(line, 54, 125 + i * 56));
     const artTex = new THREE.CanvasTexture(artCanvas);
     artTex.colorSpace = THREE.SRGBColorSpace;
     const art = new THREE.Mesh(

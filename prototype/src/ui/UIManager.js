@@ -112,7 +112,7 @@ export class UIManager {
     setTimeout(() => {
       this.showSubtitle(
         '學長 (資深住院醫師)',
-        '「今天你值班。先到 316 拿鑰匙、簽值班本，再用旁邊電腦完成交班。晚點直接上 4F。」',
+        '「今天你值班。先到 316 拿值班室鑰匙與感應卡、簽值班本，再用旁邊電腦完成交班。晚點直接上 4F。」',
         8000
       );
     }, 1200);
@@ -352,7 +352,7 @@ export class UIManager {
 
     if (!done('WARD_ENTRY')) {
       this.renderTaskBoard('今日夜班手續（17:00 交接）', [
-        {id:'task-key',text:'領取 4F 值班室鑰匙（316 總醫師辦公室）',state:done('KEY_PICKUP')?'completed':'pending'},
+        {id:'task-key',text:'領取 4F 值班室鑰匙與感應卡（316 總醫師辦公室）',state:done('KEY_PICKUP')?'completed':'pending'},
         {id:'task-log',text:'簽署 3F 值班簽到簿（316 總醫師辦公室）',state:done('DUTY_LOG')?'completed':'pending'},
         {id:'task-handoff',text:'完成電子交班工作站（HIS 終端機）',state:done('E_HANDOFF')?'completed':'pending'},
         {id:'task-elevator',text:readyFor4F?'搭乘電梯前往 4F 病房區':'搭乘電梯前往 4F（待完成交班手續）',state:readyFor4F?'ready':'locked'}
