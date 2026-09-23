@@ -6,6 +6,7 @@ export class GameState {
     this.identity = 3;
     this.fatigue = 0;
     this.gameTime = '17:00';
+    this.gamePhase = 'Phase0_1700_FirstArrival';
 
     this.requiredTasks = [
       'KEY_PICKUP',
@@ -39,6 +40,15 @@ export class GameState {
     this.flags.set('ANOMALY_ACKNOWLEDGED', false);
     this.flags.set('ANNE_STAGE', 0);
     this.flags.set('GUARD_FUTURE_ENTRY', false);
+    this.flags.set('HOOK_403_OLD_ROOM', false);
+    this.flags.set('HOOK_1F_HIDDEN_DOOR', false);
+    this.flags.set('HOOK_0217', false);
+    this.flags.set('ER_JANE_DOE_WRISTBAND', false);
+    this.flags.set('FIRST_FLOOR_GUARD_KEY', false);
+    this.flags.set('STAIR_SHORTCUT_3F_4F', false);
+    this.flags.set('FORCE_3F_ELEVATOR_STOP', false);
+    this.flags.set('FORCED_3F_ELEVATOR_STOP_DONE', false);
+    this.flags.set('NIGHT_PATROL_RETURN_3F', false);
   }
 
   addListener(fn) {
@@ -71,6 +81,16 @@ export class GameState {
       if (!this.completedTasks.has(task)) return false;
     }
     return true;
+  }
+
+  setGamePhase(phase) {
+    if (!phase || this.gamePhase === phase) return;
+    this.gamePhase = phase;
+    this.notify('phase_changed', phase);
+  }
+
+  getGamePhase() {
+    return this.gamePhase;
   }
 
   setGameTime(time) {
