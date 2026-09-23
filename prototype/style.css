@@ -1,4 +1,4 @@
-/* Songde Night Duty - Act 1 Prototype Styles */
+/* Night Corridor - Act 1 */
 * {
   margin: 0;
   padding: 0;
@@ -737,3 +737,10 @@ button:focus-visible { outline: 2px solid #658b76; outline-offset: 3px; }
   .his-table { min-width: 640px; }
   .his-footer { gap: 8px; flex-wrap: wrap; }
 }
+
+.his-login-panel{display:grid;grid-template-columns:1.5fr 1fr 1fr auto 1fr;gap:8px;align-items:center;padding:10px 16px;background:#d8e2dc;border-bottom:1px solid #b9c7be;color:#24352d}
+.his-login-panel small{display:block;color:#607067;margin-top:2px}.his-login-panel input{min-width:0;padding:7px 9px;border:1px solid #9caaa1;border-radius:3px;background:#f8faf8;color:#222}
+#his-login-status{font-size:12px;color:#6f4c24}.his-locked-content{filter:blur(3px);opacity:.32;pointer-events:none;transition:.2s}.his-locked-content.unlocked{filter:none;opacity:1;pointer-events:auto}
+.credential-slip{margin-top:10px;padding:9px 12px;border:1px dashed #7b735f;background:#fffdf3;font-family:ui-monospace,monospace;color:#39352c}
+body::before{content:"";position:fixed;inset:0;z-index:3;pointer-events:none;background:radial-gradient(circle at 50% 46%,transparent 54%,rgba(0,7,8,.20) 100%);mix-blend-mode:multiply}
+@media(max-width:900px){.his-login-panel{grid-template-columns:1fr 1fr}.his-login-panel>div,#his-login-status{grid-column:1/-1}}
