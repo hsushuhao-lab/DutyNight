@@ -108,7 +108,6 @@ export class UIManager {
       status.textContent='綠燈亮起：櫃門已解鎖';
       document.getElementById('locker-contents')?.classList.add('revealed');
       this.gameState.setFlag('LOCKER_OPENED',true);
-      this.gameState.setFlag('HIS_CREDENTIALS',true);
       this.gameState.markTaskComplete('LOCKER_OPENED');
       this.gameState.markTaskComplete('KEY_PICKUP');
       window.worldRouter?.activeZoneInstance?.markLockerOpen?.();
@@ -171,8 +170,8 @@ export class UIManager {
     setTimeout(() => {
       this.showSubtitle(
         '學長 (資深住院醫師)',
-        '「我先走了。想辦法進 316 完成交班，把今晚的鑰匙拿到手。」',
-        6500
+        '「我先走了。316 已經鎖了，先去警衛查哨點看看；想辦法進去把今晚的交班做完。」',
+        7200
       );
     }, 1200);
   }
@@ -498,10 +497,11 @@ export class UIManager {
     if (!done('WARD_ENTRY')) {
       this.renderTaskBoard('今日夜班手續（17:00 交接）',[
         {id:'task-find-key',text:'想辦法進入 316 總醫師辦公室',state:opened316?'completed':hasSpare?'ready':'pending'},
-        {id:'task-spare',text:'尋找 316 的備援鑰匙盒',state:hasSpare?'completed':opened316?'completed':'ready'},
+        {id:'task-spare',text:'到警衛查哨點尋找 316 備援鑰匙',state:hasSpare?'completed':opened316?'completed':'ready'},
         {id:'task-log',text:'查看值班手冊，找出密碼提示',state:done('DUTY_LOG')?'completed':opened316?'ready':'locked'},
-        {id:'task-locker',text:'解開 316 值班物品櫃',state:done('KEY_PICKUP')?'completed':done('DUTY_LOG')?'ready':'locked'},
-        {id:'task-handoff',text:'用取得的帳密登入 HIS 完成交班',state:done('E_HANDOFF')?'completed':done('KEY_PICKUP')?'ready':'locked'},
+        {id:'task-locker',text:'解開 316 值班物品櫃取得鑰匙與感應卡',state:done('KEY_PICKUP')?'completed':done('DUTY_LOG')?'ready':'locked'},
+        {id:'task-credentials',text:'搜尋書桌下方活動櫃，取得 HIS 登入卡',state:this.gameState.getFlag('HIS_CREDENTIALS')?'completed':done('KEY_PICKUP')?'ready':'locked'},
+        {id:'task-handoff',text:'用取得的帳密登入 HIS 完成交班',state:done('E_HANDOFF')?'completed':this.gameState.getFlag('HIS_CREDENTIALS')?'ready':'locked'},
         {id:'task-elevator',text:readyFor4F?'搭乘電梯前往 4F 病房區':'4F 尚未開放',state:readyFor4F?'ready':'locked'}
       ]);
       return;
