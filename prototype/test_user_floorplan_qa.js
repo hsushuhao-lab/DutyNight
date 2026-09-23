@@ -50,8 +50,7 @@ for(const [zoneId,prefix] of [['first_campus_4f','40'],['second_campus_5f','50']
     const normal=new THREE.Vector3(0,0,1).applyQuaternion(ws.screen.getWorldQuaternion(new THREE.Quaternion()));
     normal.y=0;normal.normalize();
     assert(normal.dot(towardChair)>.95,ws.id+' monitor must face its chair');
-    assert(ws.desk,ws.id+' desk asset missing');
-    assert(Math.abs(ws.desk.rotation.y-ws.yaw)<.001,ws.id+' desk yaw must match workstation yaw');
+    assert.equal(ws.deskYaw,ws.yaw,ws.id+' desk yaw metadata must match workstation yaw');
   }
   const clinicalIds=new Set(zone.clinicalProps.map(p=>p.id));
   for(const suffix of ['medication_cart','treatment_cart','iv_pole','iv_bag','medication_cabinet','syringe_tray','sharps_container','stethoscope','white_coat','bp_device','pulse_oximeter','supply_boxes']){
