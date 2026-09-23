@@ -155,6 +155,13 @@ export class Level3FBlockout {
     this.colliders.push(this.office302Collider);
 
     // Keypad and tiny status lamp.
+    const signCanvas=document.createElement('canvas');signCanvas.width=640;signCanvas.height=180;const sctx=signCanvas.getContext('2d');
+    sctx.fillStyle='#edf2ee';sctx.fillRect(0,0,640,180);sctx.fillStyle='#24513a';sctx.fillRect(0,0,640,44);
+    sctx.fillStyle='#173127';sctx.font='bold 34px sans-serif';sctx.fillText('302 行政主管／科秘書辦公室',28,112);
+    const signTex=new THREE.CanvasTexture(signCanvas);signTex.colorSpace=THREE.SRGBColorSpace;
+    const sign=new THREE.Mesh(new THREE.PlaneGeometry(1.55,.44),new THREE.MeshBasicMaterial({map:signTex}));
+    sign.position.set(-9.5,2.65,-3.385);this.scene.add(sign);
+
     const keypad=new THREE.Mesh(new THREE.BoxGeometry(.22,.34,.08),this.materials.fixture);
     keypad.position.set(-8.88,1.25,-3.43);
     keypad.userData={interactable:true,id:'302_KEYPAD',type:'office_302_keypad',label:'302 電子密碼鎖'};
