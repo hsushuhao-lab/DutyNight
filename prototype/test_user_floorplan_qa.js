@@ -39,6 +39,25 @@ for(const [zoneId,prefix] of [['first_campus_4f','40'],['second_campus_5f','50']
   assert.equal(zone.station.facesRoom,prefix+'6');
   assert.equal(zone.station.module,'NursingStation_V5_2_GLASS_BOX');
   assert.deepEqual(zone.station.entryDoor,[zone.planOrigin,0]);
+  assert.equal(zone.station.wardDoorReaderSide,-1);
+  assert.equal(stationWard.readerSide,-1,'Station ward reader must use the opposite jamb');
+
+  const stationWorkstations=zone.workstations.filter(w=>w.id.startsWith(tag+'_station_'));
+  assert.equal(stationWorkstations.length,4,'Nursing station must have four workstations');
+  for(const ws of stationWorkstations){
+    const screenPos=ws.screen.getWorldPosition(new THREE.Vector3());
+    const towardChair=new THREE.Vector3(...ws.chair).sub(screenPos);towardChair.y=0;towardChair.normalize();
+    const normal=new THREE.Vector3(0,0,1).applyQuaternion(ws.screen.getWorldQuaternion(new THREE.Quaternion()));
+    normal.y=0;normal.normalize();
+    assert(normal.dot(towardChair)>.95,ws.id+' monitor must face its chair');
+    assert(ws.desk,ws.id+' desk asset missing');
+    assert(Math.abs(ws.desk.rotation.y-ws.yaw)<.001,ws.id+' desk yaw must match workstation yaw');
+  }
+  const clinicalIds=new Set(zone.clinicalProps.map(p=>p.id));
+  for(const suffix of ['medication_cart','treatment_cart','iv_pole','iv_bag','medication_cabinet','syringe_tray','sharps_container','stethoscope','white_coat','bp_device','pulse_oximeter','supply_boxes']){
+    assert(clinicalIds.has(tag+'_station_'+suffix),'Missing clinical prop '+suffix);
+  }
+  assert.equal(zone.station.clinicalPropIds.length,12);
 
   const wardRooms=zone.roomAreas.filter(r=>r.kind==='ward');
   assert.deepEqual(wardRooms.map(r=>r.id),Array.from({length:9},(_,i)=>`${prefix}${i+1}`));
