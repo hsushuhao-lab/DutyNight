@@ -105,6 +105,7 @@ export class FirstCampus3F {
     this.workstationMesh = this.levelInstance.workstationMesh;
     this.dutyLogMesh = this.levelInstance.dutyLogMesh;
     this.elevatorLight = this.levelInstance.elevatorLight;
+    this.explorationArea = this.levelInstance.explorationArea;
     const keyAvailable = !gameState.isTaskComplete('KEY_PICKUP');
     this.keyMesh.visible = keyAvailable;
     this.keyMesh.userData.targetGroup.visible = keyAvailable;
