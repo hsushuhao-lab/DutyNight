@@ -30,11 +30,11 @@
     <div class="task-list">
       <div id="task-key" class="task-item pending">
         <span class="status-box"></span>
-        <span class="task-text">領取 4F 值班室鑰匙（316 總醫師辦公室）</span>
+        <span class="task-text">想辦法進入 316 總醫師辦公室</span>
       </div>
       <div id="task-log" class="task-item pending">
         <span class="status-box"></span>
-        <span class="task-text">簽署 3F 值班簽到簿 (3F 316總醫師辦公室)</span>
+        <span class="task-text">查看 316 值班手冊的交班附註</span>
       </div>
       <div id="task-handoff" class="task-item pending">
         <span class="status-box"></span>
@@ -209,6 +209,40 @@
         <button id="btn-close-log" class="btn-secondary">關閉檢視</button>
         <button id="btn-sign-log" class="btn-primary">✍️ 簽名並加蓋值班到勤章</button>
       </div>
+    </div>
+  </div>
+
+  <!-- 316 keypad locker -->
+  <div id="locker-modal" class="modal-overlay">
+    <div class="locker-window">
+      <div class="locker-header">
+        <div><strong>316 值班物品櫃</strong><small>四位數電子鎖</small></div>
+        <button id="btn-close-locker" class="btn-win-close" aria-label="關閉密碼櫃">✕</button>
+      </div>
+      <div class="locker-body">
+        <p id="locker-hint">值班手冊似乎暗示：密碼與今晚交班開始的時間有關。</p>
+        <input id="locker-code" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="0000" />
+        <button id="btn-unlock-locker" class="btn-primary">解鎖</button>
+        <div id="locker-status">櫃門鎖定中</div>
+        <div id="locker-contents" class="locker-contents">
+          <strong>值班物品袋</strong>
+          <div>4F 值班室鑰匙</div>
+          <div>Staff Access Card／感應卡</div>
+          <div class="credential-card"><b>HIS 帳號</b> night403<br><b>HIS 密碼</b> QL1700</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="anomaly-modal" class="modal-overlay">
+    <div class="anomaly-window">
+      <div class="anomaly-code">UNREGISTERED MESSAGE / 3F</div>
+      <h2>交班資料已接收。</h2>
+      <p>你不是今晚第一個看到這則訊息的人。</p>
+      <p>若想知道 316 為什麼總是少一樣東西，去三樓 <strong>文史館</strong>。</p>
+      <p>找那份<strong>沒有被編目的交班紀錄</strong>。</p>
+      <p class="anomaly-last">不要帶其他人一起去。</p>
+      <button id="btn-ack-anomaly" class="btn-primary">記下位置</button>
     </div>
   </div>
 
