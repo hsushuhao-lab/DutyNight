@@ -157,6 +157,12 @@ export class FirstCampus3F {
     this.keyMesh.userData.interactable = false;
     this.spareKeyMesh = this.levelInstance.spareKeyMesh;
     this.lockerMesh = this.levelInstance.lockerMesh;
+    if(gameState.getFlag('FOUND_316_SPARE_KEY')){
+      this.spareKeyMesh.userData.interactable=false;
+      if(this.spareKeyMesh.userData.targetGroup)this.spareKeyMesh.userData.targetGroup.visible=false;
+    }
+    if(gameState.getFlag('OPENED_316'))this.levelInstance.open316Door();
+    if(gameState.getFlag('LOCKER_OPENED'))this.levelInstance.markLockerOpen();
     this.updateElevatorLight(gameState.areRequiredTasksComplete());
 
     return this;
