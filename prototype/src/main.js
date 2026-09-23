@@ -332,6 +332,7 @@ controller.onInteract = (interactable) => {
         gameState.setFlag('FORCED_3F_ELEVATOR_STOP_DONE',true);
         gameState.setFlag('STAIR_SHORTCUT_3F_4F',true);
         floorStateManager.setPhase(GamePhase.ELEVATOR_GLITCH);
+        gameState.setGameTime('20:40');
         worldRouter.loadZone('first_campus_3f','first_3f_lift');
         uiManager.showSubtitle('李醫師','「……不是 4F。電梯怎麼停在三樓？」',3200);
         controller.enabled=true;
