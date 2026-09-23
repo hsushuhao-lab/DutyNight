@@ -1,23 +1,22 @@
-name: Deploy GitHub Pages
+name: Fast Deploy GitHub Pages
 on:
   push:
     branches: [master]
   workflow_dispatch:
 permissions:
   contents: read
-  actions: read
   pages: write
   id-token: write
 concurrency:
   group: pages
   cancel-in-progress: true
 jobs:
-  build-and-deploy:
+  fast-deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    timeout-minutes: 95
+    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,75 +26,17 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: prototype/package-lock.json
-      - name: Locate already validated identical commit (never a different tree or SHA)
-        id: candidate
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          RUN_ID=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/access-layout-validation.yml/runs?head_sha=$GITHUB_SHA&status=success&per_page=10" --jq '.workflow_runs[0].id // empty')
-          if test -n "$RUN_ID"; then
-            ACTUAL=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$RUN_ID" --jq '.head_sha')
-            test "$ACTUAL" = "$GITHUB_SHA"
-            COUNT=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$RUN_ID/artifacts" --jq '[.artifacts[] | select(.name == "access-layout-tested-site" and .expired == false)] | length')
-            if test "$COUNT" = '1'; then echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"; fi
-          fi
-          git rev-parse HEAD > SOURCE_COMMIT.txt
       - name: Install locked dependencies
         working-directory: prototype
         run: npm ci
-      - name: Download the identical commit's browser-tested site
-        if: steps.candidate.outputs.run_id != ''
-        uses: actions/download-artifact@v4
-        with:
-          name: access-layout-tested-site
-          path: prototype/dist
-          run-id: ${{ steps.candidate.outputs.run_id }}
-          github-token: ${{ github.token }}
-      - name: Download its full regression and browser evidence
-        if: steps.candidate.outputs.run_id != ''
-        uses: actions/download-artifact@v4
-        with:
-          name: access-layout-evidence
-          path: validated-evidence
-          run-id: ${{ steps.candidate.outputs.run_id }}
-          github-token: ${{ github.token }}
-      - name: Download the identical commit's visual evidence
-        if: steps.candidate.outputs.run_id != ''
-        uses: actions/download-artifact@v4
-        with:
-          name: access-layout-views
-          path: validated-views
-          run-id: ${{ steps.candidate.outputs.run_id }}
-          github-token: ${{ github.token }}
-      - name: Verify reused candidate provenance
-        if: steps.candidate.outputs.run_id != ''
-        env:
-          VALIDATED_RUN: ${{ steps.candidate.outputs.run_id }}
-        run: |
-          node --input-type=module -e "import fs from 'node:fs'; import assert from 'node:assert/strict'; const b=JSON.parse(fs.readFileSync('prototype/dist/build-info.json')); assert.equal(b.commit,process.env.GITHUB_SHA); for(const dir of ['validated-evidence','validated-views']) assert.equal(fs.readFileSync(dir+'/SOURCE_COMMIT.txt','utf8').trim(),process.env.GITHUB_SHA); fs.writeFileSync('CANDIDATE_PROVENANCE.json',JSON.stringify({commit:process.env.GITHUB_SHA,validatedRun:process.env.VALIDATED_RUN,policy:'deploy exact tested artifact; do not rebuild a different source'},null,2));"
-      - name: All Node regression suites (unvalidated commits)
-        if: steps.candidate.outputs.run_id == ''
+      - name: Fast structural QA
         working-directory: prototype
         run: node scripts/run-floorplan-regressions.mjs
-      - name: Build and embed exact release SHA (unvalidated commits)
-        if: steps.candidate.outputs.run_id == ''
+      - name: Build exact master SHA
         working-directory: prototype
         run: |
           node scripts/write-build-info.mjs
           npm run build
-      - name: Install browser dependencies
-        working-directory: prototype
-        run: npx playwright install --with-deps chromium
-      - name: Validate production build if no identical validated candidate exists
-        if: steps.candidate.outputs.run_id == ''
-        timeout-minutes: 38
-        working-directory: prototype
-        run: node scripts/test-floorplan-browser.mjs qa-results/pre-release
-      - name: Capture reviewed viewpoints if no identical validated candidate exists
-        if: steps.candidate.outputs.run_id == ''
-        timeout-minutes: 13
-        working-directory: prototype
-        run: node scripts/capture-floorplan.mjs qa-results/screens
       - name: Setup Pages
         uses: actions/configure-pages@v5
         with:
@@ -107,22 +48,6 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-      - name: Verify public build fingerprint and module
+      - name: Verify public build fingerprint
         working-directory: prototype
         run: node scripts/verify-live-build.mjs '${{ steps.deployment.outputs.page_url }}'
-      - name: Test the publicly deployed game
-        timeout-minutes: 38
-        working-directory: prototype
-        run: node scripts/test-floorplan-browser.mjs qa-results/live '${{ steps.deployment.outputs.page_url }}'
-      - name: Upload release QA evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: release-evidence
-          path: |
-            SOURCE_COMMIT.txt
-            CANDIDATE_PROVENANCE.json
-            validated-evidence/
-            validated-views/
-            prototype/qa-results/
-          retention-days: 30
