@@ -50,7 +50,7 @@ export class FirstCampus3F {
     this.gf.buildCeilingLight(this.zoneGroup,20,3.15,-4.5,.7,6);
 
     this.accessDoors={};this.keyedDoors={};
-    this.archiveDoor=new KeyedKnobDoor(this,{id:'3F_ARCHIVE_DOOR',x:19,z:-1.8,width:1.6,title:'文史館・封存資料室'});
+    this.archiveDoor=new KeyedKnobDoor(this,{id:'3F_ARCHIVE_DOOR',x:19,z:-1.8,width:1.6,title:'無門牌房間'});
     this.archiveDoor.setClosed(true);
 
     // Night guard patrol checkpoint opposite the museum wall. The 316 spare key is hidden here.
@@ -59,8 +59,9 @@ export class FirstCampus3F {
     const patrolCanvas=document.createElement('canvas');patrolCanvas.width=480;patrolCanvas.height=220;
     const pctx=patrolCanvas.getContext('2d');pctx.fillStyle='#dfe5e0';pctx.fillRect(0,0,480,220);
     pctx.fillStyle='#385344';pctx.fillRect(0,0,480,58);pctx.fillStyle='#fff';pctx.font='bold 25px sans-serif';pctx.fillText('夜間警衛查哨點',20,39);
-    pctx.fillStyle='#34463d';pctx.font='20px sans-serif';pctx.fillText('巡檢紀錄／備援物品',20,102);pctx.fillText('STAFF ONLY',20,145);
+    pctx.fillStyle='#34463d';pctx.font='20px sans-serif';pctx.fillText('巡檢紀錄／備援物品',20,96);pctx.fillText('17:00  三樓交接巡查',20,132);pctx.fillText('STAFF ONLY',20,172);
     const patrolTex=new THREE.CanvasTexture(patrolCanvas);patrolTex.colorSpace=THREE.SRGBColorSpace;
+    this.patrolCanvas=patrolCanvas;this.patrolContext=pctx;this.patrolTexture=patrolTex;
     const patrolFace=new THREE.Mesh(new THREE.PlaneGeometry(.42,.38),new THREE.MeshBasicMaterial({map:patrolTex}));
     patrolFace.position.set(19,1.38,1.625);patrolFace.rotation.y=Math.PI;this.zoneGroup.add(patrolFace);
     const hiddenKey=new THREE.Mesh(new THREE.TorusGeometry(.045,.009,10,20),m.stainless);hiddenKey.visible=false;hiddenKey.position.set(19,1.18,1.61);this.zoneGroup.add(hiddenKey);
@@ -180,6 +181,16 @@ export class FirstCampus3F {
     }
     if(gameState.getFlag('OPENED_316'))this.levelInstance.open316Door();
     if(gameState.getFlag('LOCKER_OPENED'))this.levelInstance.markLockerOpen();
+    if(gameState.getFlag('OFFICE_302_UNLOCKED'))this.levelInstance.unlock302();
+    if(gameState.getFlag('ARCHIVE_ACCESS_KEY')){
+      if(this.levelInstance.museumKey302){
+        this.levelInstance.museumKey302.userData.interactable=false;
+        if(this.levelInstance.museumKey302.userData.targetGroup)this.levelInstance.museumKey302.userData.targetGroup.visible=false;
+      }
+    }
+    const savedAnne=Number(gameState.getFlag('ANNE_STAGE')||0);
+    if(savedAnne>0)this.levelInstance.setAnneStage(savedAnne);
+    if(gameState.getFlag('GUARD_FUTURE_ENTRY'))this.setPatrolFutureEntry();
     this.updateElevatorLight(gameState.areRequiredTasksComplete());
 
     return this;
@@ -191,6 +202,36 @@ export class FirstCampus3F {
 
   markLockerOpen() {
     this.levelInstance?.markLockerOpen?.();
+  }
+
+  unlock302() {
+    return this.levelInstance?.unlock302?.() || false;
+  }
+
+  setPatrolFutureEntry() {
+    if(!this.patrolContext||!this.patrolCanvas||!this.patrolTexture)return;
+    const ctx=this.patrolContext,canvas=this.patrolCanvas;
+    ctx.fillStyle='#dfe5e0';ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle='#385344';ctx.fillRect(0,0,canvas.width,58);ctx.fillStyle='#fff';ctx.font='bold 25px sans-serif';ctx.fillText('夜間警衛查哨點',20,39);
+    ctx.fillStyle='#34463d';ctx.font='20px sans-serif';ctx.fillText('巡檢紀錄／備援物品',20,94);ctx.fillText('17:00  三樓交接巡查',20,128);
+    ctx.fillStyle='#8a2f29';ctx.font='bold 21px sans-serif';ctx.fillText('21:17  三樓巡查完成',20,164);
+    ctx.fillStyle='#34463d';ctx.font='16px sans-serif';ctx.fillText('STAFF ONLY',20,198);
+    this.patrolTexture.needsUpdate=true;
+  }
+
+  syncHorrorState() {
+    if(gameState.getFlag('GUARD_FUTURE_ENTRY'))this.setPatrolFutureEntry();
+  }
+
+  update(camera) {
+    if(!camera||!this.levelInstance?.anneGroup)return;
+    const desired=Number(gameState.getFlag('ANNE_STAGE')||0);
+    if(desired<=this.levelInstance.anneStage)return;
+    camera.updateMatrixWorld(true);
+    const vp=new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse);
+    const frustum=new THREE.Frustum().setFromProjectionMatrix(vp);
+    const worldPos=new THREE.Vector3();this.levelInstance.anneGroup.getWorldPosition(worldPos);
+    if(!frustum.containsPoint(worldPos))this.levelInstance.setAnneStage(desired);
   }
 
   updateElevatorLight(isReady) {
