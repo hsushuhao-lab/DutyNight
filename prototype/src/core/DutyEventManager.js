@@ -31,6 +31,9 @@ export class DutyEventManager {
     }
     if(zoneId==='first_campus_2f' && this.gameState.isTaskComplete('P1_REST_DONE') && !this.gameState.isTaskComplete('P1_ER_ASSESSMENT_DONE')){
       this.gameState.setGameTime('20:05');
+      if(this.gameState.getFlag('HOOK_0217')){
+        return {speaker:'急診護理師',text:'「醫師您好，這位無名氏沒有證件，只有一條很舊的住院手圈。條碼格式太舊，現在的 HIS 讀不出來。」'};
+      }
       return {speaker:'急診護理師',text:'「醫師您好，這位病人最近壓力大、兩天沒睡好，今晚心悸焦慮，所以來急診。」'};
     }
     if(zoneId==='first_campus_4f' && this.gameState.isTaskComplete('P1_ER_NOTE_DONE') && !this.gameState.isTaskComplete('P1_RETURN_4F')){
