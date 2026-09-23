@@ -116,12 +116,24 @@ export class Level3FBlockout {
     this.buildWall(-12, 1.6, 0, 0.4, 3.2, 7);
     // North wall of elevator lobby
     for(const x of [-10.8,-5.2])this.buildWall(x,1.6,3.5,2.4,3.2,.4);
-    // South wall of elevator lobby
-    this.buildWall(-8, 1.6, -3.5, 8, 3.2, 0.4);
+    // South wall opens into a new 3F waiting / reading annex instead of ending in a blank lobby.
+    this.buildWall(-10.6,1.6,-3.5,2.8,3.2,.4);
+    this.buildWall(-5.4,1.6,-3.5,2.8,3.2,.4);
+
+    const annexFloorGeo=new THREE.PlaneGeometry(8,5);
+    const annexFloor=new THREE.Mesh(annexFloorGeo,materialForSurface('floor',8,5));
+    annexFloor.rotation.x=-Math.PI/2;annexFloor.position.set(-8,0,-6);annexFloor.receiveShadow=true;this.scene.add(annexFloor);this.addWalkable(annexFloor);
+    const annexCeilGeo=new THREE.PlaneGeometry(8,5);
+    const annexCeil=new THREE.Mesh(annexCeilGeo,materialForSurface('ceiling',8,5));
+    annexCeil.rotation.x=Math.PI/2;annexCeil.position.set(-8,3.2,-6);this.scene.add(annexCeil);
+    this.buildWall(-12,1.6,-6,.4,3.2,5);
+    this.buildWall(-4,1.6,-6,.4,3.2,5);
+    this.buildWall(-8,1.6,-8.5,8,3.2,.4);
+    this.explorationArea={id:'3F_ELEVATOR_ANNEX',label:'3F 候梯閱讀區',bounds:[-12,-8.5,-4,-3.5],entry:[-8,1.7,-3.5]};
 
     // Shared vertical core installs the call light after this legacy room is built.
-    // Overhead wayfinding sign in elevator lobby, facing approaching corridor traffic (+X)
-    this.createSignMesh(-6.8, 2.65, 0, '◀ 3F 電梯大廳 ｜ 2F 急診・4F 病房區 ▶', Math.PI / 2);
+    // Keep wayfinding terse: only transport destinations.
+    this.createSignMesh(-6.8,2.65,0,'◀ 電梯 ｜ 逃生梯 ▶',Math.PI/2);
     const rodMat = new THREE.MeshStandardMaterial({ color: 0x888888, metalness: 0.85, roughness: 0.3 });
     const rod1 = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.55, 8), rodMat);
     rod1.position.set(-6.8, 2.93, -0.85);
@@ -658,6 +670,8 @@ export class Level3FBlockout {
     // Ceiling fluorescent fixtures (warm white 4000K)
     const fixturePositions = [
       { x: -8, y: 3.15, z: 0 },    // Elevator lobby
+      { x: -8, y: 3.15, z: -5.2 }, // 3F waiting / reading annex
+      { x: -8, y: 3.15, z: -7.4 }, // annex rear
       { x: -1.5, y: 3.15, z: 0 },  // Corridor west
       { x: 2.5, y: 3.15, z: 0 },   // Corridor west-mid
       { x: 6.5, y: 3.15, z: 0 },   // Corridor mid
