@@ -33,10 +33,22 @@ export class UIManager {
   }
 
   initEvents() {
+    const loginButton=document.getElementById('btn-his-login');
+    loginButton?.addEventListener('click',()=>{
+      const a=document.getElementById('his-account')?.value.trim();
+      const p=document.getElementById('his-password')?.value;
+      const ok=a==='night403'&&p===['QingLing','1700'].join('-');
+      document.getElementById('his-login-status').textContent=ok?'登入成功｜可讀取夜班交班':'帳號或密碼錯誤';
+      document.getElementById('his-handoff-content')?.classList.toggle('unlocked',ok);
+      if(ok)this.gameState.setFlag('HIS_AUTHENTICATED',true);
+      soundManager.playComputerBeep();
+    });
+
     // Workstation sign & close button
     const btnSignHandoff = document.getElementById('btn-sign-handoff');
     if (btnSignHandoff) {
       btnSignHandoff.addEventListener('click', () => {
+        if(!this.gameState.getFlag('HIS_AUTHENTICATED')){document.getElementById('his-login-status').textContent='請先用值班本上的帳密登入';return;}
         soundManager.playComputerBeep();
         this.gameState.markTaskComplete('E_HANDOFF');
         this.closeWorkstation();
@@ -354,7 +366,7 @@ export class UIManager {
       this.renderTaskBoard('今日夜班手續（17:00 交接）', [
         {id:'task-key',text:'領取 4F 值班室鑰匙與感應卡（316 總醫師辦公室）',state:done('KEY_PICKUP')?'completed':'pending'},
         {id:'task-log',text:'簽署 3F 值班簽到簿（316 總醫師辦公室）',state:done('DUTY_LOG')?'completed':'pending'},
-        {id:'task-handoff',text:'完成電子交班工作站（HIS 終端機）',state:done('E_HANDOFF')?'completed':'pending'},
+        {id:'task-handoff',text:'用值班本帳密登入 HIS，查看總床數與特殊交班',state:done('E_HANDOFF')?'completed':'pending'},
         {id:'task-elevator',text:readyFor4F?'搭乘電梯前往 4F 病房區':'搭乘電梯前往 4F（待完成交班手續）',state:readyFor4F?'ready':'locked'}
       ]);
       return;
