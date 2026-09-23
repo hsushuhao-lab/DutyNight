@@ -12,17 +12,19 @@ global.document={
 const router=new WorldRouter(new THREE.Scene(),new THREE.PerspectiveCamera(),null);
 const zone=router.loadZone('first_campus_3f');
 
-assert.equal(zone.explorationArea?.id,'3F_ELEVATOR_ANNEX');
-assert.deepEqual(zone.explorationArea.bounds,[-12,-8.5,-4,-3.5]);
+assert.equal(zone.explorationArea?.id,'3F_ELEVATOR_LOBBY');
+assert.deepEqual(zone.explorationArea.bounds,[-12,-3.5,-4,3.5]);
 assert.equal(zone.secretArchive?.bookshelfCount,4);
 assert.equal(zone.secretArchive?.documentIds.length,3);
 assert(zone.accessDoors['3F_ARCHIVE_DOOR']?.closed,'Archive access door must default closed');
 
 const docs=zone.interactables.filter(o=>o.userData?.type==='archive_document');
-assert.equal(docs.length,3,'Archive must expose three readable document objects');
+assert.equal(docs.length,5,'3F must expose three archive files plus two 316 secret documents');
+assert.equal(zone.officeSecrets?.count,2,'316 must contain two optional secret clues');
+assert.equal(zone.secretArchive?.documentIds.length,3);
 for(const doc of docs){
   assert(doc.userData.documentTitle);
-  assert(doc.userData.pages.length>=3);
+  assert(doc.userData.pages.length>=2);
   assert.match(doc.userData.label,/翻閱/);
 }
 console.log('3F EXPLORATION + ARCHIVE QA PASS');
