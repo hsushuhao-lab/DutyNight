@@ -138,13 +138,13 @@ controller.onInteract = (interactable) => {
       const keyedDoor=zone.keyedDoors?.[interactable.doorId];
       if(!keyedDoor)return;
       if(!gameState.getFlag('ARCHIVE_OBJECTIVE')){
-        soundManager.playClick();
-        uiManager.showSubtitle('文史館','「今晚的正常交班流程沒有提到這裡。先完成 316 的交班。」',3000);
+        soundManager.playDoorLockClack();
+        uiManager.showSubtitle('李醫師','「打不開。門上也沒有牌子……」',2400);
         return;
       }
       if(!gameState.getFlag('ARCHIVE_ACCESS_KEY')){
         gameState.setFlag('ARCHIVE_LOCKED_SEEN',true);
-        soundManager.playClick();
+        soundManager.playDoorLockClack();
         uiManager.showSubtitle('李醫師','「打不開……鑰匙呢？」',2600);
         return;
       }
@@ -213,36 +213,18 @@ controller.onInteract = (interactable) => {
       uiManager.showPrompt(null);
       checkElevatorReady();
     }
-  } else if (interactable.type === 'archive_key_clue_4f') {
-    if(!gameState.getFlag('ARCHIVE_KEY_CLUE_4F')){
-      gameState.setFlag('ARCHIVE_KEY_CLUE_4F',true);
-      gameState.markTaskComplete('ARCHIVE_KEY_CLUE_FOUND');
-      soundManager.playPaperSign();
-    }
+  } else if (interactable.type === 'office_302_inspect') {
     controller.enabled=false;
-    uiManager.openArchiveDocument({title:interactable.documentTitle,pages:interactable.pages});
-  } else if (interactable.type === 'archive_key_cache_4f') {
-    if(!gameState.getFlag('ARCHIVE_KEY_CLUE_4F')){
-      soundManager.playClick();
-      uiManager.showSubtitle('李醫師','「床邊櫃裡都是一般雜物。也許先找找值班室內有沒有舊的備援物品清單。」',3200);
-      return;
-    }
-    if(!gameState.getFlag('ARCHIVE_ACCESS_KEY')){
-      gameState.setFlag('ARCHIVE_ACCESS_KEY',true);
-      gameState.markTaskComplete('ARCHIVE_KEY_FOUND');
-      if(interactable.targetGroup)interactable.targetGroup.visible=false;
-      interactable.interactable=false;
-      soundManager.playKeyPickup();
-      uiManager.showSubtitle('李醫師','「最下層舊布袋裡……找到文史館備用鑰匙了。」',3200);
-      uiManager.showPrompt(null);
-    }
-  } else if (interactable.type === 'office_302_clue') {
-    controller.enabled=false;
-    uiManager.openArchiveDocument({title:interactable.documentTitle,pages:interactable.pages});
+    uiManager.open302Inspect();
   } else if (interactable.type === 'office_302_keypad') {
     if(gameState.getFlag('OFFICE_302_UNLOCKED')){
       worldRouter.activeZoneInstance.unlock302?.();
       return;
+    }
+    if(!gameState.getFlag('INTERACTED_302')){
+      gameState.setFlag('INTERACTED_302',true);
+      soundManager.playDoorLockClack();
+      uiManager.showSubtitle('李醫師','「鎖上了……需要四位數密碼。看來跟對面的夜間告示有關。」',3200);
     }
     controller.enabled=false;
     uiManager.open302Keypad();
@@ -262,7 +244,8 @@ controller.onInteract = (interactable) => {
       gameState.setFlag('PHONE_ANSWERED',true);
       gameState.setFlag('PHONE_RING_ACTIVE',false);
       soundManager.playClick();
-      uiManager.showSubtitle('電話','「……你還在三樓嗎？」',3200);
+      soundManager.duckAmbient(.18,4300);
+      uiManager.showSubtitle('電話','（三秒雜音）\n「……你還在三樓嗎？」\n嘟——　嘟——　嘟——',4300);
     }else{
       uiManager.showSubtitle('李醫師','「普通的院內電話。」',1800);
     }
