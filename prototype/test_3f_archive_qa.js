@@ -35,9 +35,13 @@ for(const doc of docs){
 }
 assert.equal(zone.levelInstance?.office302?.code,'3082');
 assert.equal(zone.levelInstance?.office302Keypad?.userData?.type,'office_302_keypad');
+assert.equal(zone.levelInstance?.office302Clue?.userData?.type,'office_302_inspect');
+assert.deepEqual(zone.levelInstance?.office302?.bulletin,[-6.35,1.73,-3.18]);
 assert.equal(zone.levelInstance?.museumKey302?.userData?.type,'museum_key_302');
 assert.equal(zone.levelInstance?.storageRoom?.anne,true);
 assert.equal(zone.levelInstance?.anneStage,0);
+assert(zone.levelInstance?.storageDoor,'Storage-room door missing');
+assert(zone.levelInstance?.anneStool,'Anne stage-2 stool missing');
 assert.equal(zone.levelInstance?.phoneMesh?.userData?.type,'office_phone_316');
 assert.equal(zone.coreOffice3F?.relativeTo4FDutyRoom,true);
 assert.deepEqual(zone.coreOffice3F?.bounds,[-22,3.5,-16,11.5]);
