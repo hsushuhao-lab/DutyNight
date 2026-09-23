@@ -49,6 +49,8 @@ export class GameState {
     this.flags.set('FORCE_3F_ELEVATOR_STOP', false);
     this.flags.set('FORCED_3F_ELEVATOR_STOP_DONE', false);
     this.flags.set('NIGHT_PATROL_RETURN_3F', false);
+    this.flags.set('HIDDEN_SERVICE_DOOR_DISCOVERED', false);
+    this.flags.set('CLUE_403_0409', false);
   }
 
   addListener(fn) {
