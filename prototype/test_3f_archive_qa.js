@@ -33,8 +33,10 @@ for(const doc of docs){
   assert(doc.userData.pages.length>=2);
   assert.match(doc.userData.label,/翻閱/);
 }
-const ward=router.loadZone('first_campus_4f');
-assert.equal(ward.archiveKeyClueMesh?.userData?.type,'archive_key_clue_4f','4F museum-key clue missing');
-assert.equal(ward.archiveKeyMesh?.userData?.type,'archive_key_cache_4f','4F hidden museum-key cache missing');
-assert.deepEqual(ward.archiveKeyAnchor,[-11.25,.26,8.08]);
+assert.equal(zone.levelInstance?.office302?.code,'3082');
+assert.equal(zone.levelInstance?.office302Keypad?.userData?.type,'office_302_keypad');
+assert.equal(zone.levelInstance?.museumKey302?.userData?.type,'museum_key_302');
+assert.equal(zone.levelInstance?.storageRoom?.anne,true);
+assert.equal(zone.levelInstance?.anneStage,0);
+assert.equal(zone.levelInstance?.phoneMesh?.userData?.type,'office_phone_316');
 console.log('3F EXPLORATION + ARCHIVE QA PASS');
