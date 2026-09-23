@@ -57,17 +57,34 @@ export function applyFirstFloorArt(level) {
   asset('printer',10,.82,6.45,[1,1,1],-Math.PI/2);
   for(const z of [4.9,6.1])asset('officeChair',8.6,0,z,[1,1,1],-Math.PI/2);
   for(const x of [5.0,9.35,13.15])asset('bench',x,0,1.94,[1.25,1,1],Math.PI);
-  for(const [x,z,s] of [[-5.3,-1.55,.82],[13.6,-1.95,.82]])asset('plant',x,0,z,[s,s,s]);
-  monstera(15.0,-1.72,.52);
+  for(const [x,z,s] of [[-5.3,-1.55,.72],[13.6,-1.95,.72],[15.0,-1.72,.62]])asset('plant',x,0,z,[s,s,s]);
 
-  // Furnish the actual elevator-front lobby, keeping the lift/stair approach fully clear.
-  asset('bench',-11.1,0,-2.55,[1.02,1,1],Math.PI/2);
-  asset('bench',-11.1,0,2.15,[1.02,1,1],Math.PI/2);
-  asset('bench',-5.0,0,-2.55,[1.02,1,1],-Math.PI/2);
-  asset('plant',-10.7,0,2.85,[.72,.72,.72]);
-  asset('plant',-5.35,0,2.85,[.62,.62,.62]);
-  monstera(-10.65,-2.95,.44);
-  monstera(-5.35,-2.95,.42);
+  // Furnish the actual elevator-front lobby; centre aisle stays open to lift and escape stair.
+  asset('bench',-11.0,0,-2.45,[1.12,1,1],Math.PI/2);
+  asset('bench',-11.0,0,2.10,[1.12,1,1],Math.PI/2);
+  asset('bench',-5.05,0,-2.45,[1.12,1,1],-Math.PI/2);
+  asset('bench',-5.05,0,2.10,[1.12,1,1],-Math.PI/2);
+  asset('plant',-10.55,0,3.00,[.55,.55,.55]);
+  asset('plant',-5.45,0,3.00,[.50,.50,.50]);
+  asset('fern_c',-10.6,0,-3.02,[1.15,1.15,1.15]);
+  asset('fern_b',-5.45,0,-3.00,[1.05,1.05,1.05]);
+
+  // Water dispenser, waste bin, sanitizer stand and wheelchair parking marker.
+  box(-5.0,.58,.95,.46,1.16,.42,m.wall);
+  box(-5.0,1.10,.95,.30,.14,.24,m.glass);
+  box(-5.0,.19,1.62,.38,.38,.34,m.wallDark);
+  box(-5.10,.72,-.95,.08,1.32,.08,m.metal);
+  box(-5.10,1.35,-.95,.24,.28,.12,m.wall);
+  box(-10.95,.018,.20,1.25,.035,.72,m.wallBumper);
+
+  // Wall clock and fire/evacuation notice make the lobby read as a staffed hospital space.
+  const clockFace=new THREE.Mesh(new THREE.CircleGeometry(.30,32),new THREE.MeshStandardMaterial({color:0xf3f0e6,roughness:.9}));
+  clockFace.position.set(-11.78,2.25,.55);clockFace.rotation.y=Math.PI/2;root.add(clockFace);
+  for(const a of [0,Math.PI/2,Math.PI,Math.PI*1.5]){
+    const tick=new THREE.Mesh(new THREE.BoxGeometry(.025,.09,.012),m.wallDark);tick.position.set(-11.75,2.25+Math.cos(a)*.21,.55+Math.sin(a)*.21);tick.rotation.y=Math.PI/2;root.add(tick);
+  }
+  box(-11.78,1.45,-1.05,.045,1.15,1.65,m.floorWood);
+  box(-11.75,1.45,-1.05,.025,1.05,1.55,m.wall);
   box(-8,1.72,-3.27,4.5,1.12,.045,m.floorWood);
   {
     const canvas=document.createElement('canvas');canvas.width=1100;canvas.height=420;const ctx=canvas.getContext('2d');
