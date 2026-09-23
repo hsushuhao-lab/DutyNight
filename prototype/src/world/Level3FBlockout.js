@@ -331,7 +331,7 @@ export class Level3FBlockout {
 
     // Door is deliberately left slightly ajar.
     const door=new THREE.Mesh(new THREE.BoxGeometry(1.15,2.30,.07),new THREE.MeshStandardMaterial({color:0x6e5140,roughness:.7}));
-    door.position.set(13.05,1.15,2.72);door.rotation.y=-.42;this.scene.add(door);
+    door.position.set(13.05,1.15,2.72);door.rotation.y=-.52;this.scene.add(door);this.storageDoor=door;
     const labelCanvas=document.createElement('canvas');labelCanvas.width=480;labelCanvas.height=180;const lctx=labelCanvas.getContext('2d');
     lctx.fillStyle='#edf2ee';lctx.fillRect(0,0,480,180);lctx.fillStyle='#24513a';lctx.fillRect(0,0,480,45);
     lctx.fillStyle='#1f2d26';lctx.font='bold 32px sans-serif';lctx.fillText('器材儲藏室',28,105);lctx.font='18px sans-serif';lctx.fillText('CPR 教學器材',28,143);
@@ -357,6 +357,10 @@ export class Level3FBlockout {
     const anneHit=new THREE.Mesh(new THREE.BoxGeometry(1.75,.65,.90),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
     anneHit.position.set(13.5,1.00,5.15);anneHit.userData={interactable:true,id:'CPR_ANNE',type:'cpr_anne',label:'查看 CPR 訓練假人「安妮」'};
     this.scene.add(anneHit);this.interactables.push(anneHit);this.anneHit=anneHit;
+    const stool=new THREE.Group();stool.position.set(13.48,0,3.18);stool.visible=false;this.scene.add(stool);
+    const stoolSeat=new THREE.Mesh(new THREE.CylinderGeometry(.24,.24,.08,18),this.materials.wallDark);stoolSeat.position.y=.48;stool.add(stoolSeat);
+    for(let i=0;i<3;i++){const a=i*Math.PI*2/3;const leg=new THREE.Mesh(new THREE.CylinderGeometry(.018,.022,.46,8),this.materials.fixture);leg.position.set(Math.cos(a)*.15,.23,Math.sin(a)*.15);stool.add(leg);}
+    this.anneStool=stool;
     this.storageRoom={id:'3F_STORAGE',label:'器材儲藏室',anne:true,bounds:[11,2.5,16,6.5]};
   }
 
@@ -366,12 +370,19 @@ export class Level3FBlockout {
     if(stage===0){
       this.anneGroup.position.set(13.5,1.02,5.15);this.anneGroup.rotation.set(Math.PI/2,0,Math.PI);this.anneHead.rotation.set(0,0,0);
       this.anneHit.position.set(13.5,1.0,5.15);
+      if(this.storageDoor){this.storageDoor.position.set(13.05,1.15,2.72);this.storageDoor.rotation.y=-.52;}
+      if(this.anneStool)this.anneStool.visible=false;
     }else if(stage===1){
       this.anneGroup.position.set(13.5,1.02,5.15);this.anneGroup.rotation.set(Math.PI/2,0,Math.PI);
-      this.anneHead.rotation.z=.72;
+      this.anneHead.rotation.z=.78;
+      this.anneHit.position.set(13.5,1.0,5.15);
+      if(this.storageDoor){this.storageDoor.position.set(13.05,1.15,2.72);this.storageDoor.rotation.y=-.52;}
+      if(this.anneStool)this.anneStool.visible=false;
     }else{
-      this.anneGroup.position.set(13.5,.45,2.96);this.anneGroup.rotation.set(0,0,0);this.anneHead.rotation.set(0,0,0);
-      this.anneHit.position.set(13.5,1.0,3.0);
+      this.anneGroup.position.set(13.48,.62,3.18);this.anneGroup.rotation.set(0,Math.PI,0);this.anneHead.rotation.set(0,0,0);
+      this.anneHit.position.set(13.48,1.0,3.18);
+      if(this.storageDoor){this.storageDoor.position.set(12.95,1.15,3.03);this.storageDoor.rotation.y=-Math.PI/2;}
+      if(this.anneStool)this.anneStool.visible=true;
     }
   }
 
