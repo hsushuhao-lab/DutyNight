@@ -5,7 +5,7 @@ import { Level3FBlockout } from '../Level3FBlockout.js';
 import { disposeZoneArt } from '../../art/ArtResources.js';
 import { applyFirstFloorArt } from '../../art/FirstFloorArt.js';
 import { applyAct1CollisionHotfix } from '../CollisionHotfix.js';
-import { AccessDoor } from '../shared/AccessDoor.js';
+import { KeyedKnobDoor } from '../shared/KeyedKnobDoor.js';
 import { asset, solid } from '../../art/ArtDetails.js';
 
 export class FirstCampus3F {
@@ -49,8 +49,8 @@ export class FirstCampus3F {
     this.gf.buildWall(this.zoneGroup,this.colliders,23.7,1.6,-4.5,.2,3.2,5.4);
     this.gf.buildCeilingLight(this.zoneGroup,20,3.15,-4.5,.7,6);
 
-    this.accessDoors={};
-    this.archiveDoor=new AccessDoor(this,{id:'3F_ARCHIVE_DOOR',x:19,z:-1.8,width:1.6,title:'文史館・封存資料室',material:m.doorWood,readerSide:-1});
+    this.accessDoors={};this.keyedDoors={};
+    this.archiveDoor=new KeyedKnobDoor(this,{id:'3F_ARCHIVE_DOOR',x:19,z:-1.8,width:1.6,title:'文史館・封存資料室'});
     this.archiveDoor.setClosed(true);
     const shelfMat=this.gf.materials.floorWood,folderMat=this.gf.materials.doorWood;
     const buildShelf=(id,x,z,yaw=0)=>{
