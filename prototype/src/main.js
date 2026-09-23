@@ -17,6 +17,7 @@ import { applyAct1CollisionHotfix } from './world/CollisionHotfix.js';
 import { FPSController } from './player/FPSController.js';
 import { UIManager } from './ui/UIManager.js';
 import { soundManager } from './audio/SoundManager.js';
+import { floorStateManager, GamePhase } from './core/FloorStateManager.js';
 
 // Setup Three.js Scene & Renderer
 const container = document.getElementById('canvas-container');
@@ -282,6 +283,11 @@ controller.onInteract = (interactable) => {
       gameState.setFlag('ARCHIVE_CLUE_FOUND',true);
       gameState.setFlag('ANNE_STAGE',2);
       gameState.setFlag('GUARD_FUTURE_ENTRY',true);
+      gameState.setFlag('HOOK_403_OLD_ROOM',true);
+      gameState.setFlag('HOOK_1F_HIDDEN_DOOR',true);
+      gameState.setFlag('HOOK_0217',true);
+      floorStateManager.setPhase(GamePhase.AFTER_ARCHIVE);
+      worldRouter.activeZoneInstance?.applyGamePhase?.(GamePhase.AFTER_ARCHIVE,gameState);
       worldRouter.activeZoneInstance?.syncHorrorState?.();
     }
   } else if (interactable.type === 'acute_gate') {
@@ -310,8 +316,27 @@ controller.onInteract = (interactable) => {
       uiManager.showSubtitle('門禁','「電梯與安全梯尚未授權。先到總醫師辦公室領取感應卡。」',2800);
       return;
     }
+    if(interactable.kind==='stairs'&&worldRouter.activeZoneId==='first_campus_3f'&&!gameState.getFlag('STAIR_SHORTCUT_3F_4F')){
+      soundManager.playDoorLockClack();
+      uiManager.showSubtitle('李醫師','「逃生梯從另一側用插銷鎖住了。」',2800);
+      return;
+    }
+    if(interactable.kind==='stairs'&&worldRouter.activeZoneId==='first_campus_4f'&&!gameState.getFlag('STAIR_SHORTCUT_3F_4F')){
+      gameState.setFlag('STAIR_SHORTCUT_3F_4F',true);
+      uiManager.showSubtitle('李醫師','「從這側可以把插銷拔開……3F 和 4F 的逃生梯打通了。」',3200);
+    }
     controller.enabled = false;
-    uiManager.openTravelSelector(worldRouter.floorDestinations(interactable.kind), worldRouter.activeZoneId, destination => {
+    const travelFrom=worldRouter.activeZoneId;
+    uiManager.openTravelSelector(worldRouter.floorDestinations(interactable.kind), travelFrom, destination => {
+      if(interactable.kind==='elevator'&&travelFrom==='first_campus_2f'&&destination.zoneId==='first_campus_4f'&&gameState.getFlag('FORCE_3F_ELEVATOR_STOP')&&!gameState.getFlag('FORCED_3F_ELEVATOR_STOP_DONE')){
+        gameState.setFlag('FORCED_3F_ELEVATOR_STOP_DONE',true);
+        gameState.setFlag('STAIR_SHORTCUT_3F_4F',true);
+        floorStateManager.setPhase(GamePhase.ELEVATOR_GLITCH);
+        worldRouter.loadZone('first_campus_3f','first_3f_lift');
+        uiManager.showSubtitle('李醫師','「……不是 4F。電梯怎麼停在三樓？」',3200);
+        controller.enabled=true;
+        return;
+      }
       if (destination.zoneId === 'first_campus_4f') gameState.markTaskComplete('WARD_ENTRY');
       worldRouter.loadZone(destination.zoneId, destination.spawn);
       const dutyLine=dutyEvents.onZoneEntered(destination.zoneId);
@@ -335,7 +360,10 @@ controller.onInteract = (interactable) => {
     } else if(action==='INSOMNIA_403'){
       if(!gameState.isTaskComplete('P1_ROUND_COMPLETE')) return uiManager.showSubtitle('李醫師','「先完成晚間巡房。」',2500);
       dutyEvents.complete('P1_INSOMNIA_DONE','18:30');
-      uiManager.showSubtitle('403 病人','「醫師，我一直睡不著。」');
+      if(gameState.getFlag('HOOK_403_OLD_ROOM')){
+        gameState.setFlag('CLUE_403_0409',true);
+        uiManager.showSubtitle('403 病人','「醫師，我一直睡不著……床底下又在敲牆。四下、停一下、九下。你們以前也把人關在這裡嗎？」',5200);
+      }else uiManager.showSubtitle('403 病人','「醫師，我一直睡不著。」');
     } else if(action==='NORMAL_EVENT'){
       if(!gameState.isTaskComplete('P1_INSOMNIA_DONE')) return uiManager.showSubtitle('李醫師','「先處理 403 的睡眠問題。」',2500);
       dutyEvents.complete('P1_NORMAL_EVENT_DONE','19:30');
@@ -347,15 +375,28 @@ controller.onInteract = (interactable) => {
     } else if(action==='ER_ASSESS'){
       if(!gameState.isTaskComplete('P1_REST_DONE')) return uiManager.showSubtitle('李醫師','「目前沒有急診會診任務。」',2500);
       dutyEvents.complete('P1_ER_ASSESSMENT_DONE','20:25');
-      uiManager.showSubtitle('急診病人','「最近壓力很大，兩天睡不好，今晚一直心悸，很焦慮。」');
+      if(gameState.getFlag('HOOK_0217')){
+        gameState.setFlag('ER_JANE_DOE_WRISTBAND',true);
+        uiManager.showSubtitle('急診護理師','「這位無名氏沒有證件，只有一條發黃的舊住院手圈。條碼格式太舊，現在 HIS 讀不到。」',4800);
+      }else uiManager.showSubtitle('急診病人','「最近壓力很大，兩天睡不好，今晚一直心悸，很焦慮。」');
     } else if(action==='ER_NOTE'){
       if(!gameState.isTaskComplete('P1_ER_ASSESSMENT_DONE')) return uiManager.showSubtitle('李醫師','「先完成病人評估。」',2500);
       dutyEvents.complete('P1_ER_NOTE_DONE','20:30');
-      uiManager.showSubtitle('李醫師','「急診評估紀錄完成，回 4F。」');
+      if(gameState.getFlag('ER_JANE_DOE_WRISTBAND')){
+        gameState.setFlag('FIRST_FLOOR_GUARD_KEY',true);
+        gameState.setFlag('FORCE_3F_ELEVATOR_STOP',true);
+        uiManager.showSubtitle('李醫師','「她外套口袋裡還有一把舊鑰匙……標籤寫著『1F 警衛台』。先收著，回 4F。」',4600);
+      }else uiManager.showSubtitle('李醫師','「急診評估紀錄完成，回 4F。」');
     } else if(action==='END_SHIFT'){
       if(!gameState.isTaskComplete('P1_RETURN_4F')) return uiManager.showSubtitle('李醫師','「還沒到可以休息的時候。」',2500);
       dutyEvents.complete('ACT1_NORMAL_FLOW','21:00');
       uiManager.showSubtitle('李醫師','「目前都處理完了。先躺一下吧。」');
+      setTimeout(()=>{
+        gameState.setGameTime('21:15');
+        gameState.setFlag('NIGHT_PATROL_RETURN_3F',true);
+        floorStateManager.setPhase(GamePhase.NIGHT_PATROL);
+        uiManager.showSubtitle('護理站電話','「李醫師，三樓保全剛打上來，說你有東西掉在那扇舊資料室門口，麻煩你下去看一下。」',5200);
+      },2200);
     }
     controller.currentInteractable=null;uiManager.showPrompt(null);
   } else if (interactable.type === 'ward_gate') {
