@@ -403,9 +403,11 @@ controller.onInteract = (interactable) => {
       }else uiManager.showSubtitle('李醫師','「急診評估紀錄完成，回 4F。」');
     } else if(action==='END_SHIFT'){
       if(!gameState.isTaskComplete('P1_RETURN_4F')) return uiManager.showSubtitle('李醫師','「還沒到可以休息的時候。」',2500);
+      if(gameState.isTaskComplete('ACT1_NORMAL_FLOW')||gameState.getFlag('NIGHT_PATROL_RETURN_3F')) return;
       dutyEvents.complete('ACT1_NORMAL_FLOW','21:00');
       uiManager.showSubtitle('李醫師','「目前都處理完了。先躺一下吧。」');
       setTimeout(()=>{
+        if(gameState.getFlag('NIGHT_PATROL_RETURN_3F')) return;
         gameState.setGameTime('21:15');
         gameState.setFlag('NIGHT_PATROL_RETURN_3F',true);
         floorStateManager.setPhase(GamePhase.NIGHT_PATROL);
