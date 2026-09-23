@@ -6,6 +6,7 @@ import { AccessDoor } from './AccessDoor.js';
 import { KeyedKnobDoor } from './KeyedKnobDoor.js';
 import { CollisionFactory } from './CollisionFactory.js';
 import { SignAnchor } from './SignAnchor.js';
+import { gameState } from '../../core/GameState.js';
 
 /** September 22 V5 user floorplan. Units are gameplay metres, not a real hospital survey. */
 export class WardFloorplan {
@@ -110,6 +111,21 @@ export class WardFloorplan {
     workstation(this,{x:-10.0,z:3.1,id:'duty_desk'});
     this.dutyCabinetAnchor=[-8.8,0,9.3];this.dutyCabinetYaw=Math.PI;
     asset(this.zoneGroup,'storageCabinet',this.dutyCabinetAnchor,[1,1,1],this.dutyCabinetYaw);
+
+    // Museum/archive spare key: stored only in the first-campus 4F duty room.
+    const archiveKeyGroup=new THREE.Group();archiveKeyGroup.name='ArchiveAccessKey_4F';
+    const archiveRing=new THREE.Mesh(new THREE.TorusGeometry(.055,.010,12,24),this.gf.materials.stainless);archiveKeyGroup.add(archiveRing);
+    const archiveBlade=new THREE.Mesh(new THREE.BoxGeometry(.018,.012,.16),this.gf.materials.stainless);archiveBlade.position.set(0,0,.11);archiveKeyGroup.add(archiveBlade);
+    const archiveTag=new THREE.Mesh(new THREE.BoxGeometry(.11,.018,.16),this.gf.materials.wallBumper);archiveTag.position.set(.08,0,-.02);archiveKeyGroup.add(archiveTag);
+    archiveKeyGroup.position.set(-9.10,1.62,9.18);
+    const archiveKeyAvailable=gameState.getFlag('ARCHIVE_OBJECTIVE')&&!gameState.getFlag('ARCHIVE_ACCESS_KEY');
+    archiveKeyGroup.visible=archiveKeyAvailable;this.zoneGroup.add(archiveKeyGroup);
+    const archiveKeyHit=new THREE.Mesh(new THREE.BoxGeometry(.55,.45,.55),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
+    archiveKeyHit.position.set(-9.10,1.62,9.18);
+    archiveKeyHit.userData={interactable:archiveKeyAvailable,id:'ARCHIVE_ACCESS_KEY_4F',type:'archive_key_4f',label:'拿取文史館備用鑰匙',targetGroup:archiveKeyGroup};
+    this.zoneGroup.add(archiveKeyHit);this.interactables.push(archiveKeyHit);
+    this.archiveKeyMesh=archiveKeyHit;this.archiveKeyAnchor=[-9.10,1.62,9.18];
+
     // Enclosed duty-room bathroom with a real knob door, toilet, sink, mirror and dedicated light.
     w.rect(-14,2,-11.5,5.2);w.cut('z',-11.5,4.0,1.1);
     this.gf.buildFloor(this.zoneGroup,this.walkables,-12.75,.006,3.6,2.5,3.2,this.gf.materials.floorTile);
