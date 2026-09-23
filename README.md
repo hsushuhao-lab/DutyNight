@@ -1,11 +1,11 @@
-# 《松德值班夜：與避無可避的傳說》
+# 《夜班迴廊：與避無可避的傳說》
 ## —— 第一幕原型：今晚輪到你（Act 1 Prototype v0.1.1）——
 
 > 🌐 **線上 3D 體驗站**：https://hsushuhao-lab.github.io/DutyNight/  
 > 📦 **GitHub 專案庫**：https://github.com/hsushuhao-lab/DutyNight  
 > 🎮 **本機一鍵啟動**：雙擊 `run-prototype.cmd`
 
-一款以當代台灣精神專科醫院（臺北市立聯合醫院松德院區）夜間值班為背景的第一人稱心理驚悚敘事遊戲。第一幕涵蓋 **16:55–21:00「今晚輪到你」**。
+一款以當代台灣精神專科醫院（完全虛構的「青嶺醫療中心」）夜間值班為背景的第一人稱心理驚悚敘事遊戲。第一幕涵蓋 **16:55–21:00「今晚輪到你」**。
 
 ---
 
@@ -85,12 +85,12 @@ npm run build
 
 ```
 DutyNight/
-├── SongdeNightDuty.uproject         # Unreal Engine 5.3+ 專案定義檔
+├── NightCorridor.uproject         # Unreal Engine 5.3+ 專案定義檔
 ├── Config/DefaultEngine.ini         # UE5 引擎設定
-├── Source/SongdeNightDuty/          # UE5 C++ 原始碼模組
+├── Source/NightCorridor/          # UE5 C++ 原始碼模組
 │   ├── Act1Director.h/.cpp          # 第一幕流程導演器
-│   ├── SongdeRunStateSubsystem.h/.cpp # 隱藏數值與狀態子系統
-│   └── SongdeNightDuty.Build.cs
+│   ├── NightRunStateSubsystem.h/.cpp # 隱藏數值與狀態子系統
+│   └── NightCorridor.Build.cs
 ├── prototype/                       # 3D 第一人稱即時體驗原型 (Three.js + Vite)
 │   ├── index.html                   # 主畫面、HUD 與 HIS/簽到本視窗
 │   ├── style.css                    # 醫院 UI、病歷表與氛圍樣式
@@ -101,7 +101,7 @@ DutyNight/
 │   │   ├── world/Level3FBlockout.js # 3F 空間幾何、4000K 夕陽與物件
 │   │   ├── audio/SoundManager.js    # Web Audio 程序化音效合成
 │   │   └── ui/UIManager.js          # 對白、任務清單與各類視窗管理
-├── SONGDE_NIGHT_DUTY_ACT1_HANDOFF_v0.1/ # 官方原始交接封包 (規格/劇本/美術參考)
+├── LEGACY_ACT1_HANDOFF/ # 官方原始交接封包 (規格/劇本/美術參考)
 └── run-prototype.cmd                # 本機一鍵啟動腳本
 ```
 
