@@ -133,8 +133,8 @@ export class WardFloorplan {
 
     const archiveKeyHit=new THREE.Mesh(new THREE.BoxGeometry(.58,.44,.60),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
     archiveKeyHit.position.set(-11.25,.26,8.08);
-    const canOpenArchiveCache=archiveSearchActive&&gameState.getFlag('ARCHIVE_KEY_CLUE_4F');
-    archiveKeyHit.userData={interactable:canOpenArchiveCache,id:'ARCHIVE_ACCESS_KEY_4F',type:'archive_key_cache_4f',label:'檢查床邊櫃最下層',targetGroup:archiveKeyGroup};
+    const canInspectArchiveCache=archiveSearchActive;
+    archiveKeyHit.userData={interactable:canInspectArchiveCache,id:'ARCHIVE_ACCESS_KEY_4F',type:'archive_key_cache_4f',label:'檢查床邊櫃',targetGroup:archiveKeyGroup};
     this.zoneGroup.add(archiveKeyHit);this.interactables.push(archiveKeyHit);
     this.archiveKeyMesh=archiveKeyHit;this.archiveKeyAnchor=[-11.25,.26,8.08];
 
