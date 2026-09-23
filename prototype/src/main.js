@@ -175,13 +175,13 @@ controller.onInteract = (interactable) => {
       if(interactable.targetGroup)interactable.targetGroup.visible=false;
       interactable.interactable=false;
       soundManager.playKeyPickup();
-      uiManager.showSubtitle('李醫師','「備援鑰匙盒裡有 316 的鑰匙。先進辦公室。」',3000);
+      uiManager.showSubtitle('李醫師','「警衛查哨點裡真的留了 316 的備援鑰匙。先回去開門。」',3200);
       uiManager.showPrompt(null);
     }
   } else if (interactable.type === 'office_316_door') {
     if(!gameState.getFlag('FOUND_316_SPARE_KEY')){
       soundManager.playClick();
-      uiManager.showSubtitle('316 總醫師辦公室','門鎖著。這時間裡面的人應該都下班了。附近也許留了備用鑰匙。',3200);
+      uiManager.showSubtitle('316 總醫師辦公室','門鎖著。學長說過可以先去警衛查哨點看看。',3200);
       return;
     }
     if(!gameState.getFlag('OPENED_316')){
@@ -213,14 +213,27 @@ controller.onInteract = (interactable) => {
       uiManager.showPrompt(null);
       checkElevatorReady();
     }
-  } else if (interactable.type === 'archive_key_4f') {
+  } else if (interactable.type === 'archive_key_clue_4f') {
+    if(!gameState.getFlag('ARCHIVE_KEY_CLUE_4F')){
+      gameState.setFlag('ARCHIVE_KEY_CLUE_4F',true);
+      gameState.markTaskComplete('ARCHIVE_KEY_CLUE_FOUND');
+      soundManager.playPaperSign();
+    }
+    controller.enabled=false;
+    uiManager.openArchiveDocument({title:interactable.documentTitle,pages:interactable.pages});
+  } else if (interactable.type === 'archive_key_cache_4f') {
+    if(!gameState.getFlag('ARCHIVE_KEY_CLUE_4F')){
+      soundManager.playClick();
+      uiManager.showSubtitle('李醫師','「床邊櫃裡都是一般雜物。也許先找找值班室內有沒有舊的備援物品清單。」',3200);
+      return;
+    }
     if(!gameState.getFlag('ARCHIVE_ACCESS_KEY')){
       gameState.setFlag('ARCHIVE_ACCESS_KEY',true);
       gameState.markTaskComplete('ARCHIVE_KEY_FOUND');
       if(interactable.targetGroup)interactable.targetGroup.visible=false;
       interactable.interactable=false;
       soundManager.playKeyPickup();
-      uiManager.showSubtitle('李醫師','「文史館備用鑰匙。原來真的放在 4F 值班室。」',3200);
+      uiManager.showSubtitle('李醫師','「最下層舊布袋裡……找到文史館備用鑰匙了。」',3200);
       uiManager.showPrompt(null);
     }
   } else if (interactable.type === 'duty_log') {
@@ -228,10 +241,19 @@ controller.onInteract = (interactable) => {
     controller.enabled = false;
     uiManager.openDutyLog();
     checkElevatorReady();
+  } else if (interactable.type === 'credential_drawer_316') {
+    if(!gameState.getFlag('OPENED_316'))return;
+    if(!gameState.getFlag('HIS_CREDENTIALS')){
+      gameState.setFlag('HIS_CREDENTIALS',true);
+      gameState.markTaskComplete('HIS_CREDENTIALS_FOUND');
+      soundManager.playPaperSign();
+    }
+    controller.enabled=false;
+    uiManager.openArchiveDocument({title:interactable.documentTitle,pages:interactable.pages});
   } else if (interactable.type === 'workstation') {
     if(!gameState.getFlag('HIS_CREDENTIALS')){
       soundManager.playClick();
-      uiManager.showSubtitle('李醫師','「沒有今晚的系統帳密。值班手冊提到旁邊的密碼櫃。」',2800);
+      uiManager.showSubtitle('李醫師','「還沒拿到今晚的系統登入卡。值班手冊提到書桌下方活動櫃。」',3000);
       return;
     }
     controller.enabled = false;
