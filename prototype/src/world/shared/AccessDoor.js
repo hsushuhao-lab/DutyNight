@@ -23,11 +23,12 @@ export class AccessDoor {
     });
     this.readers=[];
     const mountX=readerSide*(width/2+.16);
-    const mount=solid(this.root,m.metal,[mountX,1.4,0],[.24,.42,.30]);
-    mount.userData.readerMount=true;this.readerMounts=[mount];
+    const mount=new THREE.Group();mount.position.set(mountX,1.4,0);mount.name=`ReaderJambMount_${id}`;
+    mount.userData={readerMount:true,mount:'jamb',doorId:id,readerSide};this.root.add(mount);
+    solid(mount,m.metal,[0,0,0],[.24,.42,.30]);this.readerMounts=[mount];
     for(const side of [-1,1]) {
-      const reader=new THREE.Group(); reader.position.set(mountX,1.4,side*.18);
-      reader.rotation.y=side===1?0:Math.PI; this.root.add(reader);
+      const reader=new THREE.Group(); reader.position.set(0,0,side*.18);
+      reader.rotation.y=side===1?0:Math.PI; mount.add(reader);
       const panel=solid(reader,m.metal,[0,0,0],[.17,.32,.07]);
       const led=new THREE.Mesh(new THREE.CircleGeometry(.037,16),new THREE.MeshBasicMaterial({color:0xdda634}));
       led.position.z=.042; if(readers)reader.add(led);
