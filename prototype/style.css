@@ -744,3 +744,10 @@ button:focus-visible { outline: 2px solid #658b76; outline-offset: 3px; }
 .credential-slip{margin-top:10px;padding:9px 12px;border:1px dashed #7b735f;background:#fffdf3;font-family:ui-monospace,monospace;color:#39352c}
 body::before{content:"";position:fixed;inset:0;z-index:3;pointer-events:none;background:radial-gradient(circle at 50% 46%,transparent 54%,rgba(0,7,8,.20) 100%);mix-blend-mode:multiply}
 @media(max-width:900px){.his-login-panel{grid-template-columns:1fr 1fr}.his-login-panel>div,#his-login-status{grid-column:1/-1}}
+
+.archive-reader{width:min(760px,92vw);max-height:88vh;background:#efe9dc;color:#29251f;border:1px solid #6f6658;box-shadow:0 24px 70px rgba(0,0,0,.78);display:flex;flex-direction:column}
+.archive-reader-header{display:flex;align-items:flex-start;justify-content:space-between;padding:18px 20px 12px;border-bottom:1px solid #b7ad9b;background:#d8d0bd}
+.archive-reader-header h2{margin:4px 0 0;font-size:22px;color:#3d3329}.archive-classification{font-size:12px;font-weight:700;letter-spacing:.08em;color:#7b2f26}
+.archive-document-page{white-space:pre-wrap;line-height:1.9;font-family:"Noto Serif TC","PMingLiU",serif;font-size:17px;padding:28px 34px;min-height:360px;overflow:auto;background:linear-gradient(90deg,rgba(85,67,48,.05),transparent 6%,transparent 94%,rgba(85,67,48,.05)),#f7f1e3}
+.archive-reader-footer{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-top:1px solid #b7ad9b;background:#ddd4c2}
+.archive-reader-footer button:disabled{opacity:.35;cursor:default}#archive-page-indicator{font-family:ui-monospace,monospace;color:#5d5549}
