@@ -10,7 +10,7 @@ import { SignAnchor } from './SignAnchor.js';
 /** September 22 V5 user floorplan. Units are gameplay metres, not a real hospital survey. */
 export class WardFloorplan {
   constructor(scene,gf,{campus='first',floor=4}={}){
-    Object.assign(this,{scene,gf,campus,floor});this.colliders=[];this.walkables=[];this.interactables=[];this.roomAreas=[];this.bedAreas=[];this.workstations=[];this.accessDoors={};this.keyedDoors={};
+    Object.assign(this,{scene,gf,campus,floor});this.colliders=[];this.walkables=[];this.interactables=[];this.roomAreas=[];this.bedAreas=[];this.workstations=[];this.clinicalProps=[];this.accessDoors={};this.keyedDoors={};
     this.layoutVersion='USER_PLAN_20260923_IMAGE_V5_2';this.activityHall=null;this.layoutPlan=null;
     this.zoneGroup=new THREE.Group();this.zoneGroup.name=`${campus}_${floor}F_PLAN_V5_2`;
   }
