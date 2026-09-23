@@ -1,0 +1,34 @@
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {GameState} from './src/core/GameState.js';
+import {FloorStateManager,GamePhase} from './src/core/FloorStateManager.js';
+
+const state=new GameState();
+const manager=new FloorStateManager(state);
+assert.equal(manager.phase,GamePhase.FIRST_ARRIVAL);
+manager.setPhase(GamePhase.AFTER_ARCHIVE);
+assert.equal(state.getGamePhase(),GamePhase.AFTER_ARCHIVE);
+
+const router=readFileSync('./src/world/WorldRouter.js','utf8');
+const main=readFileSync('./src/main.js','utf8');
+const floor3=readFileSync('./src/world/zones/FirstCampus3F.js','utf8');
+const floor2=readFileSync('./src/world/zones/FirstCampus2FER.js','utf8');
+const floor1=readFileSync('./src/world/zones/FirstCampus1F.js','utf8');
+const core=readFileSync('./src/world/shared/VerticalCore.js','utf8');
+const duty=readFileSync('./src/core/DutyEventManager.js','utf8');
+
+assert(router.includes('floorStateManager.apply(zoneId,this.activeZoneInstance)'),'WorldRouter must reapply floor phase on every load');
+assert(floor3.includes("Phase2_2040_ElevatorGlitch")&&floor3.includes("Phase3_2117_NightPatrol"),'3F must define phase-specific return states');
+assert(floor3.includes('Phase3_2117_WetFootprints'),'21:17 3F return must have wet-footprint layer');
+assert(floor3.includes('403／舊約束隔離室')&&floor3.includes('1F／舊警衛台後配電')&&floor3.includes('2F／舊式手圈索引'),'Archive must seed 4F/1F/2F hard hooks');
+assert(main.includes("HOOK_403_OLD_ROOM")&&main.includes("CLUE_403_0409"),'403 cross-floor clinical hook missing');
+assert(main.includes("ER_JANE_DOE_WRISTBAND")&&main.includes("FIRST_FLOOR_GUARD_KEY"),'2F Jane Doe to 1F key hook missing');
+assert(floor2.includes("legacy_unreadable"),'2F old wristband visual hook missing');
+assert(floor1.includes("1F_HIDDEN_SERVICE_DOOR")&&floor1.includes("requires:'FIRST_FLOOR_GUARD_KEY'"),'1F concealed service-door hook missing');
+assert(main.includes("FORCE_3F_ELEVATOR_STOP")&&main.includes("GamePhase.ELEVATOR_GLITCH"),'20:40 forced 3F elevator return missing');
+assert(core.includes("StairLatch_3F_Locked")&&core.includes("StairBolt_4F_UnlockSide"),'3F/4F asymmetric stair shortcut visual states missing');
+assert(main.includes("STAIR_SHORTCUT_3F_4F"),'3F/4F shortcut gate logic missing');
+assert(main.includes("NIGHT_PATROL_RETURN_3F")&&main.includes("GamePhase.NIGHT_PATROL"),'21:15 return-to-3F paradox setup missing');
+assert(duty.includes("21:17")&&duty.includes("NIGHT_PATROL_RETURN_3F"),'Duty timeline must resolve the 21:17 return on 3F entry');
+
+console.log('CROSS-FLOOR ENTANGLEMENT QA PASS');
