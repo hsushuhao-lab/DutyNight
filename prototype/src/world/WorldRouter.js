@@ -5,6 +5,7 @@ import { GeometryFactory } from './shared/GeometryFactory.js';
 import { WORLD_SPAWNS as DEBUG_SPAWN_POINTS, ROUTE_PORTALS, FIRST_FLOORS, SECOND_FLOORS } from './shared/WorldRoutes.js';
 import { addTravelFixtures } from './shared/TravelFixtures.js';
 import { CollisionFactory } from './shared/CollisionFactory.js';
+import { floorStateManager } from '../core/FloorStateManager.js';
 
 import { FirstCampus3F } from './zones/FirstCampus3F.js';
 import { FirstCampus4F } from './zones/FirstCampus4F.js';
@@ -100,6 +101,7 @@ export class WorldRouter {
     this.activeZoneInstance = new ZoneClass(this.scene, this.gf, { floor: Number(floorMatch?.[1] || 5) });
     this.activeZoneInstance.build();
     addTravelFixtures(this.activeZoneInstance, zoneId);
+    floorStateManager.apply(zoneId,this.activeZoneInstance);
     this.activeZoneInstance.zoneGroup.updateMatrixWorld(true);
 
     const corridorLights = new Set();
