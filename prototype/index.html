@@ -4,7 +4,7 @@
     <link rel="icon" href="./favicon.svg" type="image/svg+xml">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>《松德值班夜》第一幕</title>
+  <title>《夜班迴廊》第一幕</title>
   <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
@@ -17,7 +17,7 @@
 
   <!-- Top Left Hospital Location & Time Info -->
   <div id="hospital-hud-bar">
-    <div class="hud-tag">松德醫療中心</div>
+    <div class="hud-tag">青嶺醫療中心</div>
     <div class="hud-location">3F 醫師辦公行政區</div>
     <div class="hud-time">17:00 ｜ 第一線值班：李住院醫師</div>
   </div>
@@ -38,7 +38,7 @@
       </div>
       <div id="task-handoff" class="task-item pending">
         <span class="status-box"></span>
-        <span class="task-text">完成電子交班工作站 (HIS 終端機)</span>
+        <span class="task-text">使用值班帳密登入 HIS，查看床數與特殊交班</span>
       </div>
       <div id="task-elevator" class="task-item locked">
         <span class="status-box"></span>
@@ -67,11 +67,19 @@
     <div class="workstation-window">
       <div class="his-titlebar">
         <div class="his-title-text">
-          松德醫療中心｜院內醫療資訊系統　夜間交班
+          青嶺醫療中心｜院內醫療資訊系統　夜間交班
         </div>
         <button aria-label="關閉交班系統" id="btn-close-terminal" class="btn-win-close">✕</button>
       </div>
 
+      <div id="his-login-panel" class="his-login-panel">
+        <div><strong>夜班 HIS 登入</strong><small>帳號與密碼記錄在桌上的值班本。</small></div>
+        <input id="his-account" autocomplete="off" placeholder="值班帳號" />
+        <input id="his-password" type="password" autocomplete="off" placeholder="值班密碼" />
+        <button id="btn-his-login" class="btn-primary">登入</button>
+        <span id="his-login-status">尚未登入</span>
+      </div>
+      <div id="his-handoff-content" class="his-locked-content">
       <div class="his-header-info">
         <div class="info-col"><strong>登入人員：</strong>李住院醫師 (第一線值班)</div>
         <div class="info-col"><strong>交班時段：</strong>今日 17:00 ～ 明日 08:30</div>
@@ -138,6 +146,7 @@
         </div>
       </div>
 
+      </div>
       <div class="his-footer">
         <div class="his-system-msg">系統連線正常 ｜ 資料庫版本 2026.09.21-1700</div>
         <button id="btn-sign-handoff" class="btn-action">確認電子交班</button>
@@ -149,7 +158,7 @@
   <div id="dutylog-modal" class="modal-overlay">
     <div class="dutylog-book">
       <div class="book-header">
-        <h3>松德醫療中心</h3>
+        <h3>青嶺醫療中心</h3>
         <h2>醫療人員夜間值班簽到名冊 (3F 行政區)</h2>
         <div class="book-date">日期：2026 年 09 月 21 日 (星期一) 17:00 交接班</div>
       </div>
@@ -188,6 +197,7 @@
 
         <div class="sign-prompt-box">
           我已閱讀並確認今日值班規範，確實到勤接管第一院區 4F 病房夜間事務。
+          <div class="credential-slip"><strong>今晚 HIS 值班帳密</strong><br>帳號：night403<br>密碼：QingLing-1700<br><small>僅供本遊戲虛構系統使用。</small></div>
         </div>
       </div>
 
