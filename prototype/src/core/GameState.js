@@ -29,6 +29,7 @@ export class GameState {
     this.flags.set('ARCHIVE_OBJECTIVE', false);
     this.flags.set('ARCHIVE_LOCKED_SEEN', false);
     this.flags.set('ARCHIVE_ACCESS_KEY', false);
+    this.flags.set('ARCHIVE_KEY_CLUE_4F', false);
   }
 
   addListener(fn) {
