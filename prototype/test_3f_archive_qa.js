@@ -39,4 +39,14 @@ assert.equal(zone.levelInstance?.museumKey302?.userData?.type,'museum_key_302');
 assert.equal(zone.levelInstance?.storageRoom?.anne,true);
 assert.equal(zone.levelInstance?.anneStage,0);
 assert.equal(zone.levelInstance?.phoneMesh?.userData?.type,'office_phone_316');
+assert.equal(zone.coreOffice3F?.relativeTo4FDutyRoom,true);
+assert.deepEqual(zone.coreOffice3F?.bounds,[-22,3.5,-16,11.5]);
+assert.deepEqual(zone.coreOffice3F?.door,[-16,1.7,7.5]);
+
+zone.levelInstance.unlock302();
+const doorway302=new THREE.Box3(new THREE.Vector3(-9.82,.10,-4.05),new THREE.Vector3(-9.18,1.8,-3.28));
+assert(!zone.colliders.some(c=>c.intersectsBox(doorway302)),'302 doorway must be physically passable after keypad unlock');
+
+const coreOfficeDoorway=new THREE.Box3(new THREE.Vector3(-16.18,.10,7.15),new THREE.Vector3(-15.82,1.8,7.85));
+assert(!zone.colliders.some(c=>c.intersectsBox(coreOfficeDoorway)),'3F office doorway at the 4F-duty-room-relative position must remain passable');
 console.log('3F EXPLORATION + ARCHIVE QA PASS');
