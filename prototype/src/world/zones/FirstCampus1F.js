@@ -7,6 +7,7 @@ import { buildRoomWing } from '../shared/RoomWing.js';
 import { Doorway } from '../shared/Doorway.js';
 import { SignAnchor } from '../shared/SignAnchor.js';
 import { CollisionFactory } from '../shared/CollisionFactory.js';
+import { gameState } from '../../core/GameState.js';
 
 export class FirstCampus1F {
   constructor(scene, geometryFactory) {
@@ -89,7 +90,7 @@ export class FirstCampus1F {
       code: 'PHARM',
       title: '【夜間未開放】門診藥局／藥庫',
       subtitle: 'PHARMACY / DRUG STORAGE CLOSED AT NIGHT',
-      header: '松德醫療中心 ｜ 藥劑科'
+      header: '青嶺醫療中心 ｜ 藥劑科'
     });
 
     // 2. Outpatient clinic facade (z = 4.0), also a visibly locked glass frontage.
@@ -113,7 +114,7 @@ export class FirstCampus1F {
       code: 'OPD',
       title: '【夜間未開放】門診診間區',
       subtitle: 'OUTPATIENT CLINICS CLOSED',
-      header: '松德醫療中心 ｜ 門診部'
+      header: '青嶺醫療中心 ｜ 門診部'
     });
 
     // West wall with elevator / stairs core
@@ -181,7 +182,7 @@ export class FirstCampus1F {
       code: 'NIGHT',
       title: '夜間正門已關閉 ｜ 門禁管制',
       subtitle: 'MAIN ENTRANCE CLOSED AT NIGHT',
-      header: '松德醫療中心 ｜ 總務保全課'
+      header: '青嶺醫療中心 ｜ 總務保全課'
     });
 
     SignAnchor.buildWallPlaque({
@@ -213,6 +214,28 @@ export class FirstCampus1F {
     this.zoneGroup.add(mainDoorHitbox);
     this.interactables.push(mainDoorHitbox);
 
+    // Legacy service door concealed by later wall finish; only becomes meaningful after 3F archive evidence.
+    const hiddenDoorMat=new THREE.MeshStandardMaterial({color:0xd8d6cf,roughness:.96});
+    const hiddenPanel=new THREE.Mesh(new THREE.PlaneGeometry(1.15,2.15),hiddenDoorMat);
+    hiddenPanel.position.set(-13.785,1.18,4.55);hiddenPanel.rotation.y=Math.PI/2;this.zoneGroup.add(hiddenPanel);
+    const seamMat=new THREE.MeshStandardMaterial({color:0x8f918d,roughness:.95});
+    for(const zOff of [-.57,.57]){
+      const seam=new THREE.Mesh(new THREE.BoxGeometry(.012,2.16,.018),seamMat);
+      seam.position.set(-13.77,1.18,4.55+zOff);this.zoneGroup.add(seam);
+    }
+    const topSeam=new THREE.Mesh(new THREE.BoxGeometry(.012,.018,1.16),seamMat);
+    topSeam.position.set(-13.77,2.25,4.55);this.zoneGroup.add(topSeam);
+    const oldKeyhole=new THREE.Mesh(new THREE.CircleGeometry(.022,12),new THREE.MeshBasicMaterial({color:0x4a4239}));
+    oldKeyhole.position.set(-13.755,1.05,4.86);oldKeyhole.rotation.y=Math.PI/2;this.zoneGroup.add(oldKeyhole);
+    const hiddenHit=new THREE.Mesh(new THREE.BoxGeometry(.38,2.3,1.35),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
+    hiddenHit.position.set(-13.58,1.18,4.55);
+    hiddenHit.userData={
+      interactable:gameState.getFlag('HOOK_1F_HIDDEN_DOOR')||gameState.getFlag('FIRST_FLOOR_GUARD_KEY'),
+      id:'1F_HIDDEN_SERVICE_DOOR',type:'hidden_service_door_1f',label:'檢查牆面的舊門框痕跡'
+    };
+    this.zoneGroup.add(hiddenHit);this.interactables.push(hiddenHit);
+    this.hiddenServiceDoor={id:'1F_HIDDEN_SERVICE_DOOR',position:[-13.78,1.18,4.55],requires:'FIRST_FLOOR_GUARD_KEY',revealedBy:'HOOK_1F_HIDDEN_DOOR'};
+
     // ==========================================
     // 2. CENTRAL INFORMATION & REGISTRATION RECEPTION (x: -1 to 5, z: -2 to 1)
     // ==========================================
@@ -240,7 +263,7 @@ export class FirstCampus1F {
       code: 'INFO',
       title: '大廳服務台 ｜ 掛號批價',
       subtitle: 'INFORMATION & REGISTRATION',
-      header: '松德醫療中心 ｜ 1F 公共服務大廳'
+      header: '青嶺醫療中心 ｜ 1F 公共服務大廳'
     });
 
     // ==========================================
