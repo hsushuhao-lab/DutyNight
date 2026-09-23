@@ -242,9 +242,18 @@ export class Level3FBlockout {
     for(const x of [-.72,.72]){const side=new THREE.Mesh(new THREE.BoxGeometry(.10,1.95,.40),shelfMat);side.position.set(x,.98,0);hintShelf.add(side);}
     for(const y of [.08,.52,.96,1.40,1.84]){const sh=new THREE.Mesh(new THREE.BoxGeometry(1.54,.08,.42),shelfMat);sh.position.set(0,y,0);hintShelf.add(sh);}
     const hintDefs=[
-      ['316_HINT_1F_SECURITY',-.43,.72,'一樓警衛查哨紀錄影本',['夜間巡邏紀錄提到：一樓舊警衛台後方仍保留早期鑰匙標籤櫃。\n\n其中幾個標籤已褪色，但仍有人在深夜更動位置。']],
-      ['316_HINT_1F_SERVICE',0,.72,'一樓設備維護單',['一樓公共大廳後方有一段舊服務走道，平時不對外開放。\n\n維修單備註：02:00 後偶爾會出現無來源的照明啟動紀錄。']],
-      ['316_HINT_OLD_ROUTE',.43,.72,'舊院區動線修訂頁',['舊版動線圖上，一樓靠近警衛台的位置曾畫有一扇服務門。\n\n新版圖面把它改成實牆，但原始門框是否拆除沒有註記。']]
+      ['316_HINT_1F_SECURITY',-.43,.72,'一樓警衛查哨紀錄影本',[
+        '夜間巡邏紀錄提到：一樓舊警衛台後方仍保留早期鑰匙標籤櫃。\n\n其中幾個標籤已褪色，但仍有人在深夜更動位置。',
+        '附註欄反覆出現同一句：「02:17 後不要單獨巡舊服務走道。」\n\n簽名欄卻沒有任何人承認寫過這句話。'
+      ]],
+      ['316_HINT_1F_SERVICE',0,.72,'一樓設備維護單',[
+        '一樓公共大廳後方有一段舊服務走道，平時不對外開放。\n\n維修單備註：02:00 後偶爾會出現無來源的照明啟動紀錄。',
+        '最近一次維修結論：線路正常。\n\n工程人員手寫：「若再發生，先確認警衛台後方舊配電箱，而不是換燈管。」'
+      ]],
+      ['316_HINT_OLD_ROUTE',.43,.72,'舊院區動線修訂頁',[
+        '舊版動線圖上，一樓靠近警衛台的位置曾畫有一扇服務門。\n\n新版圖面把它改成實牆，但原始門框是否拆除沒有註記。',
+        '圖面角落有鉛筆箭頭指向公共大廳後方，旁邊只寫：「門還在，只是被遮住。」'
+      ]]
     ];
     for(const [id,x,y,title,pages] of hintDefs){
       const file=new THREE.Mesh(new THREE.BoxGeometry(.22,.34,.24),this.materials.wood);file.position.set(x,y,.25);
