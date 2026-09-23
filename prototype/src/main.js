@@ -134,6 +134,22 @@ controller.onInteract = (interactable) => {
     }
     controller.currentInteractable=null;uiManager.showPrompt(null);
   } else if (interactable.type === 'duty_door') {
+    if(interactable.doorId==='3F_ADMIN_OFFICE_DOOR'){
+      const zone=worldRouter.activeZoneInstance;
+      const keyedDoor=zone.keyedDoors?.[interactable.doorId];
+      if(!keyedDoor)return;
+      const wasClosed=keyedDoor.closed;
+      const changed=keyedDoor.toggle(controller.position);
+      if(changed){
+        soundManager.playClick();
+        if(wasClosed&&!gameState.getFlag('ADMIN_OFFICE_ENTERED')){
+          gameState.setFlag('ADMIN_OFFICE_ENTERED',true);
+          uiManager.showSubtitle('李醫師','「行政辦公室還沒鎖。順便核對一下今晚的值勤名冊。」',3000);
+        }
+      }else uiManager.showSubtitle('門鎖','請先離開門幅後再關門。',2500);
+      controller.currentInteractable=null;uiManager.showPrompt(null);
+      return;
+    }
     if(interactable.doorId==='3F_ARCHIVE_DOOR'){
       const zone=worldRouter.activeZoneInstance;
       const keyedDoor=zone.keyedDoors?.[interactable.doorId];
@@ -169,6 +185,17 @@ controller.onInteract = (interactable) => {
     if(keyedDoor===zone.dutyDoor)zone.dutyDoorClosed=keyedDoor.closed;
     controller.currentInteractable = null;
     uiManager.showPrompt(null);
+  } else if (interactable.type === 'admin_roster_3f') {
+    if(!gameState.getFlag('ADMIN_ROSTER_CHECKED')){
+      gameState.setFlag('ADMIN_ROSTER_CHECKED',true);
+      gameState.setFlag('OLD_ROSTER_LEE_316',true);
+      gameState.markTaskComplete('P1_ADMIN_ROSTER_CHECK');
+      gameState.addEvidence(1);
+      soundManager.playPaperSign();
+      uiManager.showSubtitle('李醫師','「今晚名冊沒有我……但桌上那張舊影本倒有一個褪色的『李醫師』，旁邊寫著 316。年份被撕掉了。」',5200);
+    }else{
+      uiManager.showSubtitle('李醫師','「名冊沒有更新。那張舊影本還在。」',2500);
+    }
   } else if (interactable.type === 'spare_key_316') {
     if(!gameState.getFlag('FOUND_316_SPARE_KEY')){
       gameState.setFlag('FOUND_316_SPARE_KEY',true);
