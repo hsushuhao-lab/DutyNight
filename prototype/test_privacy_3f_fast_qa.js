@@ -8,6 +8,7 @@ const art=readFileSync('./src/art/FirstFloorArt.js','utf8');
 const floor=readFileSync('./src/world/zones/FirstCampus3F.js','utf8');
 const station=readFileSync('./src/world/shared/PlanArchitecture.js','utf8');
 const door=readFileSync('./src/world/shared/AccessDoor.js','utf8');
+const level=readFileSync('./src/world/Level3FBlockout.js','utf8');
 
 assert(!index.includes('松德'),'Public game shell must not expose real-hospital name');
 assert(index.includes('青嶺醫療中心'));
@@ -26,7 +27,6 @@ assert(floor.includes("bookshelfCount:4")&&floor.includes("type:'archive_documen
 assert(floor.includes("ARCHIVE_UNINDEXED_HANDOFF"),'Unindexed handoff clue missing');
 assert(!floor.includes('buildRoomWing'),'Generic archive wing must not reintroduce the stray partition');
 assert(floor.includes("officeSecrets={count:officeSecrets.length"),'316 secret exploration metadata missing');
-const level=readFileSync('./src/world/Level3FBlockout.js','utf8');
 assert(level.includes("◀ 電梯・逃生梯"),'Elevator and escape stair must point to the same side');
 assert(level.includes("id:'3F_ELEVATOR_LOBBY'"),'Actual elevator-front exploration area missing');
 assert(floor.includes("type:'spare_key_316'")&&floor.includes('夜間警衛查哨點'),'316 spare key must be hidden at the guard patrol checkpoint opposite the museum');
