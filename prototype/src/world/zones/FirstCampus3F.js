@@ -52,6 +52,24 @@ export class FirstCampus3F {
     this.accessDoors={};this.keyedDoors={};
     this.archiveDoor=new KeyedKnobDoor(this,{id:'3F_ARCHIVE_DOOR',x:19,z:-1.8,width:1.6,title:'文史館・封存資料室'});
     this.archiveDoor.setClosed(true);
+
+    // Night guard patrol checkpoint opposite the museum wall. The 316 spare key is hidden here.
+    const patrolBox=solid(this.zoneGroup,m.metal,[19,1.34,1.69],[.48,.62,.12]);
+    patrolBox.name='GuardPatrolCheckpoint_3F';
+    const patrolCanvas=document.createElement('canvas');patrolCanvas.width=480;patrolCanvas.height=220;
+    const pctx=patrolCanvas.getContext('2d');pctx.fillStyle='#dfe5e0';pctx.fillRect(0,0,480,220);
+    pctx.fillStyle='#385344';pctx.fillRect(0,0,480,58);pctx.fillStyle='#fff';pctx.font='bold 25px sans-serif';pctx.fillText('夜間警衛查哨點',20,39);
+    pctx.fillStyle='#34463d';pctx.font='20px sans-serif';pctx.fillText('巡檢紀錄／備援物品',20,102);pctx.fillText('STAFF ONLY',20,145);
+    const patrolTex=new THREE.CanvasTexture(patrolCanvas);patrolTex.colorSpace=THREE.SRGBColorSpace;
+    const patrolFace=new THREE.Mesh(new THREE.PlaneGeometry(.42,.38),new THREE.MeshBasicMaterial({map:patrolTex}));
+    patrolFace.position.set(19,1.38,1.625);patrolFace.rotation.y=Math.PI;this.zoneGroup.add(patrolFace);
+    const hiddenKey=new THREE.Mesh(new THREE.TorusGeometry(.045,.009,10,20),m.stainless);hiddenKey.visible=false;hiddenKey.position.set(19,1.18,1.61);this.zoneGroup.add(hiddenKey);
+    const patrolHit=new THREE.Mesh(new THREE.BoxGeometry(.70,.80,.24),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
+    patrolHit.position.set(19,1.34,1.62);
+    patrolHit.userData={interactable:true,id:'316_SPARE_KEY',type:'spare_key_316',label:'檢查夜間警衛查哨點',targetGroup:hiddenKey};
+    this.zoneGroup.add(patrolHit);this.interactables.push(patrolHit);this.spareKeyMesh=patrolHit;
+    this.guardPatrolPoint={id:'3F_GUARD_PATROL_POINT',position:[19,1.34,1.69],opposite:'3F_ARCHIVE_DOOR'};
+
     const shelfMat=this.gf.materials.floorWood,folderMat=this.gf.materials.doorWood;
     const buildShelf=(id,x,z,yaw=0)=>{
       const g=new THREE.Group();g.name=`ArchiveShelf_${id}`;g.position.set(x,0,z);g.rotation.y=yaw;this.zoneGroup.add(g);
@@ -155,7 +173,6 @@ export class FirstCampus3F {
     this.keyMesh.visible = false;
     this.keyMesh.userData.targetGroup.visible = false;
     this.keyMesh.userData.interactable = false;
-    this.spareKeyMesh = this.levelInstance.spareKeyMesh;
     this.lockerMesh = this.levelInstance.lockerMesh;
     if(gameState.getFlag('FOUND_316_SPARE_KEY')){
       this.spareKeyMesh.userData.interactable=false;
