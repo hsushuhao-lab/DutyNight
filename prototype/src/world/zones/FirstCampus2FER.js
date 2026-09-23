@@ -9,6 +9,7 @@ import { buildRoomWing } from '../shared/RoomWing.js';
 import { Doorway } from '../shared/Doorway.js';
 import { SignAnchor } from '../shared/SignAnchor.js';
 import { CollisionFactory } from '../shared/CollisionFactory.js';
+import { gameState } from '../../core/GameState.js';
 
 export class FirstCampus2FER {
   constructor(scene, geometryFactory) {
@@ -69,7 +70,7 @@ export class FirstCampus2FER {
       code: '2F-ER',
       title: '2F 急診',
       subtitle: 'EMERGENCY / ACUTE WARD — ACCESS CONTROL',
-      header: '松德醫療中心 ｜ 2F 急診'
+      header: '青嶺醫療中心 ｜ 2F 急診'
     });
 
     SignAnchor.buildHangingSign({
@@ -148,7 +149,7 @@ export class FirstCampus2FER {
       code: 'ER',
       title: '急診檢傷與護理站',
       subtitle: 'TRIAGE & NURSING',
-      header: '松德醫療中心 ｜ 急診醫學部'
+      header: '青嶺醫療中心 ｜ 急診醫學部'
     });
 
     this.gf.buildCeilingLight(this.zoneGroup, 3.5, 3.15, 6.0, 0.8, 6.0);
@@ -190,7 +191,7 @@ export class FirstCampus2FER {
       code: 'OBS',
       title: '急診留觀區 (床位 01-04)',
       subtitle: 'OBSERVATION BAYS',
-      header: '松德醫療中心 ｜ 急診醫學部'
+      header: '青嶺醫療中心 ｜ 急診醫學部'
     });
 
     // ==========================================
@@ -231,7 +232,7 @@ export class FirstCampus2FER {
       code: 'TR-1',
       title: '急性處置室 ｜ ECT 準備／集合區',
       subtitle: 'ACUTE TREATMENT / ECT PREPARATION',
-      header: '松德醫療中心 ｜ 急診醫學部'
+      header: '青嶺醫療中心 ｜ 急診醫學部'
     });
 
     // Treatment table
@@ -276,7 +277,7 @@ export class FirstCampus2FER {
       code: '208',
       title: '急診醫師診療研究室',
       subtitle: 'DUTY PHYSICIAN OFFICE',
-      header: '松德醫療中心 ｜ 急診醫學部'
+      header: '青嶺醫療中心 ｜ 急診醫學部'
     });
 
     // Charting desk & computer
@@ -333,6 +334,15 @@ export class FirstCampus2FER {
       rotationY: Math.PI / 2,
       text: '急診救護車道 ｜ 戶外山側通道 (Ambulance Bay)'
     });
+
+    if(gameState.getFlag('HOOK_0217')){
+      const bandMat=new THREE.MeshStandardMaterial({color:0xc9a94a,roughness:.82});
+      const band=new THREE.Mesh(new THREE.TorusGeometry(.095,.018,8,24),bandMat);
+      band.rotation.x=Math.PI/2;band.position.set(10.5,.92,7.26);this.zoneGroup.add(band);
+      const tag=new THREE.Mesh(new THREE.BoxGeometry(.20,.05,.08),new THREE.MeshStandardMaterial({color:0xe0cf87,roughness:.9}));
+      tag.position.set(10.58,.92,7.26);this.zoneGroup.add(tag);
+      this.janeDoeWristband={id:'2F_OLD_WRISTBAND',position:[10.5,.92,7.26],format:'legacy_unreadable'};
+    }
 
     this.interactables.push(
       {type:'p1_action',action:'ER_ASSESS',label:'進行精神科評估',position:new THREE.Vector3(10.5,1.2,7.5),radius:1.8},
