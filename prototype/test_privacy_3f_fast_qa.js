@@ -11,7 +11,7 @@ const door=readFileSync('./src/world/shared/AccessDoor.js','utf8');
 
 assert(!index.includes('松德'),'Public game shell must not expose real-hospital name');
 assert(index.includes('青嶺醫療中心'));
-assert(index.includes('his-login-panel')&&index.includes('credential-slip'));
+assert(index.includes('his-login-panel')&&index.includes('locker-modal')&&index.includes('riddle-slip'));
 assert(index.includes('四位守門者')&&index.includes('17:00'),'Duty manual must carry the locker riddle');
 assert(index.includes('locker-modal')&&index.includes('anomaly-modal'),'3F puzzle overlays missing');
 assert(index.includes('HIS 帳號')&&index.includes('QL1700'),'Unlocked locker must reveal the night HIS credential card');
