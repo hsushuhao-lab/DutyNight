@@ -367,6 +367,7 @@ export class Level3FBlockout {
   setAnneStage(stage) {
     if(!this.anneGroup || stage===this.anneStage)return;
     this.anneStage=stage;
+    this.anneGroup.visible=true;this.anneHit.visible=true;
     if(stage===0){
       this.anneGroup.position.set(13.5,1.02,5.15);this.anneGroup.rotation.set(Math.PI/2,0,Math.PI);this.anneHead.rotation.set(0,0,0);
       this.anneHit.position.set(13.5,1.0,5.15);
@@ -378,11 +379,16 @@ export class Level3FBlockout {
       this.anneHit.position.set(13.5,1.0,5.15);
       if(this.storageDoor){this.storageDoor.position.set(13.05,1.15,2.72);this.storageDoor.rotation.y=-.52;}
       if(this.anneStool)this.anneStool.visible=false;
-    }else{
+    }else if(stage===2){
       this.anneGroup.position.set(13.48,.62,3.18);this.anneGroup.rotation.set(0,Math.PI,0);this.anneHead.rotation.set(0,0,0);
       this.anneHit.position.set(13.48,1.0,3.18);
       if(this.storageDoor){this.storageDoor.position.set(12.95,1.15,3.03);this.storageDoor.rotation.y=-Math.PI/2;}
       if(this.anneStool)this.anneStool.visible=true;
+    }else{
+      this.anneGroup.visible=false;this.anneHit.visible=false;
+      this.anneHit.userData.interactable=false;
+      if(this.storageDoor){this.storageDoor.position.set(12.95,1.15,3.03);this.storageDoor.rotation.y=-Math.PI/2;}
+      if(this.anneStool)this.anneStool.visible=false;
     }
   }
 
