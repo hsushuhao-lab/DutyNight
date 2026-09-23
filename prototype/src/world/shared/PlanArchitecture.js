@@ -91,7 +91,7 @@ export function workstation(zone,{x,z,yaw=0,id}){
   const cx=x+Math.sin(yaw)*.95,cz=z+Math.cos(yaw)*.95;
   const chairObject=asset(zone.zoneGroup,'officeChair',[cx,0,cz],[1,1,1],yaw+Math.PI);
   if(chairObject)chairObject.name=`WorkstationChair_${id}`;
-  face.name=`Workstation_${id}`;zone.workstations??=[];zone.workstations.push({id,screen:face,chair:[cx,0,cz],yaw,desk,chairObject});
+  face.name=`Workstation_${id}`;zone.workstations??=[];zone.workstations.push({id,screen:face,chair:[cx,0,cz],yaw,deskYaw:yaw,desk,chairObject});
   return face;
 }
 
