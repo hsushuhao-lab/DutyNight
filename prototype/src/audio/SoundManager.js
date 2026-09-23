@@ -225,8 +225,31 @@ export class SoundManager {
         }
       };
       const now=this.ctx.currentTime;
-      ringAt(now);ringAt(now+1.0);ringAt(now+3.2);
+      ringAt(now);ringAt(now+.72);ringAt(now+2.95);ringAt(now+3.67);
     } catch (e) {}
+  }
+
+  playDoorLockClack() {
+    if(!this.ctx||this.isMuted)return;
+    try{
+      const now=this.ctx.currentTime;
+      const osc=this.ctx.createOscillator(),gain=this.ctx.createGain(),filter=this.ctx.createBiquadFilter();
+      osc.type='triangle';osc.frequency.setValueAtTime(150,now);osc.frequency.exponentialRampToValueAtTime(58,now+.12);
+      filter.type='lowpass';filter.frequency.value=620;
+      gain.gain.setValueAtTime(.16,now);gain.gain.exponentialRampToValueAtTime(.001,now+.16);
+      osc.connect(filter);filter.connect(gain);gain.connect(this.ctx.destination);osc.start(now);osc.stop(now+.18);
+    }catch(e){}
+  }
+
+  duckAmbient(level=.2,durationMs=4200) {
+    if(!this.ctx||!this.ambientGain)return;
+    try{
+      const now=this.ctx.currentTime,base=.08,target=Math.max(.001,base*level);
+      this.ambientGain.gain.cancelScheduledValues(now);
+      this.ambientGain.gain.setValueAtTime(this.ambientGain.gain.value,now);
+      this.ambientGain.gain.linearRampToValueAtTime(target,now+.08);
+      this.ambientGain.gain.linearRampToValueAtTime(base,now+durationMs/1000);
+    }catch(e){}
   }
 
   playClick() {
