@@ -254,15 +254,53 @@ export class FirstCampus3F {
     if(gameState.getFlag('GUARD_FUTURE_ENTRY'))this.setPatrolFutureEntry();
   }
 
+  isAnneObject(obj) {
+    const anne=this.levelInstance?.anneGroup;
+    for(let p=obj;p;p=p.parent)if(p===anne)return true;
+    return false;
+  }
+
+  isAnneVisibleToPlayer(camera) {
+    const anne=this.levelInstance?.anneGroup;
+    if(!anne)return false;
+    camera.updateMatrixWorld(true);
+    anne.updateWorldMatrix(true,true);
+
+    const vp=new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse);
+    const frustum=new THREE.Frustum().setFromProjectionMatrix(vp);
+    const bounds=new THREE.Box3().setFromObject(anne);
+    if(!frustum.intersectsBox(bounds))return false;
+
+    const cameraPos=new THREE.Vector3();camera.getWorldPosition(cameraPos);
+    const targets=[bounds.getCenter(new THREE.Vector3())];
+    if(this.levelInstance.anneHead){
+      const headPos=new THREE.Vector3();this.levelInstance.anneHead.getWorldPosition(headPos);targets.push(headPos);
+    }
+
+    this._anneRaycaster??=new THREE.Raycaster();
+    for(const target of targets){
+      const delta=target.clone().sub(cameraPos),distance=delta.length();
+      if(distance<.001)continue;
+      this._anneRaycaster.set(cameraPos,delta.normalize());
+      this._anneRaycaster.far=distance-.04;
+      const hits=this._anneRaycaster.intersectObjects(this.scene.children,true);
+      const blocker=hits.find(hit=>{
+        if(this.isAnneObject(hit.object))return false;
+        const mat=hit.object?.material;
+        if(mat?.transparent&&Number(mat.opacity)<=.08)return false;
+        if(hit.object?.visible===false)return false;
+        return true;
+      });
+      if(!blocker)return true;
+    }
+    return false;
+  }
+
   update(camera) {
     if(!camera||!this.levelInstance?.anneGroup)return;
     const desired=Number(gameState.getFlag('ANNE_STAGE')||0);
     if(desired<=this.levelInstance.anneStage)return;
-    camera.updateMatrixWorld(true);
-    const vp=new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse);
-    const frustum=new THREE.Frustum().setFromProjectionMatrix(vp);
-    const worldPos=new THREE.Vector3();this.levelInstance.anneGroup.getWorldPosition(worldPos);
-    if(!frustum.containsPoint(worldPos))this.levelInstance.setAnneStage(desired);
+    if(!this.isAnneVisibleToPlayer(camera))this.levelInstance.setAnneStage(desired);
   }
 
   updateElevatorLight(isReady) {
