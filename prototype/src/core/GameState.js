@@ -40,9 +40,10 @@ export class GameState {
     this.flags.set('ANOMALY_ACKNOWLEDGED', false);
     this.flags.set('ANNE_STAGE', 0);
     this.flags.set('GUARD_FUTURE_ENTRY', false);
-    this.flags.set('HOOK_403_OLD_ROOM', false);
+    this.flags.set('HOOK_409_ZERO_ROOM', false);
     this.flags.set('HOOK_1F_HIDDEN_DOOR', false);
     this.flags.set('HOOK_0217', false);
+    this.flags.set('HOOK_0316_COMMAND_POINT', false);
     this.flags.set('ER_JANE_DOE_WRISTBAND', false);
     this.flags.set('FIRST_FLOOR_GUARD_KEY', false);
     this.flags.set('STAIR_SHORTCUT_3F_4F', false);
