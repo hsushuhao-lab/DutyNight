@@ -202,7 +202,10 @@ export class Level3FBlockout {
     this.office302Door.rotation.y=-Math.PI/2;this.office302Door.position.set(-10.0,1.15,-3.95);
     this.office302Door.userData.label='302 行政主管／科秘書辦公室｜已解鎖';
     if(this.office302Led)this.office302Led.material.color.setHex(0x38a45c);
-    if(this.museumKey302)this.museumKey302.userData.interactable=true;
+    if(this.museumKey302){
+      this.museumKey302.userData.interactable=true;
+      if(this.museumKey302.userData.targetGroup)this.museumKey302.userData.targetGroup.visible=true;
+    }
     return true;
   }
 
