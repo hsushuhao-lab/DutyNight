@@ -18,7 +18,7 @@ assert(main.includes("!gameState.getFlag('STAFF_ACCESS_CARD')"),'Vertical travel
 assert(ui.includes('HIS_AUTHENTICATED'),'HIS must require duty credentials');
 assert(ui.includes("p==='QL1700'"),'HIS password verifier must match the duty book');
 assert(art.includes('夜間醫師值勤名冊'));
-assert(floor.includes("label:'文件保管室'")&&floor.includes("requires:'STAFF_ACCESS_CARD'"));
+assert(floor.includes("title:'文件保管室'")&&floor.includes("requires:'STAFF_ACCESS_CARD'"));
 assert(floor.includes("bookshelfCount:4")&&floor.includes("type:'archive_document'"));
 assert(!floor.includes('buildRoomWing'),'Generic archive wing must not reintroduce the stray partition');
 assert(floor.includes("officeSecrets={count:officeSecrets.length"),'316 secret exploration metadata missing');
