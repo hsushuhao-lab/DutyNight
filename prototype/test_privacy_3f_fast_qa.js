@@ -22,7 +22,9 @@ assert(!index.includes('虛構'),'Player-facing UI must not break immersion with
 assert(main.includes("!gameState.getFlag('STAFF_ACCESS_CARD')"),'Vertical travel must be card-gated');
 assert(ui.includes('HIS_AUTHENTICATED'),'HIS must require duty credentials');
 assert(ui.includes("p==='QL1700'"),'HIS password verifier must match the duty book');
-assert(art.includes('夜間醫師值勤名冊'));
+assert(floor.includes('夜間醫師值勤名冊'),'Physician roster must exist inside the 3F administrative office');
+assert(!art.includes('夜間醫師值勤名冊'),'Corridor roster must be removed so the storage-room doorway stays visible');
+assert(!art.includes("13.15])asset('bench'"),'No bench may sit in front of the storage-room doorway');
 assert(floor.includes("title:'無門牌房間'")&&floor.includes("requires:'ARCHIVE_ACCESS_KEY'"));
 assert(floor.includes("bookshelfCount:4")&&floor.includes("type:'archive_document'"));
 assert(floor.includes("ARCHIVE_UNINDEXED_HANDOFF"),'Unindexed handoff clue missing');
@@ -47,6 +49,8 @@ assert(ui.includes("FOUND_302_CODE")&&ui.includes("……3082 嗎？"),'302 insp
 assert(level.includes('每週一重設')&&level.includes('夜間告示'),'302 keypad note must direct player to the opposite bulletin');
 assert(level.includes("new THREE.BoxGeometry(1.02,2.30,.08)"),'302 must use a full-height standard door leaf');
 assert(floor.includes("relativeTo4FDutyRoom:true")&&floor.includes("label:'3F 行政辦公室'"),'3F office matching the 4F duty-room relative position is missing');
+assert(floor.includes("id:'3F_ADMIN_OFFICE_DOOR'")&&floor.includes("type:'admin_roster_3f'"),'3F administrative office must have a real door and roster task');
+assert(main.includes("ADMIN_ROSTER_CHECKED")&&main.includes("P1_ADMIN_ROSTER_CHECK"),'Administrative-office side-task interaction missing');
 assert(verticalCore.includes("zoneId==='first_campus_4f'||zoneId==='first_campus_3f'"),'3F shared elevator core must cut the west office doorway');
 assert(level.includes("CPR_Anne")&&level.includes("type:'cpr_anne'"),'CPR Anne environmental-horror prop missing');
 assert(main.includes("office_phone_316")&&main.includes("PHONE_ANSWERED"),'316 phone anomaly interaction missing');
