@@ -210,6 +210,25 @@ export class SoundManager {
     } catch (e) {}
   }
 
+  playPhoneRingPattern() {
+    if (!this.ctx || this.isMuted) return;
+    try {
+      const ringAt=(t)=>{
+        for(const [freq,offset] of [[440,0],[560,.09]]){
+          const osc=this.ctx.createOscillator();const gain=this.ctx.createGain();
+          osc.type='sine';osc.frequency.setValueAtTime(freq,t+offset);
+          gain.gain.setValueAtTime(.001,t+offset);
+          gain.gain.linearRampToValueAtTime(.09,t+offset+.02);
+          gain.gain.exponentialRampToValueAtTime(.001,t+offset+.42);
+          osc.connect(gain);gain.connect(this.ctx.destination);
+          osc.start(t+offset);osc.stop(t+offset+.45);
+        }
+      };
+      const now=this.ctx.currentTime;
+      ringAt(now);ringAt(now+1.0);ringAt(now+3.2);
+    } catch (e) {}
+  }
+
   playClick() {
     if (!this.ctx || this.isMuted) return;
     try {
