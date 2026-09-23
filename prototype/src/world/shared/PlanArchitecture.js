@@ -84,13 +84,66 @@ export function ordinaryRoom(zone,walls,{id,label=id+' 病房',rect,side,door,ki
 }
 
 export function workstation(zone,{x,z,yaw=0,id}){
-  asset(zone.zoneGroup,'workDesk',[x,0,z],[1.3,1,1]);
+  const desk=asset(zone.zoneGroup,'workDesk',[x,0,z],[1.3,1,1],yaw);
+  if(desk)desk.name=`WorkstationDesk_${id}`;
   CollisionFactory.addBox(zone.colliders,x,.4,z,1.85,.8,.85);
   const face=monitor(zone.zoneGroup,zone.gf.materials,x,.80,z,yaw);
   const cx=x+Math.sin(yaw)*.95,cz=z+Math.cos(yaw)*.95;
-  asset(zone.zoneGroup,'officeChair',[cx,0,cz],[1,1,1],yaw+Math.PI);
-  face.name=`Workstation_${id}`;zone.workstations??=[];zone.workstations.push({id,screen:face,chair:[cx,0,cz],yaw});
+  const chairObject=asset(zone.zoneGroup,'officeChair',[cx,0,cz],[1,1,1],yaw+Math.PI);
+  if(chairObject)chairObject.name=`WorkstationChair_${id}`;
+  face.name=`Workstation_${id}`;zone.workstations??=[];zone.workstations.push({id,screen:face,chair:[cx,0,cz],yaw,desk,chairObject});
   return face;
+}
+
+export function buildNursingStationClinicalProps(zone,{x,z=-4.3,id}){
+  const m=zone.gf.materials;zone.clinicalProps??=[];
+  const make=(suffix,type,position)=>{
+    const g=new THREE.Group();g.position.set(...position);g.name=`ClinicalProp_${id}_${suffix}`;
+    g.userData={clinicalProp:true,propId:`${id}_${suffix}`,type};zone.zoneGroup.add(g);
+    zone.clinicalProps.push({id:`${id}_${suffix}`,type,position});return g;
+  };
+  const cart=(suffix,type,px,pz)=>{
+    const g=make(suffix,type,[px,0,pz]);
+    solid(g,m.stainless,[0,.52,0],[.76,.92,.54]);solid(g,m.counterTop,[0,1.02,0],[.84,.07,.62]);
+    for(const yy of [.38,.61,.84])solid(g,m.wallDark,[0,yy,-.28],[.60,.02,.02],.002);
+    for(const [wx,wz] of [[-.28,-.20],[.28,-.20],[-.28,.20],[.28,.20]]){
+      const wheel=new THREE.Mesh(new THREE.CylinderGeometry(.05,.05,.04,12),m.wallDark);wheel.rotation.z=Math.PI/2;wheel.position.set(wx,.07,wz);g.add(wheel);
+    }
+    return g;
+  };
+
+  const med=cart('medication_cart','medication_cart',x+1.45,z+2.15);
+  for(let i=0;i<4;i++){
+    const bottle=new THREE.Mesh(new THREE.CylinderGeometry(.035,.04,.12,12),i%2?m.bedSheet:m.wallBumper);
+    bottle.position.set(-.24+i*.16,1.13,.05);med.add(bottle);
+  }
+  const tray=make('syringe_tray','syringe_tray',[x+1.45,1.16,z+1.98]);solid(tray,m.stainless,[0,0,0],[.54,.025,.18]);
+  for(let i=0;i<3;i++){solid(tray,m.glass,[-.16+i*.16,.035,0],[.14,.025,.025]);solid(tray,m.metal,[-.04+i*.16,.035,0],[.10,.006,.006],.001);}
+
+  cart('treatment_cart','treatment_cart',x+1.45,z+.15);
+  const bp=make('bp_device','bp_device',[x+1.30,1.10,z+.06]);solid(bp,m.metal,[0,.12,0],[.34,.24,.18]);solid(bp,m.glass,[0,.15,.095],[.24,.11,.02]);
+  const pulse=make('pulse_oximeter','pulse_oximeter',[x+1.68,1.08,z+.06]);solid(pulse,m.wallDark,[0,.04,0],[.18,.09,.12]);solid(pulse,m.glass,[0,.09,.01],[.12,.025,.08]);
+
+  const iv=make('iv_pole','iv_pole',[x+1.55,0,z-1.80]);
+  const pole=new THREE.Mesh(new THREE.CylinderGeometry(.025,.025,1.85,12),m.stainless);pole.position.y=.98;iv.add(pole);
+  const base=new THREE.Mesh(new THREE.CylinderGeometry(.28,.28,.035,20),m.metal);base.position.y=.035;iv.add(base);
+  solid(iv,m.stainless,[0,1.88,0],[.44,.025,.025]);solid(iv,m.stainless,[.20,1.77,0],[.025,.22,.025]);
+  const bag=make('iv_bag','iv_bag',[x+1.76,1.56,z-1.80]);solid(bag,m.glass,[0,0,0],[.20,.34,.08]);solid(bag,m.bedSheet,[0,.10,.045],[.11,.05,.01]);
+
+  const cabinet=make('medication_cabinet','medication_cabinet',[x-4.28,0,z+.05]);
+  solid(cabinet,m.stainless,[0,1.55,0],[.34,1.45,1.10]);solid(cabinet,m.glass,[.18,1.55,0],[.025,1.18,.88]);
+
+  const scope=make('stethoscope','stethoscope',[x-4.43,0,z-1.05]);
+  const ring=new THREE.Mesh(new THREE.TorusGeometry(.15,.018,10,28),m.wallDark);ring.rotation.y=Math.PI/2;ring.position.set(.03,1.62,0);scope.add(ring);
+  solid(scope,m.wallDark,[.03,1.30,0],[.025,.52,.025]);const chest=new THREE.Mesh(new THREE.CylinderGeometry(.05,.05,.02,16),m.stainless);chest.rotation.z=Math.PI/2;chest.position.set(.05,1.02,0);scope.add(chest);
+
+  const coat=make('white_coat','white_coat',[x-4.40,0,z-3.00]);
+  solid(coat,m.bedSheet,[.04,1.48,0],[.08,.96,.62]);solid(coat,m.bedSheet,[.04,1.43,-.39],[.08,.62,.16]);solid(coat,m.bedSheet,[.04,1.43,.39],[.08,.62,.16]);solid(coat,m.metal,[.04,2.05,0],[.06,.08,.50]);
+
+  const sharps=make('sharps_container','sharps_container',[x-2.80,0,z-4.10]);solid(sharps,m.wallBumper,[0,1.42,0],[.48,.54,.24]);solid(sharps,m.wallDark,[0,1.70,0],[.40,.035,.18]);
+  const supplies=make('supply_boxes','supply_boxes',[x-4.22,0,z+2.60]);for(let i=0;i<3;i++)solid(supplies,i===0?m.bedSheet:(i===1?m.wallBumper:m.stainless),[.05,.52+i*.27,0],[.28,.22,.62]);
+
+  return zone.clinicalProps.filter(p=>p.id.startsWith(id+'_')).map(p=>p.id);
 }
 
 /** Identical protected staff-station module used by legacy wards. Front faces local -Z. */
@@ -150,22 +203,26 @@ export function nursingStationV5(zone,{x,z=-4.3,id}){
   glazedSegment('z',west,north,south);
   glazedSegment('z',east,north,south);
 
-  workstation(zone,{x:x-1.75,z:-3.8,yaw:Math.PI,id:id+'_A'});
-  workstation(zone,{x:x+1.75,z:-3.8,yaw:Math.PI,id:id+'_B'});
-  asset(zone.zoneGroup,'storageCabinet',[x-3.6,0,-1.2],[1,1,1],Math.PI/2);
-  asset(zone.zoneGroup,'printer',[x+1.75,.8,-3.8],[.7,.7,.7]);
-  zone.gf.buildCeilingLight(zone.zoneGroup,x,3.15,-4.3,.8,8);
+  workstation(zone,{x:x-3.35,z:z+1.95,yaw:0,id:id+'_A'});
+  workstation(zone,{x:x-1.35,z:z+1.95,yaw:0,id:id+'_B'});
+  workstation(zone,{x:x-3.35,z:z-1.85,yaw:Math.PI,id:id+'_C'});
+  workstation(zone,{x:x-1.35,z:z-1.85,yaw:Math.PI,id:id+'_D'});
+  asset(zone.zoneGroup,'storageCabinet',[x-3.6,0,z+3.1],[1,1,1],Math.PI/2);
+  asset(zone.zoneGroup,'printer',[x-1.35,.8,z+1.95],[.7,.7,.7]);
+  const clinicalPropIds=buildNursingStationClinicalProps(zone,{x,z,id});
+  zone.gf.buildCeilingLight(zone.zoneGroup,x,3.15,z,.8,8);
 
   SignAnchor.buildWallPlaque({scene:zone.zoneGroup,x:x-2.0,y:2.64,z:north+.10,rotationY:0,width:1.7,height:.32,code:'',title:'護理站',subtitle:'',header:''});
 
   // Station -> ward activity hall uses a normally-closed metal access door.
-  new AccessDoor(zone,{id:id+'_ward',x:wardExitX,z:north,width:1.4,title:'護理站病房感應鐵門',material:m.metal,readerSide:1});
+  new AccessDoor(zone,{id:id+'_ward',x:wardExitX,z:north,width:1.4,title:'護理站病房感應鐵門',material:m.metal,readerSide:-1});
 
   zone.station={
-    id,module:'NursingStation_V5_2_GLASS_BOX',position:[x,-4.3],
+    id,module:'NursingStation_V5_2_GLASS_BOX',position:[x,z],
     bounds:[west,north,east,south],entryDoor:[x,south],wardDoor:[wardExitX,north],
     facesRoom:String(zone.floor*100+6),glazedSides:['south','north','west','east'],
-    lowerWallHeight:lowerH,upperGlassHeight:glassH,wardDoorMaterial:'metal'
+    lowerWallHeight:lowerH,upperGlassHeight:glassH,wardDoorMaterial:'metal',
+    wardDoorReaderSide:-1,workstationCount:4,clinicalPropIds
   };
   return zone.station;
 }
