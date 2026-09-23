@@ -1,0 +1,21 @@
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+
+const index=readFileSync('./index.html','utf8');
+const main=readFileSync('./src/main.js','utf8');
+const ui=readFileSync('./src/ui/UIManager.js','utf8');
+const art=readFileSync('./src/art/FirstFloorArt.js','utf8');
+const floor=readFileSync('./src/world/zones/FirstCampus3F.js','utf8');
+const station=readFileSync('./src/world/shared/PlanArchitecture.js','utf8');
+const door=readFileSync('./src/world/shared/AccessDoor.js','utf8');
+
+assert(!index.includes('松德'),'Public game shell must not expose real-hospital name');
+assert(index.includes('青嶺醫療中心'));
+assert(index.includes('his-login-panel')&&index.includes('credential-slip'));
+assert(main.includes("!gameState.getFlag('STAFF_ACCESS_CARD')"),'Vertical travel must be card-gated');
+assert(ui.includes('HIS_AUTHENTICATED'),'HIS must require the fictional duty credentials');
+assert(art.includes('夜間醫師值勤名冊'));
+assert(floor.includes("label:'文件保管室'")&&floor.includes("requires:'STAFF_ACCESS_CARD'"));
+assert(station.includes('alongX?sx:sx*.22+.025'),'Station side glazing must span its full axis');
+assert(door.includes("mount:'jamb'")&&door.includes('mount.add(reader)'),'Readers must be physically parented to jamb mounts');
+console.log('PRIVACY + 3F FAST QA PASS');
