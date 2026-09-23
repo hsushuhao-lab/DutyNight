@@ -10,8 +10,7 @@ export class GameState {
     this.requiredTasks = [
       'KEY_PICKUP',
       'DUTY_LOG',
-      'E_HANDOFF',
-      'ARCHIVE_CLUE_FOUND'
+      'E_HANDOFF'
     ];
 
     this.completedTasks = new Set();
@@ -28,6 +27,8 @@ export class GameState {
     this.flags.set('LOCKER_OPENED', false);
     this.flags.set('HIS_CREDENTIALS', false);
     this.flags.set('ARCHIVE_OBJECTIVE', false);
+    this.flags.set('ARCHIVE_LOCKED_SEEN', false);
+    this.flags.set('ARCHIVE_ACCESS_KEY', false);
   }
 
   addListener(fn) {
