@@ -136,12 +136,16 @@ controller.onInteract = (interactable) => {
   } else if (interactable.type === 'duty_door') {
     if (!gameState.isTaskComplete('KEY_PICKUP')) {
       soundManager.playClick();
-      uiManager.showSubtitle('李醫師','「值班室是鑰匙喇叭鎖，先去 316 拿鑰匙。」',3000);
+      uiManager.showSubtitle('李醫師','「這是傳統喇叭鎖，先去 316 拿值班室鑰匙與感應卡。」',3000);
       return;
     }
-    const changed=worldRouter.activeZoneInstance.toggleDutyDoor(camera.position);
+    const zone=worldRouter.activeZoneInstance;
+    const keyedDoor=zone.keyedDoors?.[interactable.doorId] || (interactable.doorId==='duty_room'?zone.dutyDoor:null);
+    if(!keyedDoor)return;
+    const changed=keyedDoor.toggle(controller.position);
     if(changed)soundManager.playClick();
     else uiManager.showSubtitle('門鎖','請先離開門幅後再關門。',2500);
+    if(keyedDoor===zone.dutyDoor)zone.dutyDoorClosed=keyedDoor.closed;
     controller.currentInteractable = null;
     uiManager.showPrompt(null);
   } else if (interactable.type === 'key') {

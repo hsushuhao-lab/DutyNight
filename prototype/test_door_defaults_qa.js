@@ -14,9 +14,11 @@ assert.match(ward,/dutyDoor\.setClosed\(true\);this\.dutyDoorClosed=true/);
 assert.doesNotMatch(ward,/doctor_office[\s\S]{0,180}readers:false/);
 assert.match(access,/this\.closed=false; this\.setClosed\(true\)/);
 assert.match(keyed,/type:'duty_door'/);
-assert.match(keyed,/鑰匙開門/);
+assert.match(keyed,/喇叭鎖：鑰匙開門/);
+assert.match(keyed,/zone\.keyedDoors/);
+assert.match(ward,/id:'duty_bathroom'/);
 assert.match(router,/this\.dutyDoorClosed = true/);
 assert.match(main,/值班室是鑰匙喇叭鎖/);
 assert.match(main,/KEY_PICKUP/);
-console.log('Door defaults QA PASS: no nursing side strip, all controlled doors closed, duty room uses keyed knob door');
+console.log('Door defaults QA PASS: controlled doors closed; duty, bathroom and patient rooms use keyed knob-door registry');
 

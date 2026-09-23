@@ -20,14 +20,16 @@ for(const id of ['first_campus_4f','second_campus_5f']){
  check(id+' outer gate at lift-lobby boundary',()=>{assert.equal(zone.wardDoor.root.position.z,2);assert.equal(zone.wardDoor.root.position.x,o);assert(controller.checkCollision(o,2));});
  check(id+' inner gate enters nursing station directly',()=>{assert.equal(zone.innerWardDoor.root.position.z,0);assert.equal(zone.innerWardDoor.root.position.x,o);assert(controller.checkCollision(o,0));assert.deepEqual(zone.station.entryDoor,[o,0]);});
  check(id+' right-side glass bypass enters ward',()=>{const d=zone.accessDoors[prefix+'_ward_glass'];assert(d?.closed);assert.equal(d.root.position.x,o+6);assert.equal(d.root.position.z,0);assert(d.leaves.every(l=>l.material.transparent&&l.material.opacity<.5));});
- check(id+' station ward door faces x06',()=>{const d=zone.accessDoors[prefix+'_station_ward'];assert(d?.closed);assert.equal(zone.station.facesRoom,(o?'50':'40')+'6');assert(Math.abs(d.root.position.x-(o+4))<.01);assert(Math.abs(d.root.position.z+8.6)<.01);});
- check(id+' all nine ward-room doors default closed',()=>{for(const room of zone.roomAreas.filter(r=>r.kind==='ward'))assert(zone.accessDoors[room.accessDoorId]?.closed,room.id);});
+ check(id+' station ward door faces x06 and is metal',()=>{const d=zone.accessDoors[prefix+'_station_ward'];assert(d?.closed);assert.equal(zone.station.facesRoom,(o?'50':'40')+'6');assert(Math.abs(d.root.position.x-(o+4))<.01);assert(Math.abs(d.root.position.z+8.6)<.01);assert(d.leaves.every(l=>l.material===zone.gf.materials.metal));});
+ check(id+' nursing station is four-sided lower-wall/upper-glass box',()=>{assert.deepEqual(zone.station.glazedSides,['south','north','west','east']);assert(zone.station.lowerWallHeight>1);assert(zone.station.upperGlassHeight>1.5);});
+ check(id+' all nine ward-room knob doors default closed',()=>{for(const room of zone.roomAreas.filter(r=>r.kind==='ward')){assert.equal(room.doorType,'knob');assert(zone.keyedDoors[room.accessDoorId]?.closed,room.id);}});
  check(id+' entrance vestibule has storage and plant',()=>{const store=zone.roomAreas.find(r=>r.id==='STORE_ENTRY');assert(store);assert(zone.accessDoors[store.accessDoorId]?.closed);assert(zone.entrancePlant);});
 }
 zone=router.loadZone('second_campus_5f');
-check('Second-campus V5.1 uses duty room, not physician office',()=>{assert(zone.roomAreas.some(r=>r.id==='SECOND_DUTY'&&r.label==='值班室'));assert(zone.accessDoors.second_duty_room?.closed);assert(!zone.roomAreas.some(r=>r.id==='DOCTOR'));});
+check('Second-campus V5.2 uses duty room, not physician office',()=>{assert(zone.roomAreas.some(r=>r.id==='SECOND_DUTY'&&r.label==='值班室'));assert(zone.accessDoors.second_duty_room?.closed);assert(!zone.roomAreas.some(r=>r.id==='DOCTOR'));});
 check('Second-campus straight route reaches station then ward',()=>{zone.setWardGateClosed(false);zone.setInnerWardGateClosed(false);const d=zone.accessDoors.second_station_ward;d.setClosed(false);walk([72,1.7,3.2],[72,1.7,1]);walk([72,1.7,1],[72,1.7,-3]);walk([76,1.7,-7.3],[76,1.7,-9.8]);});
 check('Second-campus glass bypass independently reaches ward',()=>{const d=zone.accessDoors.second_ward_glass;d.setClosed(false);walk([78,1.7,1],[78,1.7,-1.2]);});
 zone=router.loadZone('first_campus_4f');
 check('Duty-room cabinet doors face room, not wall',()=>{assert.equal(zone.dutyCabinetYaw,Math.PI);const source=zone.dutyCabinetAnchor;assert(source[2]<9.8);assert(!controller.checkCollision(source[0],source[2]-.9));});
-console.log(`SCREENSHOT ACCESS V5.1 REGRESSION PASS ${assertions}/${assertions}`);
+check('Duty-room bathroom has knob door and real fixtures',()=>{assert(zone.keyedDoors.duty_bathroom?.closed);assert.deepEqual(zone.dutyBathroom.fixtures,['toilet','sink','mirror','towel_rail','floor_drain']);});
+console.log(`SCREENSHOT ACCESS V5.2 REGRESSION PASS ${assertions}/${assertions}`);

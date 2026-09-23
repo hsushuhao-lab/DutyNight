@@ -73,6 +73,7 @@ async function use(id){
  await page.waitForTimeout(180);
 }
 async function card(id,closed=false){const d=await page.evaluate(id=>{const r=window.worldRouter,c=r.controller,d=r.activeZoneInstance.accessDoors[id];if(!d)throw Error('Door missing '+id);return {closed:d.closed,reader:d.readers.map(o=>({id:o.userData.id,distance:o.getWorldPosition(c.position.clone()).distanceTo(c.position)})).sort((a,b)=>a.distance-b.distance)[0].id};},id);if(d.closed!==closed)await use(d.reader);assert.equal(await page.evaluate(id=>window.worldRouter.activeZoneInstance.accessDoors[id].closed,id),closed);}
+async function knob(id,closed=false){const state=await page.evaluate(id=>{const d=window.worldRouter.activeZoneInstance.keyedDoors?.[id];if(!d)throw Error('Knob door missing '+id);return d.closed;},id);if(state!==closed)await use(id);assert.equal(await page.evaluate(id=>window.worldRouter.activeZoneInstance.keyedDoors[id].closed,id),closed);}
 async function portal(id,dest){const rid=await page.evaluate(id=>{const r=window.worldRouter,c=r.controller,d=r.activeZoneInstance.accessDoors[id];if(!d?.closed)throw Error('Portal should be opaque and closed');return d.readers.map(o=>({id:o.userData.id,d:o.getWorldPosition(c.position.clone()).distanceTo(c.position)})).sort((a,b)=>a.d-b.d)[0].id;},id);await use(rid);await page.waitForFunction(dest=>window.worldRouter.activeZoneId===dest&&window.worldRouter.controller.enabled,dest);await log(`card portal ${id} -> ${dest}`);}
 let cancelled=false;
 async function travel(dest,kind='elevator'){
@@ -101,39 +102,26 @@ async function travel(dest,kind='elevator'){
 }
 async function roomTour(){
  const rooms=await page.evaluate(()=>window.worldRouter.activeZoneInstance.roomAreas||[]);
-
  for(const room of rooms){
   await go(room.corridor[0],room.corridor[2]);
+  const doorId=room.accessDoorId||null,doorType=room.doorType||'card';
 
-  // Rooms may declare a controlled access door (V5 second-campus duty room).
-  const accessId=room.accessDoorId||null;
-
-  if(accessId){
-   const startsClosed=await page.evaluate(
-    id=>window.worldRouter.activeZoneInstance.accessDoors?.[id]?.closed,
-    accessId
-   );
-
-   assert.equal(
-    startsClosed,
-    true,
-    accessId+' must start closed'
-   );
-
-   await card(accessId);
+  if(doorId){
+   if(doorType==='knob')await knob(doorId);
+   else await card(doorId);
   }
 
   await go(room.point[0],room.point[2]);
   await log('room '+room.id);
   report.rooms.push(room.id);
-
   await go(room.corridor[0],room.corridor[2]);
 
-  // Restore normally-closed state after the visit.
-  if(accessId){
-   await card(accessId,true);
+  if(doorId){
+   if(doorType==='knob')await knob(doorId,true);
+   else await card(doorId,true);
   }
  }
+}
 }try{
  await page.goto(url,{waitUntil:'load',timeout:180000});await page.waitForFunction(()=>window.worldRouter?.activeZoneInstance,null,{timeout:180000});await page.waitForTimeout(700);assert.equal(await page.locator('#debug-zone-selector').count(),0);await log('Production initial 3F');
  await go(5.6,5);await use('KEY_PICKUP');await go(6.4,5);await use('DUTY_LOG');await page.locator('#btn-sign-log').click();await page.waitForFunction(()=>window.worldRouter.controller.enabled);
@@ -263,7 +251,8 @@ if (!handoffAfterMouse.enabled) {
 await page.waitForFunction(()=>window.worldRouter.controller.enabled);
 await log('key / log / HIS via real UI');
  assert(await page.locator('#task-key,#task-log,#task-handoff').evaluateAll(ns=>ns.length===3&&ns.every(n=>n.classList.contains('completed'))));
- await travel('first_campus_4f');await shot('4f-lobby',0);await go(-6.5,6);assert.equal(await page.evaluate(()=>window.worldRouter.activeZoneInstance.dutyDoor?.closed),true,'Duty-room keyed knob door must start closed');await shot('duty-door-closed',Math.PI/2);await use('duty_room');assert.equal(await page.evaluate(()=>window.worldRouter.activeZoneInstance.dutyDoor?.closed),false,'316 key must open duty-room knob lock');await go(-9.5,6);await shot('duty-room',Math.PI/2);await go(-6.5,6);
+ await travel('first_campus_4f');await shot('4f-lobby',0);await go(-6.5,6);assert.equal(await page.evaluate(()=>window.worldRouter.activeZoneInstance.dutyDoor?.closed),true,'Duty-room keyed knob door must start closed');await shot('duty-door-closed',Math.PI/2);await knob('duty_room');await go(-9.5,6);await shot('duty-room',Math.PI/2);
+ await go(-10.6,4.0);await knob('duty_bathroom');await go(-12.55,3.7);await shot('duty-bathroom',Math.PI);await go(-10.6,4.0);await knob('duty_bathroom',true);await go(-6.5,6);
  await go(0,3.2);await page.evaluate(()=>{const c=window.worldRouter.controller;c.yaw=0;c.pitch=0;c.updateCameraRotation();});await page.keyboard.down('KeyW');await page.waitForTimeout(1200);await page.keyboard.up('KeyW');assert((await state()).pos[2]>2.4,'Actual W must not cross closed gate');await go(.8,3.2);await card('first_ward');await go(0,1);await shot('first-vestibule',0);
  await card('first_ward_inner');await go(0,-3.2);await shot('first-station-inside',Math.PI);await go(4,-7.3);await shot('first-station-ward-door',0);await card('first_station_ward');await go(4,-9.8);await shot('first-ward-hall',0);
  await go(6,-1.2);await shot('first-glass-bypass',Math.PI);await card('first_ward_glass');await go(6,1);await shot('first-glass-vestibule',Math.PI);await card('first_ward_glass',true);await card('first_ward_glass');await go(6,-1.2);
@@ -274,7 +263,7 @@ await log('key / log / HIS via real UI');
  await go(-1.2,0);await card('ER_MAIN');await go(6.4,2.3);await shot('er-staff-entry',Math.PI);await card('ER_NURSE_ENTRY');await go(6.4,6);await shot('er-staff-bed-glass',-Math.PI/2);await card('ER_NURSE_BEDS');await go(9.6,6);await log('Staff-to-beds glass passage via two real card readers');await go(14.5,4.6);await card('ER_BEDS');await log('Entered controlled ER bed area');await go(20.5,0);await card('ER_HILLSIDE');await go(24,0);await shot('er-hillside',Math.PI/2);await go(20.5,0);await card('ER_HILLSIDE',true);await travel('first_campus_8f');
  await go(-1.6,0);await shot('8f-card-gate',-Math.PI/2);await portal('BRIDGE_ACCESS','skybridge');await straight(30,0);await shot('bridge-middle',-Math.PI/2);await straight(58.4,0);await portal('BRIDGE_SECOND','second_campus_2f');await shot('second2-gate',Math.PI/2);await travel('second_campus_5f');await shot('second5-core',Math.PI);await go(72,3.2);await shot('second5-direct-entry',0);await card('second_ward');await go(72,1);await shot('second5-vestibule',0);
  await card('second_ward_inner');await go(72,-3.2);await shot('second5-inside-station',Math.PI);await go(76,-7.3);await shot('second5-station-ward-door',0);await card('second_station_ward');await go(76,-9.8);
- await go(78,-1.2);await shot('second5-glass-bypass',Math.PI);await card('second_ward_glass');await go(78,1);await shot('second5-glass-vestibule',Math.PI);await card('second_ward_glass',true);await card('second_ward_glass');await go(78,-1.2);await log('Second-campus V5.1 station and glass-bypass routes verified');
+ await go(78,-1.2);await shot('second5-glass-bypass',Math.PI);await card('second_ward_glass');await go(78,1);await shot('second5-glass-vestibule',Math.PI);await card('second_ward_glass',true);await card('second_ward_glass');await go(78,-1.2);await log('Second-campus V5.2 station and glass-bypass routes verified');
  await roomTour();await go(72,-11.4);await shot('second5-station',Math.PI);await log('All 501-509 rooms visited with A-D beds and controlled doors');
  await travel('second_campus_1f');await shot('second1-guard',0);await go(72,-3);await straight(72,-10);await straight(72,-15.5);await straight(72,-16.4,'hillside_route');await log('Hillside via guard exit');
  for(const [x,z] of [[65,-20],[55,-22],[42,-25],[46,-30]])await straight(x,z);await straight(49.6,-34.5,'ecology_pond');await log('Pond reached');

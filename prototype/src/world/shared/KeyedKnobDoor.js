@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { solid } from '../../art/ArtDetails.js';
 
-/** Single-leaf, normally closed wooden duty-room door with a keyed round knob. */
+/** Single-leaf, normally closed wooden door with a traditional keyed round knob. */
 export class KeyedKnobDoor {
   constructor(zone,{id='duty_room',x,z,yaw=0,width=1.4,title='醫師值班室'}){
     this.zone=zone;this.id=id;this.width=width;
@@ -48,6 +48,7 @@ export class KeyedKnobDoor {
       zone.interactables.push(plate);
     }
 
+    zone.keyedDoors??={};zone.keyedDoors[id]=this;
     this.root.updateWorldMatrix(true,true);
     this.closedBox=new THREE.Box3(new THREE.Vector3(-width/2,0,-.10),new THREE.Vector3(width/2,2.35,.10)).applyMatrix4(this.root.matrixWorld);
     this.closed=false;this.setClosed(true);
@@ -59,7 +60,7 @@ export class KeyedKnobDoor {
     const i=this.zone.colliders.indexOf(this.closedBox);
     if(closed&&i<0)this.zone.colliders.push(this.closedBox);
     if(!closed&&i>=0)this.zone.colliders.splice(i,1);
-    this.interactionData.label=closed?'鑰匙開門':'關門';
+    this.interactionData.label=closed?'喇叭鎖：鑰匙開門':'喇叭鎖：關門';
     this.root.updateWorldMatrix(true,true);
   }
 

@@ -10,9 +10,9 @@ import { SignAnchor } from './SignAnchor.js';
 /** September 22 V5 user floorplan. Units are gameplay metres, not a real hospital survey. */
 export class WardFloorplan {
   constructor(scene,gf,{campus='first',floor=4}={}){
-    Object.assign(this,{scene,gf,campus,floor});this.colliders=[];this.walkables=[];this.interactables=[];this.roomAreas=[];this.bedAreas=[];this.workstations=[];this.accessDoors={};
-    this.layoutVersion='USER_PLAN_20260922_IMAGE_V5_1';this.activityHall=null;this.layoutPlan=null;
-    this.zoneGroup=new THREE.Group();this.zoneGroup.name=`${campus}_${floor}F_PLAN_V5_1`;
+    Object.assign(this,{scene,gf,campus,floor});this.colliders=[];this.walkables=[];this.interactables=[];this.roomAreas=[];this.bedAreas=[];this.workstations=[];this.accessDoors={};this.keyedDoors={};
+    this.layoutVersion='USER_PLAN_20260923_IMAGE_V5_2';this.activityHall=null;this.layoutPlan=null;
+    this.zoneGroup=new THREE.Group();this.zoneGroup.name=`${campus}_${floor}F_PLAN_V5_2`;
   }
   build(){this.scene.add(this.zoneGroup);const second=this.campus==='second',o=second?72:0,walls=new PlanWalls(this);this.planOrigin=o;
     this.gf.buildFloor(this.zoneGroup,this.walkables,o,0,-10,24,24,this.gf.materials.floorTile);
@@ -21,7 +21,10 @@ export class WardFloorplan {
     // V5.1: outer gate -> vestibule. Straight through the inner gate enters the nursing station.
     // From the vestibule, move right then turn left/north through the glass bypass into the ward.
     walls.rect(o-12,-22,o+12,2);walls.cut('x',2,o,2.4);
-    walls.line('x',0,o-12,o+12);walls.cut('x',0,o,2.4);walls.cut('x',0,o+6.0,1.4);
+    // Room/storage walls already cover x<=-7 and x>=7 at z=0.
+    // Only bridge the gaps to the glass-box station; keep the station's south face glazed.
+    walls.line('x',0,o-7,o-4.6);
+    walls.line('x',0,o+4.6,o+7);walls.cut('x',0,o+6.0,1.4);
 
     const room=(n,r,side,d,kind='ward',label)=>ordinaryRoom(this,walls,{id:String(this.floor*100+n),label,rect:[r[0]+o,r[1],r[2]+o,r[3]],side,door:d+(side==='north'||side==='south'?o:0),kind});
     const roomIds=Array.from({length:9},(_,i)=>String(this.floor*100+i+1));
@@ -54,11 +57,15 @@ export class WardFloorplan {
     this.wardGateCollider=this.wardDoor.closedBox;this.wardGateClosed=true;this.innerWardGateClosed=true;this.glassBypassClosed=true;
 
     this.activityHall={id:'ACTIVITY_HALL',label:'病房公共區',bounds:[o-7,-16,o+7,0],center:[o,1.7,-13]};
-    this.layoutVersion='USER_PLAN_20260922_IMAGE_V5_1';
+    this.layoutVersion='USER_PLAN_20260923_IMAGE_V5_2';
     this.layoutPlan={
       rooms:roomIds,
       storage:['STORE_ENTRY'],
       centralStation:true,
+      nursingStationFourSideGlass:true,
+      nursingStationLowerWallUpperGlass:true,
+      patientRoomDoorType:'traditional_knob',
+      bedPlaquesWallMounted:true,
       dualGate:true,
       glassBypassDoor:true,
       stationWardDoor:true,
@@ -100,9 +107,34 @@ export class WardFloorplan {
     workstation(this,{x:-10.0,z:3.1,id:'duty_desk'});
     this.dutyCabinetAnchor=[-8.8,0,9.3];this.dutyCabinetYaw=Math.PI;
     asset(this.zoneGroup,'storageCabinet',this.dutyCabinetAnchor,[1,1,1],this.dutyCabinetYaw);
-    w.rect(-14,2,-11.5,5);w.cut('z',-11.5,4,1.2);
-    solid(this.zoneGroup,this.gf.materials.bedSheet,[-13.4,.8,3],[.65,.25,.45]);
-    solid(this.zoneGroup,this.gf.materials.metal,[-13.85,1.5,3],[.025,.75,.55]);
+    // Enclosed duty-room bathroom with a real knob door, toilet, sink, mirror and dedicated light.
+    w.rect(-14,2,-11.5,5.2);w.cut('z',-11.5,4.0,1.1);
+    this.gf.buildFloor(this.zoneGroup,this.walkables,-12.75,.006,3.6,2.5,3.2,this.gf.materials.floorTile);
+    this.gf.buildCeiling(this.zoneGroup,-12.75,3.2,3.6,2.5,3.2);
+    this.dutyBathroomDoor=new KeyedKnobDoor(this,{id:'duty_bathroom',x:-11.5,z:4.0,yaw:Math.PI/2,width:1.1,title:'值班室洗手間'});
+    this.dutyBathroomDoor.setClosed(true);
+
+    // Toilet with cistern and seat.
+    solid(this.zoneGroup,this.gf.materials.bedSheet,[-13.25,.34,4.05],[.58,.68,.78]);
+    solid(this.zoneGroup,this.gf.materials.bedSheet,[-13.25,.73,4.36],[.50,.52,.20]);
+    solid(this.zoneGroup,this.gf.materials.stainless,[-13.25,.74,4.23],[.34,.035,.32]);
+
+    // Compact sink/vanity against the south wall.
+    solid(this.zoneGroup,this.gf.materials.wall,[-12.35,.42,2.55],[.78,.78,.46]);
+    solid(this.zoneGroup,this.gf.materials.stainless,[-12.35,.84,2.55],[.84,.08,.50]);
+    solid(this.zoneGroup,this.gf.materials.bedSheet,[-12.35,.88,2.55],[.48,.10,.30]);
+    solid(this.zoneGroup,this.gf.materials.metal,[-12.35,1.05,2.48],[.05,.28,.05]);
+
+    // Wall-mounted mirror, towel rail and floor drain.
+    solid(this.zoneGroup,this.gf.materials.glass,[-12.35,1.65,2.20],[.78,.82,.025]);
+    solid(this.zoneGroup,this.gf.materials.metal,[-13.35,1.20,2.35],[.48,.05,.05]);
+    solid(this.zoneGroup,this.gf.materials.metal,[-12.8,.015,4.65],[.22,.03,.22]);
+    this.gf.buildCeilingLight(this.zoneGroup,-12.75,3.15,3.6,.48,5,0xfff2dc);
+
+    this.dutyBathroom={
+      door:[-11.5,1.7,4.0],bounds:[-14,2,-11.5,5.2],
+      fixtures:['toilet','sink','mirror','towel_rail','floor_drain']
+    };
     w.build();this.gf.buildCeilingLight(this.zoneGroup,-11,3.15,6,.7,7,0xffebce);
     wallClock(this.zoneGroup,this.gf.materials,-10,2.1,2.15);
     this.dutyRoom={door:[-8,1.7,6],inside:[-9.5,1.7,6],outside:[-6.5,1.7,6],bounds:[-14,2,-8,10]};
@@ -133,5 +165,5 @@ export class WardFloorplan {
   toggleWardGate(p){const ok=this.wardDoor.toggle(p);this.wardGateClosed=this.wardDoor.closed;return ok;}
   setDutyDoorClosed(closed){if(this.dutyDoor)this.dutyDoor.setClosed(closed);this.dutyDoorClosed=closed;}
   toggleDutyDoor(p){if(!this.dutyDoor)return false;const ok=this.dutyDoor.toggle(p);this.dutyDoorClosed=this.dutyDoor.closed;return ok;}
-  cleanup(){this.scene.remove(this.zoneGroup);disposeZoneArt(this.zoneGroup);this.colliders=[];this.walkables=[];this.interactables=[];this.roomAreas=[];this.bedAreas=[];this.workstations=[];this.accessDoors={};}
+  cleanup(){this.scene.remove(this.zoneGroup);disposeZoneArt(this.zoneGroup);this.colliders=[];this.walkables=[];this.interactables=[];this.roomAreas=[];this.bedAreas=[];this.workstations=[];this.accessDoors={};this.keyedDoors={};}
 }

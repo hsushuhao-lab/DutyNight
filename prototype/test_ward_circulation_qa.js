@@ -30,9 +30,9 @@ const gx=bypass.root.position.x,gz=bypass.root.position.z;
 walk(gx,gz+1.0);bypass.setClosed(false);walk(gx,gz-1.2);walk(78,-6);walk(78,-12);
 
 // A patient room is closed by default and becomes traversable only after opening.
-const room509=zone.roomAreas.find(room=>room.id==='509'),roomDoor=zone.accessDoors[room509.accessDoorId];
-assert(roomDoor?.closed);roomDoor.setClosed(false);
+const room509=zone.roomAreas.find(room=>room.id==='509'),roomDoor=zone.keyedDoors[room509.accessDoorId];
+assert.equal(room509.doorType,'knob');assert(roomDoor?.closed);roomDoor.setClosed(false);
 walk(room509.corridor[0],room509.corridor[2]);walk(room509.point[0],room509.point[2]);
 
 zone.cleanup();
-console.log('WARD CIRCULATION V5.1 PASS: outer gate -> vestibule -> station route toward 506; alternate glass bypass -> ward');
+console.log('WARD CIRCULATION V5.2 PASS: outer gate -> vestibule -> station route toward 506; alternate glass bypass -> ward');
