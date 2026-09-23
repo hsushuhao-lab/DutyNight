@@ -95,7 +95,7 @@
           <div class="ward-summary-banner">
             <span>【第一院區 4F 病房交班摘要】</span>
             <span>總床數：36｜病房：401–409｜每房 A–D 四床</span>
-            <span>特殊交班：3 人｜以下皆為遊戲虛構資料</span>
+            <span>特殊交班：3 人｜院內資料保密・禁止外洩</span>
           </div>
 
           <table class="his-table">
@@ -197,13 +197,32 @@
 
         <div class="sign-prompt-box">
           我已閱讀並確認今日值班規範，確實到勤接管第一院區 4F 病房夜間事務。
-          <div class="credential-slip"><strong>今晚 HIS 值班帳密</strong><br>帳號：night403<br>密碼：QingLing-1700<br><small>僅供本遊戲虛構系統使用。</small></div>
+          <div class="credential-slip"><strong>今晚 HIS 值班帳密</strong><br>帳號：night403<br>密碼：QL1700<br><small>本院專屬｜資料保密｜禁止外洩</small></div>
         </div>
       </div>
 
       <div class="book-actions">
         <button id="btn-close-log" class="btn-secondary">關閉檢視</button>
         <button id="btn-sign-log" class="btn-primary">✍️ 簽名並加蓋值班到勤章</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Archive document reader -->
+  <div id="archive-modal" class="modal-overlay">
+    <div class="archive-reader">
+      <div class="archive-reader-header">
+        <div>
+          <div class="archive-classification">院內機密｜資料保密｜禁止外洩</div>
+          <h2 id="archive-document-title">文件</h2>
+        </div>
+        <button id="btn-close-archive" class="btn-win-close" aria-label="關閉文件">✕</button>
+      </div>
+      <div id="archive-document-page" class="archive-document-page"></div>
+      <div class="archive-reader-footer">
+        <button id="btn-archive-prev" class="btn-secondary">上一頁</button>
+        <span id="archive-page-indicator">1 / 1</span>
+        <button id="btn-archive-next" class="btn-primary">下一頁</button>
       </div>
     </div>
   </div>
