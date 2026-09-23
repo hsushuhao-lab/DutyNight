@@ -137,7 +137,7 @@ export class Level3FBlockout {
   }
 
   buildOffice302() {
-    // 302 administration/secretary office, immediately off the elevator lobby.
+    // 302 administration/secretary office: a fully enclosed, believable locked office.
     const floorGeo=new THREE.PlaneGeometry(4.2,4.0);
     const floor=new THREE.Mesh(floorGeo,materialForSurface('floor',4.2,4.0));
     floor.rotation.x=-Math.PI/2;floor.position.set(-9.5,0,-5.5);floor.receiveShadow=true;this.scene.add(floor);this.addWalkable(floor);
@@ -147,28 +147,66 @@ export class Level3FBlockout {
     this.buildWall(-7.4,1.6,-5.5,.25,3.2,4.0);
     this.buildWall(-9.5,1.6,-7.5,4.2,3.2,.25);
 
-    const doorMat=new THREE.MeshStandardMaterial({color:0x5c4434,roughness:.68});
-    const leaf=new THREE.Mesh(new THREE.BoxGeometry(.96,2.30,.07),doorMat);
+    // Complete jamb/header package around a full-height fire-rated wood door.
+    const frameMat=new THREE.MeshStandardMaterial({color:0x4a4338,roughness:.58,metalness:.08});
+    const doorMat=new THREE.MeshStandardMaterial({color:0x5a3f2f,roughness:.66});
+    for(const x of [-10.06,-8.94]){
+      const jamb=new THREE.Mesh(new THREE.BoxGeometry(.10,2.44,.16),frameMat);
+      jamb.position.set(x,1.22,-3.43);this.scene.add(jamb);
+    }
+    const header=new THREE.Mesh(new THREE.BoxGeometry(1.22,.10,.16),frameMat);
+    header.position.set(-9.5,2.42,-3.43);this.scene.add(header);
+
+    const leaf=new THREE.Mesh(new THREE.BoxGeometry(1.02,2.30,.08),doorMat);
     leaf.position.set(-9.5,1.15,-3.47);leaf.castShadow=true;
     leaf.userData={interactable:true,id:'302_KEYPAD_DOOR',type:'office_302_keypad',label:'302 行政主管／科秘書辦公室｜電子鎖'};
     this.scene.add(leaf);this.interactables.push(leaf);this.office302Door=leaf;this.office302Open=false;
-    this.office302Collider=new THREE.Box3(new THREE.Vector3(-10.0,0,-3.54),new THREE.Vector3(-9.0,2.35,-3.40));
+
+    // Narrow frosted vision panel keeps the office visually private while making the door feel real.
+    const glassMat=new THREE.MeshStandardMaterial({color:0xc7d1cc,transparent:true,opacity:.42,roughness:.66,metalness:0});
+    const visionFrame=new THREE.Mesh(new THREE.BoxGeometry(.34,.72,.025),frameMat);visionFrame.position.set(0,.34,-.055);leaf.add(visionFrame);
+    const vision=new THREE.Mesh(new THREE.PlaneGeometry(.27,.64),glassMat);vision.position.set(0,.34,-.071);vision.rotation.y=Math.PI;leaf.add(vision);
+    const handle=new THREE.Mesh(new THREE.BoxGeometry(.22,.035,.035),this.materials.fixture);handle.position.set(.33,-.08,-.08);leaf.add(handle);
+
+    this.office302Collider=new THREE.Box3(new THREE.Vector3(-10.02,0,-3.54),new THREE.Vector3(-8.98,2.35,-3.40));
     this.colliders.push(this.office302Collider);
 
-    // Keypad and tiny status lamp.
-    const signCanvas=document.createElement('canvas');signCanvas.width=640;signCanvas.height=180;const sctx=signCanvas.getContext('2d');
-    sctx.fillStyle='#edf2ee';sctx.fillRect(0,0,640,180);sctx.fillStyle='#24513a';sctx.fillRect(0,0,640,44);
+    // Room plaque above the door.
+    const signCanvas=document.createElement('canvas');signCanvas.width=720;signCanvas.height=190;const sctx=signCanvas.getContext('2d');
+    sctx.fillStyle='#edf2ee';sctx.fillRect(0,0,720,190);sctx.fillStyle='#24513a';sctx.fillRect(0,0,720,44);
     sctx.fillStyle='#173127';sctx.font='bold 34px sans-serif';sctx.fillText('302 行政主管／科秘書辦公室',28,112);
+    sctx.fillStyle='#5b6b62';sctx.font='18px sans-serif';sctx.fillText('ADMINISTRATION / SECRETARY OFFICE',30,154);
     const signTex=new THREE.CanvasTexture(signCanvas);signTex.colorSpace=THREE.SRGBColorSpace;
-    const sign=new THREE.Mesh(new THREE.PlaneGeometry(1.55,.44),new THREE.MeshBasicMaterial({map:signTex}));
-    sign.position.set(-9.5,2.65,-3.385);this.scene.add(sign);
+    const sign=new THREE.Mesh(new THREE.PlaneGeometry(1.65,.44),new THREE.MeshBasicMaterial({map:signTex}));
+    sign.position.set(-9.5,2.68,-3.385);this.scene.add(sign);
 
-    const keypad=new THREE.Mesh(new THREE.BoxGeometry(.22,.34,.08),this.materials.fixture);
-    keypad.position.set(-8.88,1.25,-3.43);
-    keypad.userData={interactable:true,id:'302_KEYPAD',type:'office_302_keypad',label:'302 電子密碼鎖'};
-    this.scene.add(keypad);this.interactables.push(keypad);this.office302Keypad=keypad;
+    // Physical keypad: casing, screen, 12 tactile keys and status LED.
+    const keypadGroup=new THREE.Group();keypadGroup.position.set(-8.78,1.30,-3.39);this.scene.add(keypadGroup);
+    const keypadBody=new THREE.Mesh(new THREE.BoxGeometry(.29,.52,.09),new THREE.MeshStandardMaterial({color:0x2b302d,roughness:.45,metalness:.25}));
+    keypadGroup.add(keypadBody);
+    const screen=new THREE.Mesh(new THREE.PlaneGeometry(.19,.07),new THREE.MeshBasicMaterial({color:0x90b49b}));
+    screen.position.set(0,.18,.048);keypadGroup.add(screen);
+    const keyMat=new THREE.MeshStandardMaterial({color:0x7d8781,roughness:.52,metalness:.1});
+    const labels=['1','2','3','4','5','6','7','8','9','*','0','#'];
+    for(let i=0;i<12;i++){
+      const col=i%3,row=Math.floor(i/3);
+      const key=new THREE.Mesh(new THREE.BoxGeometry(.055,.055,.018),keyMat);
+      key.position.set((col-1)*.072,.075-row*.073,.055);keypadGroup.add(key);
+    }
     const led=new THREE.Mesh(new THREE.CircleGeometry(.025,14),new THREE.MeshBasicMaterial({color:0xb93c34}));
-    led.position.set(-8.88,1.31,-3.385);this.scene.add(led);this.office302Led=led;
+    led.position.set(.09,.18,.058);keypadGroup.add(led);this.office302Led=led;
+    const keypadHit=new THREE.Mesh(new THREE.BoxGeometry(.38,.62,.24),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
+    keypadHit.position.set(-8.78,1.30,-3.36);
+    keypadHit.userData={interactable:true,id:'302_KEYPAD',type:'office_302_keypad',label:'302 電子密碼鎖'};
+    this.scene.add(keypadHit);this.interactables.push(keypadHit);this.office302Keypad=keypadHit;
+
+    // Small yellow note beside the lock. It gives direction, not the answer.
+    const noteCanvas=document.createElement('canvas');noteCanvas.width=420;noteCanvas.height=300;const nctx=noteCanvas.getContext('2d');
+    nctx.fillStyle='#f3e58f';nctx.fillRect(0,0,420,300);nctx.fillStyle='#51462d';nctx.font='bold 28px sans-serif';
+    ['每週一重設','請參照對面','夜間告示'].forEach((t,i)=>nctx.fillText(t,28,70+i*72));
+    const noteTex=new THREE.CanvasTexture(noteCanvas);noteTex.colorSpace=THREE.SRGBColorSpace;
+    const note=new THREE.Mesh(new THREE.PlaneGeometry(.32,.23),new THREE.MeshBasicMaterial({map:noteTex}));
+    note.position.set(-8.48,1.53,-3.375);this.scene.add(note);
 
     // A small desk and bottom drawer containing the brass museum key.
     const desk=new THREE.Mesh(new THREE.BoxGeometry(1.8,.08,.78),this.materials.wood);desk.position.set(-9.4,.78,-6.35);this.scene.add(desk);
@@ -184,23 +222,40 @@ export class Level3FBlockout {
     keyHit.userData={interactable:false,id:'MUSEUM_KEY_302',type:'museum_key_302',label:'檢查 302 最下層抽屜',targetGroup:keyGroup};
     this.scene.add(keyHit);this.interactables.push(keyHit);this.museumKey302=keyHit;
 
-    // Elevator-opposite clue board: code 3082 is visible only when the player bothers to inspect it.
-    const canvas=document.createElement('canvas');canvas.width=900;canvas.height=500;const ctx=canvas.getContext('2d');
-    ctx.fillStyle='#e7e5dc';ctx.fillRect(0,0,900,500);ctx.fillStyle='#355342';ctx.fillRect(0,0,900,72);
-    ctx.fillStyle='#fff';ctx.font='bold 32px sans-serif';ctx.fillText('三樓醫療行政配置／夜間聯絡',28,49);
-    ctx.fillStyle='#34463d';ctx.font='24px sans-serif';
-    ['30  行政主管','82  科秘書夜間備援','17  總醫師室','09  總務聯絡'].forEach((t,i)=>ctx.fillText(t,70,135+i*72));
-    ctx.strokeStyle='#a54338';ctx.lineWidth=8;ctx.strokeRect(52,93,330,176);
-    ctx.fillStyle='#8b2f28';ctx.font='bold 30px sans-serif';ctx.fillText('30 82',590,245);
+    // Real wall-mounted acrylic bulletin case on the solid south-wall segment.
+    const caseBack=new THREE.Mesh(new THREE.BoxGeometry(3.55,1.72,.09),new THREE.MeshStandardMaterial({color:0x735b45,roughness:.7}));
+    caseBack.position.set(-6.35,1.73,-3.28);this.scene.add(caseBack);
+    const canvas=document.createElement('canvas');canvas.width=1400;canvas.height=760;const ctx=canvas.getContext('2d');
+    ctx.fillStyle='#e8e6de';ctx.fillRect(0,0,1400,760);
+    ctx.fillStyle='#355342';ctx.fillRect(0,0,1400,90);
+    ctx.fillStyle='#fff';ctx.font='bold 42px sans-serif';ctx.fillText('三樓醫療行政配置／夜間聯絡',42,60);
+    ctx.fillStyle='#304239';ctx.font='25px sans-serif';
+    const rows=[
+      ['行政主管','代號 30','分機 4312'],
+      ['科秘書夜間備援','代號 82','分機 4398'],
+      ['總醫師室','代號 17','分機 4317'],
+      ['總務聯絡','代號 09','分機 4309'],
+      ['夜間院內保全','巡邏 3F','分機 4411'],
+      ['垃圾分類／器材回收','依總務公告辦理','']
+    ];
+    rows.forEach((r,i)=>{
+      const y=150+i*82;ctx.fillStyle=i%2?'#f2f1ec':'#dedfd9';ctx.fillRect(42,y-38,1316,64);
+      ctx.fillStyle='#34463d';ctx.font='24px sans-serif';ctx.fillText(r[0],70,y);ctx.fillText(r[1],520,y);ctx.fillText(r[2],920,y);
+    });
+    ctx.fillStyle='#706f67';ctx.font='16px sans-serif';ctx.fillText('夜間門禁請依各辦公室貼示辦理',70,700);
+    // Tiny, low-contrast handwritten residue: unreadable from normal gameplay distance.
+    ctx.save();ctx.translate(1110,650);ctx.rotate(-.08);ctx.fillStyle='rgba(120,48,38,.30)';ctx.font='18px cursive';ctx.fillText('門禁 3082',0,0);ctx.restore();
     const tex=new THREE.CanvasTexture(canvas);tex.colorSpace=THREE.SRGBColorSpace;
-    const board=new THREE.Mesh(new THREE.PlaneGeometry(2.8,1.55),new THREE.MeshStandardMaterial({map:tex,roughness:.92}));
-    board.position.set(-4.22,1.70,-.6);board.rotation.y=-Math.PI/2;this.scene.add(board);
-    const boardHit=new THREE.Mesh(new THREE.BoxGeometry(.12,1.75,3.0),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
-    boardHit.position.set(-4.20,1.70,-.6);
-    boardHit.userData={interactable:true,id:'302_CODE_BOARD',type:'office_302_clue',label:'查看三樓醫療行政配置圖',documentTitle:'三樓醫療行政配置／夜間聯絡',pages:['紅筆把「30 行政主管」與「82 科秘書夜間備援」圈在同一區。\\n\\n便條寫著：「每週密碼照舊，四碼連寫。」']};
+    const face=new THREE.Mesh(new THREE.PlaneGeometry(3.38,1.55),new THREE.MeshBasicMaterial({map:tex}));
+    face.position.set(-6.35,1.73,-3.225);this.scene.add(face);
+    const acrylic=new THREE.Mesh(new THREE.PlaneGeometry(3.42,1.59),new THREE.MeshStandardMaterial({color:0xdce6e2,transparent:true,opacity:.17,roughness:.18,metalness:.02}));
+    acrylic.position.set(-6.35,1.73,-3.205);this.scene.add(acrylic);
+    const boardHit=new THREE.Mesh(new THREE.BoxGeometry(3.60,1.80,.30),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
+    boardHit.position.set(-6.35,1.73,-3.18);
+    boardHit.userData={interactable:true,id:'302_CODE_BOARD',type:'office_302_inspect',label:'[E] 仔細查看'};
     this.scene.add(boardHit);this.interactables.push(boardHit);this.office302Clue=boardHit;
 
-    this.office302={id:'302',code:'3082',door:[-9.5,1.2,-3.47],bounds:[-11.6,-7.5,-7.4,-3.5]};
+    this.office302={id:'302',code:'3082',door:[-9.5,1.2,-3.47],bounds:[-11.6,-7.5,-7.4,-3.5],bulletin:[-6.35,1.73,-3.18]};
   }
 
   unlock302() {
