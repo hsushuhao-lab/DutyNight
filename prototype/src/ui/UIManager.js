@@ -15,6 +15,8 @@ export class UIManager {
     this.workstationModal = document.getElementById('workstation-modal');
     this.dutyLogModal = document.getElementById('dutylog-modal');
     this.archiveModal = document.getElementById('archive-modal');
+    this.lockerModal = document.getElementById('locker-modal');
+    this.anomalyModal = document.getElementById('anomaly-modal');
     this.archiveTitleEl = document.getElementById('archive-document-title');
     this.archivePageEl = document.getElementById('archive-document-page');
     this.archiveIndicatorEl = document.getElementById('archive-page-indicator');
@@ -34,6 +36,7 @@ export class UIManager {
         this.updateDebug();
       }
       if (evt === 'time_changed') this.updateTime();
+      if (evt === 'flag_changed') this.updateTasks();
     });
     this.updateTime();
   }
@@ -43,8 +46,9 @@ export class UIManager {
     loginButton?.addEventListener('click',()=>{
       const a=document.getElementById('his-account')?.value.trim();
       const p=document.getElementById('his-password')?.value;
-      const ok=a==='night403'&&p==='QL1700';
-      document.getElementById('his-login-status').textContent=ok?'登入成功｜可讀取夜班交班':'帳號或密碼錯誤';
+      const hasCredentials=this.gameState.getFlag('HIS_CREDENTIALS');
+      const ok=hasCredentials&&a==='night403'&&p==='QL1700';
+      document.getElementById('his-login-status').textContent=!hasCredentials?'尚未取得今晚的系統帳密':ok?'登入成功｜可讀取夜班交班':'帳號或密碼錯誤';
       document.getElementById('his-handoff-content')?.classList.toggle('unlocked',ok);
       if(ok)this.gameState.setFlag('HIS_AUTHENTICATED',true);
       soundManager.playComputerBeep();
@@ -58,6 +62,7 @@ export class UIManager {
         soundManager.playComputerBeep();
         this.gameState.markTaskComplete('E_HANDOFF');
         this.closeWorkstation();
+        setTimeout(()=>this.showAnomalyMessage(),180);
       });
     }
 
@@ -95,6 +100,28 @@ export class UIManager {
       if(this.archivePageIndex<this.archivePages.length-1){this.archivePageIndex++;this.renderArchivePage();soundManager.playPaperSign();}
     });
 
+    document.getElementById('btn-close-locker')?.addEventListener('click',()=>this.closeLocker());
+    document.getElementById('btn-unlock-locker')?.addEventListener('click',()=>{
+      const value=document.getElementById('locker-code')?.value.trim();
+      const status=document.getElementById('locker-status');
+      if(value!=='1700'){status.textContent='紅燈閃爍：密碼錯誤';soundManager.playClick();return;}
+      status.textContent='綠燈亮起：櫃門已解鎖';
+      document.getElementById('locker-contents')?.classList.add('revealed');
+      this.gameState.setFlag('LOCKER_OPENED',true);
+      this.gameState.setFlag('HIS_CREDENTIALS',true);
+      this.gameState.markTaskComplete('LOCKER_OPENED');
+      this.gameState.markTaskComplete('KEY_PICKUP');
+      window.worldRouter?.activeZoneInstance?.markLockerOpen?.();
+      soundManager.playKeyPickup();
+      this.updateTasks();
+    });
+    document.getElementById('btn-ack-anomaly')?.addEventListener('click',()=>{
+      this.gameState.setFlag('ARCHIVE_OBJECTIVE',true);
+      this.anomalyModal?.classList.remove('active');
+      this.updateTasks();
+      this.onTerminalClose?.();
+    });
+
     // Debug toggle with Backquote (~)
     document.addEventListener('keydown', (e) => {
       if (e.code === 'Backquote' && (import.meta.env.DEV || new URLSearchParams(location.search).get('debug') === '1')) {
@@ -108,8 +135,11 @@ export class UIManager {
         if (this.dutyLogModal.classList.contains('active')) {
           this.closeDutyLog();
         }
-        if (this.archiveModal?.classList.contains('active')) {
-          this.closeArchiveDocument();
+        if (this.archiveModal?.classList.contains('active')) this.closeArchiveDocument();
+        if (this.lockerModal?.classList.contains('active')) this.closeLocker();
+        if (this.anomalyModal?.classList.contains('active')) {
+          this.anomalyModal.classList.remove('active');
+          this.onTerminalClose?.();
         }
       }
     });
@@ -141,8 +171,8 @@ export class UIManager {
     setTimeout(() => {
       this.showSubtitle(
         '學長 (資深住院醫師)',
-        '「今天你值班。先到 316 拿值班室鑰匙與感應卡、簽值班本，再用旁邊電腦完成交班。晚點直接上 4F。」',
-        8000
+        '「我先走了。想辦法進 316 完成交班，把今晚的鑰匙拿到手。」',
+        6500
       );
     }, 1200);
   }
@@ -167,6 +197,26 @@ export class UIManager {
   closeDutyLog() {
     this.dutyLogModal.classList.remove('active');
     if (this.onTerminalClose) this.onTerminalClose();
+  }
+
+  openLocker() {
+    document.exitPointerLock();
+    const opened=this.gameState.getFlag('LOCKER_OPENED');
+    const contents=document.getElementById('locker-contents');
+    contents?.classList.toggle('revealed',opened);
+    document.getElementById('locker-status').textContent=opened?'櫃門已解鎖｜可再次查看值班物品':'櫃門鎖定中';
+    this.lockerModal?.classList.add('active');
+  }
+
+  closeLocker() {
+    this.lockerModal?.classList.remove('active');
+    this.onTerminalClose?.();
+  }
+
+  showAnomalyMessage() {
+    document.exitPointerLock();
+    this.anomalyModal?.classList.add('active');
+    soundManager.playComputerBeep();
   }
 
   openArchiveDocument(documentData) {
@@ -400,14 +450,27 @@ export class UIManager {
       });
     };
 
-    const readyFor4F = done('KEY_PICKUP') && done('DUTY_LOG') && done('E_HANDOFF');
+    const hasSpare=this.gameState.getFlag('FOUND_316_SPARE_KEY');
+    const opened316=this.gameState.getFlag('OPENED_316');
+    const archiveObjective=this.gameState.getFlag('ARCHIVE_OBJECTIVE');
+    const readyFor4F = this.gameState.areRequiredTasksComplete();
 
     if (!done('WARD_ENTRY')) {
-      this.renderTaskBoard('今日夜班手續（17:00 交接）', [
-        {id:'task-key',text:'領取 4F 值班室鑰匙與感應卡（316 總醫師辦公室）',state:done('KEY_PICKUP')?'completed':'pending'},
-        {id:'task-log',text:'簽署 3F 值班簽到簿（316 總醫師辦公室）',state:done('DUTY_LOG')?'completed':'pending'},
-        {id:'task-handoff',text:'用值班本帳密登入 HIS，查看總床數與特殊交班',state:done('E_HANDOFF')?'completed':'pending'},
-        {id:'task-elevator',text:readyFor4F?'搭乘電梯前往 4F 病房區':'搭乘電梯前往 4F（待完成交班手續）',state:readyFor4F?'ready':'locked'}
+      if(done('E_HANDOFF') && !done('ARCHIVE_CLUE_FOUND')){
+        this.renderTaskBoard('異常訊息｜3F 文史館',[
+          {id:'task-anomaly',text:archiveObjective?'前往文史館，尋找「未編目交班紀錄」':'閱讀交班後出現的異常訊息',state:archiveObjective?'ready':'pending'},
+          {id:'task-archive-clue',text:'找到未編目的交班紀錄',state:'locked'},
+          {id:'task-elevator',text:'搭乘電梯前往 4F（先完成文史館調查）',state:'locked'}
+        ]);
+        return;
+      }
+      this.renderTaskBoard('今日夜班手續（17:00 交接）',[
+        {id:'task-find-key',text:'想辦法進入 316 總醫師辦公室',state:opened316?'completed':hasSpare?'ready':'pending'},
+        {id:'task-spare',text:'尋找 316 的備用鑰匙',state:hasSpare?'completed':opened316?'completed':'ready'},
+        {id:'task-log',text:'查看值班手冊，找出密碼提示',state:done('DUTY_LOG')?'completed':opened316?'ready':'locked'},
+        {id:'task-locker',text:'解開 316 值班物品櫃',state:done('KEY_PICKUP')?'completed':done('DUTY_LOG')?'ready':'locked'},
+        {id:'task-handoff',text:'用取得的帳密登入 HIS 完成交班',state:done('E_HANDOFF')?'completed':done('KEY_PICKUP')?'ready':'locked'},
+        {id:'task-elevator',text:readyFor4F?'搭乘電梯前往 4F 病房區':'4F 尚未開放',state:readyFor4F?'ready':'locked'}
       ]);
       return;
     }
