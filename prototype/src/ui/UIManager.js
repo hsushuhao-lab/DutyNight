@@ -14,6 +14,12 @@ export class UIManager {
     this.subtitleTextEl = document.getElementById('subtitle-text');
     this.workstationModal = document.getElementById('workstation-modal');
     this.dutyLogModal = document.getElementById('dutylog-modal');
+    this.archiveModal = document.getElementById('archive-modal');
+    this.archiveTitleEl = document.getElementById('archive-document-title');
+    this.archivePageEl = document.getElementById('archive-document-page');
+    this.archiveIndicatorEl = document.getElementById('archive-page-indicator');
+    this.archivePages = [];
+    this.archivePageIndex = 0;
     this.elevatorCutscene = document.getElementById('elevator-cutscene');
     this.debugPanel = document.getElementById('debug-panel');
     this.timeEl = document.querySelector('.hud-time');
@@ -37,7 +43,7 @@ export class UIManager {
     loginButton?.addEventListener('click',()=>{
       const a=document.getElementById('his-account')?.value.trim();
       const p=document.getElementById('his-password')?.value;
-      const ok=a==='night403'&&p===['QingLing','1700'].join('-');
+      const ok=a==='night403'&&p==='QL1700';
       document.getElementById('his-login-status').textContent=ok?'登入成功｜可讀取夜班交班':'帳號或密碼錯誤';
       document.getElementById('his-handoff-content')?.classList.toggle('unlocked',ok);
       if(ok)this.gameState.setFlag('HIS_AUTHENTICATED',true);
@@ -81,6 +87,14 @@ export class UIManager {
       });
     }
 
+    document.getElementById('btn-close-archive')?.addEventListener('click',()=>this.closeArchiveDocument());
+    document.getElementById('btn-archive-prev')?.addEventListener('click',()=>{
+      if(this.archivePageIndex>0){this.archivePageIndex--;this.renderArchivePage();soundManager.playClick();}
+    });
+    document.getElementById('btn-archive-next')?.addEventListener('click',()=>{
+      if(this.archivePageIndex<this.archivePages.length-1){this.archivePageIndex++;this.renderArchivePage();soundManager.playPaperSign();}
+    });
+
     // Debug toggle with Backquote (~)
     document.addEventListener('keydown', (e) => {
       if (e.code === 'Backquote' && (import.meta.env.DEV || new URLSearchParams(location.search).get('debug') === '1')) {
@@ -93,6 +107,9 @@ export class UIManager {
         }
         if (this.dutyLogModal.classList.contains('active')) {
           this.closeDutyLog();
+        }
+        if (this.archiveModal?.classList.contains('active')) {
+          this.closeArchiveDocument();
         }
       }
     });
@@ -150,6 +167,29 @@ export class UIManager {
   closeDutyLog() {
     this.dutyLogModal.classList.remove('active');
     if (this.onTerminalClose) this.onTerminalClose();
+  }
+
+  openArchiveDocument(documentData) {
+    document.exitPointerLock();
+    this.archivePages = documentData.pages || [''];
+    this.archivePageIndex = 0;
+    this.archiveTitleEl.textContent = documentData.title || '院內文件';
+    this.archiveModal.classList.add('active');
+    this.renderArchivePage();
+    soundManager.playPaperSign();
+  }
+
+  renderArchivePage() {
+    if(!this.archivePageEl)return;
+    this.archivePageEl.textContent = this.archivePages[this.archivePageIndex] || '';
+    this.archiveIndicatorEl.textContent = `${this.archivePageIndex+1} / ${Math.max(1,this.archivePages.length)}`;
+    document.getElementById('btn-archive-prev').disabled=this.archivePageIndex===0;
+    document.getElementById('btn-archive-next').disabled=this.archivePageIndex>=this.archivePages.length-1;
+  }
+
+  closeArchiveDocument() {
+    this.archiveModal?.classList.remove('active');
+    if(this.onTerminalClose)this.onTerminalClose();
   }
 
   openTravelSelector(destinations, currentZone, onSelect, kind = 'elevator') {
