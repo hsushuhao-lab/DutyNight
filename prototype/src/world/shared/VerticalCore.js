@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { solid } from '../../art/ArtDetails.js';
 import { SignAnchor } from './SignAnchor.js';
 import { PlanWalls } from './PlanArchitecture.js';
+import { gameState } from '../../core/GameState.js';
 
 // Per-campus local layout is identical on every floor; offsets attach it to existing lobbies.
 export const CORE_ORIGINS={
@@ -33,6 +34,14 @@ export function buildVerticalCore(zone,zoneId){
  for(const sx of [-.64,.64])solid(stair,m.metal,[sx,1.2,0],[.10,2.4,.16]);solid(stair,m.metal,[0,2.42,0],[1.38,.12,.16]);
  const leaf=solid(stair,m.metal,[0,1.18,.02],[1.16,2.36,.1]);solid(stair,m.stainless,[0,1,.1],[.9,.06,.08]);
  leaf.userData={interactable:true,id:`${zoneId}_stairs`,type:'travel_selector',kind:'stairs',label:'安全梯：選擇樓層'};zone.interactables.push(leaf);
+ if(zoneId==='first_campus_3f'&&!gameState.getFlag('STAIR_SHORTCUT_3F_4F')){
+   const latch=solid(stair,m.stainless,[0,1.43,.13],[1.0,.08,.08]);
+   latch.name='StairLatch_3F_Locked';
+   const chain=solid(stair,m.metal,[0,1.68,.14],[.78,.035,.035]);chain.rotation.z=.28;chain.name='StairChain_3F';
+ }
+ if(zoneId==='first_campus_4f'&&!gameState.getFlag('STAIR_SHORTCUT_3F_4F')){
+   const bolt=solid(stair,m.stainless,[.37,1.44,.14],[.28,.09,.09]);bolt.name='StairBolt_4F_UnlockSide';
+ }
  SignAnchor.buildWallPlaque({scene:stair,x:0,y:2.7,z:.1,width:1.1,height:.3,code:'',title:'安全梯',subtitle:'',header:''});
  root.updateWorldMatrix(true,true);for(const c of local.colliders)zone.colliders.push(c.applyMatrix4(root.matrixWorld));
  zone.walkables.push(...local.walkables);zone.colliders.push(new THREE.Box3().setFromObject(leaf));
