@@ -458,15 +458,43 @@ export class UIManager {
     const currentZone=window.worldRouter?.activeZoneId || '';
     const readyFor4F = this.gameState.areRequiredTasksComplete();
 
-    if (!done('WARD_ENTRY')) {
-      if(done('E_HANDOFF') && !done('ARCHIVE_CLUE_FOUND')){
+    if(done('E_HANDOFF') && !archiveObjective){
+      this.renderTaskBoard('異常訊息｜3F',[
+        {id:'task-anomaly',text:'閱讀交班後出現的異常訊息',state:'ready'},
+        {id:'task-elevator',text:'4F 已可前往',state:readyFor4F?'ready':'locked'}
+      ]);
+      return;
+    }
+
+    if(archiveObjective && !done('ARCHIVE_CLUE_FOUND')){
+      if(!archiveLockedSeen){
         this.renderTaskBoard('異常訊息｜3F 文史館',[
-          {id:'task-anomaly',text:archiveObjective?'前往文史館，尋找「未編目交班紀錄」':'閱讀交班後出現的異常訊息',state:archiveObjective?'ready':'pending'},
-          {id:'task-archive-clue',text:'找到未編目的交班紀錄',state:'locked'},
-          {id:'task-elevator',text:'搭乘電梯前往 4F（先完成文史館調查）',state:'locked'}
+          {id:'task-archive-door',text:'前往 3F 文史館確認異常訊息',state:'ready'},
+          {id:'task-elevator',text:'4F 病房已可前往',state:readyFor4F?'ready':'locked'}
         ]);
-        return;
+      }else if(!archiveKey){
+        this.renderTaskBoard('文史館門鎖｜尋找專用鑰匙',[
+          {id:'task-archive-key',text:'前往第一院區 4F 值班室尋找文史館備用鑰匙',state:'ready'},
+          {id:'task-return-museum',text:'取得後返回 3F 文史館',state:'locked'}
+        ]);
+      }else{
+        this.renderTaskBoard('文史館調查',[
+          {id:'task-return-museum',text:currentZone==='first_campus_3f'?'使用專用鑰匙進入文史館':'返回 3F 文史館',state:'ready'},
+          {id:'task-archive-clue',text:'找到未編目的交班紀錄',state:currentZone==='first_campus_3f'?'ready':'locked'}
+        ]);
       }
+      return;
+    }
+
+    if(done('ARCHIVE_CLUE_FOUND') && currentZone==='first_campus_3f' && done('WARD_ENTRY')){
+      this.renderTaskBoard('文史館調查完成',[
+        {id:'task-archive-complete',text:'已找到未編目交班紀錄',state:'completed'},
+        {id:'task-return-4f',text:'返回 4F 病房繼續值班',state:'ready'}
+      ]);
+      return;
+    }
+
+    if (!done('WARD_ENTRY')) {
       this.renderTaskBoard('今日夜班手續（17:00 交接）',[
         {id:'task-find-key',text:'想辦法進入 316 總醫師辦公室',state:opened316?'completed':hasSpare?'ready':'pending'},
         {id:'task-spare',text:'尋找 316 的備援鑰匙盒',state:hasSpare?'completed':opened316?'completed':'ready'},
