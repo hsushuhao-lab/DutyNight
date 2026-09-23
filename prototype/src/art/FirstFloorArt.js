@@ -56,7 +56,7 @@ export function applyFirstFloorArt(level) {
   asset('workDesk',10,0,5.5,[2.6/1.4,.82/.76,1.2/.72],Math.PI/2);
   asset('printer',10,.82,6.45,[1,1,1],-Math.PI/2);
   for(const z of [4.9,6.1])asset('officeChair',8.6,0,z,[1,1,1],-Math.PI/2);
-  for(const x of [5.0,9.35,13.15])asset('bench',x,0,1.94,[1.25,1,1],Math.PI);
+  for(const x of [5.0,9.35])asset('bench',x,0,1.94,[1.25,1,1],Math.PI);
   for(const [x,z,s] of [[-5.3,-1.55,.72],[13.6,-1.95,.72],[15.0,-1.72,.62]])asset('plant',x,0,z,[s,s,s]);
 
   // Keep both elevator-lobby openings physically and visually clear.
@@ -145,7 +145,7 @@ export function applyFirstFloorArt(level) {
     for(let line=0;line<7;line++) box(x,2.17-line*.055,8.229,.29-(line%3)*.04,.006,.002,m.wallDark);
   }
   // Public administrative notices are distinct from the duty instructions inside 316.
-  [[5.1,'行政公告','ADMINISTRATION'],[12.7,'門診資訊','OUTPATIENT SERVICES']].forEach(([x,title,subtitle]) => {
+  [[5.1,'行政公告','ADMINISTRATION']].forEach(([x,title,subtitle]) => {
     box(x,1.92,2.255,2.2,1.05,.045,m.floorWood);
     const canvas=document.createElement('canvas');
     canvas.width=1024; canvas.height=512;
@@ -167,23 +167,7 @@ export function applyFirstFloorArt(level) {
     const face=new THREE.Mesh(new THREE.PlaneGeometry(2.12,.99),new THREE.MeshStandardMaterial({map:texture,roughness:.92}));
     face.position.set(x,1.92,2.228); face.rotation.y=Math.PI; root.add(face);
   });
-  // Fictional physician roster: no real hospital, staff names or portraits are published.
-  box(12.7,2.0,2.205,3.25,1.35,.055,m.floorWood);
-  {
-    const canvas=document.createElement('canvas');canvas.width=1200;canvas.height=520;
-    const ctx=canvas.getContext('2d');ctx.fillStyle='#e9ece7';ctx.fillRect(0,0,1200,520);
-    ctx.fillStyle='#344d40';ctx.fillRect(0,0,1200,78);ctx.fillStyle='#fff';ctx.font='bold 34px sans-serif';ctx.fillText('青嶺醫療中心｜夜間醫師值勤名冊',28,51);
-    const staff=[['林醫師','總醫師'],['周醫師','住院醫師'],['陳醫師','住院醫師'],['許醫師','主治醫師'],['江醫師','主治醫師'],['方醫師','值班支援']];
-    staff.forEach(([name,role],i)=>{const col=i%3,row=Math.floor(i/3),x=38+col*385,y=112+row*190;
-      ctx.fillStyle='#c9d1ca';ctx.beginPath();ctx.arc(x+58,y+56,42,0,Math.PI*2);ctx.fill();
-      ctx.fillStyle='#6f7c74';ctx.beginPath();ctx.arc(x+58,y+47,17,0,Math.PI*2);ctx.fill();ctx.fillRect(x+35,y+67,46,25);
-      ctx.fillStyle='#26372f';ctx.font='bold 27px sans-serif';ctx.fillText(name,x+118,y+48);ctx.font='21px sans-serif';ctx.fillStyle='#657168';ctx.fillText(role,x+118,y+83);
-      ctx.strokeStyle='#b7beb8';ctx.strokeRect(x,y,340,135);
-    });
-    const tex=new THREE.CanvasTexture(canvas);tex.colorSpace=THREE.SRGBColorSpace;
-    const face=new THREE.Mesh(new THREE.PlaneGeometry(3.15,1.25),new THREE.MeshStandardMaterial({map:tex,roughness:.9}));face.position.set(12.7,2.0,2.17);face.rotation.y=Math.PI;root.add(face);
-  }
-
+  // Physician roster moved inside the 3F administrative office so it cannot cover the storage-room doorway.
   // Desk lamp has a connected articulated stem, not a floating shade.
   box(5.1,.98,6.5,.022,.27,.022,m.metal);
   box(5.1,1.11,6.5,.18,.018,.022,m.metal);
