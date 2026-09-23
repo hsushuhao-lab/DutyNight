@@ -142,6 +142,16 @@ export class WardFloorplan {
     solid(this.zoneGroup,this.gf.materials.metal,[-12.35,1.22,2.185],[.86,.035,.04]);
     solid(this.zoneGroup,this.gf.materials.metal,[-12.79,1.65,2.185],[.035,.86,.04]);
     solid(this.zoneGroup,this.gf.materials.metal,[-11.91,1.65,2.185],[.035,.86,.04]);
+    solid(this.zoneGroup,this.gf.materials.bedSheet,[-11.93,1.24,2.18],[.18,.28,.12]);
+    solid(this.zoneGroup,this.gf.materials.metal,[-13.86,.95,3.28],[.06,.08,.42]);
+    const paper=new THREE.Mesh(new THREE.CylinderGeometry(.09,.09,.28,20),this.gf.materials.bedSheet);
+    paper.rotation.x=Math.PI/2;paper.position.set(-13.80,.95,3.28);this.zoneGroup.add(paper);
+    const bin=new THREE.Mesh(new THREE.CylinderGeometry(.15,.18,.42,20),this.gf.materials.stainless);
+    bin.position.set(-13.20,.21,2.78);this.zoneGroup.add(bin);
+    solid(this.zoneGroup,this.gf.materials.metal,[-13.25,.88,4.38],[.12,.06,.03]);
+    solid(this.zoneGroup,this.gf.materials.wallDark,[-13.20,2.63,2.16],[.52,.28,.035]);
+    for(let i=0;i<5;i++)solid(this.zoneGroup,this.gf.materials.stainless,[-13.38+i*.09,2.63,2.135],[.015,.20,.01],.001);
+    solid(this.zoneGroup,this.gf.materials.wallBumper,[-12.55,.018,3.55],[.90,.025,.58]);
     this.gf.buildCeilingLight(this.zoneGroup,-12.75,3.15,3.6,.48,5,0xfff2dc);
 
     this.dutyBathroom={
