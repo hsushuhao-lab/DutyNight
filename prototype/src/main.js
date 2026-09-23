@@ -299,6 +299,19 @@ controller.onInteract = (interactable) => {
     }
     controller.currentInteractable = null;
     uiManager.showPrompt(null);
+  } else if (interactable.type === 'hidden_service_door_1f') {
+    if(!gameState.getFlag('FIRST_FLOOR_GUARD_KEY')){
+      uiManager.showSubtitle('李醫師','「牆面接縫不像一般裝修……但現在沒有能試的鑰匙。」',3000);
+      return;
+    }
+    if(!gameState.getFlag('HIDDEN_SERVICE_DOOR_DISCOVERED')){
+      gameState.setFlag('HIDDEN_SERVICE_DOOR_DISCOVERED',true);
+      gameState.addEvidence(1);
+      soundManager.playDoorLockClack();
+      uiManager.showSubtitle('李醫師','「1F 警衛台那把舊鑰匙真的能插進去……但門後像被東西頂住。這裡原本真的有一扇門。」',4600);
+    }else{
+      uiManager.showSubtitle('李醫師','「門還在，只是被後來的牆面遮住了。」',2600);
+    }
   } else if (interactable.type === 'exit_door' || interactable.type === 'closed_door') {
     soundManager.playClick();
     if (interactable.id === '1F_MAIN_DOOR') {
