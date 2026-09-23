@@ -1,4 +1,4 @@
-// main.js - Songde Night Duty Act 1 First Agent Task (1~6)
+// main.js - Night Corridor Act 1
 import * as THREE from 'three';
 import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUniformsLib.js';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
@@ -189,6 +189,11 @@ controller.onInteract = (interactable) => {
       uiManager.showSubtitle('李醫師', interactable.subtitle || '「夜間門禁管制時間，此區域暫不開放。」', 3000);
     }
   } else if (interactable.type === 'elevator' || interactable.type === 'travel_selector') {
+    if(!gameState.getFlag('STAFF_ACCESS_CARD')){
+      soundManager.playClick();
+      uiManager.showSubtitle('門禁','「電梯與安全梯尚未授權。先到總醫師辦公室領取感應卡。」',2800);
+      return;
+    }
     controller.enabled = false;
     uiManager.openTravelSelector(worldRouter.floorDestinations(interactable.kind), worldRouter.activeZoneId, destination => {
       if (destination.zoneId === 'first_campus_4f') gameState.markTaskComplete('WARD_ENTRY');
