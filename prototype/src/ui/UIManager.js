@@ -17,6 +17,7 @@ export class UIManager {
     this.archiveModal = document.getElementById('archive-modal');
     this.lockerModal = document.getElementById('locker-modal');
     this.anomalyModal = document.getElementById('anomaly-modal');
+    this.office302Modal = document.getElementById('office302-modal');
     this.archiveTitleEl = document.getElementById('archive-document-title');
     this.archivePageEl = document.getElementById('archive-document-page');
     this.archiveIndicatorEl = document.getElementById('archive-page-indicator');
@@ -121,6 +122,18 @@ export class UIManager {
       this.onTerminalClose?.();
     });
 
+    document.getElementById('btn-close-302')?.addEventListener('click',()=>this.close302Keypad());
+    document.getElementById('btn-unlock-302')?.addEventListener('click',()=>{
+      const code=document.getElementById('office302-code')?.value.trim();
+      const status=document.getElementById('office302-status');
+      if(code!=='3082'){status.textContent='ACCESS DENIED';soundManager.playClick();return;}
+      status.textContent='ACCESS GRANTED';
+      this.gameState.setFlag('OFFICE_302_UNLOCKED',true);
+      window.worldRouter?.activeZoneInstance?.unlock302?.();
+      soundManager.playComputerBeep();
+      setTimeout(()=>this.close302Keypad(),350);
+    });
+
     // Debug toggle with Backquote (~)
     document.addEventListener('keydown', (e) => {
       if (e.code === 'Backquote' && (import.meta.env.DEV || new URLSearchParams(location.search).get('debug') === '1')) {
@@ -136,6 +149,7 @@ export class UIManager {
         }
         if (this.archiveModal?.classList.contains('active')) this.closeArchiveDocument();
         if (this.lockerModal?.classList.contains('active')) this.closeLocker();
+        if (this.office302Modal?.classList.contains('active')) this.close302Keypad();
         if (this.anomalyModal?.classList.contains('active')) {
           this.anomalyModal.classList.remove('active');
           this.onTerminalClose?.();
@@ -170,8 +184,8 @@ export class UIManager {
     setTimeout(() => {
       this.showSubtitle(
         '學長 (資深住院醫師)',
-        '「我先走了。316 已經鎖了，先去警衛查哨點看看；想辦法進去把今晚的交班做完。」',
-        7200
+        '「我先走了，先把 316 鎖了，自己想辦法進去把今晚的交班做完吧，值班交給你了。」\n「有問題就去警衛查哨點看看。」',
+        7800
       );
     }, 1200);
   }
@@ -179,6 +193,11 @@ export class UIManager {
   openWorkstation() {
     document.exitPointerLock();
     soundManager.playComputerBeep();
+    if(this.gameState.getFlag('HIS_CREDENTIALS')){
+      const a=document.getElementById('his-account'),p=document.getElementById('his-password');
+      if(a&&!a.value)a.value='night403';
+      if(p&&!p.value)p.value='QL1700';
+    }
     this.workstationModal.classList.add('active');
   }
 
@@ -215,8 +234,22 @@ export class UIManager {
   showAnomalyMessage() {
     document.exitPointerLock();
     this.gameState.setFlag('ARCHIVE_OBJECTIVE',true);
+    this.gameState.setFlag('HIS_ANOMALY_SEEN',true);
+    this.gameState.setFlag('PHONE_RING_ACTIVE',true);
+    this.gameState.setFlag('ANNE_STAGE',1);
     this.anomalyModal?.classList.add('active');
     soundManager.playComputerBeep();
+    setTimeout(()=>soundManager.playPhoneRingPattern(),1100);
+  }
+
+  open302Keypad() {
+    document.exitPointerLock();
+    this.office302Modal?.classList.add('active');
+  }
+
+  close302Keypad() {
+    this.office302Modal?.classList.remove('active');
+    this.onTerminalClose?.();
   }
 
   openArchiveDocument(documentData) {
@@ -455,7 +488,6 @@ export class UIManager {
     const archiveObjective=this.gameState.getFlag('ARCHIVE_OBJECTIVE');
     const archiveLockedSeen=this.gameState.getFlag('ARCHIVE_LOCKED_SEEN');
     const archiveKey=this.gameState.getFlag('ARCHIVE_ACCESS_KEY');
-    const archiveKeyClue=this.gameState.getFlag('ARCHIVE_KEY_CLUE_4F');
     const currentZone=window.worldRouter?.activeZoneId || '';
     const readyFor4F = this.gameState.areRequiredTasksComplete();
 
@@ -469,19 +501,17 @@ export class UIManager {
 
     if(archiveObjective && !done('ARCHIVE_CLUE_FOUND')){
       if(!archiveLockedSeen){
-        this.renderTaskBoard('異常訊息｜3F 文史館',[
-          {id:'task-archive-door',text:'前往 3F 文史館確認異常訊息',state:'ready'},
-          {id:'task-elevator',text:'4F 病房已可前往',state:readyFor4F?'ready':'locked'}
+        this.renderTaskBoard('異常訊息｜3F',[
+          {id:'task-archive-door',text:'找出「沒有編號的門」',state:'ready'}
         ]);
       }else if(!archiveKey){
-        this.renderTaskBoard('文史館門鎖｜尋找專用鑰匙',[
-          {id:'task-archive-key',text:currentZone==='first_campus_4f'?(archiveKeyClue?'依備援物品清單檢查床邊櫃':'在 4F 值班室尋找舊院區備援物品清單'):'前往第一院區 4F 值班室尋找線索',state:'ready'},
-          {id:'task-return-museum',text:'取得文史館鑰匙後返回 3F',state:'locked'}
+        this.renderTaskBoard('無門牌房間｜上鎖',[
+          {id:'task-archive-key',text:'想辦法找到能打開這扇門的鑰匙',state:'ready'}
         ]);
       }else{
-        this.renderTaskBoard('文史館調查',[
-          {id:'task-return-museum',text:currentZone==='first_campus_3f'?'使用專用鑰匙進入文史館':'返回 3F 文史館',state:'ready'},
-          {id:'task-archive-clue',text:'找到未編目的交班紀錄',state:currentZone==='first_campus_3f'?'ready':'locked'}
+        this.renderTaskBoard('無門牌房間',[
+          {id:'task-return-museum',text:'回到沒有編號的門',state:'ready'},
+          {id:'task-archive-clue',text:'找出未編目的交班紀錄',state:currentZone==='first_campus_3f'?'ready':'locked'}
         ]);
       }
       return;
