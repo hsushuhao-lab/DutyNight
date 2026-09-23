@@ -132,6 +132,16 @@ export class WardFloorplan {
     solid(this.zoneGroup,this.gf.materials.glass,[-12.35,1.65,2.20],[.78,.82,.025]);
     solid(this.zoneGroup,this.gf.materials.metal,[-13.35,1.20,2.35],[.48,.05,.05]);
     solid(this.zoneGroup,this.gf.materials.metal,[-12.8,.015,4.65],[.22,.03,.22]);
+
+    // Refined tile wainscot and framed mirror; geometry stays inside the existing bathroom bounds.
+    solid(this.zoneGroup,this.gf.materials.bedSheet,[-13.88,1.02,3.62],[.025,1.98,2.90]);
+    solid(this.zoneGroup,this.gf.materials.bedSheet,[-12.75,1.02,2.12],[2.20,1.98,.025]);
+    solid(this.zoneGroup,this.gf.materials.bedSheet,[-12.75,1.02,5.08],[2.20,1.98,.025]);
+    for(const yy of [.52,1.02,1.52])solid(this.zoneGroup,this.gf.materials.wallBumper,[-13.865,yy,3.62],[.012,.018,2.86],.001);
+    solid(this.zoneGroup,this.gf.materials.metal,[-12.35,2.08,2.185],[.86,.035,.04]);
+    solid(this.zoneGroup,this.gf.materials.metal,[-12.35,1.22,2.185],[.86,.035,.04]);
+    solid(this.zoneGroup,this.gf.materials.metal,[-12.79,1.65,2.185],[.035,.86,.04]);
+    solid(this.zoneGroup,this.gf.materials.metal,[-11.91,1.65,2.185],[.035,.86,.04]);
     this.gf.buildCeilingLight(this.zoneGroup,-12.75,3.15,3.6,.48,5,0xfff2dc);
 
     this.dutyBathroom={
