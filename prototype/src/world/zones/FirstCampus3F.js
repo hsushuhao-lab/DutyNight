@@ -155,7 +155,7 @@ export class FirstCampus3F {
         pages:[
           '封面沒有日期，也沒有歸檔編號。第一頁只有一句話：\n\n「如果你是從 316 的系統訊息找到這裡，代表它又開始了。」',
           '第二頁列出幾個重複時間：02:17、03:16、04:09。旁邊有人用紅筆寫：\n\n「不要把它當成樓層或房號。」',
-          '最後一頁只剩一行：\n\n「今晚先完成值班。真正要找的東西，不在病歷裡。」\n\n頁角蓋著模糊的舊院章。'
+          '最後一頁只剩一行：\n\n「今晚先完成值班。真正要找的東西，不在病歷裡。」\n\n頁角蓋著模糊的舊院章。\n\n旁邊夾著一張殘缺索引：403／舊約束隔離室；1F／舊警衛台後配電；2F／舊式手圈索引。'
         ]
       }
     ];
@@ -224,7 +224,48 @@ export class FirstCampus3F {
     if(gameState.getFlag('GUARD_FUTURE_ENTRY'))this.setPatrolFutureEntry();
     this.updateElevatorLight(gameState.areRequiredTasksComplete());
 
+    // Phase-driven environmental layers are authored once and toggled by applyGamePhase().
+    this.phaseRedLight=new THREE.PointLight(0x7a1616,0,14,2);
+    this.phaseRedLight.position.set(6,2.55,0);this.zoneGroup.add(this.phaseRedLight);
+    this.phaseWetMarks=new THREE.Group();this.phaseWetMarks.name='Phase3_2117_WetFootprints';this.phaseWetMarks.visible=false;this.zoneGroup.add(this.phaseWetMarks);
+    const wetMat=new THREE.MeshStandardMaterial({color:0x272b2a,transparent:true,opacity:.28,roughness:.25});
+    [[18.6,1.2],[17.8,.8],[17.0,.45],[16.2,.10]].forEach(([x,z],i)=>{
+      for(const dz of [-.10,.10]){
+        const mark=new THREE.Mesh(new THREE.PlaneGeometry(.16,.32),wetMat);
+        mark.rotation.x=-Math.PI/2;mark.rotation.z=(i%2?.14:-.12);mark.position.set(x,.012,z+dz);this.phaseWetMarks.add(mark);
+      }
+    });
+    this.applyGamePhase(gameState.getGamePhase?.()||'Phase0_1700_FirstArrival');
+
     return this;
+  }
+
+  applyGamePhase(phase,state=gameState) {
+    this.currentGamePhase=phase;
+    if(this.phaseRedLight)this.phaseRedLight.intensity=0;
+    if(this.phaseWetMarks)this.phaseWetMarks.visible=false;
+
+    if(phase==='Phase0_1700_FirstArrival'){
+      return;
+    }
+
+    if(phase==='Phase1_1715_AfterArchive'){
+      if(Number(state.getFlag('ANNE_STAGE')||0)<2)state.setFlag('ANNE_STAGE',2);
+      return;
+    }
+
+    if(phase==='Phase2_2040_ElevatorGlitch'){
+      this.phaseRedLight.intensity=2.6;
+      state.setFlag('ANNE_STAGE',3);
+      this.levelInstance?.setAnneStage?.(3);
+      return;
+    }
+
+    if(phase==='Phase3_2117_NightPatrol'){
+      this.phaseRedLight.intensity=.55;
+      if(this.phaseWetMarks)this.phaseWetMarks.visible=true;
+      this.setPatrolFutureEntry();
+    }
   }
 
   open316Door() {
