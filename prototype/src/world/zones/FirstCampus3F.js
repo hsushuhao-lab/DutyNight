@@ -105,8 +105,8 @@ export class FirstCampus3F {
     officeSign.position.set(-15.885,2.45,6.05);officeSign.rotation.y=Math.PI/2;this.zoneGroup.add(officeSign);
     this.coreOffice3F={
       id:'3F_CORE_OFFICE',label:'3F 行政辦公室',
-      bounds:[-22,3.5,-16,11.5],door:[-16,1.7,7.5],
-      relativeTo4FDutyRoom:true,coreOrigin:[-8,7.5]
+      bounds:[-22,3.5,-16,11.5],door:[-16,1.7,7.5],doorId:'3F_ADMIN_OFFICE_DOOR',
+      taskId:'3F_ADMIN_ROSTER_TASK',relativeTo4FDutyRoom:true,coreOrigin:[-8,7.5]
     };
     this.gf.buildFloor(this.zoneGroup,this.walkables,20,0,0,8,3.6,m.floor);
     this.gf.buildCeiling(this.zoneGroup,20,3.2,0,8,3.6);
