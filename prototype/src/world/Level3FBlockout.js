@@ -236,6 +236,22 @@ export class Level3FBlockout {
     board.position.set(6.5, 2.0, 8.28);
     this.scene.add(board);
 
+    // Side bookshelf for optional game hints; positioned clear of the duty-rule board.
+    const shelfMat=new THREE.MeshStandardMaterial({color:0x4c3526,roughness:.72});
+    const hintShelf=new THREE.Group();hintShelf.position.set(9.65,0,8.08);this.scene.add(hintShelf);
+    for(const x of [-.72,.72]){const side=new THREE.Mesh(new THREE.BoxGeometry(.10,1.95,.40),shelfMat);side.position.set(x,.98,0);hintShelf.add(side);}
+    for(const y of [.08,.52,.96,1.40,1.84]){const sh=new THREE.Mesh(new THREE.BoxGeometry(1.54,.08,.42),shelfMat);sh.position.set(0,y,0);hintShelf.add(sh);}
+    const hintDefs=[
+      ['316_HINT_1F_SECURITY',-.43,.72,'一樓警衛查哨紀錄影本',['夜間巡邏紀錄提到：一樓舊警衛台後方仍保留早期鑰匙標籤櫃。\n\n其中幾個標籤已褪色，但仍有人在深夜更動位置。']],
+      ['316_HINT_1F_SERVICE',0,.72,'一樓設備維護單',['一樓公共大廳後方有一段舊服務走道，平時不對外開放。\n\n維修單備註：02:00 後偶爾會出現無來源的照明啟動紀錄。']],
+      ['316_HINT_OLD_ROUTE',.43,.72,'舊院區動線修訂頁',['舊版動線圖上，一樓靠近警衛台的位置曾畫有一扇服務門。\n\n新版圖面把它改成實牆，但原始門框是否拆除沒有註記。']]
+    ];
+    for(const [id,x,y,title,pages] of hintDefs){
+      const file=new THREE.Mesh(new THREE.BoxGeometry(.22,.34,.24),this.materials.wood);file.position.set(x,y,.25);
+      file.userData={interactable:true,id,type:'archive_document',label:`翻閱：${title}`,documentTitle:title,pages};hintShelf.add(file);this.interactables.push(file);
+    }
+    this.addCollider(new THREE.Box3(new THREE.Vector3(8.88,0,7.82),new THREE.Vector3(10.42,1.95,8.32)));
+
     // Desk warm lamp
     const lampBase = new THREE.Mesh(
       new THREE.CylinderGeometry(0.12, 0.14, 0.04, 16),
@@ -338,16 +354,27 @@ export class Level3FBlockout {
     this.interactables.push(logHitbox);
     this.dutyLogMesh = logHitbox;
 
+    // HIS credentials are hidden in the mobile pedestal under the main desk.
+    const credentialDrawer=new THREE.Mesh(new THREE.BoxGeometry(.72,.62,.66),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
+    credentialDrawer.position.set(6.75,.39,6.2);
+    credentialDrawer.userData={
+      interactable:true,id:'316_CREDENTIAL_DRAWER',type:'credential_drawer_316',
+      label:'打開書桌下方活動櫃',
+      documentTitle:'夜班 HIS 登入卡',
+      pages:['抽屜最底層壓著一張院內登入卡。\n\n帳號：night403\n密碼：QL1700\n\n資料保密・禁止外洩。']
+    };
+    this.scene.add(credentialDrawer);this.interactables.push(credentialDrawer);this.credentialDrawerMesh=credentialDrawer;
+
     // Four-digit locked cabinet holding the real duty items.
     const lockerBody=new THREE.Mesh(new THREE.BoxGeometry(1.15,1.65,.48),new THREE.MeshStandardMaterial({color:0x59625d,roughness:.72,metalness:.15}));
-    lockerBody.position.set(3.55,.83,8.0);lockerBody.castShadow=true;this.scene.add(lockerBody);
-    this.addCollider(new THREE.Box3(new THREE.Vector3(2.95,0,7.72),new THREE.Vector3(4.15,1.70,8.28)));
-    const keypad=new THREE.Mesh(new THREE.BoxGeometry(.22,.30,.07),new THREE.MeshStandardMaterial({color:0x242826,roughness:.45}));
-    keypad.position.set(4.14,1.05,7.98);
+    lockerBody.position.set(1.75,.83,7.55);lockerBody.castShadow=true;this.scene.add(lockerBody);
+    this.addCollider(new THREE.Box3(new THREE.Vector3(1.16,0,7.27),new THREE.Vector3(2.34,1.70,7.83)));
+    const keypad=new THREE.Mesh(new THREE.BoxGeometry(.07,.30,.22),new THREE.MeshStandardMaterial({color:0x242826,roughness:.45}));
+    keypad.position.set(2.36,1.05,7.55);
     keypad.userData={interactable:true,id:'316_LOCKER',type:'locker_316',label:'輸入四位數密碼打開值班櫃'};
     this.scene.add(keypad);this.interactables.push(keypad);this.lockerMesh=keypad;
     const keypadLed=new THREE.Mesh(new THREE.CircleGeometry(.025,14),new THREE.MeshBasicMaterial({color:0xaa3a32}));
-    keypadLed.rotation.y=Math.PI/2;keypadLed.position.set(4.18,1.12,7.98);this.scene.add(keypadLed);this.lockerLed=keypadLed;
+    keypadLed.rotation.y=Math.PI/2;keypadLed.position.set(2.405,1.12,7.55);this.scene.add(keypadLed);this.lockerLed=keypadLed;
   }
 
   buildWorkstations() {
@@ -551,18 +578,6 @@ export class Level3FBlockout {
     plaque.position.set(1.25, 1.85, 2.274);
     plaque.rotation.y = Math.PI;
     this.scene.add(plaque);
-
-    // Discreet wall-mounted emergency key box outside 316.
-    const keyBoxMat=new THREE.MeshStandardMaterial({color:0x66726c,roughness:.72,metalness:.18});
-    const keyBox=new THREE.Mesh(new THREE.BoxGeometry(.34,.46,.12),keyBoxMat);
-    keyBox.position.set(1.30,1.25,2.27);keyBox.castShadow=true;this.scene.add(keyBox);
-    const keyWindow=new THREE.Mesh(new THREE.PlaneGeometry(.22,.24),new THREE.MeshStandardMaterial({color:0xcfd8d3,transparent:true,opacity:.38,roughness:.18}));
-    keyWindow.position.set(1.30,1.28,2.205);keyWindow.rotation.y=Math.PI;this.scene.add(keyWindow);
-    const keyHint=new THREE.Mesh(new THREE.TorusGeometry(.045,.009,10,20),this.materials.brass);
-    keyHint.position.set(1.30,1.27,2.19);keyHint.rotation.x=Math.PI/2;this.scene.add(keyHint);
-    const spareHit=new THREE.Mesh(new THREE.BoxGeometry(.48,.58,.22),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
-    spareHit.position.set(1.30,1.25,2.22);spareHit.userData={interactable:true,id:'316_SPARE_KEY',type:'spare_key_316',label:'檢查 316 備援鑰匙盒',targetGroup:keyHint};
-    this.scene.add(spareHit);this.interactables.push(spareHit);this.spareKeyMesh=spareHit;
 
     // Corridor seating and waiting nook.
     const seatMat = new THREE.MeshStandardMaterial({ color: 0x566e65, roughness: 0.78 });
