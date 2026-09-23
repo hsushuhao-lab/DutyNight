@@ -57,26 +57,26 @@ export function applyFirstFloorArt(level) {
   asset('printer',10,.82,6.45,[1,1,1],-Math.PI/2);
   for(const z of [4.9,6.1])asset('officeChair',8.6,0,z,[1,1,1],-Math.PI/2);
   for(const x of [5.0,9.35,13.15])asset('bench',x,0,1.94,[1.25,1,1],Math.PI);
-  for(const [x,z,s] of [[-5.3,-1.55,1.05],[13.6,-1.95,1]])asset('plant',x,0,z,[s,s,s]);
-  asset('fern_b',-6.7,0,1.35,[1.7,1.7,1.7]);
-  monstera(15.0,-1.72,.72);
+  for(const [x,z,s] of [[-5.3,-1.55,.82],[13.6,-1.95,.82]])asset('plant',x,0,z,[s,s,s]);
+  monstera(15.0,-1.72,.52);
 
-  // 3F elevator-annex furnishings: a quieter side area to explore before going upstairs.
-  asset('bench',-10.15,0,-7.55,[1.18,1,1],0);
-  asset('bench',-5.85,0,-7.55,[1.18,1,1],0);
-  asset('fern_a',-10.9,0,-4.45,[1.8,1.8,1.8]);
-  monstera(-5.05,-4.75,.88);
-  monstera(-10.95,-6.15,.68);
-  box(-8,1.65,-8.27,4.6,1.25,.055,m.floorWood);
+  // Furnish the actual elevator-front lobby, keeping the lift/stair approach fully clear.
+  asset('bench',-11.1,0,-2.55,[1.02,1,1],Math.PI/2);
+  asset('bench',-11.1,0,2.15,[1.02,1,1],Math.PI/2);
+  asset('bench',-5.0,0,-2.55,[1.02,1,1],-Math.PI/2);
+  asset('plant',-10.7,0,2.85,[.72,.72,.72]);
+  asset('plant',-5.35,0,2.85,[.62,.62,.62]);
+  monstera(-10.65,-2.95,.44);
+  monstera(-5.35,-2.95,.42);
+  box(-8,1.72,-3.27,4.5,1.12,.045,m.floorWood);
   {
     const canvas=document.createElement('canvas');canvas.width=1100;canvas.height=420;const ctx=canvas.getContext('2d');
     ctx.fillStyle='#e8e5dc';ctx.fillRect(0,0,1100,420);ctx.fillStyle='#42594b';ctx.fillRect(0,0,1100,72);
-    ctx.fillStyle='#fff';ctx.font='bold 34px sans-serif';ctx.fillText('三樓院內公告與舊照片',30,48);
+    ctx.fillStyle='#fff';ctx.font='bold 34px sans-serif';ctx.fillText('三樓院內公告',30,48);
     ctx.fillStyle='#3e4c44';ctx.font='23px sans-serif';
-    ['夜間通行請攜帶感應卡','舊行政區整修紀錄：部分資料移交保管室','非值勤人員請勿進入文件保管區'].forEach((t,i)=>ctx.fillText('• '+t,38,125+i*60));
-    ctx.fillStyle='#b8b2a5';for(let i=0;i<4;i++){ctx.fillRect(650+i*95,112,74,106);ctx.fillStyle='#d5d0c5';ctx.fillRect(660+i*95,122,54,72);ctx.fillStyle='#b8b2a5';}
+    ['夜間通行請攜帶感應卡','文件調閱請依保管規範辦理','值班期間保持通道暢通'].forEach((t,i)=>ctx.fillText('• '+t,38,125+i*60));
     const tex=new THREE.CanvasTexture(canvas);tex.colorSpace=THREE.SRGBColorSpace;
-    const face=new THREE.Mesh(new THREE.PlaneGeometry(4.48,1.13),new THREE.MeshStandardMaterial({map:tex,roughness:.9}));face.position.set(-8,1.65,-8.235);root.add(face);
+    const face=new THREE.Mesh(new THREE.PlaneGeometry(4.38,1.02),new THREE.MeshStandardMaterial({map:tex,roughness:.9}));face.position.set(-8,1.72,-3.235);root.add(face);
   }
   // Low filing units sit inside the existing desk footprint.
   asset('storageCabinet',6.75,0,6.2,[.8,.39,1.8],Math.PI);
