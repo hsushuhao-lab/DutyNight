@@ -280,6 +280,7 @@ export class Level3FBlockout {
     keyGroup.add(cardStripe);
 
     keyGroup.position.set(5.6, 0.83, 6.0);
+    keyGroup.visible = false;
     this.scene.add(keyGroup);
 
     // Hitbox for key pickup
@@ -289,14 +290,13 @@ export class Level3FBlockout {
     );
     keyHitbox.position.copy(keyGroup.position);
     keyHitbox.userData = {
-      interactable: true,
+      interactable: false,
       id: 'KEY_PICKUP',
-      label: '領取 4F 值班室鑰匙與感應卡',
+      label: '值班物品已移至密碼櫃',
       type: 'key',
       targetGroup: keyGroup
     };
     this.scene.add(keyHitbox);
-    this.interactables.push(keyHitbox);
     this.keyMesh = keyHitbox;
 
     // INTERACTABLE 2: Duty Log Book (值班本)
@@ -337,6 +337,17 @@ export class Level3FBlockout {
     this.scene.add(logHitbox);
     this.interactables.push(logHitbox);
     this.dutyLogMesh = logHitbox;
+
+    // Four-digit locked cabinet holding the real duty items.
+    const lockerBody=new THREE.Mesh(new THREE.BoxGeometry(1.15,1.65,.48),new THREE.MeshStandardMaterial({color:0x59625d,roughness:.72,metalness:.15}));
+    lockerBody.position.set(3.55,.83,8.0);lockerBody.castShadow=true;this.scene.add(lockerBody);
+    this.addCollider(new THREE.Box3(new THREE.Vector3(2.95,0,7.72),new THREE.Vector3(4.15,1.70,8.28)));
+    const keypad=new THREE.Mesh(new THREE.BoxGeometry(.22,.30,.07),new THREE.MeshStandardMaterial({color:0x242826,roughness:.45}));
+    keypad.position.set(4.14,1.05,7.98);
+    keypad.userData={interactable:true,id:'316_LOCKER',type:'locker_316',label:'輸入四位數密碼打開值班櫃'};
+    this.scene.add(keypad);this.interactables.push(keypad);this.lockerMesh=keypad;
+    const keypadLed=new THREE.Mesh(new THREE.CircleGeometry(.025,14),new THREE.MeshBasicMaterial({color:0xaa3a32}));
+    keypadLed.rotation.y=Math.PI/2;keypadLed.position.set(4.18,1.12,7.98);this.scene.add(keypadLed);this.lockerLed=keypadLed;
   }
 
   buildWorkstations() {
@@ -472,27 +483,17 @@ export class Level3FBlockout {
     jambTop.position.set(2.4, 2.37, 2.5);
     this.scene.add(jambTop);
 
-    // Door leaf propped open against the inside west wall of 316
-    const doorMat = new THREE.MeshStandardMaterial({ color: 0x8b6a4f, roughness: 0.6 });
-    const door = new THREE.Mesh(new THREE.BoxGeometry(0.06, 2.28, 1.02), doorMat);
-    door.position.set(1.92, 1.14, 3.12);
-    this.scene.add(door);
-
-    // Door glazed vision panel
-    const doorGlass = new THREE.Mesh(
-      new THREE.PlaneGeometry(0.22, 0.42),
-      new THREE.MeshStandardMaterial({ color: 0xc4d6dd, transparent: true, opacity: 0.42, roughness: 0.2, side: THREE.DoubleSide })
-    );
-    doorGlass.position.set(1.96, 1.55, 3.12);
-    doorGlass.rotation.y = Math.PI / 2;
-    this.scene.add(doorGlass);
-
-    // Door handle lever
+    // 316 is locked after office hours. The spare key is hidden nearby.
+    const doorMat = new THREE.MeshStandardMaterial({ color: 0x6d4c36, roughness: 0.62 });
+    const door = new THREE.Mesh(new THREE.BoxGeometry(1.08,2.28,.07),doorMat);
+    door.position.set(2.4,1.14,2.46);door.castShadow=true;
+    door.userData={interactable:true,id:'316_OFFICE_DOOR',type:'office_316_door',label:'316 總醫師辦公室｜上鎖'};
+    this.scene.add(door);this.interactables.push(door);this.officeDoorLeaf=door;this.officeDoorOpen=false;
+    this.officeDoorCollider=new THREE.Box3(new THREE.Vector3(1.86,0,2.40),new THREE.Vector3(2.94,2.35,2.54));
+    this.colliders.push(this.officeDoorCollider);
     const handleMat = new THREE.MeshStandardMaterial({ color: 0xc8c8c8, metalness: 0.85, roughness: 0.25 });
-    const handleBar = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.12, 8), handleMat);
-    handleBar.rotation.z = Math.PI / 2;
-    handleBar.position.set(1.97, 1.05, 3.52);
-    this.scene.add(handleBar);
+    const handleBar = new THREE.Mesh(new THREE.SphereGeometry(.055,14,10),handleMat);
+    handleBar.position.set(.36,-.09,-.07);door.add(handleBar);
 
     // 316 Plaque mounted physically on the corridor wall to the left of the doorway
     const plaqueMountMat = new THREE.MeshStandardMaterial({ color: 0x22362b, metalness: 0.3, roughness: 0.6 });
@@ -551,6 +552,17 @@ export class Level3FBlockout {
     plaque.rotation.y = Math.PI;
     this.scene.add(plaque);
 
+    // Spare-key planter outside 316: subtle disturbed soil gives the first exploration clue.
+    const sparePot=new THREE.Mesh(new THREE.CylinderGeometry(.22,.17,.38,18),new THREE.MeshStandardMaterial({color:0xa99179,roughness:.9}));
+    sparePot.position.set(1.22,.19,1.62);this.scene.add(sparePot);
+    const spareSoil=new THREE.Mesh(new THREE.CylinderGeometry(.17,.17,.025,18),new THREE.MeshStandardMaterial({color:0x3b2e24,roughness:1}));
+    spareSoil.position.set(1.22,.39,1.62);this.scene.add(spareSoil);
+    for(let i=0;i<5;i++){const stem=new THREE.Mesh(new THREE.CylinderGeometry(.012,.016,.55,8),new THREE.MeshStandardMaterial({color:0x54705a,roughness:.85}));stem.position.set(1.22+(i-2)*.045,.66,1.62);stem.rotation.z=(i-2)*.09;this.scene.add(stem);}
+    const keyHint=new THREE.Mesh(new THREE.BoxGeometry(.10,.015,.035),this.materials.brass);keyHint.position.set(1.29,.415,1.60);this.scene.add(keyHint);
+    const spareHit=new THREE.Mesh(new THREE.BoxGeometry(.58,.75,.58),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
+    spareHit.position.set(1.22,.42,1.62);spareHit.userData={interactable:true,id:'316_SPARE_KEY',type:'spare_key_316',label:'翻找 316 門旁盆栽',targetGroup:keyHint};
+    this.scene.add(spareHit);this.interactables.push(spareHit);this.spareKeyMesh=spareHit;
+
     // Corridor seating and waiting nook.
     const seatMat = new THREE.MeshStandardMaterial({ color: 0x566e65, roughness: 0.78 });
     [8.7, 10.0].forEach((x) => {
@@ -608,6 +620,21 @@ export class Level3FBlockout {
     const trim = new THREE.Mesh(new THREE.BoxGeometry(1.24, 0.06, 0.06), trimMat);
     trim.position.set(2.4, 2.42, 2.28);
     this.scene.add(trim);
+  }
+
+  open316Door() {
+    if(this.officeDoorOpen)return false;
+    this.officeDoorOpen=true;
+    const i=this.colliders.indexOf(this.officeDoorCollider);if(i>=0)this.colliders.splice(i,1);
+    this.officeDoorLeaf.rotation.y=-Math.PI/2;
+    this.officeDoorLeaf.position.set(1.90,1.14,3.00);
+    this.officeDoorLeaf.userData.label='316 總醫師辦公室｜已開啟';
+    return true;
+  }
+
+  markLockerOpen() {
+    if(this.lockerLed)this.lockerLed.material.color.setHex(0x3ea75a);
+    if(this.lockerMesh)this.lockerMesh.userData.label='值班櫃｜已解鎖';
   }
 
   createSignMesh(x, y, z, text, rotationY = 0) {
