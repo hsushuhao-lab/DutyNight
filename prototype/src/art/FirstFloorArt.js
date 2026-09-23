@@ -59,23 +59,21 @@ export function applyFirstFloorArt(level) {
   for(const x of [5.0,9.35,13.15])asset('bench',x,0,1.94,[1.25,1,1],Math.PI);
   for(const [x,z,s] of [[-5.3,-1.55,.72],[13.6,-1.95,.72],[15.0,-1.72,.62]])asset('plant',x,0,z,[s,s,s]);
 
-  // Furnish the actual elevator-front lobby; centre aisle stays open to lift and escape stair.
-  asset('bench',-11.0,0,-2.45,[1.12,1,1],Math.PI/2);
-  asset('bench',-11.0,0,2.10,[1.12,1,1],Math.PI/2);
-  asset('bench',-5.05,0,-2.45,[1.12,1,1],-Math.PI/2);
-  asset('bench',-5.05,0,2.10,[1.12,1,1],-Math.PI/2);
-  asset('plant',-10.55,0,3.00,[.55,.55,.55]);
-  asset('plant',-5.45,0,3.00,[.50,.50,.50]);
-  asset('fern_c',-10.6,0,-3.02,[1.15,1.15,1.15]);
-  asset('fern_b',-5.45,0,-3.00,[1.05,1.05,1.05]);
+  // Furnish the actual elevator-front lobby; all seating hugs side walls and the centre aisle stays clear.
+  asset('bench',-8.85,0,2.92,[1.02,1,1],Math.PI);
+  asset('bench',-6.35,0,2.92,[1.02,1,1],Math.PI);
+  asset('bench',-8.85,0,-2.92,[1.02,1,1],0);
+  asset('bench',-6.35,0,-2.92,[1.02,1,1],0);
+  asset('plant',-10.65,0,2.95,[.48,.48,.48]);
+  asset('plant',-5.10,0,2.95,[.46,.46,.46]);
+  asset('fern_c',-10.55,0,-2.98,[.82,.82,.82]);
+  asset('fern_b',-5.05,0,-2.98,[.78,.78,.78]);
 
-  // Water dispenser, waste bin, sanitizer stand and wheelchair parking marker.
-  box(-5.0,.58,.95,.46,1.16,.42,m.wall);
-  box(-5.0,1.10,.95,.30,.14,.24,m.glass);
-  box(-5.0,.19,1.62,.38,.38,.34,m.wallDark);
-  box(-5.10,.72,-.95,.08,1.32,.08,m.metal);
-  box(-5.10,1.35,-.95,.24,.28,.12,m.wall);
-  box(-10.95,.018,.20,1.25,.035,.72,m.wallBumper);
+  // Wall-side amenities: water dispenser, bin and sanitizer are tucked against the south wall.
+  box(-9.55,.56,-3.10,.44,1.12,.34,m.wall);
+  box(-9.55,1.08,-3.02,.28,.14,.18,m.glass);
+  box(-8.92,.18,-3.08,.32,.36,.30,m.wallDark);
+  box(-6.05,1.28,-3.20,.26,.34,.10,m.wall);
 
   // Wall clock and fire/evacuation notice make the lobby read as a staffed hospital space.
   const clockFace=new THREE.Mesh(new THREE.CircleGeometry(.30,32),new THREE.MeshStandardMaterial({color:0xf3f0e6,roughness:.9}));
