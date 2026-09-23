@@ -31,9 +31,12 @@ export class GameState {
     this.flags.set('ARCHIVE_ACCESS_KEY', false);
     this.flags.set('ARCHIVE_KEY_CLUE_4F', false);
     this.flags.set('OFFICE_302_UNLOCKED', false);
+    this.flags.set('INTERACTED_302', false);
+    this.flags.set('FOUND_302_CODE', false);
     this.flags.set('PHONE_RING_ACTIVE', false);
     this.flags.set('PHONE_ANSWERED', false);
     this.flags.set('HIS_ANOMALY_SEEN', false);
+    this.flags.set('ANOMALY_ACKNOWLEDGED', false);
     this.flags.set('ANNE_STAGE', 0);
     this.flags.set('GUARD_FUTURE_ENTRY', false);
   }
