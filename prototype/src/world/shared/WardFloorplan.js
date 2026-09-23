@@ -112,19 +112,31 @@ export class WardFloorplan {
     this.dutyCabinetAnchor=[-8.8,0,9.3];this.dutyCabinetYaw=Math.PI;
     asset(this.zoneGroup,'storageCabinet',this.dutyCabinetAnchor,[1,1,1],this.dutyCabinetYaw);
 
-    // Museum/archive spare key: stored only in the first-campus 4F duty room.
-    const archiveKeyGroup=new THREE.Group();archiveKeyGroup.name='ArchiveAccessKey_4F';
-    const archiveRing=new THREE.Mesh(new THREE.TorusGeometry(.055,.010,12,24),this.gf.materials.stainless);archiveKeyGroup.add(archiveRing);
-    const archiveBlade=new THREE.Mesh(new THREE.BoxGeometry(.018,.012,.16),this.gf.materials.stainless);archiveBlade.position.set(0,0,.11);archiveKeyGroup.add(archiveBlade);
-    const archiveTag=new THREE.Mesh(new THREE.BoxGeometry(.11,.018,.16),this.gf.materials.wallBumper);archiveTag.position.set(.08,0,-.02);archiveKeyGroup.add(archiveTag);
-    archiveKeyGroup.position.set(-9.10,1.62,9.18);
-    const archiveKeyAvailable=gameState.getFlag('ARCHIVE_LOCKED_SEEN')&&!gameState.getFlag('ARCHIVE_ACCESS_KEY');
-    archiveKeyGroup.visible=archiveKeyAvailable;this.zoneGroup.add(archiveKeyGroup);
-    const archiveKeyHit=new THREE.Mesh(new THREE.BoxGeometry(.55,.45,.55),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
-    archiveKeyHit.position.set(-9.10,1.62,9.18);
-    archiveKeyHit.userData={interactable:archiveKeyAvailable,id:'ARCHIVE_ACCESS_KEY_4F',type:'archive_key_4f',label:'拿取文史館備用鑰匙',targetGroup:archiveKeyGroup};
+    // Museum/archive key is deliberately hidden: first read the old backup-item sheet,
+    // then inspect the lowest bedside drawer. Nothing is displayed in plain sight.
+    const archiveSearchActive=gameState.getFlag('ARCHIVE_LOCKED_SEEN')&&!gameState.getFlag('ARCHIVE_ACCESS_KEY');
+
+    const archiveClue=new THREE.Mesh(new THREE.BoxGeometry(.34,.035,.26),this.gf.materials.lightWarm);
+    archiveClue.position.set(-8.98,1.34,9.12);archiveClue.rotation.y=.12;archiveClue.visible=archiveSearchActive;
+    archiveClue.userData={
+      interactable:archiveSearchActive,id:'ARCHIVE_KEY_CLUE_4F',type:'archive_key_clue_4f',
+      label:'翻閱：舊院區備援物品清單',
+      documentTitle:'舊院區備援物品清單｜4F 值班室',
+      pages:['文史館備用鑰匙：已由總務移至值班室內部保管。\\n\\n手寫補註：「不要放桌上。收在床邊櫃最下層，舊布袋裡。」']
+    };
+    this.zoneGroup.add(archiveClue);this.interactables.push(archiveClue);this.archiveKeyClueMesh=archiveClue;
+
+    const archiveKeyGroup=new THREE.Group();archiveKeyGroup.name='ArchiveAccessKey_4F_Hidden';
+    const archiveRing=new THREE.Mesh(new THREE.TorusGeometry(.05,.009,12,24),this.gf.materials.stainless);archiveKeyGroup.add(archiveRing);
+    const archiveBlade=new THREE.Mesh(new THREE.BoxGeometry(.016,.010,.15),this.gf.materials.stainless);archiveBlade.position.set(0,0,.10);archiveKeyGroup.add(archiveBlade);
+    archiveKeyGroup.position.set(-11.25,.18,8.08);archiveKeyGroup.visible=false;this.zoneGroup.add(archiveKeyGroup);
+
+    const archiveKeyHit=new THREE.Mesh(new THREE.BoxGeometry(.58,.44,.60),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
+    archiveKeyHit.position.set(-11.25,.26,8.08);
+    const canOpenArchiveCache=archiveSearchActive&&gameState.getFlag('ARCHIVE_KEY_CLUE_4F');
+    archiveKeyHit.userData={interactable:canOpenArchiveCache,id:'ARCHIVE_ACCESS_KEY_4F',type:'archive_key_cache_4f',label:'檢查床邊櫃最下層',targetGroup:archiveKeyGroup};
     this.zoneGroup.add(archiveKeyHit);this.interactables.push(archiveKeyHit);
-    this.archiveKeyMesh=archiveKeyHit;this.archiveKeyAnchor=[-9.10,1.62,9.18];
+    this.archiveKeyMesh=archiveKeyHit;this.archiveKeyAnchor=[-11.25,.26,8.08];
 
     // Enclosed duty-room bathroom with a real knob door, toilet, sink, mirror and dedicated light.
     w.rect(-14,2,-11.5,5.2);w.cut('z',-11.5,4.0,1.1);
