@@ -189,6 +189,7 @@ export class WorldRouter {
   }
 
   update() {
+    this.activeZoneInstance?.update?.(this.camera);
     if (!this.controller?.enabled) return;
     const portal = ROUTE_PORTALS.find(p => !p.gated && p.from === this.activeZoneId && new THREE.Box3(new THREE.Vector3(...p.bounds[0]), new THREE.Vector3(...p.bounds[1])).containsPoint(this.controller.position));
     if (portal) this.teleportToSpawn(portal.spawn);
