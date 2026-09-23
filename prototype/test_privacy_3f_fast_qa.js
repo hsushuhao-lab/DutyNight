@@ -22,7 +22,7 @@ assert(main.includes("!gameState.getFlag('STAFF_ACCESS_CARD')"),'Vertical travel
 assert(ui.includes('HIS_AUTHENTICATED'),'HIS must require duty credentials');
 assert(ui.includes("p==='QL1700'"),'HIS password verifier must match the duty book');
 assert(art.includes('夜間醫師值勤名冊'));
-assert(floor.includes("title:'文史館・封存資料室'")&&floor.includes("requires:'ARCHIVE_ACCESS_KEY'"));
+assert(floor.includes("title:'無門牌房間'")&&floor.includes("requires:'ARCHIVE_ACCESS_KEY'"));
 assert(floor.includes("bookshelfCount:4")&&floor.includes("type:'archive_document'"));
 assert(floor.includes("ARCHIVE_UNINDEXED_HANDOFF"),'Unindexed handoff clue missing');
 assert(!floor.includes('buildRoomWing'),'Generic archive wing must not reintroduce the stray partition');
@@ -36,7 +36,11 @@ assert(level.includes("type:'office_316_door'"),'Locked 316 office door missing'
 assert(!level.includes('316_SPARE_KEY'),'316 spare key must not remain beside the office door');
 assert(!main.includes('ContactShadows'),'3F floor-ring SSAO artifact path must be removed');
 assert(main.includes("ARCHIVE_ACCESS_KEY"),'Museum door must require the dedicated 4F key');
-assert(main.includes("archive_key_clue_4f")&&main.includes("archive_key_cache_4f"),'4F museum-key clue/cache interactions missing');
+assert(main.includes("office_302_keypad")&&main.includes("museum_key_302"),'302 keypad/museum-key interactions missing');
+assert(level.includes("code:'3082'")&&level.includes("MUSEUM_KEY_302"),'302 code puzzle or brass key missing');
+assert(level.includes("CPR_Anne")&&level.includes("type:'cpr_anne'"),'CPR Anne environmental-horror prop missing');
+assert(main.includes("office_phone_316")&&main.includes("PHONE_ANSWERED"),'316 phone anomaly interaction missing');
+assert(ui.includes("B1")&&ui.includes("B2"),'Post-archive elevator display glitch missing');
 assert(station.includes('alongX?sx:sx*.22+.025'),'Station side glazing must span its full axis');
 assert(door.includes("mount:'jamb'")&&door.includes('mount.add(reader)'),'Readers must be physically parented to jamb mounts');
 console.log('PRIVACY + 3F FAST QA PASS');
