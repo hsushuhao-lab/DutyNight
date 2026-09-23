@@ -44,6 +44,10 @@ assert(zone.levelInstance?.storageDoor,'Storage-room door missing');
 assert(zone.levelInstance?.anneStool,'Anne stage-2 stool missing');
 assert.equal(zone.levelInstance?.phoneMesh?.userData?.type,'office_phone_316');
 assert.equal(zone.coreOffice3F?.relativeTo4FDutyRoom,true);
+assert.equal(zone.coreOffice3F?.doorId,'3F_ADMIN_OFFICE_DOOR');
+assert.equal(zone.coreOffice3F?.taskId,'3F_ADMIN_ROSTER_TASK');
+assert(zone.keyedDoors['3F_ADMIN_OFFICE_DOOR']?.closed,'3F administrative office door must default closed');
+assert(zone.interactables.some(o=>o.userData?.type==='admin_roster_3f'),'3F administrative office roster task missing');
 assert.deepEqual(zone.coreOffice3F?.bounds,[-22,3.5,-16,11.5]);
 assert.deepEqual(zone.coreOffice3F?.door,[-16,1.7,7.5]);
 
@@ -54,5 +58,11 @@ console.log('302 doorway blockers',blockers302.map(b=>({min:b.min.toArray(),max:
 assert.equal(blockers302.length,0,'302 doorway must be physically passable after keypad unlock');
 
 const coreOfficeDoorway=new THREE.Box3(new THREE.Vector3(-16.18,.10,7.15),new THREE.Vector3(-15.82,1.8,7.85));
-assert(!zone.colliders.some(c=>c.intersectsBox(coreOfficeDoorway)),'3F office doorway at the 4F-duty-room-relative position must remain passable');
+const adminDoor=zone.keyedDoors['3F_ADMIN_OFFICE_DOOR'];
+adminDoor.setClosed(false);
+assert(!zone.colliders.some(c=>c.intersectsBox(coreOfficeDoorway)),'3F office doorway must be passable after the office door opens');
+
+const storageDoorway=new THREE.Box3(new THREE.Vector3(13.05,.10,2.18),new THREE.Vector3(13.95,1.82,3.05));
+const storageBlockers=zone.colliders.filter(c=>c.intersectsBox(storageDoorway));
+assert.equal(storageBlockers.length,0,'Equipment storage-room doorway must not be blocked by wall or furniture colliders');
 console.log('3F EXPLORATION + ARCHIVE QA PASS');
