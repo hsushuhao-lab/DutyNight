@@ -455,6 +455,7 @@ export class UIManager {
     const archiveObjective=this.gameState.getFlag('ARCHIVE_OBJECTIVE');
     const archiveLockedSeen=this.gameState.getFlag('ARCHIVE_LOCKED_SEEN');
     const archiveKey=this.gameState.getFlag('ARCHIVE_ACCESS_KEY');
+    const archiveKeyClue=this.gameState.getFlag('ARCHIVE_KEY_CLUE_4F');
     const currentZone=window.worldRouter?.activeZoneId || '';
     const readyFor4F = this.gameState.areRequiredTasksComplete();
 
@@ -474,8 +475,8 @@ export class UIManager {
         ]);
       }else if(!archiveKey){
         this.renderTaskBoard('文史館門鎖｜尋找專用鑰匙',[
-          {id:'task-archive-key',text:'前往第一院區 4F 值班室尋找文史館備用鑰匙',state:'ready'},
-          {id:'task-return-museum',text:'取得後返回 3F 文史館',state:'locked'}
+          {id:'task-archive-key',text:currentZone==='first_campus_4f'?(archiveKeyClue?'依備援物品清單檢查床邊櫃':'在 4F 值班室尋找舊院區備援物品清單'):'前往第一院區 4F 值班室尋找線索',state:'ready'},
+          {id:'task-return-museum',text:'取得文史館鑰匙後返回 3F',state:'locked'}
         ]);
       }else{
         this.renderTaskBoard('文史館調查',[
