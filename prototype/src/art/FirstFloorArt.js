@@ -80,16 +80,7 @@ export function applyFirstFloorArt(level) {
   }
   box(-11.78,1.45,-1.05,.045,1.15,1.65,m.floorWood);
   box(-11.75,1.45,-1.05,.025,1.05,1.55,m.wall);
-  box(-6.35,1.72,-3.27,3.7,1.12,.045,m.floorWood);
-  {
-    const canvas=document.createElement('canvas');canvas.width=1100;canvas.height=420;const ctx=canvas.getContext('2d');
-    ctx.fillStyle='#e8e5dc';ctx.fillRect(0,0,1100,420);ctx.fillStyle='#42594b';ctx.fillRect(0,0,1100,72);
-    ctx.fillStyle='#fff';ctx.font='bold 34px sans-serif';ctx.fillText('三樓院內公告',30,48);
-    ctx.fillStyle='#3e4c44';ctx.font='23px sans-serif';
-    ['夜間通行請攜帶感應卡','文件調閱請依保管規範辦理','值班期間保持通道暢通'].forEach((t,i)=>ctx.fillText('• '+t,38,125+i*60));
-    const tex=new THREE.CanvasTexture(canvas);tex.colorSpace=THREE.SRGBColorSpace;
-    const face=new THREE.Mesh(new THREE.PlaneGeometry(3.58,1.02),new THREE.MeshStandardMaterial({map:tex,roughness:.9}));face.position.set(-6.35,1.72,-3.235);root.add(face);
-  }
+  // 302 puzzle bulletin is authored by Level3FBlockout so art overlays cannot cover the interactive case.
   // Low filing units sit inside the existing desk footprint.
   asset('storageCabinet',6.75,0,6.2,[.8,.39,1.8],Math.PI);
 
