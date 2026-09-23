@@ -19,11 +19,13 @@ assert.equal(zone.secretArchive?.documentIds.length,4);
 assert(zone.keyedDoors['3F_ARCHIVE_DOOR']?.closed,'Museum keyed door must default closed');
 assert.equal(zone.secretArchive?.requires,'ARCHIVE_ACCESS_KEY');
 assert(zone.levelInstance?.officeDoorLeaf?.userData?.type==='office_316_door','316 office must begin as a locked interactive door');
-assert(zone.levelInstance?.spareKeyMesh?.userData?.type==='spare_key_316','316 wall key-box interaction missing');
+assert(zone.spareKeyMesh?.userData?.type==='spare_key_316','316 guard-patrol spare-key interaction missing');
+assert.equal(zone.guardPatrolPoint?.opposite,'3F_ARCHIVE_DOOR');
 assert(zone.levelInstance?.lockerMesh?.userData?.type==='locker_316','316 keypad locker interaction missing');
+assert(zone.levelInstance?.credentialDrawerMesh?.userData?.type==='credential_drawer_316','316 under-desk credential drawer missing');
 
 const docs=zone.interactables.filter(o=>o.userData?.type==='archive_document');
-assert.equal(docs.length,6,'3F must expose four museum files plus two 316 secret documents');
+assert.equal(docs.length,9,'3F must expose four museum files, two office secrets and three 1F hint files');
 assert.equal(zone.officeSecrets?.count,2,'316 must contain two optional secret clues');
 assert.equal(zone.secretArchive?.documentIds.length,4);
 for(const doc of docs){
@@ -32,6 +34,7 @@ for(const doc of docs){
   assert.match(doc.userData.label,/翻閱/);
 }
 const ward=router.loadZone('first_campus_4f');
-assert.equal(ward.archiveKeyMesh?.userData?.type,'archive_key_4f','4F duty room museum key missing');
-assert.deepEqual(ward.archiveKeyAnchor,[-9.10,1.62,9.18]);
+assert.equal(ward.archiveKeyClueMesh?.userData?.type,'archive_key_clue_4f','4F museum-key clue missing');
+assert.equal(ward.archiveKeyMesh?.userData?.type,'archive_key_cache_4f','4F hidden museum-key cache missing');
+assert.deepEqual(ward.archiveKeyAnchor,[-11.25,.26,8.08]);
 console.log('3F EXPLORATION + ARCHIVE QA PASS');
