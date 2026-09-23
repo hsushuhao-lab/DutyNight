@@ -73,7 +73,7 @@
       </div>
 
       <div id="his-login-panel" class="his-login-panel">
-        <div><strong>夜班 HIS 登入</strong><small>帳號與密碼記錄在桌上的值班本。</small></div>
+        <div><strong>夜班 HIS 登入</strong><small>需使用今晚值班登入憑證。</small></div>
         <input id="his-account" autocomplete="off" placeholder="值班帳號" />
         <input id="his-password" type="password" autocomplete="off" placeholder="值班密碼" />
         <button id="btn-his-login" class="btn-primary">登入</button>
@@ -239,10 +239,26 @@
       <div class="anomaly-code">UNREGISTERED MESSAGE / 3F</div>
       <h2>交班資料已接收。</h2>
       <p>你不是今晚第一個看到這則訊息的人。</p>
-      <p>若想知道 316 為什麼總是少一樣東西，去三樓 <strong>文史館</strong>。</p>
+      <p>若想知道 316 為什麼總是少一樣東西，去三樓<strong>那扇沒有編號的門</strong>。</p>
       <p>找那份<strong>沒有被編目的交班紀錄</strong>。</p>
       <p class="anomaly-last">不要帶其他人一起去。</p>
       <button id="btn-ack-anomaly" class="btn-primary">記下位置</button>
+    </div>
+  </div>
+
+  <!-- 302 electronic keypad -->
+  <div id="office302-modal" class="modal-overlay">
+    <div class="locker-window">
+      <div class="locker-header">
+        <div><strong>302 行政主管／科秘書辦公室</strong><small>電子密碼鎖</small></div>
+        <button id="btn-close-302" class="btn-win-close" aria-label="關閉 302 密碼鎖">✕</button>
+      </div>
+      <div class="locker-body">
+        <p>門鎖顯示四位數輸入。旁邊沒有任何密碼提示。</p>
+        <input id="office302-code" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="0000" />
+        <button id="btn-unlock-302" class="btn-primary">確認</button>
+        <div id="office302-status">LOCKED</div>
+      </div>
     </div>
   </div>
 
