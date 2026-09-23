@@ -1,17 +1,20 @@
-name: Access layout validation
+name: Full Release QA
 on:
-  push:
-    branches: [fix/access-layout-20260921]
   workflow_dispatch:
 permissions:
   contents: read
+  pages: write
+  id-token: write
 concurrency:
-  group: access-layout-validation
-  cancel-in-progress: true
+  group: full-release
+  cancel-in-progress: false
 jobs:
-  verify:
+  full-release:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 95
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -24,7 +27,7 @@ jobs:
       - name: Install locked dependencies
         working-directory: prototype
         run: npm ci
-      - name: All Node regressions
+      - name: Full Node regressions
         working-directory: prototype
         run: node scripts/run-floorplan-regressions.mjs
       - name: Production build
@@ -35,56 +38,38 @@ jobs:
       - name: Browser dependencies
         working-directory: prototype
         run: npx playwright install --with-deps chromium
-      - name: Continuous browser walkthrough
+      - name: Production browser walkthrough
         timeout-minutes: 38
         working-directory: prototype
-        run: node scripts/test-floorplan-browser.mjs
-      - name: Save the exact browser-tested site
-        uses: actions/upload-artifact@v4
+        run: node scripts/test-floorplan-browser.mjs qa-results/full-release
+      - name: Visual QA capture
+        timeout-minutes: 13
+        working-directory: prototype
+        run: node scripts/capture-floorplan.mjs qa-results/screens
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
         with:
-          name: access-layout-tested-site
-          path: prototype/dist/
-          retention-days: 14
-          if-no-files-found: error
-      - name: Preserve test evidence even on failure
+          enablement: true
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: prototype/dist
+      - name: Deploy tested artifact
+        id: deployment
+        uses: actions/deploy-pages@v4
+      - name: Verify public build fingerprint
+        working-directory: prototype
+        run: node scripts/verify-live-build.mjs '${{ steps.deployment.outputs.page_url }}'
+      - name: Public deployed browser QA
+        timeout-minutes: 38
+        working-directory: prototype
+        run: node scripts/test-floorplan-browser.mjs qa-results/live '${{ steps.deployment.outputs.page_url }}'
+      - name: Preserve full release evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: access-layout-evidence
+          name: full-release-evidence
           path: |
             SOURCE_COMMIT.txt
             prototype/qa-results/
-          retention-days: 30
-  views:
-    runs-on: ubuntu-latest
-    timeout-minutes: 18
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-          cache-dependency-path: prototype/package-lock.json
-      - name: Install, fingerprint and build the same commit
-        working-directory: prototype
-        run: |
-          npm ci
-          node scripts/write-build-info.mjs
-          npm run build
-          npx playwright install --with-deps chromium
-      - name: Fixed review viewpoints (visual evidence, not traversal proof)
-        timeout-minutes: 13
-        working-directory: prototype
-        run: node scripts/capture-floorplan.mjs
-      - name: Record exact source
-        if: always()
-        run: git rev-parse HEAD > SOURCE_COMMIT.txt
-      - name: Preserve fixed-view evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: access-layout-views
-          path: |
-            SOURCE_COMMIT.txt
-            prototype/qa-results/screens/
           retention-days: 30
