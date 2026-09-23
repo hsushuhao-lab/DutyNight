@@ -118,7 +118,7 @@ export class WardFloorplan {
     const archiveBlade=new THREE.Mesh(new THREE.BoxGeometry(.018,.012,.16),this.gf.materials.stainless);archiveBlade.position.set(0,0,.11);archiveKeyGroup.add(archiveBlade);
     const archiveTag=new THREE.Mesh(new THREE.BoxGeometry(.11,.018,.16),this.gf.materials.wallBumper);archiveTag.position.set(.08,0,-.02);archiveKeyGroup.add(archiveTag);
     archiveKeyGroup.position.set(-9.10,1.62,9.18);
-    const archiveKeyAvailable=gameState.getFlag('ARCHIVE_OBJECTIVE')&&!gameState.getFlag('ARCHIVE_ACCESS_KEY');
+    const archiveKeyAvailable=gameState.getFlag('ARCHIVE_LOCKED_SEEN')&&!gameState.getFlag('ARCHIVE_ACCESS_KEY');
     archiveKeyGroup.visible=archiveKeyAvailable;this.zoneGroup.add(archiveKeyGroup);
     const archiveKeyHit=new THREE.Mesh(new THREE.BoxGeometry(.55,.45,.55),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
     archiveKeyHit.position.set(-9.10,1.62,9.18);
