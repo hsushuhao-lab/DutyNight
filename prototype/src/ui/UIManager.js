@@ -215,6 +215,7 @@ export class UIManager {
 
   showAnomalyMessage() {
     document.exitPointerLock();
+    this.gameState.setFlag('ARCHIVE_OBJECTIVE',true);
     this.anomalyModal?.classList.add('active');
     soundManager.playComputerBeep();
   }
