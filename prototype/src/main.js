@@ -168,6 +168,10 @@ controller.onInteract = (interactable) => {
     controller.enabled = false;
     uiManager.openWorkstation();
     checkElevatorReady();
+  } else if (interactable.type === 'archive_document') {
+    controller.enabled = false;
+    uiManager.openArchiveDocument({title:interactable.documentTitle,pages:interactable.pages});
+    gameState.addEvidence(1);
   } else if (interactable.type === 'acute_gate') {
     const changed = worldRouter.activeZoneInstance.toggleAcuteGate(controller.position);
     if (changed) {
