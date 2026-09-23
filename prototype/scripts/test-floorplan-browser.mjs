@@ -122,7 +122,7 @@ async function roomTour(){
   }
  }
 }
-}try{
+try{
  await page.goto(url,{waitUntil:'load',timeout:180000});await page.waitForFunction(()=>window.worldRouter?.activeZoneInstance,null,{timeout:180000});await page.waitForTimeout(700);assert.equal(await page.locator('#debug-zone-selector').count(),0);await log('Production initial 3F');
  await go(5.6,5);await use('KEY_PICKUP');await go(6.4,5);await use('DUTY_LOG');await page.locator('#btn-sign-log').click();await page.waitForFunction(()=>window.worldRouter.controller.enabled);
  await go(8.7,4.9);
