@@ -118,6 +118,11 @@ controller.onInteract = (interactable) => {
       controller.enabled=false;controller.cancelAutoMove();
       uiManager.runDoorTransition(()=>worldRouter.teleportToSpawn(door.portal));
     }else{
+      if(interactable.doorId==='3F_ARCHIVE_DOOR'&&!gameState.getFlag('ARCHIVE_OBJECTIVE')){
+        soundManager.playClick();
+        uiManager.showSubtitle('李醫師','「文史館？今晚的正常交班流程沒有提到這裡。先把 316 的交班做完。」',3200);
+        return;
+      }
       if(!gameState.getFlag('STAFF_ACCESS_CARD')){
         soundManager.playClick();
         uiManager.showSubtitle('門禁','「需要先到 316 領取值班室鑰匙與感應卡。」',2800);
@@ -148,6 +153,39 @@ controller.onInteract = (interactable) => {
     if(keyedDoor===zone.dutyDoor)zone.dutyDoorClosed=keyedDoor.closed;
     controller.currentInteractable = null;
     uiManager.showPrompt(null);
+  } else if (interactable.type === 'spare_key_316') {
+    if(!gameState.getFlag('FOUND_316_SPARE_KEY')){
+      gameState.setFlag('FOUND_316_SPARE_KEY',true);
+      gameState.markTaskComplete('FOUND_316_SPARE_KEY');
+      if(interactable.targetGroup)interactable.targetGroup.visible=false;
+      interactable.interactable=false;
+      soundManager.playKeyPickup();
+      uiManager.showSubtitle('李醫師','「土裡真的有一把備用鑰匙……先去開 316。」',3000);
+      uiManager.showPrompt(null);
+    }
+  } else if (interactable.type === 'office_316_door') {
+    if(!gameState.getFlag('FOUND_316_SPARE_KEY')){
+      soundManager.playClick();
+      uiManager.showSubtitle('316 總醫師辦公室','門鎖著。這時間裡面的人應該都下班了。附近也許留了備用鑰匙。',3200);
+      return;
+    }
+    if(!gameState.getFlag('OPENED_316')){
+      const opened=worldRouter.activeZoneInstance.open316Door?.();
+      if(opened){
+        gameState.setFlag('OPENED_316',true);
+        gameState.markTaskComplete('OPENED_316');
+        soundManager.playClick();
+        uiManager.showSubtitle('李醫師','「開了。先找值班手冊，學長應該有留下交班方式。」',3200);
+      }
+    }
+  } else if (interactable.type === 'locker_316') {
+    if(!gameState.isTaskComplete('DUTY_LOG')){
+      soundManager.playClick();
+      uiManager.showSubtitle('李醫師','「四位數電子鎖……先看看桌上的值班手冊有沒有寫什麼。」',3000);
+      return;
+    }
+    controller.enabled=false;
+    uiManager.openLocker();
   } else if (interactable.type === 'key') {
     if (!gameState.isTaskComplete('KEY_PICKUP')) {
       soundManager.playKeyPickup();
@@ -161,10 +199,16 @@ controller.onInteract = (interactable) => {
       checkElevatorReady();
     }
   } else if (interactable.type === 'duty_log') {
+    if(!gameState.getFlag('OPENED_316'))return;
     controller.enabled = false;
     uiManager.openDutyLog();
     checkElevatorReady();
   } else if (interactable.type === 'workstation') {
+    if(!gameState.getFlag('HIS_CREDENTIALS')){
+      soundManager.playClick();
+      uiManager.showSubtitle('李醫師','「沒有今晚的系統帳密。值班手冊提到旁邊的密碼櫃。」',2800);
+      return;
+    }
     controller.enabled = false;
     uiManager.openWorkstation();
     checkElevatorReady();
@@ -172,6 +216,10 @@ controller.onInteract = (interactable) => {
     controller.enabled = false;
     uiManager.openArchiveDocument({title:interactable.documentTitle,pages:interactable.pages});
     gameState.addEvidence(1);
+    if(interactable.id==='ARCHIVE_UNINDEXED_HANDOFF'&&gameState.getFlag('ARCHIVE_OBJECTIVE')){
+      gameState.markTaskComplete('ARCHIVE_CLUE_FOUND');
+      gameState.setFlag('ARCHIVE_CLUE_FOUND',true);
+    }
   } else if (interactable.type === 'acute_gate') {
     const changed = worldRouter.activeZoneInstance.toggleAcuteGate(controller.position);
     if (changed) {
@@ -335,4 +383,4 @@ if (import.meta.env.DEV || urlParams.get('debug') === '1') {
 }
 
 animate();
-console.log('Songde Night Duty - Full World Modeling System Initialized.');
+console.log('Night Corridor - Full World Modeling System Initialized.');
