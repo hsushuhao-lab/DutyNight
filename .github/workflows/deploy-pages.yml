@@ -20,16 +20,30 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Refuse stale queued push
+        id: freshness
+        run: |
+          git fetch origin master --depth=1
+          if [ "$(git rev-parse HEAD)" = "$(git rev-parse origin/master)" ]; then
+            echo "current=true" >> "$GITHUB_OUTPUT"
+            echo "Deploying current master $(git rev-parse HEAD)"
+          else
+            echo "current=false" >> "$GITHUB_OUTPUT"
+            echo "Skipping stale queued SHA $(git rev-parse HEAD); master is $(git rev-parse origin/master)"
+          fi
       - name: Setup Node.js
+        if: steps.freshness.outputs.current == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
           cache-dependency-path: prototype/package-lock.json
       - name: Install locked dependencies
+        if: steps.freshness.outputs.current == 'true'
         working-directory: prototype
         run: npm ci
       - name: Fast structural QA
+        if: steps.freshness.outputs.current == 'true'
         working-directory: prototype
         run: |
           node test_privacy_3f_fast_qa.js
@@ -38,21 +52,26 @@ jobs:
           node test_user_floorplan_qa.js
           node test_ward_circulation_qa.js
       - name: Build exact master SHA
+        if: steps.freshness.outputs.current == 'true'
         working-directory: prototype
         run: |
           node scripts/write-build-info.mjs
           npm run build
       - name: Setup Pages
+        if: steps.freshness.outputs.current == 'true'
         uses: actions/configure-pages@v5
         with:
           enablement: true
       - name: Upload Pages artifact
+        if: steps.freshness.outputs.current == 'true'
         uses: actions/upload-pages-artifact@v3
         with:
           path: prototype/dist
       - name: Deploy to GitHub Pages
+        if: steps.freshness.outputs.current == 'true'
         id: deployment
         uses: actions/deploy-pages@v4
       - name: Verify public build fingerprint
+        if: steps.freshness.outputs.current == 'true'
         working-directory: prototype
         run: node scripts/verify-live-build.mjs '${{ steps.deployment.outputs.page_url }}'
