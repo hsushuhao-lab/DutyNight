@@ -66,8 +66,16 @@ export class UIManager {
         if(!this.gameState.getFlag('HIS_AUTHENTICATED')){document.getElementById('his-login-status').textContent='請先用值班本上的帳密登入';return;}
         soundManager.playComputerBeep();
         this.gameState.markTaskComplete('E_HANDOFF');
-        this.closeWorkstation();
-        setTimeout(()=>this.showAnomalyMessage(),180);
+        btnSignHandoff.disabled=true;
+        btnSignHandoff.textContent='交班資料送出中…';
+        document.querySelector('.his-system-msg').textContent='正在寫入夜間交班資料…';
+        setTimeout(()=>{
+          this.closeWorkstation();
+          btnSignHandoff.disabled=false;
+          btnSignHandoff.textContent='確認電子交班';
+          document.querySelector('.his-system-msg').textContent='系統連線正常 ｜ 資料庫版本 2026.09.21-1700';
+          this.showAnomalyMessage();
+        },1200);
       });
     }
 
@@ -199,8 +207,15 @@ export class UIManager {
     soundManager.playComputerBeep();
     if(this.gameState.getFlag('HIS_CREDENTIALS')){
       const a=document.getElementById('his-account'),p=document.getElementById('his-password');
-      if(a&&!a.value)a.value='night403';
-      if(p&&!p.value)p.value='QL1700';
+      if(a)a.value='night403';
+      if(p)p.value='QL1700';
+      this.gameState.setFlag('HIS_AUTHENTICATED',true);
+      document.getElementById('his-login-status').textContent='憑證已讀取｜登入成功';
+      document.getElementById('his-handoff-content')?.classList.add('unlocked');
+    }else{
+      this.gameState.setFlag('HIS_AUTHENTICATED',false);
+      document.getElementById('his-login-status').textContent='尚未取得今晚的系統帳密';
+      document.getElementById('his-handoff-content')?.classList.remove('unlocked');
     }
     this.workstationModal.classList.add('active');
   }
