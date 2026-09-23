@@ -283,7 +283,8 @@ controller.onInteract = (interactable) => {
       gameState.setFlag('ARCHIVE_CLUE_FOUND',true);
       gameState.setFlag('ANNE_STAGE',2);
       gameState.setFlag('GUARD_FUTURE_ENTRY',true);
-      gameState.setFlag('HOOK_403_OLD_ROOM',true);
+      gameState.setFlag('HOOK_409_ZERO_ROOM',true);
+      gameState.setFlag('HOOK_0316_COMMAND_POINT',true);
       gameState.setFlag('HOOK_1F_HIDDEN_DOOR',true);
       gameState.setFlag('HOOK_0217',true);
       floorStateManager.setPhase(GamePhase.AFTER_ARCHIVE);
@@ -374,9 +375,9 @@ controller.onInteract = (interactable) => {
     } else if(action==='INSOMNIA_403'){
       if(!gameState.isTaskComplete('P1_ROUND_COMPLETE')) return uiManager.showSubtitle('李醫師','「先完成晚間巡房。」',2500);
       dutyEvents.complete('P1_INSOMNIA_DONE','18:30');
-      if(gameState.getFlag('HOOK_403_OLD_ROOM')){
+      if(gameState.getFlag('HOOK_409_ZERO_ROOM')){
         gameState.setFlag('CLUE_403_0409',true);
-        uiManager.showSubtitle('403 病人','「醫師，我一直睡不著……床底下又在敲牆。四下、停一下、九下。你們以前也把人關在這裡嗎？」',5200);
+        uiManager.showSubtitle('403 病人','「醫師，我一直睡不著……不是這間，是那邊一直在敲。四下、停一下、九下。每晚都一樣。」',5200);
       }else uiManager.showSubtitle('403 病人','「醫師，我一直睡不著。」');
     } else if(action==='NORMAL_EVENT'){
       if(!gameState.isTaskComplete('P1_INSOMNIA_DONE')) return uiManager.showSubtitle('李醫師','「先處理 403 的睡眠問題。」',2500);
