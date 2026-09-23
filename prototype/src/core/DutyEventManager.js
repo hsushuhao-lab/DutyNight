@@ -37,6 +37,10 @@ export class DutyEventManager {
       this.complete('P1_RETURN_4F','20:40');
       return {speaker:'晚班護理師',text:'「醫師辛苦了，目前病房都還好，可以先回值班室休息。」'};
     }
+    if(zoneId==='first_campus_3f' && this.gameState.getFlag('NIGHT_PATROL_RETURN_3F')){
+      this.gameState.setGameTime('21:17');
+      return {speaker:'李醫師',text:'「21:17……查哨簿上那個時間，就是現在。」'};
+    }
     return null;
   }
 }
