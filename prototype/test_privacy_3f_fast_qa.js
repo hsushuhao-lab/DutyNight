@@ -20,9 +20,11 @@ assert(ui.includes("p==='QL1700'"),'HIS password verifier must match the duty bo
 assert(art.includes('夜間醫師值勤名冊'));
 assert(floor.includes("label:'文件保管室'")&&floor.includes("requires:'STAFF_ACCESS_CARD'"));
 assert(floor.includes("bookshelfCount:4")&&floor.includes("type:'archive_document'"));
+assert(!floor.includes('buildRoomWing'),'Generic archive wing must not reintroduce the stray partition');
+assert(floor.includes("officeSecrets={count:officeSecrets.length"),'316 secret exploration metadata missing');
 const level=readFileSync('./src/world/Level3FBlockout.js','utf8');
-assert(level.includes("◀ 電梯 ｜ 逃生梯 ▶"),'Wayfinding must stay transport-only');
-assert(level.includes("id:'3F_ELEVATOR_ANNEX'"),'3F elevator annex missing');
+assert(level.includes("◀ 電梯・逃生梯"),'Elevator and escape stair must point to the same side');
+assert(level.includes("id:'3F_ELEVATOR_LOBBY'"),'Actual elevator-front exploration area missing');
 assert(station.includes('alongX?sx:sx*.22+.025'),'Station side glazing must span its full axis');
 assert(door.includes("mount:'jamb'")&&door.includes('mount.add(reader)'),'Readers must be physically parented to jamb mounts');
 console.log('PRIVACY + 3F FAST QA PASS');
