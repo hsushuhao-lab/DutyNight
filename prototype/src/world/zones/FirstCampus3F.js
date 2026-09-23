@@ -119,7 +119,7 @@ export class FirstCampus3F {
     ctx.fillStyle='#d8d0bc';ctx.fillRect(0,0,760,300);ctx.fillStyle='#4a2f28';ctx.font='bold 34px sans-serif';ctx.fillText('文史館｜封存索引',28,50);
     ctx.font='23px sans-serif';ctx.fillStyle='#302b27';['資料保密・禁止外洩','工程紀錄／夜間紀錄／照片封存','調閱後請依原位置歸檔'].forEach((t,i)=>ctx.fillText('• '+t,42,112+i*55));
     const tex=new THREE.CanvasTexture(lore);tex.colorSpace=THREE.SRGBColorSpace;
-    const board=new THREE.Mesh(new THREE.PlaneGeometry(2.4,.95),new THREE.MeshStandardMaterial({map:tex,roughness:.95}));board.position.set(23.55,1.55,-6.10);board.rotation.y=-Math.PI/2;this.zoneGroup.add(board);
+    const board=new THREE.Mesh(new THREE.PlaneGeometry(2.8,1.05),new THREE.MeshStandardMaterial({map:tex,roughness:.95}));board.position.set(20,1.62,-7.08);this.zoneGroup.add(board);
     this.secretArchive={id:'3F_ARCHIVE',label:'文史館・封存資料室',doorId:'3F_ARCHIVE_DOOR',requires:'STAFF_ACCESS_CARD',bookshelfCount:4,documentIds:documents.map(d=>d.id),lore:['night_anomaly_records','missing_floorplans','unlabelled_photos','unindexed_handoff']};
 
     // Two optional secrets inside 316. They are discoverable but not required for the duty workflow.
