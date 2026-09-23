@@ -595,6 +595,19 @@ export class UIManager {
       }
     }
 
+    if(this.gameState.getFlag('NIGHT_PATROL_RETURN_3F')){
+      if(currentZone==='first_campus_3f'){
+        this.renderTaskBoard('21:17｜3F',[
+          {id:'task-night-patrol',text:'去警衛查哨點看看',state:'ready'}
+        ]);
+      }else{
+        this.renderTaskBoard('21:15｜護理站來電',[
+          {id:'task-night-return',text:'回 3F 一趟',state:'ready'}
+        ]);
+      }
+      return;
+    }
+
     if (done('ACT1_NORMAL_FLOW')) {
       this.renderTaskBoard('夜班進度（21:00）', [
         {id:'task-normal-flow-complete',text:'正常值班流程完成｜目前可在值班室休息',state:'completed'}
