@@ -59,24 +59,18 @@ export function applyFirstFloorArt(level) {
   for(const x of [5.0,9.35,13.15])asset('bench',x,0,1.94,[1.25,1,1],Math.PI);
   for(const [x,z,s] of [[-5.3,-1.55,.72],[13.6,-1.95,.72],[15.0,-1.72,.62]])asset('plant',x,0,z,[s,s,s]);
 
-  // Elevator-front lobby: two authored wall benches, no asset penetration into walls or the centre aisle.
-  const lobbySeatMat=new THREE.MeshStandardMaterial({color:0x526d61,roughness:.78});
-  for(const side of [-1,1]){
-    const z=side*2.92,backZ=side*3.18;
-    box(-8.25,.47,z,2.45,.12,.48,lobbySeatMat);
-    box(-8.25,.80,backZ,2.45,.55,.10,lobbySeatMat);
-    for(const x of [-9.15,-7.35])box(x,.23,z,.08,.46,.08,m.metal);
-  }
-  asset('plant',-10.75,0,2.95,[.42,.42,.42]);
-  asset('plant',-5.05,0,2.95,[.40,.40,.40]);
-  asset('fern_c',-10.60,0,-2.95,[.62,.62,.62]);
-  asset('fern_b',-5.00,0,-2.95,[.58,.58,.58]);
+  // Keep both elevator-lobby openings physically and visually clear.
+  // Seating was removed from the doorway axes after browser QA showed it could block 302/core access.
+  asset('plant',-11.10,0,2.95,[.38,.38,.38]);
+  asset('plant',-4.85,0,2.95,[.36,.36,.36]);
+  asset('fern_c',-11.05,0,-2.95,[.48,.48,.48]);
+  asset('fern_b',-4.75,0,-2.95,[.46,.46,.46]);
 
-  // Wall-side amenities: water dispenser, bin and sanitizer are tucked against the south wall.
-  box(-9.55,.56,-3.10,.44,1.12,.34,m.wall);
-  box(-9.55,1.08,-3.02,.28,.14,.18,m.glass);
-  box(-8.92,.18,-3.08,.32,.36,.30,m.wallDark);
-  box(-6.05,1.28,-3.20,.26,.34,.10,m.wall);
+  // Wall-side amenities stay on the solid south-wall segment, clear of the 302 doorway.
+  box(-5.55,.56,-3.10,.44,1.12,.34,m.wall);
+  box(-5.55,1.08,-3.02,.28,.14,.18,m.glass);
+  box(-6.10,.18,-3.08,.32,.36,.30,m.wallDark);
+  box(-4.75,1.28,-3.20,.26,.34,.10,m.wall);
 
   // Wall clock and fire/evacuation notice make the lobby read as a staffed hospital space.
   const clockFace=new THREE.Mesh(new THREE.CircleGeometry(.30,32),new THREE.MeshStandardMaterial({color:0xf3f0e6,roughness:.9}));
@@ -86,7 +80,7 @@ export function applyFirstFloorArt(level) {
   }
   box(-11.78,1.45,-1.05,.045,1.15,1.65,m.floorWood);
   box(-11.75,1.45,-1.05,.025,1.05,1.55,m.wall);
-  box(-8,1.72,-3.27,4.5,1.12,.045,m.floorWood);
+  box(-6.35,1.72,-3.27,3.7,1.12,.045,m.floorWood);
   {
     const canvas=document.createElement('canvas');canvas.width=1100;canvas.height=420;const ctx=canvas.getContext('2d');
     ctx.fillStyle='#e8e5dc';ctx.fillRect(0,0,1100,420);ctx.fillStyle='#42594b';ctx.fillRect(0,0,1100,72);
@@ -94,7 +88,7 @@ export function applyFirstFloorArt(level) {
     ctx.fillStyle='#3e4c44';ctx.font='23px sans-serif';
     ['夜間通行請攜帶感應卡','文件調閱請依保管規範辦理','值班期間保持通道暢通'].forEach((t,i)=>ctx.fillText('• '+t,38,125+i*60));
     const tex=new THREE.CanvasTexture(canvas);tex.colorSpace=THREE.SRGBColorSpace;
-    const face=new THREE.Mesh(new THREE.PlaneGeometry(4.38,1.02),new THREE.MeshStandardMaterial({map:tex,roughness:.9}));face.position.set(-8,1.72,-3.235);root.add(face);
+    const face=new THREE.Mesh(new THREE.PlaneGeometry(3.58,1.02),new THREE.MeshStandardMaterial({map:tex,roughness:.9}));face.position.set(-6.35,1.72,-3.235);root.add(face);
   }
   // Low filing units sit inside the existing desk footprint.
   asset('storageCabinet',6.75,0,6.2,[.8,.39,1.8],Math.PI);
