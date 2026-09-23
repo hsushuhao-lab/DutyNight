@@ -18,6 +18,10 @@ export class UIManager {
     this.lockerModal = document.getElementById('locker-modal');
     this.anomalyModal = document.getElementById('anomaly-modal');
     this.office302Modal = document.getElementById('office302-modal');
+    this.inspect302Modal = document.getElementById('inspect302-modal');
+    this.inspect302Board = document.getElementById('inspect302-board');
+    this.inspect302Clue = document.getElementById('inspect302-clue');
+    this.inspect302FocusTimer = null;
     this.archiveTitleEl = document.getElementById('archive-document-title');
     this.archivePageEl = document.getElementById('archive-document-page');
     this.archiveIndicatorEl = document.getElementById('archive-page-indicator');
@@ -115,12 +119,7 @@ export class UIManager {
       soundManager.playKeyPickup();
       this.updateTasks();
     });
-    document.getElementById('btn-ack-anomaly')?.addEventListener('click',()=>{
-      this.gameState.setFlag('ARCHIVE_OBJECTIVE',true);
-      this.anomalyModal?.classList.remove('active');
-      this.updateTasks();
-      this.onTerminalClose?.();
-    });
+    document.getElementById('btn-ack-anomaly')?.addEventListener('click',()=>this.acknowledgeAnomaly());
 
     document.getElementById('btn-close-302')?.addEventListener('click',()=>this.close302Keypad());
     document.getElementById('btn-unlock-302')?.addEventListener('click',()=>{
@@ -133,11 +132,18 @@ export class UIManager {
       soundManager.playComputerBeep();
       setTimeout(()=>this.close302Keypad(),350);
     });
+    document.getElementById('btn-close-inspect302')?.addEventListener('click',()=>this.close302Inspect());
+    this.inspect302Board?.addEventListener('pointermove',(e)=>this.update302InspectParallax(e));
+    this.inspect302Clue?.addEventListener('pointerenter',()=>this.begin302ClueFocus());
+    this.inspect302Clue?.addEventListener('pointerleave',()=>this.cancel302ClueFocus());
 
     // Debug toggle with Backquote (~)
     document.addEventListener('keydown', (e) => {
       if (e.code === 'Backquote' && (import.meta.env.DEV || new URLSearchParams(location.search).get('debug') === '1')) {
         this.toggleDebug();
+      }
+      if(e.code==='Space'&&this.inspect302Modal?.classList.contains('active')){
+        e.preventDefault();this.close302Inspect();return;
       }
       if (e.code === 'Escape') {
         if(this.elevatorCutscene.dataset.selecting==='true')this.closeTravelSelector();
@@ -150,10 +156,8 @@ export class UIManager {
         if (this.archiveModal?.classList.contains('active')) this.closeArchiveDocument();
         if (this.lockerModal?.classList.contains('active')) this.closeLocker();
         if (this.office302Modal?.classList.contains('active')) this.close302Keypad();
-        if (this.anomalyModal?.classList.contains('active')) {
-          this.anomalyModal.classList.remove('active');
-          this.onTerminalClose?.();
-        }
+        if (this.inspect302Modal?.classList.contains('active')) this.close302Inspect();
+        if (this.anomalyModal?.classList.contains('active')) this.acknowledgeAnomaly();
       }
     });
   }
@@ -235,11 +239,71 @@ export class UIManager {
     document.exitPointerLock();
     this.gameState.setFlag('ARCHIVE_OBJECTIVE',true);
     this.gameState.setFlag('HIS_ANOMALY_SEEN',true);
-    this.gameState.setFlag('PHONE_RING_ACTIVE',true);
     this.gameState.setFlag('ANNE_STAGE',1);
+    document.body.classList.add('his-flicker');
+    setTimeout(()=>document.body.classList.remove('his-flicker'),460);
+    const win=this.anomalyModal?.querySelector('.anomaly-window');
+    win?.classList.remove('anomaly-typing');
+    void win?.offsetWidth;
+    win?.classList.add('anomaly-typing');
     this.anomalyModal?.classList.add('active');
     soundManager.playComputerBeep();
-    setTimeout(()=>soundManager.playPhoneRingPattern(),1100);
+    this.updateTasks();
+  }
+
+  acknowledgeAnomaly() {
+    if(!this.anomalyModal?.classList.contains('active'))return;
+    this.gameState.setFlag('ANOMALY_ACKNOWLEDGED',true);
+    this.anomalyModal.classList.remove('active');
+    this.updateTasks();
+    this.onTerminalClose?.();
+    if(!this.gameState.getFlag('PHONE_ANSWERED')&&!this.gameState.getFlag('PHONE_RING_ACTIVE')){
+      setTimeout(()=>{
+        this.gameState.setFlag('PHONE_RING_ACTIVE',true);
+        soundManager.playPhoneRingPattern();
+      },2000);
+    }
+  }
+
+  open302Inspect() {
+    document.exitPointerLock();
+    this.inspect302Modal?.classList.add('active');
+    if(this.inspect302Clue){
+      this.inspect302Clue.classList.toggle('found',this.gameState.getFlag('FOUND_302_CODE'));
+      this.inspect302Clue.classList.remove('focused');
+    }
+  }
+
+  update302InspectParallax(e) {
+    if(!this.inspect302Board)return;
+    const rect=this.inspect302Board.getBoundingClientRect();
+    const nx=((e.clientX-rect.left)/rect.width-.5),ny=((e.clientY-rect.top)/rect.height-.5);
+    this.inspect302Board.style.transform=`rotateY(${nx*8}deg) rotateX(${-ny*5}deg) translate3d(${nx*6}px,${ny*4}px,0)`;
+    const glare=this.inspect302Board.querySelector('.inspect302-glare');
+    if(glare)glare.style.transform=`translateX(${-32+nx*58}%)`;
+  }
+
+  begin302ClueFocus() {
+    this.inspect302Clue?.classList.add('focused');
+    if(this.gameState.getFlag('FOUND_302_CODE'))return;
+    clearTimeout(this.inspect302FocusTimer);
+    this.inspect302FocusTimer=setTimeout(()=>{
+      this.gameState.setFlag('FOUND_302_CODE',true);
+      this.inspect302Clue?.classList.add('found');
+      this.showSubtitle('李醫師','「……3082 嗎？」',2300);
+    },1000);
+  }
+
+  cancel302ClueFocus() {
+    clearTimeout(this.inspect302FocusTimer);
+    if(!this.gameState.getFlag('FOUND_302_CODE'))this.inspect302Clue?.classList.remove('focused');
+  }
+
+  close302Inspect() {
+    clearTimeout(this.inspect302FocusTimer);
+    this.inspect302Modal?.classList.remove('active');
+    if(this.inspect302Board)this.inspect302Board.style.transform='';
+    this.onTerminalClose?.();
   }
 
   open302Keypad() {
@@ -459,6 +523,8 @@ export class UIManager {
   }
 
   renderTaskBoard(header, items) {
+    const panel=document.getElementById('task-panel');
+    panel?.classList.remove('no-guidance');
     const headerEl = document.querySelector('#task-panel .task-header');
     const listEl = document.querySelector('#task-panel .task-list');
     if (!headerEl || !listEl) return;
@@ -491,59 +557,27 @@ export class UIManager {
       });
     };
 
-    const hasSpare=this.gameState.getFlag('FOUND_316_SPARE_KEY');
     const opened316=this.gameState.getFlag('OPENED_316');
-    const archiveObjective=this.gameState.getFlag('ARCHIVE_OBJECTIVE');
-    const archiveLockedSeen=this.gameState.getFlag('ARCHIVE_LOCKED_SEEN');
-    const archiveKey=this.gameState.getFlag('ARCHIVE_ACCESS_KEY');
     const currentZone=window.worldRouter?.activeZoneId || '';
-    const readyFor4F = this.gameState.areRequiredTasksComplete();
 
-    if(done('E_HANDOFF') && !archiveObjective){
-      this.renderTaskBoard('異常訊息｜3F',[
-        {id:'task-anomaly',text:'閱讀交班後出現的異常訊息',state:'ready'},
-        {id:'task-elevator',text:'4F 已可前往',state:readyFor4F?'ready':'locked'}
-      ]);
-      return;
-    }
-
-    if(archiveObjective && !done('ARCHIVE_CLUE_FOUND')){
-      if(!archiveLockedSeen){
-        this.renderTaskBoard('異常訊息｜3F',[
-          {id:'task-archive-door',text:'找出「沒有編號的門」',state:'ready'}
-        ]);
-      }else if(!archiveKey){
-        this.renderTaskBoard('無門牌房間｜上鎖',[
-          {id:'task-archive-key',text:'想辦法找到能打開這扇門的鑰匙',state:'ready'}
-        ]);
-      }else{
-        this.renderTaskBoard('無門牌房間',[
-          {id:'task-return-museum',text:'回到沒有編號的門',state:'ready'},
-          {id:'task-archive-clue',text:'找出未編目的交班紀錄',state:currentZone==='first_campus_3f'?'ready':'locked'}
-        ]);
+    if(!done('WARD_ENTRY')){
+      const panel=document.getElementById('task-panel');
+      if(this.gameState.getFlag('HIS_ANOMALY_SEEN')){
+        panel?.classList.add('no-guidance');
+        return;
       }
-      return;
-    }
-
-    if(done('ARCHIVE_CLUE_FOUND') && currentZone==='first_campus_3f' && done('WARD_ENTRY')){
-      this.renderTaskBoard('文史館調查完成',[
-        {id:'task-archive-complete',text:'已找到未編目交班紀錄',state:'completed'},
-        {id:'task-return-4f',text:'返回 4F 病房繼續值班',state:'ready'}
-      ]);
-      return;
-    }
-
-    if (!done('WARD_ENTRY')) {
-      this.renderTaskBoard('今日夜班手續（17:00 交接）',[
-        {id:'task-find-key',text:'想辦法進入 316 總醫師辦公室',state:opened316?'completed':hasSpare?'ready':'pending'},
-        {id:'task-spare',text:'到警衛查哨點尋找 316 備援鑰匙',state:hasSpare?'completed':opened316?'completed':'ready'},
-        {id:'task-log',text:'查看值班手冊，找出密碼提示',state:done('DUTY_LOG')?'completed':opened316?'ready':'locked'},
-        {id:'task-locker',text:'解開 316 值班物品櫃取得鑰匙與感應卡',state:done('KEY_PICKUP')?'completed':done('DUTY_LOG')?'ready':'locked'},
-        {id:'task-credentials',text:'搜尋書桌下方活動櫃，取得 HIS 登入卡',state:this.gameState.getFlag('HIS_CREDENTIALS')?'completed':done('KEY_PICKUP')?'ready':'locked'},
-        {id:'task-handoff',text:'用取得的帳密登入 HIS 完成交班',state:done('E_HANDOFF')?'completed':this.gameState.getFlag('HIS_CREDENTIALS')?'ready':'locked'},
-        {id:'task-elevator',text:readyFor4F?'搭乘電梯前往 4F 病房區':'4F 尚未開放',state:readyFor4F?'ready':'locked'}
-      ]);
-      return;
+      if(!opened316){
+        this.renderTaskBoard('目前',[
+          {id:'task-current',text:'想辦法進入 316 總醫師辦公室',state:'ready'}
+        ]);
+        return;
+      }
+      if(!done('E_HANDOFF')){
+        this.renderTaskBoard('目前',[
+          {id:'task-current',text:'完成今晚的電子交班',state:'ready'}
+        ]);
+        return;
+      }
     }
 
     if (done('ACT1_NORMAL_FLOW')) {
