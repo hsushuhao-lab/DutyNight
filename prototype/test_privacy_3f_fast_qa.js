@@ -20,7 +20,7 @@ assert(main.includes("!gameState.getFlag('STAFF_ACCESS_CARD')"),'Vertical travel
 assert(ui.includes('HIS_AUTHENTICATED'),'HIS must require duty credentials');
 assert(ui.includes("p==='QL1700'"),'HIS password verifier must match the duty book');
 assert(art.includes('夜間醫師值勤名冊'));
-assert(floor.includes("title:'文史館・封存資料室'")&&floor.includes("requires:'STAFF_ACCESS_CARD'"));
+assert(floor.includes("title:'文史館・封存資料室'")&&floor.includes("requires:'ARCHIVE_ACCESS_KEY'"));
 assert(floor.includes("bookshelfCount:4")&&floor.includes("type:'archive_document'"));
 assert(floor.includes("ARCHIVE_UNINDEXED_HANDOFF"),'Unindexed handoff clue missing');
 assert(!floor.includes('buildRoomWing'),'Generic archive wing must not reintroduce the stray partition');
@@ -28,9 +28,12 @@ assert(floor.includes("officeSecrets={count:officeSecrets.length"),'316 secret e
 const level=readFileSync('./src/world/Level3FBlockout.js','utf8');
 assert(level.includes("◀ 電梯・逃生梯"),'Elevator and escape stair must point to the same side');
 assert(level.includes("id:'3F_ELEVATOR_LOBBY'"),'Actual elevator-front exploration area missing');
-assert(level.includes("type:'spare_key_316'"),'Hidden 316 spare key interaction missing');
+assert(level.includes("type:'spare_key_316'")&&level.includes('備援鑰匙盒'),'316 wall key-box interaction missing');
 assert(level.includes("type:'locker_316'"),'316 keypad locker missing');
 assert(level.includes("type:'office_316_door'"),'Locked 316 office door missing');
+assert(!level.includes('翻找 316 門旁盆栽'),'316 spare key must not use the odd planter interaction');
+assert(main.includes("ARCHIVE_ACCESS_KEY"),'Museum door must require the dedicated 4F key');
+assert(main.includes("archive_key_4f"),'4F museum-key pickup interaction missing');
 assert(station.includes('alongX?sx:sx*.22+.025'),'Station side glazing must span its full axis');
 assert(door.includes("mount:'jamb'")&&door.includes('mount.add(reader)'),'Readers must be physically parented to jamb mounts');
 console.log('PRIVACY + 3F FAST QA PASS');
