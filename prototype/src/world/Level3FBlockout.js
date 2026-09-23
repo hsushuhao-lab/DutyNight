@@ -60,9 +60,10 @@ export class Level3FBlockout {
     // Bounding box collider
     const halfW = width / 2;
     const halfD = depth / 2;
+    const halfH = height / 2;
     this.addCollider(new THREE.Box3(
-      new THREE.Vector3(x - halfW, 0, z - halfD),
-      new THREE.Vector3(x + halfW, height, z + halfD)
+      new THREE.Vector3(x - halfW, y - halfH, z - halfD),
+      new THREE.Vector3(x + halfW, y + halfH, z + halfD)
     ));
     return mesh;
   }
