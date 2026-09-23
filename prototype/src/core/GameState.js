@@ -10,7 +10,8 @@ export class GameState {
     this.requiredTasks = [
       'KEY_PICKUP',
       'DUTY_LOG',
-      'E_HANDOFF'
+      'E_HANDOFF',
+      'ARCHIVE_CLUE_FOUND'
     ];
 
     this.completedTasks = new Set();
@@ -22,6 +23,11 @@ export class GameState {
     this.flags.set('CURRENT_FLOOR', '3F');
     this.flags.set('SUPERNATURAL_ENABLED', false);
     this.flags.set('STAFF_ACCESS_CARD', false);
+    this.flags.set('FOUND_316_SPARE_KEY', false);
+    this.flags.set('OPENED_316', false);
+    this.flags.set('LOCKER_OPENED', false);
+    this.flags.set('HIS_CREDENTIALS', false);
+    this.flags.set('ARCHIVE_OBJECTIVE', false);
   }
 
   addListener(fn) {
