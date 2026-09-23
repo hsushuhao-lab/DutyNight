@@ -552,15 +552,16 @@ export class Level3FBlockout {
     plaque.rotation.y = Math.PI;
     this.scene.add(plaque);
 
-    // Spare-key planter outside 316: subtle disturbed soil gives the first exploration clue.
-    const sparePot=new THREE.Mesh(new THREE.CylinderGeometry(.22,.17,.38,18),new THREE.MeshStandardMaterial({color:0xa99179,roughness:.9}));
-    sparePot.position.set(1.22,.19,1.62);this.scene.add(sparePot);
-    const spareSoil=new THREE.Mesh(new THREE.CylinderGeometry(.17,.17,.025,18),new THREE.MeshStandardMaterial({color:0x3b2e24,roughness:1}));
-    spareSoil.position.set(1.22,.39,1.62);this.scene.add(spareSoil);
-    for(let i=0;i<5;i++){const stem=new THREE.Mesh(new THREE.CylinderGeometry(.012,.016,.55,8),new THREE.MeshStandardMaterial({color:0x54705a,roughness:.85}));stem.position.set(1.22+(i-2)*.045,.66,1.62);stem.rotation.z=(i-2)*.09;this.scene.add(stem);}
-    const keyHint=new THREE.Mesh(new THREE.BoxGeometry(.10,.015,.035),this.materials.brass);keyHint.position.set(1.29,.415,1.60);this.scene.add(keyHint);
-    const spareHit=new THREE.Mesh(new THREE.BoxGeometry(.58,.75,.58),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
-    spareHit.position.set(1.22,.42,1.62);spareHit.userData={interactable:true,id:'316_SPARE_KEY',type:'spare_key_316',label:'翻找 316 門旁盆栽',targetGroup:keyHint};
+    // Discreet wall-mounted emergency key box outside 316.
+    const keyBoxMat=new THREE.MeshStandardMaterial({color:0x66726c,roughness:.72,metalness:.18});
+    const keyBox=new THREE.Mesh(new THREE.BoxGeometry(.34,.46,.12),keyBoxMat);
+    keyBox.position.set(1.30,1.25,2.27);keyBox.castShadow=true;this.scene.add(keyBox);
+    const keyWindow=new THREE.Mesh(new THREE.PlaneGeometry(.22,.24),new THREE.MeshStandardMaterial({color:0xcfd8d3,transparent:true,opacity:.38,roughness:.18}));
+    keyWindow.position.set(1.30,1.28,2.205);keyWindow.rotation.y=Math.PI;this.scene.add(keyWindow);
+    const keyHint=new THREE.Mesh(new THREE.TorusGeometry(.045,.009,10,20),this.materials.brass);
+    keyHint.position.set(1.30,1.27,2.19);keyHint.rotation.x=Math.PI/2;this.scene.add(keyHint);
+    const spareHit=new THREE.Mesh(new THREE.BoxGeometry(.48,.58,.22),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
+    spareHit.position.set(1.30,1.25,2.22);spareHit.userData={interactable:true,id:'316_SPARE_KEY',type:'spare_key_316',label:'檢查 316 備援鑰匙盒',targetGroup:keyHint};
     this.scene.add(spareHit);this.interactables.push(spareHit);this.spareKeyMesh=spareHit;
 
     // Corridor seating and waiting nook.
