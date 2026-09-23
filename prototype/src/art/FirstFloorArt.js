@@ -59,15 +59,18 @@ export function applyFirstFloorArt(level) {
   for(const x of [5.0,9.35,13.15])asset('bench',x,0,1.94,[1.25,1,1],Math.PI);
   for(const [x,z,s] of [[-5.3,-1.55,.72],[13.6,-1.95,.72],[15.0,-1.72,.62]])asset('plant',x,0,z,[s,s,s]);
 
-  // Furnish the actual elevator-front lobby; all seating hugs side walls and the centre aisle stays clear.
-  asset('bench',-8.85,0,2.92,[1.02,1,1],Math.PI);
-  asset('bench',-6.35,0,2.92,[1.02,1,1],Math.PI);
-  asset('bench',-8.85,0,-2.92,[1.02,1,1],0);
-  asset('bench',-6.35,0,-2.92,[1.02,1,1],0);
-  asset('plant',-10.65,0,2.95,[.48,.48,.48]);
-  asset('plant',-5.10,0,2.95,[.46,.46,.46]);
-  asset('fern_c',-10.55,0,-2.98,[.82,.82,.82]);
-  asset('fern_b',-5.05,0,-2.98,[.78,.78,.78]);
+  // Elevator-front lobby: two authored wall benches, no asset penetration into walls or the centre aisle.
+  const lobbySeatMat=new THREE.MeshStandardMaterial({color:0x526d61,roughness:.78});
+  for(const side of [-1,1]){
+    const z=side*2.92,backZ=side*3.18;
+    box(-8.25,.47,z,2.45,.12,.48,lobbySeatMat);
+    box(-8.25,.80,backZ,2.45,.55,.10,lobbySeatMat);
+    for(const x of [-9.15,-7.35])box(x,.23,z,.08,.46,.08,m.metal);
+  }
+  asset('plant',-10.75,0,2.95,[.42,.42,.42]);
+  asset('plant',-5.05,0,2.95,[.40,.40,.40]);
+  asset('fern_c',-10.60,0,-2.95,[.62,.62,.62]);
+  asset('fern_b',-5.00,0,-2.95,[.58,.58,.58]);
 
   // Wall-side amenities: water dispenser, bin and sanitizer are tucked against the south wall.
   box(-9.55,.56,-3.10,.44,1.12,.34,m.wall);
