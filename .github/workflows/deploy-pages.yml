@@ -34,6 +34,7 @@ jobs:
         run: |
           node test_privacy_3f_fast_qa.js
           node test_3f_archive_qa.js
+          node test_cross_floor_entanglement_qa.js
           node test_user_floorplan_qa.js
           node test_ward_circulation_qa.js
       - name: Build exact master SHA
