@@ -61,7 +61,7 @@ export function ordinaryRoom(zone,walls,{id,label=id+' 病房',rect,side,door,ki
   const corridor=[x+outward[0]*1.1,1.7,z+outward[1]*1.1];
   const point=kind==='ward'?(alongX?[x,1.7,cz]:[cx,1.7,z]):[x-outward[0]*1.25,1.7,z-outward[1]*1.25];
   const yaw=side==='north'?Math.PI:side==='south'?0:side==='west'?-Math.PI/2:Math.PI/2;
-  SignAnchor.buildWallPlaque({scene:zone.zoneGroup,x:x+(alongX?-1.1:outward[0]*.15),y:1.75,z:z+(alongX?outward[1]*.15:-1.1),rotationY:yaw,width:1,height:.34,code:id,title:label.replace(id,'').trim(),subtitle:'',header:''});
+  SignAnchor.buildWallPlaque({scene:zone.zoneGroup,x:x+(alongX?-1.5:outward[0]*.15),y:1.75,z:z+(alongX?outward[1]*.15:-1.5),rotationY:yaw,width:1,height:.34,code:id,title:label.replace(id,'').trim(),subtitle:'',header:''});
 
   if(kind==='ward'){
     const dx=Math.min(1.4,(x2-x1)*.28),dz=Math.min(2.2,(z2-z1)*.28);
@@ -185,7 +185,7 @@ export function nursingStationV5(zone,{x,z=-4.3,id}){
     const alongX=axis==='x',cx=alongX?(a+b)/2:at,cz=alongX?at:(a+b)/2;
     const sx=alongX?b-a:thickness,sz=alongX?thickness:b-a;
     solid(zone.zoneGroup,m.wall,[cx,lowerH/2,cz],[sx,lowerH,sz]);
-    solid(zone.zoneGroup,glass,[cx,glassY,cz],[sx,glassH,sz*.22+.025]);
+    solid(zone.zoneGroup,glass,[cx,glassY,cz],[alongX?sx:sx*.22+.025,glassH,alongX?sz*.22+.025:sz]);
     solid(zone.zoneGroup,m.metal,[cx,lowerH+.02,cz],[sx+.02,.06,sz+.02]);
     solid(zone.zoneGroup,m.metal,[cx,lowerH+glassH+.05,cz],[sx+.02,.10,sz+.02]);
     CollisionFactory.addBox(zone.colliders,cx,1.42,cz,sx,2.84,sz);
