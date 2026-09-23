@@ -145,7 +145,7 @@ controller.onInteract = (interactable) => {
       if(!gameState.getFlag('ARCHIVE_ACCESS_KEY')){
         gameState.setFlag('ARCHIVE_LOCKED_SEEN',true);
         soundManager.playClick();
-        uiManager.showSubtitle('李醫師','「不是 316 的鑰匙。門邊備註寫著：文史館備用鑰匙保管於 4F 值班室。」',3600);
+        uiManager.showSubtitle('李醫師','「打不開……鑰匙呢？」',2600);
         return;
       }
       const changed=keyedDoor.toggle(controller.position);
@@ -236,6 +236,39 @@ controller.onInteract = (interactable) => {
       uiManager.showSubtitle('李醫師','「最下層舊布袋裡……找到文史館備用鑰匙了。」',3200);
       uiManager.showPrompt(null);
     }
+  } else if (interactable.type === 'office_302_clue') {
+    controller.enabled=false;
+    uiManager.openArchiveDocument({title:interactable.documentTitle,pages:interactable.pages});
+  } else if (interactable.type === 'office_302_keypad') {
+    if(gameState.getFlag('OFFICE_302_UNLOCKED')){
+      worldRouter.activeZoneInstance.unlock302?.();
+      return;
+    }
+    controller.enabled=false;
+    uiManager.open302Keypad();
+  } else if (interactable.type === 'museum_key_302') {
+    if(!gameState.getFlag('OFFICE_302_UNLOCKED'))return;
+    if(!gameState.getFlag('ARCHIVE_ACCESS_KEY')){
+      gameState.setFlag('ARCHIVE_ACCESS_KEY',true);
+      gameState.markTaskComplete('ARCHIVE_KEY_FOUND');
+      if(interactable.targetGroup)interactable.targetGroup.visible=false;
+      interactable.interactable=false;
+      soundManager.playKeyPickup();
+      uiManager.showSubtitle('李醫師','「黃銅牌只刻了兩個字：『文史』……」',3000);
+      uiManager.showPrompt(null);
+    }
+  } else if (interactable.type === 'office_phone_316') {
+    if(gameState.getFlag('PHONE_RING_ACTIVE')&&!gameState.getFlag('PHONE_ANSWERED')){
+      gameState.setFlag('PHONE_ANSWERED',true);
+      gameState.setFlag('PHONE_RING_ACTIVE',false);
+      soundManager.playClick();
+      uiManager.showSubtitle('電話','「……你還在三樓嗎？」',3200);
+    }else{
+      uiManager.showSubtitle('李醫師','「普通的院內電話。」',1800);
+    }
+  } else if (interactable.type === 'cpr_anne') {
+    const stage=gameState.getFlag('ANNE_STAGE')||0;
+    uiManager.showSubtitle('李醫師',stage===0?'「CPR 訓練用假人安妮。新的，看起來還沒怎麼用過。」':'「……剛才它是這個方向嗎？」',2600);
   } else if (interactable.type === 'duty_log') {
     if(!gameState.getFlag('OPENED_316'))return;
     controller.enabled = false;
@@ -251,13 +284,11 @@ controller.onInteract = (interactable) => {
     controller.enabled=false;
     uiManager.openArchiveDocument({title:interactable.documentTitle,pages:interactable.pages});
   } else if (interactable.type === 'workstation') {
-    if(!gameState.getFlag('HIS_CREDENTIALS')){
-      soundManager.playClick();
-      uiManager.showSubtitle('李醫師','「還沒拿到今晚的系統登入卡。值班手冊提到書桌下方活動櫃。」',3000);
-      return;
-    }
     controller.enabled = false;
     uiManager.openWorkstation();
+    if(!gameState.getFlag('HIS_CREDENTIALS')){
+      uiManager.showSubtitle('李醫師','「但是我沒有帳號密碼……」',2800);
+    }
     checkElevatorReady();
   } else if (interactable.type === 'archive_document') {
     controller.enabled = false;
@@ -266,6 +297,9 @@ controller.onInteract = (interactable) => {
     if(interactable.id==='ARCHIVE_UNINDEXED_HANDOFF'&&gameState.getFlag('ARCHIVE_OBJECTIVE')){
       gameState.markTaskComplete('ARCHIVE_CLUE_FOUND');
       gameState.setFlag('ARCHIVE_CLUE_FOUND',true);
+      gameState.setFlag('ANNE_STAGE',2);
+      gameState.setFlag('GUARD_FUTURE_ENTRY',true);
+      worldRouter.activeZoneInstance?.syncHorrorState?.();
     }
   } else if (interactable.type === 'acute_gate') {
     const changed = worldRouter.activeZoneInstance.toggleAcuteGate(controller.position);
