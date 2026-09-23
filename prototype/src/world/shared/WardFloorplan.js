@@ -156,7 +156,9 @@ export class WardFloorplan {
 
     this.dutyBathroom={
       door:[-11.5,1.7,4.0],bounds:[-14,2,-11.5,5.2],
-      fixtures:['toilet','sink','mirror','towel_rail','floor_drain']
+      fixtures:['toilet','sink','mirror','towel_rail','floor_drain'],
+      details:['tile_wainscot','mirror_frame','soap_dispenser','toilet_paper','waste_bin','flush_button','exhaust_grille','bath_mat'],
+      visualRefinement:'V5_2_DUTY_BATHROOM_REFINEMENT'
     };
     w.build();this.gf.buildCeilingLight(this.zoneGroup,-11,3.15,6,.7,7,0xffebce);
     wallClock(this.zoneGroup,this.gf.materials,-10,2.1,2.15);
