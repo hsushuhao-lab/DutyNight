@@ -9,6 +9,7 @@ const floor=readFileSync('./src/world/zones/FirstCampus3F.js','utf8');
 const station=readFileSync('./src/world/shared/PlanArchitecture.js','utf8');
 const door=readFileSync('./src/world/shared/AccessDoor.js','utf8');
 const level=readFileSync('./src/world/Level3FBlockout.js','utf8');
+const verticalCore=readFileSync('./src/world/shared/VerticalCore.js','utf8');
 
 assert(!index.includes('松德'),'Public game shell must not expose real-hospital name');
 assert(index.includes('青嶺醫療中心'));
@@ -35,9 +36,13 @@ assert(level.includes('316_HINT_1F_SECURITY')&&level.includes('316_HINT_1F_SERVI
 assert(level.includes("type:'office_316_door'"),'Locked 316 office door missing');
 assert(!level.includes('316_SPARE_KEY'),'316 spare key must not remain beside the office door');
 assert(!main.includes('ContactShadows'),'3F floor-ring SSAO artifact path must be removed');
+assert(!art.includes("box(-8.25,.47"),'Lobby benches must not sit in the 302/core doorway axes');
+assert(art.includes("box(-6.35,1.72,-3.27"),'Lobby notice board must stay on the solid wall segment clear of 302');
 assert(main.includes("ARCHIVE_ACCESS_KEY"),'Museum door must require the dedicated 4F key');
 assert(main.includes("office_302_keypad")&&main.includes("museum_key_302"),'302 keypad/museum-key interactions missing');
 assert(level.includes("code:'3082'")&&level.includes("MUSEUM_KEY_302"),'302 code puzzle or brass key missing');
+assert(floor.includes("relativeTo4FDutyRoom:true")&&floor.includes("label:'3F 行政辦公室'"),'3F office matching the 4F duty-room relative position is missing');
+assert(verticalCore.includes("zoneId==='first_campus_4f'||zoneId==='first_campus_3f'"),'3F shared elevator core must cut the west office doorway');
 assert(level.includes("CPR_Anne")&&level.includes("type:'cpr_anne'"),'CPR Anne environmental-horror prop missing');
 assert(main.includes("office_phone_316")&&main.includes("PHONE_ANSWERED"),'316 phone anomaly interaction missing');
 assert(ui.includes("B1")&&ui.includes("B2"),'Post-archive elevator display glitch missing');
