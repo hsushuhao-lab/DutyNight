@@ -45,7 +45,9 @@ assert.deepEqual(zone.coreOffice3F?.door,[-16,1.7,7.5]);
 
 zone.levelInstance.unlock302();
 const doorway302=new THREE.Box3(new THREE.Vector3(-9.82,.10,-4.05),new THREE.Vector3(-9.18,1.8,-3.28));
-assert(!zone.colliders.some(c=>c.intersectsBox(doorway302)),'302 doorway must be physically passable after keypad unlock');
+const blockers302=zone.colliders.filter(c=>c.intersectsBox(doorway302));
+console.log('302 doorway blockers',blockers302.map(b=>({min:b.min.toArray(),max:b.max.toArray()})));
+assert.equal(blockers302.length,0,'302 doorway must be physically passable after keypad unlock');
 
 const coreOfficeDoorway=new THREE.Box3(new THREE.Vector3(-16.18,.10,7.15),new THREE.Vector3(-15.82,1.8,7.85));
 assert(!zone.colliders.some(c=>c.intersectsBox(coreOfficeDoorway)),'3F office doorway at the 4F-duty-room-relative position must remain passable');
