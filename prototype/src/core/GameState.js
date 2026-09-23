@@ -52,6 +52,8 @@ export class GameState {
     this.flags.set('NIGHT_PATROL_RETURN_3F', false);
     this.flags.set('HIDDEN_SERVICE_DOOR_DISCOVERED', false);
     this.flags.set('CLUE_403_0409', false);
+    this.flags.set('ADMIN_ROSTER_CHECKED', false);
+    this.flags.set('ADMIN_OFFICE_ENTERED', false);
   }
 
   addListener(fn) {
