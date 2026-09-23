@@ -50,7 +50,7 @@ export class FirstCampus3F {
     this.gf.buildCeilingLight(this.zoneGroup,20,3.15,-4.5,.7,6);
 
     this.accessDoors={};
-    this.archiveDoor=new AccessDoor(this,{id:'3F_ARCHIVE_DOOR',x:19,z:-1.8,width:1.6,title:'文件保管室',material:m.doorWood,readerSide:-1});
+    this.archiveDoor=new AccessDoor(this,{id:'3F_ARCHIVE_DOOR',x:19,z:-1.8,width:1.6,title:'文史館・封存資料室',material:m.doorWood,readerSide:-1});
     this.archiveDoor.setClosed(true);
     const shelfMat=this.gf.materials.floorWood,folderMat=this.gf.materials.doorWood;
     const buildShelf=(id,x,z,yaw=0)=>{
@@ -98,6 +98,15 @@ export class FirstCampus3F {
           '第一張照片：空的電梯前廳，時鐘顯示 02:17。遠端安全梯門似乎半開。\n\n照片背面寫著：「門當時是鎖著的。」',
           '最後一張照片只拍到文件保管室門牌。照片邊緣有一行鉛筆字：\n「第一次看到它時，這裡沒有這個房間。」'
         ]
+      },
+      {
+        id:'ARCHIVE_UNINDEXED_HANDOFF',shelf:shelves[3],x:-.26,y:1.66,
+        title:'未編目交班紀錄｜無年份',
+        pages:[
+          '封面沒有日期，也沒有歸檔編號。第一頁只有一句話：\n\n「如果你是從 316 的系統訊息找到這裡，代表它又開始了。」',
+          '第二頁列出幾個重複時間：02:17、03:16、04:09。旁邊有人用紅筆寫：\n\n「不要把它當成樓層或房號。」',
+          '最後一頁只剩一行：\n\n「今晚先完成值班。真正要找的東西，不在病歷裡。」\n\n頁角蓋著模糊的舊院章。'
+        ]
       }
     ];
     for(const d of documents){
@@ -107,11 +116,11 @@ export class FirstCampus3F {
     }
 
     const lore=document.createElement('canvas');lore.width=760;lore.height=300;const ctx=lore.getContext('2d');
-    ctx.fillStyle='#d8d0bc';ctx.fillRect(0,0,760,300);ctx.fillStyle='#4a2f28';ctx.font='bold 34px sans-serif';ctx.fillText('文件保管室｜封存索引',28,50);
+    ctx.fillStyle='#d8d0bc';ctx.fillRect(0,0,760,300);ctx.fillStyle='#4a2f28';ctx.font='bold 34px sans-serif';ctx.fillText('文史館｜封存索引',28,50);
     ctx.font='23px sans-serif';ctx.fillStyle='#302b27';['資料保密・禁止外洩','工程紀錄／夜間紀錄／照片封存','調閱後請依原位置歸檔'].forEach((t,i)=>ctx.fillText('• '+t,42,112+i*55));
     const tex=new THREE.CanvasTexture(lore);tex.colorSpace=THREE.SRGBColorSpace;
     const board=new THREE.Mesh(new THREE.PlaneGeometry(2.4,.95),new THREE.MeshStandardMaterial({map:tex,roughness:.95}));board.position.set(23.55,1.55,-6.10);board.rotation.y=-Math.PI/2;this.zoneGroup.add(board);
-    this.secretArchive={id:'3F_ARCHIVE',doorId:'3F_ARCHIVE_DOOR',requires:'STAFF_ACCESS_CARD',bookshelfCount:4,documentIds:documents.map(d=>d.id),lore:['night_anomaly_records','missing_floorplans','unlabelled_photos']};
+    this.secretArchive={id:'3F_ARCHIVE',label:'文史館・封存資料室',doorId:'3F_ARCHIVE_DOOR',requires:'STAFF_ACCESS_CARD',bookshelfCount:4,documentIds:documents.map(d=>d.id),lore:['night_anomaly_records','missing_floorplans','unlabelled_photos','unindexed_handoff']};
 
     // Two optional secrets inside 316. They are discoverable but not required for the duty workflow.
     const officeSecrets=[
@@ -143,13 +152,22 @@ export class FirstCampus3F {
     this.dutyLogMesh = this.levelInstance.dutyLogMesh;
     this.elevatorLight = this.levelInstance.elevatorLight;
     this.explorationArea = this.levelInstance.explorationArea;
-    const keyAvailable = !gameState.isTaskComplete('KEY_PICKUP');
-    this.keyMesh.visible = keyAvailable;
-    this.keyMesh.userData.targetGroup.visible = keyAvailable;
-    this.keyMesh.userData.interactable = keyAvailable;
+    this.keyMesh.visible = false;
+    this.keyMesh.userData.targetGroup.visible = false;
+    this.keyMesh.userData.interactable = false;
+    this.spareKeyMesh = this.levelInstance.spareKeyMesh;
+    this.lockerMesh = this.levelInstance.lockerMesh;
     this.updateElevatorLight(gameState.areRequiredTasksComplete());
 
     return this;
+  }
+
+  open316Door() {
+    return this.levelInstance?.open316Door?.() || false;
+  }
+
+  markLockerOpen() {
+    this.levelInstance?.markLockerOpen?.();
   }
 
   updateElevatorLight(isReady) {
