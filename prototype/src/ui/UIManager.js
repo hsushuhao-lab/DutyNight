@@ -453,6 +453,9 @@ export class UIManager {
     const hasSpare=this.gameState.getFlag('FOUND_316_SPARE_KEY');
     const opened316=this.gameState.getFlag('OPENED_316');
     const archiveObjective=this.gameState.getFlag('ARCHIVE_OBJECTIVE');
+    const archiveLockedSeen=this.gameState.getFlag('ARCHIVE_LOCKED_SEEN');
+    const archiveKey=this.gameState.getFlag('ARCHIVE_ACCESS_KEY');
+    const currentZone=window.worldRouter?.activeZoneId || '';
     const readyFor4F = this.gameState.areRequiredTasksComplete();
 
     if (!done('WARD_ENTRY')) {
@@ -466,7 +469,7 @@ export class UIManager {
       }
       this.renderTaskBoard('今日夜班手續（17:00 交接）',[
         {id:'task-find-key',text:'想辦法進入 316 總醫師辦公室',state:opened316?'completed':hasSpare?'ready':'pending'},
-        {id:'task-spare',text:'尋找 316 的備用鑰匙',state:hasSpare?'completed':opened316?'completed':'ready'},
+        {id:'task-spare',text:'尋找 316 的備援鑰匙盒',state:hasSpare?'completed':opened316?'completed':'ready'},
         {id:'task-log',text:'查看值班手冊，找出密碼提示',state:done('DUTY_LOG')?'completed':opened316?'ready':'locked'},
         {id:'task-locker',text:'解開 316 值班物品櫃',state:done('KEY_PICKUP')?'completed':done('DUTY_LOG')?'ready':'locked'},
         {id:'task-handoff',text:'用取得的帳密登入 HIS 完成交班',state:done('E_HANDOFF')?'completed':done('KEY_PICKUP')?'ready':'locked'},
