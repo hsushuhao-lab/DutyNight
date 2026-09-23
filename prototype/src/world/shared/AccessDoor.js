@@ -26,7 +26,7 @@ export class AccessDoor {
     const mount=solid(this.root,m.metal,[mountX,1.4,0],[.24,.42,.30]);
     mount.userData.readerMount=true;this.readerMounts=[mount];
     for(const side of [-1,1]) {
-      const reader=new THREE.Group(); reader.position.set(mountX,1.4,side*.20);
+      const reader=new THREE.Group(); reader.position.set(mountX,1.4,side*.18);
       reader.rotation.y=side===1?0:Math.PI; this.root.add(reader);
       const panel=solid(reader,m.metal,[0,0,0],[.17,.32,.07]);
       const led=new THREE.Mesh(new THREE.CircleGeometry(.037,16),new THREE.MeshBasicMaterial({color:0xdda634}));
