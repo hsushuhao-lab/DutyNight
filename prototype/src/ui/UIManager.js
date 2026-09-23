@@ -383,12 +383,20 @@ export class UIManager {
     const up=destination.floorNum>fromFloor;
     this.elevatorCutscene.querySelector('.floor-arrow').textContent=up?'▲':'▼';
     this.elevatorCutscene.querySelector('.floor-digit').textContent=up?'上行':'下行';
-    document.getElementById('elevator-status-text').textContent=`${kind==='stairs'?'安全梯':'電梯'} ${fromFloor}F → ${destination.floorNum}F`;
+    const statusEl=document.getElementById('elevator-status-text');
+    statusEl.textContent=`${kind==='stairs'?'安全梯':'電梯'} ${fromFloor}F → ${destination.floorNum}F`;
     if(kind==='stairs')soundManager.playClick();else soundManager.playElevatorMotor();
+    const glitch=kind!=='stairs'&&fromFloor===3&&destination.floorNum===4&&this.gameState.isTaskComplete('ARCHIVE_CLUE_FOUND');
+    if(glitch){
+      const digit=this.elevatorCutscene.querySelector('.floor-digit');
+      const seq=['3','2','1','B1','B2','4'];
+      seq.forEach((v,i)=>setTimeout(()=>{digit.textContent=v;},260+i*250));
+      setTimeout(()=>{statusEl.textContent='電梯 3F → 4F';},1650);
+    }
     this.travelTimer=setTimeout(()=>{
       try {onSelect(destination);soundManager.playElevatorChime();}
       finally {this.elevatorCutscene.dataset.travelling='false';this.closeTravelSelector();}
-    },kind==='stairs'?1100:1700);
+    },kind==='stairs'?1100:(glitch?2100:1700));
   }
 
   runDoorTransition(onArrival) {
