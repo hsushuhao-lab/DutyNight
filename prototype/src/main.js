@@ -139,6 +139,27 @@ controller.onInteract = (interactable) => {
     }
     controller.currentInteractable=null;uiManager.showPrompt(null);
   } else if (interactable.type === 'duty_door') {
+    if(interactable.doorId==='3F_ARCHIVE_DOOR'){
+      const zone=worldRouter.activeZoneInstance;
+      const keyedDoor=zone.keyedDoors?.[interactable.doorId];
+      if(!keyedDoor)return;
+      if(!gameState.getFlag('ARCHIVE_OBJECTIVE')){
+        soundManager.playClick();
+        uiManager.showSubtitle('文史館','「今晚的正常交班流程沒有提到這裡。先完成 316 的交班。」',3000);
+        return;
+      }
+      if(!gameState.getFlag('ARCHIVE_ACCESS_KEY')){
+        gameState.setFlag('ARCHIVE_LOCKED_SEEN',true);
+        soundManager.playClick();
+        uiManager.showSubtitle('李醫師','「不是 316 的鑰匙。門邊備註寫著：文史館備用鑰匙保管於 4F 值班室。」',3600);
+        return;
+      }
+      const changed=keyedDoor.toggle(controller.position);
+      if(changed)soundManager.playClick();
+      else uiManager.showSubtitle('門鎖','請先離開門幅後再關門。',2500);
+      controller.currentInteractable=null;uiManager.showPrompt(null);
+      return;
+    }
     if (!gameState.isTaskComplete('KEY_PICKUP')) {
       soundManager.playClick();
       uiManager.showSubtitle('李醫師','「這是傳統喇叭鎖，先去 316 拿值班室鑰匙與感應卡。」',3000);
@@ -160,7 +181,7 @@ controller.onInteract = (interactable) => {
       if(interactable.targetGroup)interactable.targetGroup.visible=false;
       interactable.interactable=false;
       soundManager.playKeyPickup();
-      uiManager.showSubtitle('李醫師','「土裡真的有一把備用鑰匙……先去開 316。」',3000);
+      uiManager.showSubtitle('李醫師','「備援鑰匙盒裡有 316 的鑰匙。先進辦公室。」',3000);
       uiManager.showPrompt(null);
     }
   } else if (interactable.type === 'office_316_door') {
@@ -197,6 +218,16 @@ controller.onInteract = (interactable) => {
       interactable.interactable = false;
       uiManager.showPrompt(null);
       checkElevatorReady();
+    }
+  } else if (interactable.type === 'archive_key_4f') {
+    if(!gameState.getFlag('ARCHIVE_ACCESS_KEY')){
+      gameState.setFlag('ARCHIVE_ACCESS_KEY',true);
+      gameState.markTaskComplete('ARCHIVE_KEY_FOUND');
+      if(interactable.targetGroup)interactable.targetGroup.visible=false;
+      interactable.interactable=false;
+      soundManager.playKeyPickup();
+      uiManager.showSubtitle('李醫師','「文史館備用鑰匙。原來真的放在 4F 值班室。」',3200);
+      uiManager.showPrompt(null);
     }
   } else if (interactable.type === 'duty_log') {
     if(!gameState.getFlag('OPENED_316'))return;
