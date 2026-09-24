@@ -700,11 +700,13 @@ controller.onInteract = (interactable) => {
       gameState.setFlag('BOOTSTRAP_2117_RESOLVED',true);
       gameState.setFlag('TIME_PROOF_FRAGMENT',true);
       gameState.setFlag('GHOST_REGISTRATION_ARMED',true);
+      gameState.setFlag('SANDBOX_MODE',true);
       persistentMemory.learnCode('code_0217');
       persistentMemory.addJournalNote('ECHO_2117','17點看到的「21:17 三樓巡查完成」，最後是我自己回來完成的。');
       gameState.setGameTime('21:17');
       soundManager.playPaperSign();
       uiManager.showSubtitle('李醫師','「筆跡不是我的……但簽的卻是我的名字。原來那行 21:17，不是預言，是我正在把它完成。」',6200);
+      setTimeout(()=>uiManager.showSubtitle('院內系統','【常規值班已瓦解】\n任務指引中止。門禁仍依你目前持有的權限運作。',4200),1500);
       uiManager.updateTasks();
     }else{
       uiManager.showSubtitle('李醫師','「這一行已經完成了。下一次異常不該現在就出現。」',2600);
