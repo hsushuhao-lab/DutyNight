@@ -720,11 +720,19 @@ export class Level3FBlockout {
     railNorthWest.castShadow = true;
     this.scene.add(railNorthWest);
 
-    // North wall handrail: East of office door (x: 3.2 to 15.5, length 12.3, center 9.35)
-    const railNorthEast = new THREE.Mesh(new THREE.BoxGeometry(12.3, 0.10, 0.10), railMat);
-    railNorthEast.position.set(9.35, 1.05, 2.31);
-    railNorthEast.castShadow = true;
-    this.scene.add(railNorthEast);
+    // North wall handrail is split around the CPR equipment-room doorway.
+    // Door opening: x 12.9–14.1.  Keep an additional 0.15 m termination margin on both sides.
+    const railNorthEastWest = new THREE.Mesh(new THREE.BoxGeometry(9.55, 0.10, 0.10), railMat);
+    railNorthEastWest.name='RailNorthEast_WestOfStorage';
+    railNorthEastWest.position.set(7.975, 1.05, 2.31);
+    railNorthEastWest.castShadow = true;
+    this.scene.add(railNorthEastWest);
+
+    const railNorthEastEast = new THREE.Mesh(new THREE.BoxGeometry(1.25, 0.10, 0.10), railMat);
+    railNorthEastEast.name='RailNorthEast_EastOfStorage';
+    railNorthEastEast.position.set(14.875, 1.05, 2.31);
+    railNorthEastEast.castShadow = true;
+    this.scene.add(railNorthEastEast);
 
     // 316 Office doorway frame & open door leaf
     const frameMat = new THREE.MeshStandardMaterial({ color: 0x7c5d42, roughness: 0.65 });
