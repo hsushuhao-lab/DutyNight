@@ -20,6 +20,7 @@ import { SecondCampus1F } from './zones/SecondCampus1F.js';
 import { HillsideRoute } from './zones/HillsideRoute.js';
 import { EcologyPond } from './zones/EcologyPond.js';
 import { Phantom6F } from './zones/Phantom6F.js';
+import { B2Archive } from './zones/B2Archive.js';
 
 export class WorldRouter {
   constructor(scene, camera, controller) {
@@ -49,7 +50,8 @@ export class WorldRouter {
       'second_campus_1f': SecondCampus1F,
       'hillside_route': HillsideRoute,
       'ecology_pond': EcologyPond,
-      'phantom_6f': Phantom6F
+      'phantom_6f': Phantom6F,
+      'b2_archive': B2Archive
     };
 
     this.zoneLabels = {
@@ -66,7 +68,8 @@ export class WorldRouter {
       'second_campus_1f': '9. 第二院區 1F 警衛台與山側後門 (M10)',
       'hillside_route': '10. 山側景觀步道與叉路 (M11)',
       'ecology_pond': '11. 生態池觀景木棧台 (M12)',
-      'phantom_6f': '不存在的 6F'
+      'phantom_6f': '不存在的 6F',
+      'b2_archive': 'B2 封存隔離層'
     };
 
     this.lightingGroup = new THREE.Group();
