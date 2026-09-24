@@ -122,16 +122,21 @@ try{
   s=await snap();assert.equal(s.flags.BOOTSTRAP_2117_RESOLVED,true);assert.equal(s.time,'21:17');
   assert.equal(s.flags.GHOST_REGISTRATION_ARMED,false,'00:33 must not arm immediately at 21:17');
 
-  // 21:17 must actively push the player back to the 4F duty room. The duty-room
-  // phone then advances the narrative clock and sends the player to 2F.
-  await enter('first_campus_4f');
-  await interact({action:'END_SHIFT'});
+  // 21:17 must actively push the player back to the 4F duty room. Merely entering
+  // the room must trigger the sequence: no hidden E target or END_SHIFT fallback.
+  await enter('first_campus_4f','m2_4f_duty_room');
+  await page.waitForFunction(()=>window.__storyQA.gameState.getFlag('POST_2117_DUTY_ROOM_TRIGGERED')===true,null,{timeout:5000});
+  s=await snap();
+  assert.equal(s.time,'23:55');
+  assert.equal(s.flags.POST_2117_DUTY_ROOM_TRIGGERED,true);
+  assert.equal(s.controllerEnabled,false,'post-21:17 duty-room beat must briefly take control without player interaction');
   await page.waitForFunction(()=>window.__storyQA.gameState.getFlag('POST_2117_DUTY_CALL_DONE')===true,null,{timeout:10000});
   s=await snap();
   assert.equal(s.time,'00:30');
   assert.equal(s.flags.GHOST_REGISTRATION_ARMED,true);
+  assert.equal(s.controllerEnabled,true,'movement must return after the forced phone beat');
   assert.equal(await q(()=>window.__storyQA.gameState.getDisplayTime()),'翌日 00:30');
-  await mark('21:17 pushes player to duty room and 00:30 ER call');
+  await mark('21:17 duty-room entry auto-triggers 23:55 beat and 00:30 ER call');
 
   // Only after the duty-room call does re-entry to 2F materialize the 00:33 registration.
   await enter('first_campus_2f');

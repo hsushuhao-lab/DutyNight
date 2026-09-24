@@ -134,19 +134,26 @@ uiManager.setBed33Handlers({
 
 function triggerPost2117DutyRoomSequence(){
   if(!gameState.getFlag('BOOTSTRAP_2117_RESOLVED'))return false;
-  if(gameState.getFlag('POST_2117_DUTY_CALL_DONE')||gameState.getFlag('POST_2117_DUTY_ROOM_TRIGGERED'))return false;
+  if(gameState.getFlag('POST_2117_DUTY_CALL_DONE'))return false;
+  if(gameState.getFlag('POST_2117_DUTY_ROOM_TRIGGERED'))return true;
 
   gameState.setFlag('POST_2117_DUTY_ROOM_TRIGGERED',true);
   gameState.setFlag('POST_2117_RETURN_TO_DUTY_ROOM',false);
+  controller.cancelAutoMove();
+  controller.enabled=false;
   gameState.setGameTime('23:55');
   uiManager.showSubtitle('李醫師','「先把今晚看到的東西寫下來……21:17、316、409。等等，已經快午夜了？」',4300);
   uiManager.updateTasks();
 
   setTimeout(()=>{
-    if(gameState.getFlag('POST_2117_DUTY_CALL_DONE'))return;
+    if(gameState.getFlag('POST_2117_DUTY_CALL_DONE')){
+      controller.enabled=true;
+      return;
+    }
     gameState.setGameTime('00:30');
     gameState.setFlag('POST_2117_DUTY_CALL_DONE',true);
     gameState.setFlag('GHOST_REGISTRATION_ARMED',true);
+    controller.enabled=true;
     soundManager.playPhoneRingPattern();
     uiManager.showSubtitle('2F 急診值班電話','☎「李醫師，剛才那位無名氏的資料又卡住了。檢傷台有一筆很舊的掛號格式，我們沒人敢動，麻煩你下來看一下。」',6200);
     uiManager.updateTasks();
@@ -205,6 +212,7 @@ if(new URLSearchParams(location.search).get('qa')==='story'){
     },
     snapshot:()=>({
       zone:worldRouter.activeZoneId,time:gameState.gameTime,
+      controllerEnabled:controller.enabled,
       flags:Object.fromEntries(gameState.flags),
       tasks:[...gameState.completedTasks],
       memory:JSON.parse(JSON.stringify(persistentMemory.data)),

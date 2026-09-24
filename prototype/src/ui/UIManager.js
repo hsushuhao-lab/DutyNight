@@ -806,11 +806,12 @@ export class UIManager {
 
     if(this.gameState.getFlag('BOOTSTRAP_2117_RESOLVED')){
       if(!this.gameState.getFlag('POST_2117_DUTY_CALL_DONE')){
+        const triggered=this.gameState.getFlag('POST_2117_DUTY_ROOM_TRIGGERED');
         const at4F=currentZone==='first_campus_4f';
-        this.renderTaskBoard('21:17 之後｜故事仍在繼續',[
+        this.renderTaskBoard(triggered?'23:55｜值班室':'21:17 之後｜故事仍在繼續',[
           {
             id:'task-post2117-duty',
-            text:at4F?'回值班室，在桌邊整理今晚的異常紀錄':'回 4F 值班室',
+            text:triggered?'整理今晚的異常紀錄……':(at4F?'進入值班室，故事會繼續':'回 4F 值班室'),
             state:'ready'
           }
         ]);
