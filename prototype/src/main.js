@@ -18,6 +18,9 @@ import { FPSController } from './player/FPSController.js';
 import { UIManager } from './ui/UIManager.js';
 import { soundManager } from './audio/SoundManager.js';
 import { floorStateManager, GamePhase } from './core/FloorStateManager.js';
+import { persistentMemory } from './core/PersistentMemory.js';
+import { legendState, NodeState } from './core/LegendStateManager.js';
+import { LoopManager } from './core/LoopManager.js';
 
 // Setup Three.js Scene & Renderer
 const container = document.getElementById('canvas-container');
@@ -65,6 +68,7 @@ const controller = new FPSController(
 const worldRouter = new WorldRouter(scene, camera, controller);
 window.worldRouter = worldRouter;
 const dutyEvents = new DutyEventManager(gameState);
+persistentMemory.applyToGameState(gameState);
 
 // Instantiate UI Manager
 let uiManager;
