@@ -136,7 +136,7 @@ try{
   assert.equal(s.flags.POST_2117_DUTY_CALL_DONE,true);
   assert.equal(s.controllerEnabled,true,'movement must return after the forced phone beat');
   assert.equal(await q(()=>window.__storyQA.gameState.getDisplayTime()),'翌日 00:30');
-  assert.match(await taskText(),/2F 急診/,'00:30 call must leave an explicit 2F ER objective');
+  assert.match(await taskText(),/立即前往 2F 急診/,'00:30 call must actively push the player to 2F ER');
   await mark('21:17 duty-room entry auto-triggers 23:55 beat and 00:30 ER call');
 
   // Only after the duty-room call does re-entry to 2F materialize the 00:33 registration.
