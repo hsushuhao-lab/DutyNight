@@ -94,6 +94,20 @@ uiManager = new UIManager(
   }
 );
 
+function resolveAdminIdentityPuzzleIfReady() {
+  if(gameState.getFlag('ADMIN_IDENTITY_PUZZLE_RESOLVED')) return;
+  const complete=
+    gameState.getFlag('ADMIN_ROSTER_CHECKED') &&
+    gameState.getFlag('ADMIN_PRINTER_DOC_CHECKED') &&
+    gameState.getFlag('ADMIN_DRAWER_MANUAL_CHECKED');
+  if(!complete) return;
+  gameState.setFlag('ADMIN_IDENTITY_PUZZLE_RESOLVED',true);
+  gameState.setFlag('ECHO_2117_KNOWN',true);
+  gameState.markTaskComplete('P1_ADMIN_IDENTITY_PUZZLE');
+  gameState.addEvidence(1);
+  uiManager.showSubtitle('李醫師','「名冊是空的，補登單卻寫我 21:17 已完成巡查……而備忘錄又說最後完成交班的人才算值班醫師。這三份資料不可能同時是真的。」',6200);
+}
+
 // Setup Raycast Hover & Interaction
 controller.onHoverChange = (interactable) => {
   if (interactable) {
@@ -185,17 +199,21 @@ controller.onInteract = (interactable) => {
     if(keyedDoor===zone.dutyDoor)zone.dutyDoorClosed=keyedDoor.closed;
     controller.currentInteractable = null;
     uiManager.showPrompt(null);
-  } else if (interactable.type === 'admin_roster_3f') {
-    if(!gameState.getFlag('ADMIN_ROSTER_CHECKED')){
-      gameState.setFlag('ADMIN_ROSTER_CHECKED',true);
-      gameState.setFlag('OLD_ROSTER_LEE_316',true);
-      gameState.markTaskComplete('P1_ADMIN_ROSTER_CHECK');
-      gameState.addEvidence(1);
+  } else if (['admin_roster_3f','admin_printer_doc_3f','admin_drawer_manual_3f'].includes(interactable.type)) {
+    const config={
+      admin_roster_3f:['ADMIN_ROSTER_CHECKED','P1_ADMIN_ROSTER_CHECK'],
+      admin_printer_doc_3f:['ADMIN_PRINTER_DOC_CHECKED','P1_ADMIN_PRINTER_DOC'],
+      admin_drawer_manual_3f:['ADMIN_DRAWER_MANUAL_CHECKED','P1_ADMIN_DRAWER_MANUAL']
+    }[interactable.type];
+    const [flag,taskId]=config;
+    if(!gameState.getFlag(flag)){
+      gameState.setFlag(flag,true);
+      gameState.markTaskComplete(taskId);
       soundManager.playPaperSign();
-      uiManager.showSubtitle('李醫師','「今晚名冊沒有我……但桌上那張舊影本倒有一個褪色的『李醫師』，旁邊寫著 316。年份被撕掉了。」',5200);
-    }else{
-      uiManager.showSubtitle('李醫師','「名冊沒有更新。那張舊影本還在。」',2500);
     }
+    controller.enabled=false;
+    uiManager.openArchiveDocument({title:interactable.documentTitle,pages:interactable.pages});
+    resolveAdminIdentityPuzzleIfReady();
   } else if (interactable.type === 'spare_key_316') {
     if(!gameState.getFlag('FOUND_316_SPARE_KEY')){
       gameState.setFlag('FOUND_316_SPARE_KEY',true);
