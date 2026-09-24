@@ -25,11 +25,16 @@ line=duty.onZoneEntered('first_campus_3f');
 assert.equal(state.gameTime,'21:16');
 assert.match(line.text,/查哨點/);
 state.setFlag('BOOTSTRAP_2117_RESOLVED',true);
+state.setGameTime('21:17');
+assert.equal(state.setGameTime('20:40'),false,'Narrative clock must reject backward time');
+assert.equal(state.gameTime,'21:17');
+state.setFlag('POST_2117_DUTY_CALL_DONE',true);
 state.setFlag('GHOST_REGISTRATION_ARMED',true);
 state.markTaskComplete('P1_ER_ASSESSMENT_DONE');
 state.markTaskComplete('P1_ER_NOTE_DONE');
 line=duty.onZoneEntered('first_campus_2f');
 assert.equal(state.gameTime,'00:33');
+assert.equal(state.getDisplayTime(),'翌日 00:33');
 assert.equal(state.getFlag('GHOST_REGISTRATION_AVAILABLE'),true);
 assert.match(line.text,/00:33/);
 
