@@ -165,6 +165,13 @@ if(new URLSearchParams(location.search).get('qa')==='story'){
   window.__storyQA={
     gameState,persistentMemory,legendState,worldRouter,uiManager,loopManager,dutyEvents,GamePhase,floorStateManager,
     load:(zone,spawn)=>worldRouter.loadZone(zone,spawn),
+    enter:(zone,spawn)=>{
+      worldRouter.loadZone(zone,spawn);
+      const line=dutyEvents.onZoneEntered(zone);
+      worldRouter.activeZoneInstance?.syncStoryState?.();
+      if(line)uiManager.showSubtitle(line.speaker,line.text);
+      return line;
+    },
     setFlag:(k,v=true)=>gameState.setFlag(k,v),
     task:id=>gameState.markTaskComplete(id),
     phase:p=>{floorStateManager.setPhase(p);worldRouter.activeZoneInstance?.applyGamePhase?.(p,gameState);},
