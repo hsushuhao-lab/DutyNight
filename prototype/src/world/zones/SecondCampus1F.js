@@ -104,7 +104,7 @@ export class SecondCampus1F {
       code: 'EXIT',
       title: '山側環山步道出口',
       subtitle: 'HILLSIDE TRAIL EXIT',
-      header: '松德醫療中心 ｜ 第二院區'
+      header: '青嶺醫療中心 ｜ 第二院區'
     });
 
     this.gf.buildCeilingLight(this.zoneGroup, 72, 3.15, -4.0);
@@ -120,7 +120,7 @@ export class SecondCampus1F {
     solid(art, this.gf.materials.doorWood, [75, 1.19, -4.5], [0.35, 0.04, 0.28]);
     solid(art, this.gf.materials.metal, [73.2, 1.25, -4.5], [0.08, 0.22, 0.08]);
     CollisionFactory.addBox(this.colliders, 74, .6, -4.5, 2.7, 1.2, .9);
-    SignAnchor.buildWallPlaque({scene:this.zoneGroup,x:74,y:.73,z:-4.02,rotationY:0,code:'SEC-1',title:'1F 警衛駐守台',subtitle:'SECURITY POST',header:'松德醫療中心 ｜ 第二院區'});
+    SignAnchor.buildWallPlaque({scene:this.zoneGroup,x:74,y:.73,z:-4.02,rotationY:0,code:'SEC-1',title:'1F 警衛駐守台',subtitle:'SECURITY POST',header:'青嶺醫療中心 ｜ 第二院區'});
 
     asset(art,'bench',[76.5,0,-2],[1,1,1],-Math.PI/2);
     asset(art,'plant',[67.3,0,1]);
