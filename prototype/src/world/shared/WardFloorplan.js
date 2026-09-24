@@ -199,8 +199,9 @@ export class WardFloorplan {
     };
     this.zoneGroup.add(board);this.interactables.push(board);
 
-    // Printed HIS discrepancy kept near the station desk.
-    const hisSheet=solid(this.zoneGroup,m.lightWarm,[-1.55,1.14,-2.58],[.38,.018,.28]);
+    // Printed HIS discrepancy sits physically on workstation B instead of floating in open space.
+    const stationDeskTopY=.82;
+    const hisSheet=solid(this.zoneGroup,m.lightWarm,[-1.28,stationDeskTopY+.009,-2.16],[.38,.018,.28]);
     hisSheet.rotation.y=-.12;hisSheet.name='Bed33_HIS409Sheet';
     hisSheet.userData={
       interactable:true,id:'BED33_HIS_409',type:'bed33_his_status',label:'查看 409 系統狀態列印',
@@ -209,8 +210,8 @@ export class WardFloorplan {
     };
     this.interactables.push(hisSheet);
 
-    // Temporary assignment form: the tempting ordinary action.
-    const assignment=solid(this.zoneGroup,m.lightWarm,[.65,1.14,-2.62],[.40,.018,.30]);
+    // Temporary assignment form is placed on workstation A; it must never float beside the station island.
+    const assignment=solid(this.zoneGroup,m.lightWarm,[-3.22,stationDeskTopY+.009,-2.18],[.40,.018,.30]);
     assignment.rotation.y=.08;assignment.name='Bed33_AssignmentForm';
     assignment.userData={interactable:true,id:'BED33_ASSIGNMENT',type:'bed33_assignment',label:'查看臨時床位分配單'};
     this.interactables.push(assignment);
