@@ -33,6 +33,7 @@ async function shot(name){
 }
 async function q(fn,arg){return page.evaluate(fn,arg);}
 async function load(zone,spawn){await q(({zone,spawn})=>window.__storyQA.load(zone,spawn),{zone,spawn});await page.waitForTimeout(120);}
+async function enter(zone,spawn){await q(({zone,spawn})=>window.__storyQA.enter(zone,spawn),{zone,spawn});await page.waitForTimeout(160);}
 async function flag(k,v=true){await q(({k,v})=>window.__storyQA.setFlag(k,v),{k,v});}
 async function task(id){await q(id=>window.__storyQA.task(id),id);}
 async function interact(query){await q(query=>window.__storyQA.interact(query),query);await page.waitForTimeout(100);}
@@ -100,21 +101,33 @@ try{
   s=await snap();assert.equal(s.flags.BED33_RESOLVED,true);assert.equal(s.memory.proofs.space,true);assert.equal(s.memory.trueNameFragments.frag_givenName_1,'昱');
   await mark('M2 resolved by persistent cognition');
 
-  // M3: complete the 21:17 echo, Jane Doe, entry-only exit, and 00:33 safe branch.
-  await flag('HOOK_0217',true);await flag('NIGHT_PATROL_RETURN_3F',true);
-  await q(()=>window.__storyQA.floorStateManager.setPhase(window.__storyQA.GamePhase.NIGHT_PATROL));
-  await load('first_campus_3f');
-  await interact({id:'GUARD_LOG_2117'});
-  s=await snap();assert.equal(s.flags.BOOTSTRAP_2117_RESOLVED,true);assert.equal(s.time,'21:17');
-  await task('P1_REST_DONE');await load('first_campus_2f');
+  // M3: Jane Doe happens during the normal 20:00 consult. 00:33 must NOT leak before the 21:17 bootstrap.
+  await flag('HOOK_0217',true);await task('P1_REST_DONE');
+  await enter('first_campus_2f');
+  s=await snap();
+  const preGhost=await q(()=>window.__storyQA.worldRouter.activeZoneInstance?.ghostRegistrationTerminal?.userData?.interactable===true);
+  assert.equal(preGhost,false,'00:33 terminal must stay dormant during the first ER consult');
   await interact({action:'ER_ASSESS'});await interact({action:'ER_NOTE'});
   s=await snap();assert.equal(s.flags.B_PANEL_KEY,true);assert.equal(s.memory.trueNameFragments.frag_surname,'林');
   await interact({id:'ER_EXIT_NOTICE'});
   assert((await page.locator('#subtitle-text').innerText()).includes('只進不出'));
+
+  // Then the 21:15 call returns the player to 3F; noticing the panel is not enough — the logbook must be signed.
+  await flag('NIGHT_PATROL_RETURN_3F',true);
+  await q(()=>window.__storyQA.floorStateManager.setPhase(window.__storyQA.GamePhase.NIGHT_PATROL));
+  await enter('first_campus_3f');
+  await interact({id:'GUARD_SIGN_2117'});
+  s=await snap();assert.equal(s.flags.GUARD_SIGN_EXAMINED,true);assert.equal(s.flags.BOOTSTRAP_2117_RESOLVED,false);
+  await interact({id:'GUARD_BOOK_2117'});
+  s=await snap();assert.equal(s.flags.BOOTSTRAP_2117_RESOLVED,true);assert.equal(s.time,'21:17');
+
+  // Only a later re-entry to 2F materializes the 00:33 registration.
+  await enter('first_campus_2f');
+  s=await snap();assert.equal(s.flags.GHOST_REGISTRATION_AVAILABLE,true);assert.equal(s.time,'00:33');
   await interact({id:'ER_GHOST_REGISTRATION'});
   await page.waitForSelector('#story-choice-modal.active');await shot('m3-0033-registration');await secondary();
   s=await snap();assert.equal(s.flags.LEGEND_ER0033_RESOLVED,true);assert.equal(s.flags.SECOND_CAMPUS_ACCESS,true);assert.equal(s.memory.proofs.time,true);
-  await mark('M3 Jane Doe + 00:33 resolved; second campus unlocked');
+  await mark('M3 Jane Doe + 21:17 + 00:33 gating resolved; second campus unlocked');
 
   // M4: second-campus chest-pain duplicate patient.
   await load('second_campus_5f');
