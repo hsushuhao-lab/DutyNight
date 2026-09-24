@@ -284,7 +284,8 @@ export class WardFloorplan {
     patientHit.userData={interactable:true,id:'SECOND_CHEST_PATIENT',type:'second_chest_patient',label:'評估多出來的胸痛病人'};
     this.zoneGroup.add(patientHit);this.interactables.push(patientHit);
 
-    const form=solid(this.zoneGroup,m.lightWarm,[o+1.15,1.15,-6.15],[.42,.018,.30]);
+    // The transfer form sits on the second-campus nursing-station workstation, not in mid-air.
+    const form=solid(this.zoneGroup,m.lightWarm,[o-1.28,.829,-2.18],[.42,.018,.30]);
     form.name='SecondCampus_ChestTransferForm';
     form.userData={interactable:true,id:'SECOND_CHEST_TRANSFER',type:'second_chest_transfer',label:'查看胸痛病人轉院單'};
     this.interactables.push(form);
