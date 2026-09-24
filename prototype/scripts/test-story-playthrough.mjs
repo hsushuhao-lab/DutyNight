@@ -89,6 +89,7 @@ try{
   await shot('m2-bed33-assignment');
   await domClick('#btn-bed33-confirm');
   await page.waitForSelector('#loop-cutscene.active');
+  await page.locator('#btn-loop-skip').waitFor({state:'visible',timeout:15000});
   assert.equal(await page.locator('#btn-loop-skip').isVisible(),true,'Loop fast-forward control must be visible while override is active');
   await shot('m2-override');
   if(await page.locator('#loop-cutscene.active #btn-loop-skip').isVisible().catch(()=>false))await domClick('#btn-loop-skip');
