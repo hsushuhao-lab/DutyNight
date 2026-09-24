@@ -26,6 +26,11 @@ export class UIManager {
     this.journalModal = document.getElementById('journal-modal');
     this.bed33Modal = document.getElementById('bed33-modal');
     this.loopCutscene = document.getElementById('loop-cutscene');
+    this.storyChoiceModal = document.getElementById('story-choice-modal');
+    this.finalHandoffModal = document.getElementById('final-handoff-modal');
+    this.finalSuccessModal = document.getElementById('final-success-modal');
+    this.storyChoiceHandlers = null;
+    this.finalHandoffHandler = null;
     this.bed33Handlers = null;
     this.loopCutsceneTimers = [];
     this.archiveTitleEl = document.getElementById('archive-document-title');
@@ -172,6 +177,17 @@ export class UIManager {
       this.bed33Handlers?.onConfirm?.();
     });
     document.getElementById('btn-loop-skip')?.addEventListener('click',()=>this.finishLoopCutscene());
+    document.getElementById('btn-story-primary')?.addEventListener('click',()=>{
+      const fn=this.storyChoiceHandlers?.primary;this.closeStoryChoice(false);fn?.();
+    });
+    document.getElementById('btn-story-secondary')?.addEventListener('click',()=>{
+      const fn=this.storyChoiceHandlers?.secondary;this.closeStoryChoice(false);fn?.();
+    });
+    document.getElementById('btn-close-final-handoff')?.addEventListener('click',()=>this.closeFinalHandoff());
+    document.getElementById('btn-submit-final-handoff')?.addEventListener('click',()=>{
+      const value=document.getElementById('final-true-name')?.value.trim()||'';
+      this.finalHandoffHandler?.(value);
+    });
 
     // Debug toggle with Backquote (~)
     document.addEventListener('keydown', (e) => {
@@ -202,6 +218,8 @@ export class UIManager {
         if (this.anomalyModal?.classList.contains('active')) this.acknowledgeAnomaly();
         if (this.journalModal?.classList.contains('active')) this.closeJournal();
         if (this.bed33Modal?.classList.contains('active')) this.closeBed33Assignment();
+        if (this.storyChoiceModal?.classList.contains('active')) this.closeStoryChoice();
+        if (this.finalHandoffModal?.classList.contains('active')) this.closeFinalHandoff();
       }
     });
   }
@@ -437,7 +455,7 @@ export class UIManager {
     if(resume)this.onTerminalClose?.();
   }
 
-  playBed33Override(onComplete){
+  playLegendOverride({legend='LEGEND OVERRIDE',reason='你已被重新分類。'}={},onComplete){
     document.exitPointerLock();
     this.loopOverrideComplete=onComplete;
     for(const t of this.loopCutsceneTimers)clearTimeout(t);
@@ -446,15 +464,19 @@ export class UIManager {
     const body=document.getElementById('loop-stage-body');
     const band=document.getElementById('loop-wristband');
     const card=document.getElementById('loop-gameover-card');
-    title.textContent='BED ASSIGNMENT COMPLETE';
-    body.textContent='床位分配完成。';
+    title.textContent='IDENTITY OVERRIDE';
+    body.textContent='系統正在重新分類你的身分。';
     band?.classList.remove('visible');card?.classList.remove('visible');
+    if(card){
+      card.querySelector('strong').textContent=legend;
+      card.querySelector('span').textContent=reason;
+    }
     this.loopCutscene?.classList.add('active');
 
     const later=(ms,fn)=>this.loopCutsceneTimers.push(setTimeout(fn,ms));
     later(900,()=>{title.textContent='';body.textContent='日光燈一格一格從視野上方滑過。\n推車輪子壓過地磚，發出規律的咕嚕聲。';});
-    later(2500,()=>{band?.classList.add('visible');body.textContent='你的手腕被套上病人手圈。\n「33床新收案，自稱是今晚的值班醫師。」';});
-    later(4400,()=>{body.textContent='「緊急安置醫囑已確認，先執行保護性處置。」\n皮帶扣環一個接一個拉緊。';});
+    later(2500,()=>{band?.classList.add('visible');body.textContent='你的 Staff Card 被拿走，病人手圈套上手腕。\n「33床新收案，自稱是今晚的值班醫師。」';});
+    later(4400,()=>{body.textContent='「身分認知混亂，先執行保護性處置。」\n皮帶扣環一個接一個拉緊。';});
     later(6100,()=>{body.textContent='門口站著另一個穿白袍的「李醫師」。\n護理師說：「33床一直說自己才是值班醫師。」\n他只回答：「我知道。」';});
     later(7900,()=>{title.textContent='';body.textContent='視線開始模糊。白噪音蓋過所有聲音。';});
     later(9300,()=>{body.textContent='';card?.classList.add('visible');});
@@ -468,6 +490,42 @@ export class UIManager {
     this.loopCutscene.classList.remove('active');
     const cb=this.loopOverrideComplete;this.loopOverrideComplete=null;
     cb?.();
+  }
+
+  openStoryChoice({title,body,primaryText='確認',secondaryText='暫緩',onPrimary,onSecondary}){
+    document.exitPointerLock();
+    document.getElementById('story-choice-title').textContent=title;
+    document.getElementById('story-choice-body').textContent=body;
+    document.getElementById('btn-story-primary').textContent=primaryText;
+    document.getElementById('btn-story-secondary').textContent=secondaryText;
+    this.storyChoiceHandlers={primary:onPrimary,secondary:onSecondary};
+    this.storyChoiceModal?.classList.add('active');
+  }
+
+  closeStoryChoice(resume=true){
+    this.storyChoiceModal?.classList.remove('active');
+    this.storyChoiceHandlers=null;
+    if(resume)this.onTerminalClose?.();
+  }
+
+  openFinalHandoff(handler){
+    document.exitPointerLock();
+    this.finalHandoffHandler=handler;
+    const input=document.getElementById('final-true-name');if(input)input.value='';
+    document.getElementById('final-handoff-status').textContent='IDENTITY VERIFICATION REQUIRED';
+    this.finalHandoffModal?.classList.add('active');
+  }
+
+  setFinalHandoffStatus(text){const el=document.getElementById('final-handoff-status');if(el)el.textContent=text;}
+
+  closeFinalHandoff(){
+    this.finalHandoffModal?.classList.remove('active');this.finalHandoffHandler=null;this.onTerminalClose?.();
+  }
+
+  showFinalSuccess(name){
+    this.finalHandoffModal?.classList.remove('active');
+    const last=this.finalSuccessModal?.querySelector('.anomaly-last');if(last)last.textContent=`你第一次記得自己的名字：${name}。`;
+    this.finalSuccessModal?.classList.add('active');
   }
 
   closeAllTransientOverlays(){
