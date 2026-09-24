@@ -211,15 +211,27 @@ export class FirstCampus3F {
     // 21:17 bootstrap is intentionally two-step: first notice the impossible wall record,
     // then sign the actual logbook on the shelf. This prevents the mission from stalling
     // when the player looks at the panel but never hits a tiny overlapping trigger.
-    const futureSignHit=new THREE.Mesh(new THREE.BoxGeometry(.82,.78,.30),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
-    futureSignHit.position.set(19,1.40,1.56);
+    // Large, wall-aligned interaction volume centred on the actual patrol board.
+    // The previous sub-metre sensor sat too low/too close to the spare-key shelf.
+    const futureSignHit=new THREE.Mesh(new THREE.BoxGeometry(1.55,1.30,.62),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
+    futureSignHit.position.set(19,1.55,1.44);
+    futureSignHit.name='Guard2117_SignSensor';
     futureSignHit.userData={interactable:false,id:'GUARD_SIGN_2117',type:'guard_sign_2117',label:'查看 21:17 查哨紀錄'};
     this.zoneGroup.add(futureSignHit);this.interactables.push(futureSignHit);this.guardSign2117=futureSignHit;
 
     const logBook=solid(this.zoneGroup,m.floorWood,[18.98,.98,1.48],[.52,.045,.34]);
     logBook.rotation.y=.06;logBook.name='GuardLogBook_2117';logBook.visible=false;
-    logBook.userData={interactable:false,id:'GUARD_BOOK_2117',type:'guard_book_2117',label:'翻開三樓夜間巡查簽名簿'};
-    this.interactables.push(logBook);this.guardLog2117=logBook;
+    logBook.userData={interactable:false,id:'GUARD_BOOK_2117_VISUAL',type:'decorative',label:''};
+
+    // Separate generous sensor around the visible logbook: visual size stays realistic,
+    // interaction size becomes forgiving and no longer depends on hitting a 4.5 cm slab.
+    const logBookHit=new THREE.Mesh(new THREE.BoxGeometry(1.20,.72,.78),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
+    logBookHit.position.set(18.98,1.10,1.42);
+    logBookHit.name='Guard2117_LogBookSensor';
+    logBookHit.visible=false;
+    logBookHit.userData={interactable:false,id:'GUARD_BOOK_2117',type:'guard_book_2117',label:'翻開三樓夜間巡查簽名簿'};
+    this.zoneGroup.add(logBookHit);this.interactables.push(logBookHit);
+    this.guardLog2117=logBookHit;this.guardLog2117Visual=logBook;
 
     this.guardPatrolPoint={id:'3F_GUARD_PATROL_POINT',position:[19,1.34,1.69],opposite:'3F_ARCHIVE_DOOR'};
 
@@ -387,6 +399,7 @@ export class FirstCampus3F {
       if(this.phaseWetMarks)this.phaseWetMarks.visible=true;
       this.setPatrolFutureEntry();
       if(this.guardSign2117)this.guardSign2117.userData.interactable=true;
+      if(this.guardLog2117Visual)this.guardLog2117Visual.visible=true;
       if(this.guardLog2117){
         this.guardLog2117.visible=true;
         this.guardLog2117.userData.interactable=state.getFlag('GUARD_SIGN_EXAMINED')===true;
