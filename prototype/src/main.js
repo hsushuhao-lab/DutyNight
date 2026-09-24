@@ -18,7 +18,7 @@ import { FPSController } from './player/FPSController.js';
 import { UIManager } from './ui/UIManager.js';
 import { soundManager } from './audio/SoundManager.js';
 import { floorStateManager, GamePhase } from './core/FloorStateManager.js';
-import { persistentMemory } from './core/PersistentMemory.js';
+import { persistentMemory, TRUE_NAME_CANON } from './core/PersistentMemory.js';
 import { legendState, NodeState } from './core/LegendStateManager.js';
 import { LoopManager } from './core/LoopManager.js';
 import { canAccess } from './core/AccessGraph.js';
@@ -375,6 +375,27 @@ controller.onInteract = (interactable) => {
     controller.enabled=false;
     uiManager.openArchiveDocument({title:interactable.documentTitle,pages:interactable.pages});
   } else if (interactable.type === 'workstation') {
+    if(gameState.getFlag('M8_IDENTITY_BATTLE_ACTIVE')&&worldRouter.activeZoneId==='first_campus_3f'){
+      controller.enabled=false;
+      uiManager.openFinalHandoff((value)=>{
+        if(value===TRUE_NAME_CANON&&persistentMemory.data.trueNameResolved&&persistentMemory.hasAllProofs()){
+          gameState.setFlag('GAME_COMPLETE',true);
+          persistentMemory.completeGame();
+          uiManager.showFinalSuccess(TRUE_NAME_CANON);
+          controller.enabled=false;
+        }else{
+          uiManager.setFinalHandoffStatus(value?'IDENTITY MISMATCH / HANDOFF ALREADY COMPLETED':'NAME REQUIRED');
+          if(value){
+            setTimeout(()=>{
+              uiManager.closeFinalHandoff(false);
+              loopManager.triggerLegendOverride('FINAL',{legend:'最終覆寫 — 晨間交班',reason:'今日值班醫師已確認；你已被收治。'});
+            },650);
+          }
+        }
+      });
+      uiManager.setFinalHandoffStatus('另一個「李醫師」已在 316 登入｜請輸入真正姓名');
+      return;
+    }
     controller.enabled = false;
     uiManager.openWorkstation();
     if(!gameState.getFlag('HIS_CREDENTIALS')){
@@ -433,18 +454,52 @@ controller.onInteract = (interactable) => {
     controller.currentInteractable = null;
     uiManager.showPrompt(null);
   } else if (interactable.type === 'hidden_service_door_1f') {
-    if(!gameState.getFlag('FIRST_FLOOR_GUARD_KEY')){
-      uiManager.showSubtitle('李醫師','「牆面接縫不像一般裝修……但現在沒有能試的鑰匙。」',3000);
+    if(!gameState.getFlag('B_PANEL_KEY')){
+      uiManager.showSubtitle('李醫師','「牆面接縫不像一般裝修……但 Jane Doe 提到的舊配電鑰匙還不在我手上。」',3200);
       return;
     }
-    if(!gameState.getFlag('HIDDEN_SERVICE_DOOR_DISCOVERED')){
+    if(!persistentMemory.hasAllProofs()||!gameState.getFlag('M6_FLOOR6_RESOLVED')){
       gameState.setFlag('HIDDEN_SERVICE_DOOR_DISCOVERED',true);
-      gameState.addEvidence(1);
-      soundManager.playDoorLockClack();
-      uiManager.showSubtitle('李醫師','「1F 警衛台那把舊鑰匙真的能插進去……但門後像被東西頂住。這裡原本真的有一扇門。」',4600);
-    }else{
-      uiManager.showSubtitle('李醫師','「門還在，只是被後來的牆面遮住了。」',2600);
+      uiManager.showSubtitle('李醫師','「鑰匙能插進去，但還少了什麼。409、21:17、另一個我……線索還沒有完全對上。」',4000);
+      return;
     }
+    if(gameState.getFlag('M7_B2_OPEN')){worldRouter.loadZone('b2_archive','b2_archive_lift');return;}
+    gameState.setGameTime('02:17');
+    controller.enabled=false;
+    uiManager.openStoryChoice({
+      title:'02:17｜舊警衛台後配電',
+      body:'舊紀錄寫著：「02:17 拉下總閘，封閉服務門。」\n\n但你已經知道：紀錄可能是在逼未來重演。',
+      primaryText:'完全照舊紀錄拉下總閘',
+      secondaryText:'只隔離 B-Panel，再開服務門',
+      onPrimary:()=>loopManager.triggerLegendOverride('TIMELOOP',{legend:'02:17 — 重演',reason:'你成了事故紀錄裡的人。'}),
+      onSecondary:()=>{
+        gameState.setFlag('M7_B2_OPEN',true);
+        gameState.setFlag('B2_DOOR_READY',true);
+        persistentMemory.setProof('time',true);
+        persistentMemory.addJournalNote('B2_OPEN','02:17 不是命令。我只隔離 B-Panel，沒有重演整個斷電流程。');
+        worldRouter.loadZone('b2_archive','b2_archive_lift');
+        controller.enabled=true;
+      }
+    });
+  } else if (interactable.type === 'b2_archive_terminal') {
+    if(gameState.getFlag('M7_B2_RESOLVED')){
+      uiManager.showSubtitle('舊終端機',`ARCHIVE ID：${TRUE_NAME_CANON}｜住院醫師｜1998 夜班事件關係人`,3600);
+      return;
+    }
+    gameState.setFlag('M7_B2_RESOLVED',true);
+    gameState.setFlag('M8_IDENTITY_BATTLE_ACTIVE',true);
+    persistentMemory.setTrueNameFragment('frag_title','住院醫師');
+    persistentMemory.resolveTrueName(TRUE_NAME_CANON);
+    while(persistentMemory.data.identityErosionLevel<4)persistentMemory.raiseErosion(1);
+    persistentMemory.addJournalNote('B2_316','B2 的 316 舊終端顯示：我的名字是林昱衡。現在 3F-316 有另一個「李醫師」登入中。');
+    uiManager.showSubtitle('UNREGISTERED MESSAGE / ARCHIVE',`「交班完成。\nARCHIVE ID：${TRUE_NAME_CANON}。\n3F-316：另一個使用者已登入。」`,5600);
+  } else if (interactable.type === 'b2_return_lift') {
+    if(!gameState.getFlag('M7_B2_RESOLVED')) return uiManager.showSubtitle('李醫師','「先看那台舊終端機。」',2400);
+    worldRouter.loadZone('first_campus_1f');
+    gameState.setFlag('LAST_CALL_SEEN',true);
+    persistentMemory.resolveLegend('lastCall');
+    setTimeout(()=>uiManager.showSubtitle('不明來電','☎「……快逃。」',3000),900);
+    controller.enabled=true;
   } else if (interactable.type === 'exit_door' || interactable.type === 'closed_door') {
     soundManager.playClick();
     if (interactable.id === '1F_MAIN_DOOR') {
