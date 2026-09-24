@@ -804,6 +804,11 @@ export class UIManager {
       return;
     }
 
+    if(this.gameState.getFlag('BOOTSTRAP_2117_RESOLVED')){
+      document.getElementById('task-panel')?.classList.add('no-guidance');
+      return;
+    }
+
     if (done('ACT1_NORMAL_FLOW')) {
       this.renderTaskBoard('夜班進度（21:00）', [
         {id:'task-normal-flow-complete',text:'正常值班流程完成｜目前可在值班室休息',state:'completed'}
