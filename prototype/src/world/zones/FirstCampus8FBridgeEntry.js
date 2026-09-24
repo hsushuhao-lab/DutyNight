@@ -91,7 +91,7 @@ export class FirstCampus8FBridgeEntry {
       z: 0,
       ceilingY: 3.2,
       rotationY: Math.PI / 2,
-      text: '🌉 松德院史長廊 ｜ 歷任院長與重大貢獻者紀念展 ▶'
+      text: '🌉 青嶺院史長廊 ｜ 歷任院長與重大貢獻者紀念展 ▶'
     });
 
     // Gallery introductory exhibition plaque
@@ -104,9 +104,9 @@ export class FirstCampus8FBridgeEntry {
       width: 1.1,
       height: 0.55,
       code: 'HERITAGE',
-      title: '松德院史長廊 ｜ 創立與傳承',
+      title: '青嶺院史長廊 ｜ 創立與傳承',
       subtitle: 'HOSPITAL HERITAGE & ARCHIVAL GALLERY',
-      header: '松德醫療中心 ｜ 8F 空中連通道'
+      header: '青嶺醫療中心 ｜ 8F 空中連通道'
     });
 
     // Archival vintage B&W portraits on vestibule walls
