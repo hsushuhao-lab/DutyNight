@@ -52,6 +52,7 @@ jobs:
           node test_cross_floor_sequence_qa.js
           node test_persistent_loop_qa.js
           node test_bed33_gold_slice_qa.js
+          node test_m3_m9_story_qa.js
           node test_user_floorplan_qa.js
           node test_ward_circulation_qa.js
       - name: Build exact master SHA
