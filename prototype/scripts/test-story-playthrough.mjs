@@ -67,8 +67,13 @@ try{
   await publicPage.goto(base,{waitUntil:'load',timeout:180000});
   await publicPage.waitForFunction(()=>window.worldRouter?.activeZoneInstance,null,{timeout:180000});
   assert.equal(await publicPage.evaluate(()=>typeof window.__storyQA),'undefined');
-  await publicPage.screenshot({path:out+'/m1-3f-normal-duty.png',fullPage:false,timeout:5000});
-  report.screenshots.push('m1-3f-normal-duty.png');
+  try{
+    await publicPage.screenshot({path:out+'/m1-3f-normal-duty.png',fullPage:false,timeout:5000});
+    report.screenshots.push('m1-3f-normal-duty.png');
+  }catch(e){
+    report.screenshotWarnings.push({name:'m1-3f-normal-duty',error:e.message});
+    console.log('SCREENSHOT_WARNING','m1-3f-normal-duty',e.message.split('\\n')[0]);
+  }
   await publicPage.close();
 
   await page.goto(url,{waitUntil:'load',timeout:180000});
