@@ -17,8 +17,8 @@ export class AccessDoor {
     this.leaves=[-1,1].map(side=>{
       const leaf=solid(this.root,material||m.metal,[side*width/4,1.175,0],[width/2,2.35,.10]);
       if(!readers)solid(leaf,m.stainless,[-side*.14,-.12,-.07],[.035,.34,.05]);
-      leaf.userData={interactable:!portal,id:`${id}_leaf_${side}`,type:'access_door',doorId:id,label:`開啟${title}`};
-      if(!portal) zone.interactables.push(leaf);
+      leaf.userData={interactable:!portal&&!readers,id:`${id}_leaf_${side}`,type:'access_door',doorId:id,label:`開啟${title}`};
+      if(!portal&&!readers) zone.interactables.push(leaf);
       return leaf;
     });
     this.readers=[];
@@ -26,6 +26,18 @@ export class AccessDoor {
     const mount=new THREE.Group();mount.position.set(mountX,1.4,0);mount.name=`ReaderJambMount_${id}`;
     mount.userData={readerMount:true,mount:'jamb',doorId:id,readerSide};this.root.add(mount);
     solid(mount,m.metal,[0,0,0],[.24,.42,.30]);this.readerMounts=[mount];
+
+    if(readers&&!portal){
+      const sensor=new THREE.Mesh(
+        new THREE.BoxGeometry(.48,.72,.42),
+        new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false})
+      );
+      sensor.name=`ReaderInteractionSensor_${id}`;
+      sensor.position.set(0,0,0);
+      sensor.userData={interactable:true,id:`${id}_reader_sensor`,type:'access_door',doorId:id,label:`感應開啟${title}`,readerSensor:true};
+      mount.add(sensor);zone.interactables.push(sensor);this.readerSensor=sensor;
+    }
+
     for(const side of [-1,1]) {
       const reader=new THREE.Group(); reader.position.set(0,0,side*.18);
       reader.rotation.y=side===1?0:Math.PI; mount.add(reader);
@@ -48,7 +60,8 @@ export class AccessDoor {
     const i=this.zone.colliders.indexOf(this.closedBox);
     if(closed&&i<0)this.zone.colliders.push(this.closedBox);
     if(!closed&&i>=0)this.zone.colliders.splice(i,1);
-    for(const panel of this.readers) panel.userData.label=this.id==='duty_room'?(closed?'鑰匙開門':'關門'):(closed?'感應開門':'感應關門');
+    for(const panel of this.readers) panel.userData.label=closed?'感應開門':'感應關門';
+    if(this.readerSensor)this.readerSensor.userData.label=closed?'感應開門':'感應關門';
     this.root.updateWorldMatrix(true,true);
   }
   toggle(position) {
