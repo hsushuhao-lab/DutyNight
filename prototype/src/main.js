@@ -726,14 +726,14 @@ controller.onInteract = (interactable) => {
     if(!gameState.getFlag('BOOTSTRAP_2117_RESOLVED')){
       gameState.setFlag('BOOTSTRAP_2117_RESOLVED',true);
       gameState.setFlag('TIME_PROOF_FRAGMENT',true);
-      gameState.setFlag('GHOST_REGISTRATION_ARMED',true);
-      gameState.setFlag('SANDBOX_MODE',true);
+      gameState.setFlag('POST_2117_RETURN_TO_DUTY_ROOM',true);
+      gameState.setFlag('SANDBOX_MODE',false);
       persistentMemory.learnCode('code_0217');
       persistentMemory.addJournalNote('ECHO_2117','17點看到的「21:17 三樓巡查完成」，最後是我自己回來完成的。');
       gameState.setGameTime('21:17');
       soundManager.playPaperSign();
       uiManager.showSubtitle('李醫師','「筆跡不是我的……但簽的卻是我的名字。原來那行 21:17，不是預言，是我正在把它完成。」',6200);
-      setTimeout(()=>uiManager.showSubtitle('院內系統','【常規值班已瓦解】\n任務指引中止。門禁仍依你目前持有的權限運作。',4200),1500);
+      setTimeout(()=>uiManager.showSubtitle('李醫師','「先回 4F 值班室。我要把今晚發生的事情整理清楚。」',3600),1500);
       uiManager.updateTasks();
     }else{
       uiManager.showSubtitle('李醫師','「這一行已經完成了。下一次異常不該現在就出現。」',2600);
@@ -814,6 +814,21 @@ controller.onInteract = (interactable) => {
       }else uiManager.showSubtitle('李醫師','「急診評估紀錄完成，回 4F。」');
     } else if(action==='END_SHIFT'){
       if(!gameState.isTaskComplete('P1_RETURN_4F')) return uiManager.showSubtitle('李醫師','「還沒到可以休息的時候。」',2500);
+
+      if(gameState.getFlag('BOOTSTRAP_2117_RESOLVED')&&!gameState.getFlag('POST_2117_DUTY_CALL_DONE')){
+        gameState.setFlag('POST_2117_RETURN_TO_DUTY_ROOM',false);
+        gameState.setGameTime('00:30');
+        uiManager.showSubtitle('李醫師','「21:17、316、409……我把能記的都寫下來了。不知不覺已經過了午夜。」',4200);
+        setTimeout(()=>{
+          gameState.setFlag('POST_2117_DUTY_CALL_DONE',true);
+          gameState.setFlag('GHOST_REGISTRATION_ARMED',true);
+          soundManager.playPhoneRingPattern();
+          uiManager.showSubtitle('2F 急診值班電話','☎「李醫師，剛才那位無名氏的資料又卡住了。檢傷台有一筆很舊的掛號格式，我們沒人敢動，麻煩你下來看一下。」',6200);
+          uiManager.updateTasks();
+        },1400);
+        return;
+      }
+
       if(gameState.isTaskComplete('ACT1_NORMAL_FLOW')||gameState.getFlag('NIGHT_PATROL_RETURN_3F')) return;
       dutyEvents.complete('ACT1_NORMAL_FLOW','21:00');
       uiManager.showSubtitle('李醫師','「目前都處理完了。先躺一下吧。」');
