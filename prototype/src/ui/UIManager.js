@@ -760,6 +760,13 @@ export class UIManager {
       return;
     }
 
+    if(done('P1_INSOMNIA_DONE')&&!this.gameState.getFlag('BED33_RESOLVED')){
+      this.renderTaskBoard('4F 病房｜床位異常',[
+        {id:'task-bed33',text:'核對 409A 臨時床位資料，再決定是否確認過床',state:'ready'}
+      ]);
+      return;
+    }
+
     if (done('P1_REST_DONE')) {
       this.renderTaskBoard('2F 急診會診｜20:00–20:40', sequential([
         {id:'task-er-assess',task:'P1_ER_ASSESSMENT_DONE',text:'20:05 前往 2F 急診完成精神科評估'},
