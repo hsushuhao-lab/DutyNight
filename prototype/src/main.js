@@ -737,15 +737,15 @@ controller.onInteract = (interactable) => {
     if(action==='NURSE_REPORT'){
       if(!gameState.isTaskComplete('WARD_ENTRY')) return uiManager.showSubtitle('李醫師','「先正式抵達 4F 再報到。」',2500);
       dutyEvents.complete('P1_4F_REPORT','17:15');
-      uiManager.showSubtitle('晚班護理師','「醫師晚安，今天目前都還算穩定。403 昨晚比較睡不好，406 下午有點焦慮，408 晚點再追一下血壓。」');
+      uiManager.showSubtitle('晚班護理師','「李醫師，你來啦。今晚 4F 滿床，總共 36 床。403 老先生一直說隔壁在敲牆，待會巡房麻煩你幫忙看一下。」',5200);
     } else if(action==='DUTY_ROOM_PREP'){
       if(!gameState.isTaskComplete('P1_4F_REPORT')) return uiManager.showSubtitle('李醫師','「先去護理站報到。」',2500);
       dutyEvents.complete('P1_DUTY_ROOM_READY','17:30');
-      uiManager.showSubtitle('李醫師','「東西放好了，床也整理一下。值班電話正常。」');
+      uiManager.showSubtitle('李醫師','「值班電話正常……等等，桌上怎麼已經有一杯熱咖啡？值班室鑰匙剛才明明在我身上。」',5200);
     } else if(action==='WARD_ROUND'){
       if(!gameState.isTaskComplete('P1_DUTY_ROOM_READY')) return uiManager.showSubtitle('李醫師','「先把值班室整理好再巡房。」',2500);
       dutyEvents.complete('P1_ROUND_COMPLETE','18:00');
-      uiManager.showSubtitle('值班電話','☎ 護理站：「醫師，403 說睡不著，可以來看一下嗎？」');
+      uiManager.showSubtitle('值班電話','☎ 護理站：「李醫師，403 老先生又說隔壁在敲牆，麻煩你過來看一下。」',4200);
     } else if(action==='INSOMNIA_403'){
       if(!gameState.isTaskComplete('P1_ROUND_COMPLETE')) return uiManager.showSubtitle('李醫師','「先完成晚間巡房。」',2500);
       dutyEvents.complete('P1_INSOMNIA_DONE','18:30');
@@ -770,7 +770,7 @@ controller.onInteract = (interactable) => {
       if(gameState.getFlag('HOOK_0217')){
         gameState.setFlag('ER_JANE_DOE_WRISTBAND',true);
         persistentMemory.setTrueNameFragment('frag_surname','林');
-        uiManager.showSubtitle('Jane Doe','「……林醫師？02:17……警衛室後面……配電箱……門要被封死了……」',5200);
+        uiManager.showSubtitle('Jane Doe','「……林醫師？02:17！門要被關上了……舊配電箱在 1F 警衛台後面。不要簽……千萬不要簽第 33 床……」',6200);
       }else uiManager.showSubtitle('急診病人','「最近壓力很大，兩天睡不好，今晚一直心悸，很焦慮。」');
     } else if(action==='ER_NOTE'){
       if(!gameState.isTaskComplete('P1_ER_ASSESSMENT_DONE')) return uiManager.showSubtitle('李醫師','「先完成病人評估。」',2500);
@@ -779,7 +779,7 @@ controller.onInteract = (interactable) => {
         gameState.setFlag('FIRST_FLOOR_GUARD_KEY',true);
         gameState.setFlag('B_PANEL_KEY',true);
         gameState.setFlag('FORCE_3F_ELEVATOR_STOP',true);
-        uiManager.showSubtitle('李醫師','「她外套口袋裡還有一把舊鑰匙……標籤寫著『1F 警衛台』。先收著，回 4F。」',4600);
+        uiManager.showSubtitle('李醫師','「急診評估紀錄完成。她掉下來的舊十字鑰匙標著 B-Panel……先收著，現在先回 4F。」',4800);
       }else uiManager.showSubtitle('李醫師','「急診評估紀錄完成，回 4F。」');
     } else if(action==='END_SHIFT'){
       if(!gameState.isTaskComplete('P1_RETURN_4F')) return uiManager.showSubtitle('李醫師','「還沒到可以休息的時候。」',2500);
@@ -791,7 +791,7 @@ controller.onInteract = (interactable) => {
         gameState.setGameTime('21:15');
         gameState.setFlag('NIGHT_PATROL_RETURN_3F',true);
         floorStateManager.setPhase(GamePhase.NIGHT_PATROL);
-        uiManager.showSubtitle('護理站電話','「李醫師，三樓保全剛打上來，說你有東西掉在那扇舊資料室門口，麻煩你下去看一下。」',5200);
+        uiManager.showSubtitle('4F 護理站電話','「李醫師，三樓警衛說你剛才在查哨點少簽了一個名字，21:17 前要送巡查大表。你現在立刻下去補簽。」\n李醫師：「我？我一直在四樓值班室啊……」\n護理師：「三樓說看著你的背影走過去的。快去吧。」',7600);
       },2200);
     }
     controller.currentInteractable=null;uiManager.showPrompt(null);
