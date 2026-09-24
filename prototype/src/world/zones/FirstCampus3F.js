@@ -62,7 +62,7 @@ export class FirstCampus3F {
     adminPrinter.name='AdminDesk_Printer';
     const printerTop=solid(this.zoneGroup,m.wallDark,[-20.28,adminDeskSurface+.295,5.27],[.38,.03,.26]);
     printerTop.name='AdminDesk_PrinterTop';
-    const printerPaper=solid(this.zoneGroup,m.lightWarm,[-20.28,adminDeskSurface+.318,5.22],[.28,.012,.20]);
+    const printerPaper=solid(this.zoneGroup,m.lightWarm,[-20.28,adminDeskSurface+.316,5.22],[.28,.012,.20]);
     printerPaper.name='AdminDesk_PrinterPaper';
 
     const monitorBase=solid(this.zoneGroup,m.metal,[-19.25,adminDeskSurface+.015,5.18],[.34,.03,.22]);
