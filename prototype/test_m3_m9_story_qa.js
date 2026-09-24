@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {PersistentMemory,TRUE_NAME_CANON} from './src/core/PersistentMemory.js';
 
-assert.equal(TRUE_NAME_CANON,'林昱衡');
+assert.equal(TRUE_NAME_CANON,'張守恆');
 
 const main=readFileSync('./src/main.js','utf8');
 const er=readFileSync('./src/world/zones/FirstCampus2FER.js','utf8');
@@ -17,14 +17,14 @@ const html=readFileSync('./index.html','utf8');
 
 assert(er.includes("type:'er_ghost_registration'"),'M3 ghost registration terminal missing');
 assert(er.includes("type:'er_exit_notice'")&&er.includes('此門只進不出'),'M3 ER entry-only exit warning missing');
-assert(main.includes("LEGEND 02 — 00:33 急診掛號")&&main.includes("SECOND_CAMPUS_ACCESS"),'M3 resolve/override or campus call missing');
+assert(main.includes("LEGEND 02 — 00:33 急診掛號")&&main.includes("ER0033_SLIP_COLLECTED")&&main.includes("316_LEGACY_TERMINAL")&&main.includes("SECOND_CAMPUS_ACCESS"),'M3 two-stage ER-to-316 resolve or campus call missing');
 
 assert(ward.includes("type:'second_chest_patient'")&&ward.includes("type:'second_chest_transfer'"),'M4 chest-pain patient/form missing');
 assert(main.includes("LEGEND 03 — 多出來的胸痛病人")&&main.includes("M4_CHEST_RESOLVED"),'M4 decision flow missing');
 
 assert(bridge.includes("type:'bridge_loop_event'")&&main.includes("LEGEND 04 — 不能回頭的天橋"),'M5 bridge legend missing');
 assert(pond.includes("type:'pond_reflection_event'")&&main.includes("LEGEND 05 — 生態池裡的人影"),'M5 pond legend missing');
-assert(main.includes("frag_givenName_2','衡'"),'M5 true-name fragment missing');
+assert(main.includes("frag_givenName_2','恆'"),'M5 true-name fragment missing');
 
 assert(floor6.includes("type:'floor6_safe_return'")&&floor6.includes("type:'floor6_chase'"),'M6 phantom floor interactions missing');
 assert(router.includes("'phantom_6f': Phantom6F")&&routes.includes("phantom_6f_lift"),'M6 route registration missing');
@@ -42,12 +42,13 @@ const storage={getItem:k=>backing.get(k)||null,setItem:(k,v)=>backing.set(k,v),r
 const memory=new PersistentMemory(storage);
 memory.setProof('space');memory.setProof('identity');memory.setProof('time');
 assert(memory.hasAllProofs(),'M7 proof convergence must require all three proofs');
-memory.setTrueNameFragment('frag_surname','林');
-memory.setTrueNameFragment('frag_givenName_1','昱');
-memory.setTrueNameFragment('frag_givenName_2','衡');
+memory.setTrueNameFragment('frag_employeePrefix','MED-87');
+memory.setTrueNameFragment('frag_surname','張');
+memory.setTrueNameFragment('frag_givenName_1','守');
+memory.setTrueNameFragment('frag_givenName_2','恆');
 memory.setTrueNameFragment('frag_title','住院醫師');
-memory.resolveTrueName(TRUE_NAME_CANON);
-assert.equal(memory.data.trueName,'林昱衡');
+assert.equal(memory.resolveTrueName(TRUE_NAME_CANON),true);
+assert.equal(memory.data.trueName,'張守恆');
 memory.completeGame();
 assert.equal(memory.data.gameComplete,true);
 
