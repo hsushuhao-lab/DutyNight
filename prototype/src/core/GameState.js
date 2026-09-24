@@ -131,6 +131,14 @@ export class GameState {
     this.identity += delta;
     this.notify('identity_changed', this.identity);
   }
+
+  resetForLoop() {
+    const listeners=this.listeners;
+    const fresh=new GameState();
+    Object.assign(this,fresh);
+    this.listeners=listeners;
+    this.notify('loop_reset',null);
+  }
 }
 
 export const gameState = new GameState();
