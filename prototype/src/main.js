@@ -572,6 +572,7 @@ controller.onInteract = (interactable) => {
       if (destination.zoneId === 'first_campus_4f') gameState.markTaskComplete('WARD_ENTRY');
       worldRouter.loadZone(destination.zoneId, destination.spawn);
       const dutyLine=dutyEvents.onZoneEntered(destination.zoneId);
+      worldRouter.activeZoneInstance?.syncStoryState?.();
       if(dutyLine)uiManager.showSubtitle(dutyLine.speaker,dutyLine.text);
       controller.enabled = true;
     }, interactable.kind);
