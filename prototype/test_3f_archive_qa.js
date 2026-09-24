@@ -52,12 +52,15 @@ assert(zone.interactables.some(o=>o.userData?.type==='admin_printer_doc_3f'),'3F
 assert(zone.interactables.some(o=>o.userData?.type==='admin_drawer_manual_3f'),'3F administrative office secretary memo missing');
 assert.deepEqual(zone.adminRosterTask?.pieces,['3F_ADMIN_ROSTER_TASK','3F_ADMIN_PRINTER_DOC','3F_ADMIN_DRAWER_MANUAL']);
 
-for(const name of ['AdminDesk_Printer','AdminDesk_MonitorBase','AdminDesk_Keyboard','AdminDesk_PrinterPaper']){
+for(const name of ['AdminDesk_Printer','AdminDesk_MonitorBase','AdminDesk_Keyboard']){
   const obj=zone.zoneGroup.getObjectByName(name);
   assert(obj,`${name} missing`);
   const box=new THREE.Box3().setFromObject(obj);
   assert(Math.abs(box.min.y-.82)<.006,`${name} must physically touch the .82m desk surface; got bottom ${box.min.y}`);
 }
+const printerTopBox=new THREE.Box3().setFromObject(zone.zoneGroup.getObjectByName('AdminDesk_PrinterTop'));
+const printerPaperBox=new THREE.Box3().setFromObject(zone.zoneGroup.getObjectByName('AdminDesk_PrinterPaper'));
+assert(Math.abs(printerPaperBox.min.y-printerTopBox.max.y)<.004,'Printer supplement sheet must sit on the printer output surface');
 
 const storageRailClearance=new THREE.Box3(new THREE.Vector3(12.76,.96,2.20),new THREE.Vector3(14.24,1.14,2.40));
 for(const name of ['RailNorthEast_WestOfStorage','RailNorthEast_EastOfStorage']){
