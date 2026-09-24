@@ -1,3 +1,10 @@
+const STORY_TIME_SEQUENCE=Object.freeze([
+  '17:00','17:10','17:15','17:30','18:00','18:30','19:30','20:00','20:05','20:25','20:30','20:40',
+  '21:00','21:15','21:16','21:17','23:55','00:30','00:33','01:15','01:45','02:00','02:17','03:30','04:05'
+]);
+const STORY_TIME_INDEX=new Map(STORY_TIME_SEQUENCE.map((value,index)=>[value,index]));
+const MIDNIGHT_STORY_INDEX=STORY_TIME_INDEX.get('00:30');
+
 // GameState.js - Mirrored from SongdeRunStateSubsystem and Act1Director
 export class GameState {
   constructor() {
@@ -6,6 +13,7 @@ export class GameState {
     this.identity = 3;
     this.fatigue = 0;
     this.gameTime = '17:00';
+    this.storyTimeIndex = STORY_TIME_INDEX.get('17:00');
     this.gamePhase = 'Phase0_1700_FirstArrival';
 
     this.requiredTasks = [
@@ -83,6 +91,8 @@ export class GameState {
     this.flags.set('M8_IDENTITY_BATTLE_ACTIVE', false);
     this.flags.set('LAST_CALL_SEEN', false);
     this.flags.set('GAME_COMPLETE', false);
+    this.flags.set('POST_2117_RETURN_TO_DUTY_ROOM', false);
+    this.flags.set('POST_2117_DUTY_CALL_DONE', false);
   }
 
   addListener(fn) {
@@ -128,9 +138,24 @@ export class GameState {
   }
 
   setGameTime(time) {
-    if (this.gameTime === time) return;
-    this.gameTime = time;
+    if (this.gameTime === time) return true;
+    const nextIndex=STORY_TIME_INDEX.get(time);
+    if(nextIndex===undefined){
+      console.warn('[GameState] Unknown story time ignored:',time);
+      return false;
+    }
+    if(nextIndex<this.storyTimeIndex){
+      console.warn('[GameState] Backward story time rejected:',this.gameTime,'->',time);
+      return false;
+    }
+    this.storyTimeIndex=nextIndex;
+    this.gameTime=time;
     this.notify('time_changed', time);
+    return true;
+  }
+
+  getDisplayTime() {
+    return this.storyTimeIndex>=MIDNIGHT_STORY_INDEX?'翌日 '+this.gameTime:this.gameTime;
   }
 
   setFlag(flag, val = true) {
