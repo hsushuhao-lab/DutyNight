@@ -346,8 +346,8 @@ export class FirstCampus2FER {
 
     const ghostTerminal=new THREE.Mesh(new THREE.BoxGeometry(.75,.55,.35),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
     ghostTerminal.position.set(13,1.18,-6.35);
-    ghostTerminal.userData={interactable:true,id:'ER_GHOST_REGISTRATION',type:'er_ghost_registration',label:'查看急診掛號系統'};
-    this.zoneGroup.add(ghostTerminal);this.interactables.push(ghostTerminal);
+    ghostTerminal.userData={interactable:gameState.getFlag('GHOST_REGISTRATION_AVAILABLE')===true,id:'ER_GHOST_REGISTRATION',type:'er_ghost_registration',label:'查看急診掛號系統'};
+    this.zoneGroup.add(ghostTerminal);this.interactables.push(ghostTerminal);this.ghostRegistrationTerminal=ghostTerminal;
 
     const exitNotice=new THREE.Mesh(new THREE.BoxGeometry(.9,.42,.10),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
     exitNotice.position.set(21.72,1.75,.95);
@@ -375,6 +375,12 @@ export class FirstCampus2FER {
       if(child.name.startsWith('ArtAsset/') && new THREE.Box3().setFromObject(child).intersectsBox(wingVolume)) child.visible=false;
     }
     return this;
+  }
+
+  syncStoryState(){
+    if(this.ghostRegistrationTerminal){
+      this.ghostRegistrationTerminal.userData.interactable=gameState.getFlag('GHOST_REGISTRATION_AVAILABLE')===true;
+    }
   }
 
   buildCurtain(x, z) {
