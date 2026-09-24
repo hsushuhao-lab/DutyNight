@@ -827,6 +827,43 @@ export class UIManager {
         this.renderTaskBoard('等待院內來電',[
           {id:'task-second-call',text:'留意第二院區來電',state:'ready'}
         ]);
+      }else if(this.gameState.getFlag('SECOND_CAMPUS_ACCESS')&&!this.gameState.getFlag('M4_CHEST_RESOLVED')){
+        const seen=this.gameState.getFlag('SECOND_CHEST_PATIENT_SEEN');
+        this.renderTaskBoard('翌日 01:15｜第二院區 5F',[
+          {
+            id:'task-m4-chest',
+            text:seen?'到護理站核對胸痛病人的轉院單':'前往第二院區 5F 病房，找到護理站通知的胸痛病人',
+            state:'ready'
+          }
+        ]);
+      }else if(this.gameState.getFlag('M4_CHEST_RESOLVED')&&!this.gameState.getFlag('M5_ROUTE_RESOLVED')){
+        this.renderTaskBoard('翌日 01:45｜離開第二院區',[
+          {id:'task-m5-route',text:'返回第一院區；可走天橋，或從第二院區 1F 山側步道經生態池繞回',state:'ready'}
+        ]);
+      }else if(this.gameState.getFlag('M5_ROUTE_RESOLVED')&&!this.gameState.getFlag('M6_FLOOR6_RESOLVED')){
+        this.renderTaskBoard('翌日 02:00｜樓層異常',[
+          {id:'task-m6-floor6',text:'回到院區電梯，確認突然出現在樓層選單裡的「6F」',state:'ready'}
+        ]);
+      }else if(this.gameState.getFlag('M6_FLOOR6_RESOLVED')&&!this.gameState.getFlag('M7_B2_OPEN')){
+        this.renderTaskBoard('翌日 02:17 前｜B-Panel',[
+          {id:'task-m7-service-door',text:'前往第一院區 1F，查看舊警衛台後方的隱藏服務門',state:'ready'}
+        ]);
+      }else if(this.gameState.getFlag('M7_B2_OPEN')&&!this.gameState.getFlag('M7_B2_RESOLVED')){
+        this.renderTaskBoard('翌日 02:17｜B2',[
+          {id:'task-m7-b2-terminal',text:'查看 B2 的「316」舊終端，完成身分驗證',state:'ready'}
+        ]);
+      }else if(this.gameState.getFlag('M7_B2_RESOLVED')&&!this.gameState.getFlag('LAST_CALL_SEEN')){
+        this.renderTaskBoard('B2｜身分驗證完成',[
+          {id:'task-m8-b2-exit',text:'搭舊貨梯離開 B2，回到第一院區',state:'ready'}
+        ]);
+      }else if(this.gameState.getFlag('M8_IDENTITY_BATTLE_ACTIVE')&&!this.gameState.getFlag('GAME_COMPLETE')){
+        this.renderTaskBoard('翌日 03:30｜真正的交班',[
+          {id:'task-m9-final-handoff',text:'回第一院區 3F 的 316 總醫師辦公室，用工作站完成真正的晨間交班',state:'ready'}
+        ]);
+      }else if(this.gameState.getFlag('GAME_COMPLETE')){
+        this.renderTaskBoard('翌日 04:05｜交班完成',[
+          {id:'task-game-complete',text:'張守恆已完成真正的晨間交班',state:'completed'}
+        ]);
       }else{
         document.getElementById('task-panel')?.classList.add('no-guidance');
       }

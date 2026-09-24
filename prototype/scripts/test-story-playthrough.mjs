@@ -32,6 +32,7 @@ async function shot(name){
   }
 }
 async function q(fn,arg){return page.evaluate(fn,arg);}
+async function taskText(){return q(()=>document.getElementById('task-panel')?.innerText||'');}
 async function load(zone,spawn){await q(({zone,spawn})=>window.__storyQA.load(zone,spawn),{zone,spawn});await page.waitForTimeout(120);}
 async function enter(zone,spawn){await q(({zone,spawn})=>window.__storyQA.enter(zone,spawn),{zone,spawn});await page.waitForTimeout(160);}
 async function flag(k,v=true){await q(({k,v})=>window.__storyQA.setFlag(k,v),{k,v});}
@@ -136,6 +137,7 @@ try{
   assert.equal(s.flags.GHOST_REGISTRATION_ARMED,true);
   assert.equal(s.controllerEnabled,true,'movement must return after the forced phone beat');
   assert.equal(await q(()=>window.__storyQA.gameState.getDisplayTime()),'翌日 00:30');
+  assert.match(await taskText(),/2F 急診/,'00:30 call must leave an explicit 2F ER objective');
   await mark('21:17 duty-room entry auto-triggers 23:55 beat and 00:30 ER call');
 
   // Only after the duty-room call does re-entry to 2F materialize the 00:33 registration.
@@ -148,6 +150,7 @@ try{
   assert.equal(s.flags.ER0033_SLIP_COLLECTED,true);
   assert.equal(s.flags.LEGEND_ER0033_RESOLVED,false);
   assert.equal(s.flags.SECOND_CAMPUS_ACCESS,false);
+  assert.match(await taskText(),/3F 316/,'00:33 slip must explicitly push the player back to 316');
 
   // M3 only resolves after the 1998-ER-0217 slip is carried back to the second 316 terminal.
   await load('first_campus_3f');
@@ -160,14 +163,17 @@ try{
   assert.equal(s.memory.trueNameFragments.frag_surname,'張');
   assert.equal(s.time,'01:15');
   assert.equal(await q(()=>window.__storyQA.gameState.getDisplayTime()),'翌日 01:15');
+  assert.match(await taskText(),/第二院區 5F[\s\S]*胸痛/,'M3 resolution must leave a concrete second-campus objective');
   await mark('M3 00:33 slip decoded at 316; second campus unlocked');
 
   // M4: second-campus chest-pain duplicate patient.
   await load('second_campus_5f');
   await interact({id:'SECOND_CHEST_PATIENT'});
+  assert.match(await taskText(),/轉院單/,'seeing the M4 patient must advance the objective to the transfer form');
   await interact({id:'SECOND_CHEST_TRANSFER'});
   await page.waitForSelector('#story-choice-modal.active');await shot('m4-chest-transfer');await secondary();
   s=await snap();assert.equal(s.flags.M4_CHEST_RESOLVED,true);assert.equal(s.flags.OUTDOOR_ROUTE_ACCESS,true);assert.equal(s.flags.CHEST_RECORD_MATCH,true);assert.equal(s.memory.trueNameFragments.frag_givenName_1,'守');assert.equal(s.time,'01:45');
+  assert.match(await taskText(),/返回第一院區/,'M4 resolution must push the player toward the next route');
   await mark('M4 chest-pain duplicate resolved');
 
   // M5A: skybridge rule.
@@ -175,6 +181,7 @@ try{
   await interact({id:'BRIDGE_LOOP_EVENT'});
   await page.waitForSelector('#story-choice-modal.active');await shot('m5-bridge-double');await secondary();
   s=await snap();assert.equal(s.flags.M5_BRIDGE_RESOLVED,true);assert.equal(s.flags.FLOOR6_AVAILABLE,true);assert.equal(s.memory.proofs.identity,true);assert.equal(s.memory.trueNameFragments.frag_givenName_2,'恆');assert.equal(s.time,'02:00');
+  assert.match(await taskText(),/6F/,'M5 resolution must reveal the 6F objective');
   await mark('M5 bridge rule resolved');
 
   // M5B: alternate pond route is independently functional.
@@ -189,6 +196,7 @@ try{
   await shot('m6-phantom6');
   await interact({id:'FLOOR6_SAFE_RETURN'});
   s=await snap();assert.equal(s.flags.M6_FLOOR6_RESOLVED,true);assert.equal(s.zone,'second_campus_5f');
+  assert.match(await taskText(),/第一院區 1F[\s\S]*隱藏服務門/,'M6 resolution must push the player to the 1F service door');
   await mark('M6 nonexistent 6F resolved');
 
   // M7: 02:17 decision + B2 convergence.
@@ -202,9 +210,11 @@ try{
   await shot('m7-b2');
   await interact({id:'B2_ARCHIVE_TERMINAL'});
   s=await snap();assert.equal(s.flags.M7_B2_RESOLVED,true);assert.equal(s.flags.M8_IDENTITY_BATTLE_ACTIVE,true);assert.equal(s.memory.trueNameResolved,true);assert.equal(s.memory.trueName,'張守恆');assert.equal(s.memory.trueNameFragments.frag_employeeFull,'MED-870409');
+  assert.match(await taskText(),/舊貨梯[\s\S]*離開 B2/,'B2 verification must explicitly tell the player how to leave');
   await interact({id:'B2_RETURN_LIFT'});
   await page.waitForFunction(()=>window.__storyQA.worldRouter.activeZoneId==='first_campus_1f');
   s=await snap();assert.equal(s.flags.LAST_CALL_SEEN,true);assert.equal(s.time,'03:30');
+  assert.match(await taskText(),/3F[\s\S]*316/,'last call must push the player back to 3F 316 for the final handoff');
   await mark('M7 B2 reveals true name; M8 identity battle active');
 
   // M9: return to 316 and complete the real handoff.
@@ -217,6 +227,7 @@ try{
   await page.waitForSelector('#final-success-modal.active');
   await shot('m9-success');
   s=await snap();assert.equal(s.flags.GAME_COMPLETE,true);assert.equal(s.memory.gameComplete,true);
+  assert.match(await taskText(),/交班完成/,'completed game must close the task chain instead of dropping guidance');
   await mark('M9 TRUE NAME handoff accepted');
 
   assert.equal(report.errors.length,0,JSON.stringify(report.errors,null,2));
