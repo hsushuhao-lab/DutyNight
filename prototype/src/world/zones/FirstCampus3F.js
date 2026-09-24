@@ -88,7 +88,7 @@ export class FirstCampus3F {
 
     // Closed but unlocked office door on the shared-core side.
     this.adminOfficeDoor=new KeyedKnobDoor(this,{
-      id:'3F_ADMIN_OFFICE_DOOR',x:-16,z:7.5,yaw:Math.PI/2,width:1.35,title:'3F 行政辦公室'
+      id:'3F_ADMIN_OFFICE_DOOR',x:-16,z:7.5,yaw:Math.PI/2,width:1.35,title:'3F 行政辦公室',openDirection:1
     });
     this.adminOfficeDoor.setClosed(true);
     this.adminOfficeDoor.interactionData.label='3F 行政辦公室｜開門';
