@@ -808,16 +808,16 @@ export class UIManager {
       if(!this.gameState.getFlag('POST_2117_DUTY_CALL_DONE')){
         const triggered=this.gameState.getFlag('POST_2117_DUTY_ROOM_TRIGGERED');
         const at4F=currentZone==='first_campus_4f';
-        this.renderTaskBoard(triggered?'23:55｜值班室':'21:17 之後｜故事仍在繼續',[
+        this.renderTaskBoard(triggered?'23:55｜值班室｜異常正在逼近':'21:17 之後｜回值班室',[
           {
             id:'task-post2117-duty',
-            text:triggered?'整理今晚的異常紀錄……':(at4F?'進入值班室，故事會繼續':'回 4F 值班室'),
+            text:triggered?'把「21:17／316／409」寫進值班紀錄；不要離開，值班電話即將響起':(at4F?'立刻進入值班室；一進門就會觸發下一段事件':'立刻返回 4F 值班室；不要在院區漫遊'),
             state:'ready'
           }
         ]);
       }else if(!this.gameState.getFlag('GHOST_REGISTRATION_AVAILABLE')&&!this.gameState.getFlag('ER0033_SLIP_COLLECTED')){
         this.renderTaskBoard('翌日 00:30｜值班電話',[
-          {id:'task-post2117-er',text:'前往 2F 急診檢傷站查看舊格式掛號異常',state:'ready'}
+          {id:'task-post2117-er',text:'立即前往 2F 急診檢傷站；查看「無名氏」的舊格式掛號異常',state:'ready'}
         ]);
       }else if(this.gameState.getFlag('ER0033_SLIP_COLLECTED')&&!this.gameState.getFlag('M3_316_DECODED')){
         this.renderTaskBoard('00:33｜1998-ER-0217',[
