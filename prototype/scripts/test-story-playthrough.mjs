@@ -203,7 +203,7 @@ try{
   report.verdict='PASS';
 }catch(e){
   report.verdict='FAIL';report.failure=e.stack;report.last=await snap().catch(()=>null);
-  if(page)await page.screenshot({path:out+'/failure.png',fullPage:true}).catch(()=>{});
+  if(page)await page.screenshot({path:out+'/failure.png',fullPage:false,timeout:2000}).catch(()=>{});
   process.exitCode=1;console.error(e.stack);
 }finally{
   report.ended=new Date().toISOString();
