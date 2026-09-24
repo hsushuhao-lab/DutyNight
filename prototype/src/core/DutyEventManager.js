@@ -27,12 +27,12 @@ export class DutyEventManager {
   onZoneEntered(zoneId){
     if(zoneId==='first_campus_4f' && this.gameState.isTaskComplete('E_HANDOFF') && !this.gameState.isTaskComplete('P1_4F_REPORT')){
       this.gameState.setGameTime('17:15');
-      return {speaker:'晚班護理師',text:'「醫師晚安，今天目前都還算穩定。403 昨晚比較睡不好，406 下午有點焦慮，408 晚點再追一下血壓。」'};
+      return {speaker:'晚班護理師',text:'「李醫師，你來啦。今晚 4F 滿床，總共 36 床。403 床老先生一直說隔壁在敲牆壁，待會巡房麻煩你幫忙看一下。」'};
     }
     if(zoneId==='first_campus_2f' && this.gameState.isTaskComplete('P1_REST_DONE') && !this.gameState.isTaskComplete('P1_ER_ASSESSMENT_DONE')){
       this.gameState.setGameTime('20:05');
       if(this.gameState.getFlag('HOOK_0217')){
-        return {speaker:'急診護理師',text:'「醫師您好，這位無名氏沒有證件，只有一條很舊的住院手圈。條碼格式太舊，現在的 HIS 讀不出來。」'};
+        return {speaker:'急診護理師',text:'「李醫師，這位無名氏沒有證件，只有一條 1998 年格式的舊手圈。現行 HIS 讀不出來，先麻煩你完成精神科評估。」'};
       }
       return {speaker:'急診護理師',text:'「醫師您好，這位病人最近壓力大、兩天沒睡好，今晚心悸焦慮，所以來急診。」'};
     }
@@ -40,9 +40,19 @@ export class DutyEventManager {
       this.complete('P1_RETURN_4F','20:40');
       return {speaker:'晚班護理師',text:'「醫師辛苦了，目前病房都還好，可以先回值班室休息。」'};
     }
-    if(zoneId==='first_campus_3f' && this.gameState.getFlag('NIGHT_PATROL_RETURN_3F')){
-      this.gameState.setGameTime('21:17');
-      return {speaker:'李醫師',text:'「21:17……查哨簿上那個時間，就是現在。」'};
+    if(zoneId==='first_campus_3f' && this.gameState.getFlag('NIGHT_PATROL_RETURN_3F') && !this.gameState.getFlag('BOOTSTRAP_2117_RESOLVED')){
+      this.gameState.setGameTime('21:16');
+      return {speaker:'李醫師',text:'「我一直在 4F……三樓卻說剛才看見我。先去查哨點確認那份紀錄。」'};
+    }
+    if(zoneId==='first_campus_2f'
+      && this.gameState.getFlag('GHOST_REGISTRATION_ARMED')
+      && this.gameState.getFlag('BOOTSTRAP_2117_RESOLVED')
+      && this.gameState.isTaskComplete('P1_ER_NOTE_DONE')
+      && !this.gameState.getFlag('GHOST_REGISTRATION_AVAILABLE')
+      && !this.gameState.getFlag('LEGEND_ER0033_RESOLVED')){
+      this.gameState.setFlag('GHOST_REGISTRATION_AVAILABLE',true);
+      this.gameState.setGameTime('00:33');
+      return {speaker:'急診掛號系統',text:'「00:33｜新增掛號 1 筆。來源：查無送入紀錄。」'};
     }
     return null;
   }
