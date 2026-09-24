@@ -21,6 +21,7 @@ import { floorStateManager, GamePhase } from './core/FloorStateManager.js';
 import { persistentMemory } from './core/PersistentMemory.js';
 import { legendState, NodeState } from './core/LegendStateManager.js';
 import { LoopManager } from './core/LoopManager.js';
+import { canAccess } from './core/AccessGraph.js';
 
 // Setup Three.js Scene & Renderer
 const container = document.getElementById('canvas-container');
@@ -123,11 +124,21 @@ uiManager.setBed33Handlers({
     gameState.markTaskComplete('LEGEND_BED33_RESOLVED');
     gameState.addEvidence(1);
     persistentMemory.learnCode('code_0409');
-    persistentMemory.setTrueNameFragment('frag_givenName_1','FRAG_409_A');
+    persistentMemory.setProof('space',true);
+    persistentMemory.setTrueNameFragment('frag_givenName_1','昱');
+    persistentMemory.resolveLegend('bed33');
     persistentMemory.addJournalNote('BED33_RESOLVED','409A 的床位單不是正常流程；上面的電子簽名也不是我留下的。');
     uiManager.showSubtitle('夜班護理師','「409 整修中？……奇怪，這張不是我印的。可是上面是你的電子簽名。」',5200);
   }
 });
+
+function unlockSecondCampusAccess(){
+  if(gameState.getFlag('SECOND_CAMPUS_ACCESS'))return;
+  gameState.setFlag('SECOND_CAMPUS_ACCESS',true);
+  gameState.setFlag('BRIDGE_ACCESS',true);
+  persistentMemory.addJournalNote('SECOND_CAMPUS_CALL','第二院區護理站主動開了天橋權限；在這之前我根本沒有跨院區資格。');
+  uiManager.showSubtitle('第二院區護理站','☎「醫師，我們這邊有一床胸痛病人請你評估。我幫你開天橋通過權限。」',5600);
+}
 
 function resolveAdminIdentityPuzzleIfReady() {
   if(gameState.getFlag('ADMIN_IDENTITY_PUZZLE_RESOLVED')) return;
@@ -159,9 +170,19 @@ controller.onInteract = (interactable) => {
     const door=worldRouter.activeZoneInstance.accessDoors?.[interactable.doorId];
     if(!door)return;
     if(door.portal){
+      if(['BRIDGE_ACCESS','BRIDGE_FIRST','BRIDGE_SECOND'].includes(interactable.doorId)&&!canAccess(gameState,interactable.doorId==='BRIDGE_ACCESS'?'FIRST_TO_SECOND_BRIDGE':'SECOND_TO_FIRST_BRIDGE')){
+        soundManager.playDoorLockClack();
+        uiManager.showSubtitle('門禁','「夜間跨院區權限尚未開啟。」',2800);
+        return;
+      }
       controller.enabled=false;controller.cancelAutoMove();
       uiManager.runDoorTransition(()=>worldRouter.teleportToSpawn(door.portal));
     }else{
+      if(interactable.doorId==='ER_HILLSIDE'&&!gameState.getFlag('OUTDOOR_ROUTE_ACCESS')){
+        soundManager.playDoorLockClack();
+        uiManager.showSubtitle('門禁','「此門只進不出。」',2600);
+        return;
+      }
       if(interactable.doorId==='3F_ARCHIVE_DOOR'&&!gameState.getFlag('ARCHIVE_OBJECTIVE')){
         soundManager.playClick();
         uiManager.showSubtitle('李醫師','「文史館？今晚的正常交班流程沒有提到這裡。先把 316 的交班做完。」',3200);
@@ -469,6 +490,48 @@ controller.onInteract = (interactable) => {
       if(dutyLine)uiManager.showSubtitle(dutyLine.speaker,dutyLine.text);
       controller.enabled = true;
     }, interactable.kind);
+  } else if (interactable.type === 'guard_log_2117') {
+    if(!gameState.getFlag('NIGHT_PATROL_RETURN_3F'))return;
+    if(!gameState.getFlag('BOOTSTRAP_2117_RESOLVED')){
+      gameState.setFlag('BOOTSTRAP_2117_RESOLVED',true);
+      gameState.setFlag('TIME_PROOF_FRAGMENT',true);
+      persistentMemory.learnCode('code_0217');
+      persistentMemory.addJournalNote('ECHO_2117','17點看到的「21:17 三樓巡查完成」，最後是我自己回來完成的。');
+      gameState.setGameTime('21:17');
+      soundManager.playPaperSign();
+      uiManager.showSubtitle('李醫師','「……原來那行 21:17，不是預言。是我自己補上的。」',4600);
+      setTimeout(()=>uiManager.showSubtitle('急診掛號系統','系統通知：00:33 有一筆無來源掛號等待查核。',4200),1700);
+    }
+  } else if (interactable.type === 'er_exit_notice') {
+    uiManager.showSubtitle('夜間出入口告示','「此門只進不出。」',2600);
+  } else if (interactable.type === 'er_ghost_registration') {
+    if(!gameState.getFlag('BOOTSTRAP_2117_RESOLVED')){
+      uiManager.showSubtitle('急診掛號系統','目前沒有待處理的異常掛號。',2200);
+      return;
+    }
+    if(gameState.getFlag('LEGEND_ER0033_RESOLVED')){
+      uiManager.showSubtitle('李醫師','「00:33 那筆掛號已經查過了。它和 Jane Doe 的舊手圈格式完全相同。」',3200);
+      return;
+    }
+    gameState.setGameTime('00:33');
+    controller.enabled=false;
+    uiManager.openStoryChoice({
+      title:'00:33｜無來源掛號',
+      body:'姓名：UNKNOWN\n病歷格式：1998-legacy\n來源：查無送入紀錄\n\n系統提供「建立新病歷」與「僅查閱舊索引」兩種處理方式。',
+      primaryText:'建立新病歷',
+      secondaryText:'只查閱，不建立',
+      onPrimary:()=>loopManager.triggerLegendOverride('ER0033',{legend:'LEGEND 02 — 00:33 急診掛號',reason:'你已完成掛號。'}),
+      onSecondary:()=>{
+        gameState.setFlag('LEGEND_ER0033_RESOLVED',true);
+        gameState.setFlag('ER0033_INDEX_MATCH',true);
+        persistentMemory.resolveLegend('er0033');
+        persistentMemory.setTrueNameFragment('frag_surname','林');
+        persistentMemory.addJournalNote('ER0033_SAFE','00:33 的掛號格式和 Jane Doe 手上的舊手圈一致；只能查閱，不能建立新病歷。');
+        if(gameState.getFlag('TIME_PROOF_FRAGMENT')){gameState.setFlag('TIME_PROOF',true);persistentMemory.setProof('time',true);}
+        unlockSecondCampusAccess();
+        controller.enabled=true;
+      }
+    });
   } else if (interactable.type === 'p1_action') {
     const action=interactable.action;
     if(action==='NURSE_REPORT'){
@@ -506,13 +569,15 @@ controller.onInteract = (interactable) => {
       dutyEvents.complete('P1_ER_ASSESSMENT_DONE','20:25');
       if(gameState.getFlag('HOOK_0217')){
         gameState.setFlag('ER_JANE_DOE_WRISTBAND',true);
-        uiManager.showSubtitle('急診護理師','「這位無名氏沒有證件，只有一條發黃的舊住院手圈。條碼格式太舊，現在 HIS 讀不到。」',4800);
+        persistentMemory.setTrueNameFragment('frag_surname','林');
+        uiManager.showSubtitle('Jane Doe','「……林醫師？02:17……警衛室後面……配電箱……門要被封死了……」',5200);
       }else uiManager.showSubtitle('急診病人','「最近壓力很大，兩天睡不好，今晚一直心悸，很焦慮。」');
     } else if(action==='ER_NOTE'){
       if(!gameState.isTaskComplete('P1_ER_ASSESSMENT_DONE')) return uiManager.showSubtitle('李醫師','「先完成病人評估。」',2500);
       dutyEvents.complete('P1_ER_NOTE_DONE','20:30');
       if(gameState.getFlag('ER_JANE_DOE_WRISTBAND')){
         gameState.setFlag('FIRST_FLOOR_GUARD_KEY',true);
+        gameState.setFlag('B_PANEL_KEY',true);
         gameState.setFlag('FORCE_3F_ELEVATOR_STOP',true);
         uiManager.showSubtitle('李醫師','「她外套口袋裡還有一把舊鑰匙……標籤寫著『1F 警衛台』。先收著，回 4F。」',4600);
       }else uiManager.showSubtitle('李醫師','「急診評估紀錄完成，回 4F。」');
