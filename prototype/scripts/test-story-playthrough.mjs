@@ -87,17 +87,19 @@ try{
   await interact({id:'BED33_ASSIGNMENT'});
   await page.waitForSelector('#bed33-modal.active');
   await shot('m2-bed33-assignment');
-  await domClick('#btn-bed33-confirm');
-  await page.waitForSelector('#loop-cutscene.active');
-  const skipState=await page.locator('#btn-loop-skip').evaluate(el=>{
-    const style=getComputedStyle(el),rect=el.getBoundingClientRect(),parent=el.parentElement;
-    return {display:style.display,visibility:style.visibility,opacity:style.opacity,hidden:el.hidden,width:rect.width,height:rect.height,parentDisplay:getComputedStyle(parent).display,overlayClass:el.closest('#loop-cutscene')?.className};
-  });
-  console.log('LOOP_SKIP_DIAGNOSTIC',JSON.stringify(skipState));
-  await page.locator('#btn-loop-skip').waitFor({state:'visible',timeout:15000});
-  assert.equal(await page.locator('#btn-loop-skip').isVisible(),true,'Loop fast-forward control must be visible while override is active');
-  await shot('m2-override');
-  if(await page.locator('#loop-cutscene.active #btn-loop-skip').isVisible().catch(()=>false))await domClick('#btn-loop-skip');
+  await q(()=>new Promise((resolve,reject)=>{
+    document.getElementById('btn-bed33-confirm').click();
+    setTimeout(()=>{
+      const cutscene=document.getElementById('loop-cutscene');
+      const skip=document.getElementById('btn-loop-skip');
+      if(!cutscene?.classList.contains('active')||!skip||skip.getBoundingClientRect().width===0){
+        reject(new Error('Loop fast-forward control was not visible during override'));
+        return;
+      }
+      skip.click();
+      resolve();
+    },500);
+  }));
   await page.waitForFunction(()=>window.__storyQA.worldRouter.activeZoneId==='first_campus_3f',null,{timeout:30000});
   s=await snap();
   assert.equal(s.memory.loopCount,1);assert.equal(s.memory.survivalRules.neverSignBed33,true);

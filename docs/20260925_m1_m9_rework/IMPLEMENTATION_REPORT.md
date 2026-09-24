@@ -30,7 +30,7 @@ Durable source-of-truth documents:
 - All 14 static QA scripts in `MASTER_REWORK_SPEC.md` passed.
 - `npm run build` passed (67 modules). Vite reports the production JS chunk is 1,140.58 kB, above its 1,000 kB advisory threshold.
 - `node scripts/test-story-playthrough.mjs qa-results/story-local` passed M2–M9, including the override loop, 21:17/00:33 sequence, 316 phone gate, M4 clue pickup, both M5 route variants, phantom floor, B2 identity verification, and successful two-field M9 handoff.
-- Browser result: `prototype/qa-results/story-local/result.json`; verdict `PASS`, 20 screenshots listed, zero screenshot warnings, and zero browser errors. Screenshot images are stored beside the result.
+- Browser result: `prototype/qa-results/story-local/result.json`; verdict `PASS`, 19 screenshots listed, zero screenshot warnings, and zero browser errors. Screenshot images are stored beside the result.
 - `git diff --check` passed.
 
 The browser playthrough uses the opt-in `?qa=story` bridge for checkpoint setup so it can test later milestones without skipping their runtime interaction handlers. Public mode was separately checked not to expose that bridge.
