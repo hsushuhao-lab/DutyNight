@@ -6,6 +6,7 @@ assert.equal(TRUE_NAME_CANON,'張守恆');
 
 const main=readFileSync('./src/main.js','utf8');
 const er=readFileSync('./src/world/zones/FirstCampus2FER.js','utf8');
+const level3=readFileSync('./src/world/Level3FBlockout.js','utf8');
 const ward=readFileSync('./src/world/shared/WardFloorplan.js','utf8');
 const bridge=readFileSync('./src/world/zones/Skybridge.js','utf8');
 const pond=readFileSync('./src/world/zones/EcologyPond.js','utf8');
@@ -17,7 +18,7 @@ const html=readFileSync('./index.html','utf8');
 
 assert(er.includes("type:'er_ghost_registration'"),'M3 ghost registration terminal missing');
 assert(er.includes("type:'er_exit_notice'")&&er.includes('此門只進不出'),'M3 ER entry-only exit warning missing');
-assert(main.includes("LEGEND 02 — 00:33 急診掛號")&&main.includes("ER0033_SLIP_COLLECTED")&&main.includes("316_LEGACY_TERMINAL")&&main.includes("SECOND_CAMPUS_ACCESS"),'M3 two-stage ER-to-316 resolve or campus call missing');
+assert(main.includes("LEGEND 02 — 00:33 急診掛號")&&main.includes("ER0033_SLIP_COLLECTED")&&main.includes("legacy_terminal_316")&&level3.includes("316_LEGACY_TERMINAL")&&main.includes("SECOND_CAMPUS_ACCESS"),'M3 two-stage ER-to-316 resolve or campus call missing');
 
 assert(ward.includes("type:'second_chest_patient'")&&ward.includes("type:'second_chest_transfer'"),'M4 chest-pain patient/form missing');
 assert(main.includes("LEGEND 03 — 多出來的胸痛病人")&&main.includes("M4_CHEST_RESOLVED"),'M4 decision flow missing');
