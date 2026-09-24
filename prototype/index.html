@@ -54,6 +54,7 @@
     <span><kbd>滑鼠</kbd> 慢速視角</span>
     <span><kbd>雙擊</kbd> 自動走近物品 / 地面</span>
     <span><kbd>E</kbd> 互動</span>
+    <span><kbd>Tab</kbd> 醫師手冊</span>
   </div>
 
   <!-- Bottom Subtitle Box -->
@@ -282,6 +283,62 @@
       </div>
       <button id="btn-close-inspect302" class="btn-secondary">離開檢視</button>
     </div>
+  </div>
+
+  <!-- Persistent doctor journal -->
+  <div id="journal-modal" class="modal-overlay">
+    <div class="journal-book">
+      <div class="journal-header">
+        <div><small>李醫師隨身手冊</small><h2>夜班筆記</h2></div>
+        <button id="btn-close-journal" class="btn-win-close" aria-label="關閉醫師手冊">✕</button>
+      </div>
+      <div id="journal-loop-count" class="journal-loop-count">這是第一次值班。</div>
+      <div id="journal-notes" class="journal-notes"></div>
+    </div>
+  </div>
+
+  <!-- Legend 01: Bed 33 decision -->
+  <div id="bed33-modal" class="modal-overlay">
+    <div class="bed33-form">
+      <div class="bed33-form-header">臨時床位分配單</div>
+      <div class="bed33-form-body">
+        <div class="bed33-form-row"><span>床號</span><strong>33</strong></div>
+        <div class="bed33-form-row"><span>位置</span><strong>409A</strong></div>
+        <div class="bed33-form-row"><span>收治姓名</span><strong>李○○</strong></div>
+        <div class="bed33-form-row"><span>狀態</span><strong>待醫師確認</strong></div>
+        <p id="bed33-warning-text">急診留置床系統卡住，請值班醫師確認過床。</p>
+      </div>
+      <div class="bed33-form-actions">
+        <button id="btn-bed33-defer" class="btn-secondary">先關閉，核對資料</button>
+        <button id="btn-bed33-reject" class="btn-secondary">409 不是整修中嗎？暫緩過床</button>
+        <button id="btn-bed33-confirm" class="btn-primary">確認 409A 臨時床位分配</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loop / identity override cutscene -->
+  <div id="loop-cutscene" class="cutscene-overlay loop-cutscene">
+    <div class="loop-cutscene-inner">
+      <div id="loop-stage-title" class="loop-stage-title">BED ASSIGNMENT COMPLETE</div>
+      <div id="loop-stage-body" class="loop-stage-body"></div>
+      <div id="loop-wristband" class="loop-wristband">
+        <div>青嶺醫療中心｜急性精神科</div>
+        <strong>409-A　　第33床</strong>
+        <div>姓名：李○○　身分：收治病人</div>
+      </div>
+      <div id="loop-gameover-card" class="loop-gameover-card">
+        <div>夜班紀錄已被覆寫</div>
+        <strong>LEGEND 01 — 第 33 床</strong>
+        <span>你已被收治。</span>
+      </div>
+      <button id="btn-loop-skip" class="btn-secondary loop-skip">略過演出</button>
+    </div>
+  </div>
+
+  <!-- Loop wake residue -->
+  <div id="loop-wake-flash" class="loop-wake-flash">
+    <div class="loop-wake-text">叮——</div>
+    <div class="loop-wrist-mark"></div>
   </div>
 
   <!-- Archive document reader -->
