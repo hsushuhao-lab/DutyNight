@@ -332,7 +332,7 @@ export class FirstCampus2FER {
       z: 0,
       ceilingY: 3.2,
       rotationY: Math.PI / 2,
-      text: '急診救護車道 ｜ 戶外山側通道 (Ambulance Bay)'
+      text: '急診夜間出入口 ｜ 此門只進不出'
     });
 
     if(gameState.getFlag('HOOK_0217')){
@@ -343,6 +343,16 @@ export class FirstCampus2FER {
       tag.position.set(10.58,.92,7.26);this.zoneGroup.add(tag);
       this.janeDoeWristband={id:'2F_OLD_WRISTBAND',position:[10.5,.92,7.26],format:'legacy_unreadable'};
     }
+
+    const ghostTerminal=new THREE.Mesh(new THREE.BoxGeometry(.75,.55,.35),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
+    ghostTerminal.position.set(13,1.18,-6.35);
+    ghostTerminal.userData={interactable:true,id:'ER_GHOST_REGISTRATION',type:'er_ghost_registration',label:'查看急診掛號系統'};
+    this.zoneGroup.add(ghostTerminal);this.interactables.push(ghostTerminal);
+
+    const exitNotice=new THREE.Mesh(new THREE.BoxGeometry(.9,.42,.10),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
+    exitNotice.position.set(21.72,1.75,.95);
+    exitNotice.userData={interactable:true,id:'ER_EXIT_NOTICE',type:'er_exit_notice',label:'查看急診夜間出入口告示'};
+    this.zoneGroup.add(exitNotice);this.interactables.push(exitNotice);
 
     this.interactables.push(
       {type:'p1_action',action:'ER_ASSESS',label:'進行精神科評估',position:new THREE.Vector3(10.5,1.2,7.5),radius:1.8},
