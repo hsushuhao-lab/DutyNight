@@ -125,7 +125,7 @@ uiManager.setBed33Handlers({
     gameState.addEvidence(1);
     persistentMemory.learnCode('code_0409');
     persistentMemory.setProof('space',true);
-    persistentMemory.setTrueNameFragment('frag_givenName_1','昱');
+    persistentMemory.setTrueNameFragment('frag_employeePrefix','MED-87');
     persistentMemory.resolveLegend('bed33');
     persistentMemory.addJournalNote('BED33_RESOLVED','409A 的床位單不是正常流程；上面的電子簽名也不是我留下的。');
     uiManager.showSubtitle('夜班護理師','「409 整修中？……奇怪，這張不是我印的。可是上面是你的電子簽名。」',5200);
@@ -410,6 +410,27 @@ controller.onInteract = (interactable) => {
     }
     controller.enabled=false;
     uiManager.openArchiveDocument({title:interactable.documentTitle,pages:interactable.pages});
+  } else if (interactable.type === 'legacy_terminal_316') {
+    if(!gameState.getFlag('ER0033_SLIP_COLLECTED')){
+      uiManager.showSubtitle('316 舊資料終端','「ARCHIVE CLIENT｜目前沒有待查的舊索引。」',2600);
+      return;
+    }
+    if(gameState.getFlag('M3_316_DECODED')){
+      uiManager.showSubtitle('316 舊資料終端','「1998-ER-0217｜責任醫師工號前綴 MED-87｜姓氏：張。」',3600);
+      return;
+    }
+    gameState.setFlag('M3_316_DECODED',true);
+    gameState.setFlag('LEGEND_ER0033_RESOLVED',true);
+    gameState.setFlag('ER0033_INDEX_MATCH',true);
+    persistentMemory.resolveLegend('er0033');
+    persistentMemory.setTrueNameFragment('frag_surname','張');
+    persistentMemory.addJournalNote('ER0033_DECODED','316 舊終端解出 1998-ER-0217：責任醫師工號以 MED-87 開頭，姓氏是「張」。');
+    if(gameState.getFlag('TIME_PROOF_FRAGMENT')){
+      gameState.setFlag('TIME_PROOF',true);
+      persistentMemory.setProof('time',true);
+    }
+    unlockSecondCampusAccess();
+    uiManager.showSubtitle('316 舊資料終端','「1998-ER-0217｜責任醫師：張○○｜工號前綴：MED-87。」',5200);
   } else if (interactable.type === 'workstation') {
     if(gameState.getFlag('M8_IDENTITY_BATTLE_ACTIVE')&&worldRouter.activeZoneId==='first_campus_3f'){
       controller.enabled=false;
@@ -522,13 +543,18 @@ controller.onInteract = (interactable) => {
       uiManager.showSubtitle('舊終端機',`ARCHIVE ID：${TRUE_NAME_CANON}｜住院醫師｜1998 夜班事件關係人`,3600);
       return;
     }
+    persistentMemory.setTrueNameFragment('frag_title','住院醫師');
+    persistentMemory.setTrueNameFragment('frag_employeeFull','MED-870409');
+    const restored=persistentMemory.resolveTrueName(TRUE_NAME_CANON);
+    if(!restored){
+      uiManager.showSubtitle('UNREGISTERED MESSAGE / ARCHIVE','「身分碎片不足。工號、姓氏與姓名記錄仍無法完成一致性驗證。」',4600);
+      return;
+    }
     gameState.setFlag('M7_B2_RESOLVED',true);
     gameState.setFlag('M8_IDENTITY_BATTLE_ACTIVE',true);
-    persistentMemory.setTrueNameFragment('frag_title','住院醫師');
-    persistentMemory.resolveTrueName(TRUE_NAME_CANON);
     while(persistentMemory.data.identityErosionLevel<4)persistentMemory.raiseErosion(1);
-    persistentMemory.addJournalNote('B2_316','B2 的 316 舊終端顯示：我的名字是林昱衡。現在 3F-316 有另一個「李醫師」登入中。');
-    uiManager.showSubtitle('UNREGISTERED MESSAGE / ARCHIVE',`「交班完成。\nARCHIVE ID：${TRUE_NAME_CANON}。\n3F-316：另一個使用者已登入。」`,5600);
+    persistentMemory.addJournalNote('B2_316',`B2 的 316 舊終端完成驗證：MED-870409｜${TRUE_NAME_CANON}｜住院醫師。3F-316 同時有另一個「李醫師」登入中。`);
+    uiManager.showSubtitle('UNREGISTERED MESSAGE / ARCHIVE',`「IDENTITY VERIFIED：MED-870409｜${TRUE_NAME_CANON}。\n3F-316：另一個使用者已登入。」`,5800);
   } else if (interactable.type === 'b2_return_lift') {
     if(!gameState.getFlag('M7_B2_RESOLVED')) return uiManager.showSubtitle('李醫師','「先看那台舊終端機。」',2400);
     worldRouter.loadZone('first_campus_1f');
@@ -614,7 +640,8 @@ controller.onInteract = (interactable) => {
         gameState.setFlag('CHEST_RECORD_MATCH',true);
         gameState.setFlag('OUTDOOR_ROUTE_ACCESS',true);
         persistentMemory.resolveLegend('chestPain');
-        persistentMemory.addJournalNote('CHEST_RESOLVED','胸痛病人的轉院單早已有「李醫師」電子簽名；我沒有簽過。');
+        persistentMemory.setTrueNameFragment('frag_givenName_1','守');
+        persistentMemory.addJournalNote('CHEST_RESOLVED','胸痛病人的轉院單早已有「李醫師」電子簽名；第二院區舊名冊殘頁則留下名字中的「守」字。');
         persistentMemory.raiseErosion(1);
         uiManager.showSubtitle('第二院區護理師','「……可是系統顯示你已經簽過了。那剛才來的人是誰？」',4400);
         controller.enabled=true;
@@ -636,7 +663,7 @@ controller.onInteract = (interactable) => {
         gameState.setFlag('M5_ROUTE_RESOLVED',true);
         gameState.setFlag('FLOOR6_AVAILABLE',true);
         persistentMemory.resolveLegend('bridge');
-        persistentMemory.setTrueNameFragment('frag_givenName_2','衡');
+        persistentMemory.setTrueNameFragment('frag_givenName_2','恆');
         persistentMemory.addJournalNote('BRIDGE_SAFE','天橋中線後不要回頭。遠處白袍胸牌最後一個字像是「衡」。');
         if(gameState.getFlag('CHEST_RECORD_MATCH')){gameState.setFlag('IDENTITY_PROOF',true);persistentMemory.setProof('identity',true);}
         controller.enabled=true;
@@ -658,8 +685,8 @@ controller.onInteract = (interactable) => {
         gameState.setFlag('M5_ROUTE_RESOLVED',true);
         gameState.setFlag('FLOOR6_AVAILABLE',true);
         persistentMemory.resolveLegend('pond');
-        persistentMemory.setTrueNameFragment('frag_givenName_2','衡');
-        persistentMemory.addJournalNote('POND_SAFE','倒影沒有跟著我停下。它胸前的名牌末字是「衡」。');
+        persistentMemory.setTrueNameFragment('frag_givenName_2','恆');
+        persistentMemory.addJournalNote('POND_SAFE','倒影沒有跟著我停下。它胸前的名牌末字是「恆」。');
         if(gameState.getFlag('CHEST_RECORD_MATCH')){gameState.setFlag('IDENTITY_PROOF',true);persistentMemory.setProof('identity',true);}
         controller.enabled=true;
       }
@@ -731,13 +758,9 @@ controller.onInteract = (interactable) => {
       secondaryText:'只查閱，不建立',
       onPrimary:()=>loopManager.triggerLegendOverride('ER0033',{legend:'LEGEND 02 — 00:33 急診掛號',reason:'你已完成掛號。'}),
       onSecondary:()=>{
-        gameState.setFlag('LEGEND_ER0033_RESOLVED',true);
-        gameState.setFlag('ER0033_INDEX_MATCH',true);
-        persistentMemory.resolveLegend('er0033');
-        persistentMemory.setTrueNameFragment('frag_surname','林');
-        persistentMemory.addJournalNote('ER0033_SAFE','00:33 的掛號格式和 Jane Doe 手上的舊手圈一致；只能查閱，不能建立新病歷。');
-        if(gameState.getFlag('TIME_PROOF_FRAGMENT')){gameState.setFlag('TIME_PROOF',true);persistentMemory.setProof('time',true);}
-        unlockSecondCampusAccess();
+        gameState.setFlag('ER0033_SLIP_COLLECTED',true);
+        persistentMemory.addJournalNote('ER0033_SLIP','00:33 的掛號格式和 Jane Doe 手上的舊手圈完全相同。先不要建檔，把掛號聯帶回 316 舊終端查 1998 索引。');
+        uiManager.showSubtitle('李醫師','「不能用現在的 HIS 建檔。把這張 1998-ER-0217 帶回 316 查舊索引。」',4400);
         controller.enabled=true;
       }
     });
@@ -778,8 +801,7 @@ controller.onInteract = (interactable) => {
       dutyEvents.complete('P1_ER_ASSESSMENT_DONE','20:25');
       if(gameState.getFlag('HOOK_0217')){
         gameState.setFlag('ER_JANE_DOE_WRISTBAND',true);
-        persistentMemory.setTrueNameFragment('frag_surname','林');
-        uiManager.showSubtitle('Jane Doe','「……林醫師？02:17！門要被關上了……舊配電箱在 1F 警衛台後面。不要簽……千萬不要簽第 33 床……」',6200);
+        uiManager.showSubtitle('Jane Doe','「……醫師……02:17！門要被關上了……舊配電箱在 1F 警衛台後面。不要照他們留下的順序……紫色的燈……」',6600);
       }else uiManager.showSubtitle('急診病人','「最近壓力很大，兩天睡不好，今晚一直心悸，很焦慮。」');
     } else if(action==='ER_NOTE'){
       if(!gameState.isTaskComplete('P1_ER_ASSESSMENT_DONE')) return uiManager.showSubtitle('李醫師','「先完成病人評估。」',2500);
