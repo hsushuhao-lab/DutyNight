@@ -235,7 +235,7 @@ export class WorldRouter {
       }
       return { floorNum: f, zoneId, spawn, label };
     });
-    if(campus==='second'&&gameState.getFlag('FLOOR6_AVAILABLE')){
+    if(gameState.getFlag('FLOOR6_AVAILABLE')){
       mapped.push({floorNum:6,zoneId:'phantom_6f',spawn:'phantom_6f_lift',label:'6F'});
     }
     return mapped;
