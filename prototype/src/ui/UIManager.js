@@ -790,10 +790,11 @@ export class UIManager {
       }
     }
 
-    if(this.gameState.getFlag('NIGHT_PATROL_RETURN_3F')){
+    if(this.gameState.getFlag('NIGHT_PATROL_RETURN_3F')&&!this.gameState.getFlag('BOOTSTRAP_2117_RESOLVED')){
       if(currentZone==='first_campus_3f'){
+        const examined=this.gameState.getFlag('GUARD_SIGN_EXAMINED');
         this.renderTaskBoard('21:17｜3F',[
-          {id:'task-night-patrol',text:'去警衛查哨點看看',state:'ready'}
+          {id:'task-night-patrol',text:examined?'查看查哨簽名簿':'去警衛查哨點看看',state:'ready'}
         ]);
       }else{
         this.renderTaskBoard('21:15｜護理站來電',[
