@@ -29,6 +29,9 @@ assert(main.includes("FORCE_3F_ELEVATOR_STOP")&&main.includes("GamePhase.ELEVATO
 assert(core.includes("StairLatch_3F_Locked")&&core.includes("StairBolt_4F_UnlockSide"),'3F/4F asymmetric stair shortcut visual states missing');
 assert(main.includes("STAIR_SHORTCUT_3F_4F"),'3F/4F shortcut gate logic missing');
 assert(main.includes("NIGHT_PATROL_RETURN_3F")&&main.includes("GamePhase.NIGHT_PATROL"),'21:15 return-to-3F paradox setup missing');
-assert(duty.includes("21:17")&&duty.includes("NIGHT_PATROL_RETURN_3F"),'Duty timeline must resolve the 21:17 return on 3F entry');
+assert(duty.includes("21:16")&&duty.includes("NIGHT_PATROL_RETURN_3F"),'3F return must stage the player just before the 21:17 bootstrap');
+assert(floor3.includes("type:'guard_sign_2117'")&&floor3.includes("type:'guard_book_2117'"),'21:17 bootstrap must require both noticing the checkpoint and signing the logbook');
+assert(main.includes("GUARD_SIGN_EXAMINED")&&main.includes("BOOTSTRAP_2117_RESOLVED"),'21:17 two-step completion flags missing');
+assert(main.includes("GHOST_REGISTRATION_AVAILABLE")&&floor2.includes("GHOST_REGISTRATION_AVAILABLE"),'00:33 registration must stay gated until a later ER return');
 
 console.log('CROSS-FLOOR ENTANGLEMENT QA PASS');
