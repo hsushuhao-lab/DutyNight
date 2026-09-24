@@ -106,10 +106,17 @@ export class WardFloorplan {
     this.gf.buildCeiling(this.zoneGroup,-11,3.2,6,6,8);
     this.dutyDoor=new KeyedKnobDoor(this,{id:'duty_room',x:-8,z:6,yaw:Math.PI/2,width:1.4,title:'醫師值班室',openDirection:1});
     this.dutyDoor.setClosed(true);this.dutyDoorClosed=true;
+    SignAnchor.buildWallPlaque({scene:this.zoneGroup,x:-7.885,y:1.78,z:4.95,rotationY:Math.PI/2,width:1.18,height:.34,code:'4F',title:'醫師值班室',subtitle:'ON-CALL ROOM',header:''});
     asset(this.zoneGroup,'hospitalBed',[-12.5,0,7.8],[1.2,.95,.97]);CollisionFactory.addBox(this.colliders,-12.5,.45,7.8,1.4,.9,2.2);
     solid(this.zoneGroup,this.gf.materials.doorWood,[-11.25,.28,8.1],[.5,.56,.5]);
     solid(this.zoneGroup,this.gf.materials.lightWarm,[-11.25,.76,8.1],[.19,.24,.19]);
     workstation(this,{x:-10.0,z:3.1,id:'duty_desk'});
+    const coffeeCup=new THREE.Group();coffeeCup.name='DutyRoom_HotCoffee';coffeeCup.position.set(-9.45,.82,3.05);this.zoneGroup.add(coffeeCup);
+    const cupBody=new THREE.Mesh(new THREE.CylinderGeometry(.07,.06,.13,18),this.gf.materials.bedSheet);cupBody.position.y=.065;coffeeCup.add(cupBody);
+    const coffee=new THREE.Mesh(new THREE.CircleGeometry(.055,18),new THREE.MeshBasicMaterial({color:0x3b2417,side:THREE.DoubleSide}));coffee.rotation.x=-Math.PI/2;coffee.position.y=.132;coffeeCup.add(coffee);
+    const handle=new THREE.Mesh(new THREE.TorusGeometry(.045,.012,8,16,Math.PI),this.gf.materials.bedSheet);handle.rotation.y=Math.PI/2;handle.position.set(.07,.075,0);coffeeCup.add(handle);
+    const steamMat=new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.16,depthWrite:false});
+    for(const [dx,dy] of [[-.018,.19],[.016,.25]]){const s=new THREE.Mesh(new THREE.SphereGeometry(.022,8,6),steamMat);s.scale.set(.65,1.8,.65);s.position.set(dx,dy,0);coffeeCup.add(s);}
     this.dutyCabinetAnchor=[-8.8,0,9.3];this.dutyCabinetYaw=Math.PI;
     asset(this.zoneGroup,'storageCabinet',this.dutyCabinetAnchor,[1,1,1],this.dutyCabinetYaw);
 
@@ -119,6 +126,7 @@ export class WardFloorplan {
     this.gf.buildCeiling(this.zoneGroup,-12.75,3.2,3.6,2.5,3.2);
     this.dutyBathroomDoor=new KeyedKnobDoor(this,{id:'duty_bathroom',x:-11.5,z:4.0,yaw:Math.PI/2,width:1.1,title:'值班室洗手間',openDirection:1});
     this.dutyBathroomDoor.setClosed(true);
+    SignAnchor.buildWallPlaque({scene:this.zoneGroup,x:-11.385,y:1.72,z:4.85,rotationY:Math.PI/2,width:.95,height:.30,code:'',title:'洗手間',subtitle:'',header:''});
 
     // Toilet with cistern and seat.
     solid(this.zoneGroup,this.gf.materials.bedSheet,[-13.25,.34,4.05],[.58,.68,.78]);
