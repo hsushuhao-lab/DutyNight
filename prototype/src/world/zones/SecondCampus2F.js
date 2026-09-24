@@ -113,7 +113,7 @@ export class SecondCampus2F {
       code: 'SEC-2',
       title: '2F 連通道警衛室 ｜ 出入口管制台',
       subtitle: 'BRIDGE SECURITY & ACCESS CONTROL',
-      header: '松德醫療中心 ｜ 第二院區 2F'
+      header: '青嶺醫療中心 ｜ 第二院區 2F'
     });
 
     // ==========================================
