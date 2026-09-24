@@ -670,22 +670,41 @@ controller.onInteract = (interactable) => {
     worldRouter.loadZone(returnZone);
     controller.enabled=true;
     uiManager.showSubtitle('李醫師','「不要追。這層根本不在樓層圖上。」',2800);
-  } else if (interactable.type === 'guard_log_2117') {
+  } else if (interactable.type === 'guard_sign_2117') {
     if(!gameState.getFlag('NIGHT_PATROL_RETURN_3F'))return;
+    if(!gameState.getFlag('GUARD_SIGN_EXAMINED')){
+      gameState.setFlag('GUARD_SIGN_EXAMINED',true);
+      const zone=worldRouter.activeZoneInstance;
+      if(zone?.guardLog2117)zone.guardLog2117.userData.interactable=true;
+      soundManager.playPaperSign();
+      uiManager.showSubtitle('李醫師','「21:17……三樓巡查完成？現在就是 21:17。這不是剛好，是有人先替我寫好了。」',5200);
+      uiManager.updateTasks();
+    }else{
+      uiManager.showSubtitle('李醫師','「牌子上的 21:17 沒變。桌上的簽名簿才是關鍵。」',2800);
+    }
+  } else if (interactable.type === 'guard_book_2117') {
+    if(!gameState.getFlag('NIGHT_PATROL_RETURN_3F'))return;
+    if(!gameState.getFlag('GUARD_SIGN_EXAMINED')){
+      uiManager.showSubtitle('李醫師','「先把牆上的查哨紀錄看清楚。」',2400);
+      return;
+    }
     if(!gameState.getFlag('BOOTSTRAP_2117_RESOLVED')){
       gameState.setFlag('BOOTSTRAP_2117_RESOLVED',true);
       gameState.setFlag('TIME_PROOF_FRAGMENT',true);
+      gameState.setFlag('GHOST_REGISTRATION_ARMED',true);
       persistentMemory.learnCode('code_0217');
       persistentMemory.addJournalNote('ECHO_2117','17點看到的「21:17 三樓巡查完成」，最後是我自己回來完成的。');
       gameState.setGameTime('21:17');
       soundManager.playPaperSign();
-      uiManager.showSubtitle('李醫師','「……原來那行 21:17，不是預言。是我自己補上的。」',4600);
-      setTimeout(()=>uiManager.showSubtitle('急診掛號系統','系統通知：00:33 有一筆無來源掛號等待查核。',4200),1700);
+      uiManager.showSubtitle('李醫師','「筆跡不是我的……但簽的卻是我的名字。原來那行 21:17，不是預言，是我正在把它完成。」',6200);
+      uiManager.updateTasks();
+    }else{
+      uiManager.showSubtitle('李醫師','「這一行已經完成了。下一次異常不該現在就出現。」',2600);
     }
   } else if (interactable.type === 'er_exit_notice') {
     uiManager.showSubtitle('夜間出入口告示','「此門只進不出。」',2600);
   } else if (interactable.type === 'er_ghost_registration') {
-    if(!gameState.getFlag('BOOTSTRAP_2117_RESOLVED')){
+    if(!gameState.getFlag('GHOST_REGISTRATION_AVAILABLE')){
       uiManager.showSubtitle('急診掛號系統','目前沒有待處理的異常掛號。',2200);
       return;
     }
