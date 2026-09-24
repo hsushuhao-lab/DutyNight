@@ -89,6 +89,11 @@ try{
   await shot('m2-bed33-assignment');
   await domClick('#btn-bed33-confirm');
   await page.waitForSelector('#loop-cutscene.active');
+  const skipState=await page.locator('#btn-loop-skip').evaluate(el=>{
+    const style=getComputedStyle(el),rect=el.getBoundingClientRect(),parent=el.parentElement;
+    return {display:style.display,visibility:style.visibility,opacity:style.opacity,hidden:el.hidden,width:rect.width,height:rect.height,parentDisplay:getComputedStyle(parent).display,overlayClass:el.closest('#loop-cutscene')?.className};
+  });
+  console.log('LOOP_SKIP_DIAGNOSTIC',JSON.stringify(skipState));
   await page.locator('#btn-loop-skip').waitFor({state:'visible',timeout:15000});
   assert.equal(await page.locator('#btn-loop-skip').isVisible(),true,'Loop fast-forward control must be visible while override is active');
   await shot('m2-override');
