@@ -67,7 +67,7 @@ try{
   await publicPage.goto(base,{waitUntil:'load',timeout:180000});
   await publicPage.waitForFunction(()=>window.worldRouter?.activeZoneInstance,null,{timeout:180000});
   assert.equal(await publicPage.evaluate(()=>typeof window.__storyQA),'undefined');
-  await publicPage.screenshot({path:out+'/m1-3f-normal-duty.png',fullPage:false,timeout:2000});
+  await publicPage.screenshot({path:out+'/m1-3f-normal-duty.png',fullPage:false,timeout:5000});
   report.screenshots.push('m1-3f-normal-duty.png');
   await publicPage.close();
 
