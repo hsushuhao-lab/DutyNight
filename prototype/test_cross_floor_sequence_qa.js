@@ -26,6 +26,7 @@ assert.equal(state.gameTime,'21:16');
 assert.match(line.text,/查哨點/);
 state.setFlag('BOOTSTRAP_2117_RESOLVED',true);
 state.setFlag('GHOST_REGISTRATION_ARMED',true);
+state.markTaskComplete('P1_ER_ASSESSMENT_DONE');
 state.markTaskComplete('P1_ER_NOTE_DONE');
 line=duty.onZoneEntered('first_campus_2f');
 assert.equal(state.gameTime,'00:33');
