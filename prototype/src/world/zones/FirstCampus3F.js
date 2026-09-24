@@ -207,6 +207,11 @@ export class FirstCampus3F {
     patrolHit.position.set(19,1.34,1.62);
     patrolHit.userData={interactable:true,id:'316_SPARE_KEY',type:'spare_key_316',label:'檢查夜間警衛查哨點',targetGroup:hiddenKey};
     this.zoneGroup.add(patrolHit);this.interactables.push(patrolHit);this.spareKeyMesh=patrolHit;
+
+    const futureLogHit=new THREE.Mesh(new THREE.BoxGeometry(.66,.26,.30),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
+    futureLogHit.position.set(19,1.67,1.57);
+    futureLogHit.userData={interactable:false,id:'GUARD_LOG_2117',type:'guard_log_2117',label:'簽署夜間巡查紀錄'};
+    this.zoneGroup.add(futureLogHit);this.interactables.push(futureLogHit);this.guardLog2117=futureLogHit;
     this.guardPatrolPoint={id:'3F_GUARD_PATROL_POINT',position:[19,1.34,1.69],opposite:'3F_ARCHIVE_DOOR'};
 
     const shelfMat=this.gf.materials.floorWood,folderMat=this.gf.materials.doorWood;
@@ -372,6 +377,7 @@ export class FirstCampus3F {
       this.phaseRedLight.intensity=.55;
       if(this.phaseWetMarks)this.phaseWetMarks.visible=true;
       this.setPatrolFutureEntry();
+      if(this.guardLog2117)this.guardLog2117.userData.interactable=true;
     }
   }
 
