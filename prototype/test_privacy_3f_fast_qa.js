@@ -51,6 +51,13 @@ assert(level.includes("new THREE.BoxGeometry(1.02,2.30,.08)"),'302 must use a fu
 assert(floor.includes("relativeTo4FDutyRoom:true")&&floor.includes("label:'3F 行政辦公室'"),'3F office matching the 4F duty-room relative position is missing');
 assert(floor.includes("id:'3F_ADMIN_OFFICE_DOOR'")&&floor.includes("type:'admin_roster_3f'"),'3F administrative office must have a real door and roster task');
 assert(main.includes("ADMIN_ROSTER_CHECKED")&&main.includes("P1_ADMIN_ROSTER_CHECK"),'Administrative-office side-task interaction missing');
+assert(floor.includes("type:'admin_printer_doc_3f'")&&floor.includes("type:'admin_drawer_manual_3f'"),'Administrative-office 3-piece puzzle is incomplete');
+assert(main.includes("ADMIN_IDENTITY_PUZZLE_RESOLVED")&&main.includes("ECHO_2117_KNOWN"),'Administrative identity puzzle resolution state missing');
+assert(floor.includes("21:17:42")&&floor.includes('最後完成電子交班'),'Administrative puzzle must seed the future-time and final-handoff rules');
+assert(floor.includes("AdminDesk_Printer")&&floor.includes("AdminDesk_Keyboard"),'Grounded administrative desk props must be explicitly authored');
+assert(!floor.includes("asset(this.zoneGroup,'printer',[-20.28,.82,5.30]"),'Floating printer asset must not return');
+assert(level.includes("RailNorthEast_WestOfStorage")&&level.includes("RailNorthEast_EastOfStorage"),'CPR doorway handrail must remain split');
+assert(art.includes("clearStorageDoor=x>=12.75&&x<=14.25"),'Rail mounting brackets must skip the CPR doorway');
 assert(verticalCore.includes("zoneId==='first_campus_4f'||zoneId==='first_campus_3f'"),'3F shared elevator core must cut the west office doorway');
 assert(level.includes("CPR_Anne")&&level.includes("type:'cpr_anne'"),'CPR Anne environmental-horror prop missing');
 assert(main.includes("office_phone_316")&&main.includes("PHONE_ANSWERED"),'316 phone anomaly interaction missing');
