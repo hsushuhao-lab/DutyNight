@@ -58,6 +58,31 @@ export class GameState {
     this.flags.set('ADMIN_IDENTITY_PUZZLE_RESOLVED', false);
     this.flags.set('ECHO_2117_KNOWN', false);
     this.flags.set('ADMIN_OFFICE_ENTERED', false);
+
+    // Canonical staged-story flags. Keep all false at loop start so browser/runtime
+    // logic never has to distinguish "missing" from false.
+    this.flags.set('GUARD_SIGN_EXAMINED', false);
+    this.flags.set('BOOTSTRAP_2117_RESOLVED', false);
+    this.flags.set('GHOST_REGISTRATION_ARMED', false);
+    this.flags.set('GHOST_REGISTRATION_AVAILABLE', false);
+    this.flags.set('SANDBOX_MODE', false);
+    this.flags.set('ER0033_SLIP_COLLECTED', false);
+    this.flags.set('M3_316_DECODED', false);
+    this.flags.set('LEGEND_ER0033_RESOLVED', false);
+    this.flags.set('SECOND_CAMPUS_ACCESS', false);
+    this.flags.set('BRIDGE_ACCESS', false);
+    this.flags.set('OUTDOOR_ROUTE_ACCESS', false);
+    this.flags.set('M4_CHEST_RESOLVED', false);
+    this.flags.set('M5_BRIDGE_RESOLVED', false);
+    this.flags.set('M5_POND_RESOLVED', false);
+    this.flags.set('M5_ROUTE_RESOLVED', false);
+    this.flags.set('FLOOR6_AVAILABLE', false);
+    this.flags.set('M6_FLOOR6_RESOLVED', false);
+    this.flags.set('M7_B2_OPEN', false);
+    this.flags.set('M7_B2_RESOLVED', false);
+    this.flags.set('M8_IDENTITY_BATTLE_ACTIVE', false);
+    this.flags.set('LAST_CALL_SEEN', false);
+    this.flags.set('GAME_COMPLETE', false);
   }
 
   addListener(fn) {
