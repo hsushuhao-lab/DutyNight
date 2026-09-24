@@ -46,21 +46,45 @@ export class FirstCampus3F {
     this.gf.buildWall(this.zoneGroup,this.colliders,-19,1.6,11.5,6,3.2,.22);
     this.gf.buildCeilingLight(this.zoneGroup,-19,3.15,7.5,.72,7);
 
+    const adminDeskSurface=.82;
     const officeDeskTop=solid(this.zoneGroup,m.floorWood,[-19.25,.78,5.35],[2.25,.08,.85]);
+    officeDeskTop.name='AdminDesk_Surface';
     solid(this.zoneGroup,m.metal,[-20.10,.38,5.35],[.08,.72,.08]);
     solid(this.zoneGroup,m.metal,[-18.40,.38,5.35],[.08,.72,.08]);
     asset(this.zoneGroup,'officeChair',[-19.25,0,6.35],[1,1,1],Math.PI);
     asset(this.zoneGroup,'storageCabinet',[-21.35,0,10.55],[.88,.88,.88],Math.PI/2);
     asset(this.zoneGroup,'storageCabinet',[-20.15,0,10.55],[.88,.88,.88],Math.PI/2);
-    asset(this.zoneGroup,'printer',[-20.28,.82,5.30],[.82,.82,.82],0);
     asset(this.zoneGroup,'officeChair',[-18.05,0,6.30],[.92,.92,.92],Math.PI);
     asset(this.zoneGroup,'officeChair',[-17.25,0,6.30],[.92,.92,.92],Math.PI);
 
-    // Desk monitor / keyboard / files: enough detail to read as a functioning office, without blocking circulation.
-    solid(this.zoneGroup,m.wallDark,[-19.25,1.18,5.18],[.72,.44,.06]);
-    solid(this.zoneGroup,m.metal,[-19.25,.97,5.18],[.08,.34,.08]);
-    solid(this.zoneGroup,m.wall,[-19.25,.84,5.55],[.66,.025,.22]);
-    for(const [x,z] of [[-18.45,5.25],[-18.20,5.25],[-17.95,5.25]])solid(this.zoneGroup,m.lightWarm,[x,.84,z],[.18,.035,.26]);
+    // Grounded desk props: every object's physical bottom is snapped to the desk surface.
+    const adminPrinter=solid(this.zoneGroup,m.wall,[-20.28,adminDeskSurface+.14,5.30],[.50,.28,.38]);
+    adminPrinter.name='AdminDesk_Printer';
+    const printerTop=solid(this.zoneGroup,m.wallDark,[-20.28,adminDeskSurface+.295,5.27],[.38,.03,.26]);
+    printerTop.name='AdminDesk_PrinterTop';
+    const printerPaper=solid(this.zoneGroup,m.lightWarm,[-20.28,adminDeskSurface+.318,5.22],[.28,.012,.20]);
+    printerPaper.name='AdminDesk_PrinterPaper';
+
+    const monitorBase=solid(this.zoneGroup,m.metal,[-19.25,adminDeskSurface+.015,5.18],[.34,.03,.22]);
+    monitorBase.name='AdminDesk_MonitorBase';
+    const monitorStem=solid(this.zoneGroup,m.metal,[-19.25,adminDeskSurface+.18,5.18],[.06,.33,.06]);
+    monitorStem.name='AdminDesk_MonitorStem';
+    const monitorScreen=solid(this.zoneGroup,m.wallDark,[-19.25,adminDeskSurface+.47,5.18],[.72,.44,.06]);
+    monitorScreen.name='AdminDesk_Monitor';
+    const adminKeyboard=solid(this.zoneGroup,m.wall,[-19.25,adminDeskSurface+.013,5.55],[.66,.026,.22]);
+    adminKeyboard.name='AdminDesk_Keyboard';
+    for(const [i,[x,z]] of [[0,[-18.45,5.25]],[1,[-18.20,5.25]],[2,[-17.95,5.25]]]){
+      const file=solid(this.zoneGroup,m.lightWarm,[x,adminDeskSurface+.018,z],[.18,.036,.26]);
+      file.name=`AdminDesk_File_${i}`;
+    }
+
+    // Under-desk pedestal for the secretary memo.
+    const adminPedestal=solid(this.zoneGroup,m.wall,[-18.45,.35,5.55],[.52,.70,.58]);
+    adminPedestal.name='AdminDesk_Pedestal';
+    for(const y of [.20,.38,.56]){
+      const front=solid(this.zoneGroup,m.wallDark,[-18.45,y,5.245],[.42,.12,.025]);
+      front.name=`AdminDesk_DrawerFront_${y.toFixed(2)}`;
+    }
 
     // Closed but unlocked office door on the shared-core side.
     this.adminOfficeDoor=new KeyedKnobDoor(this,{
