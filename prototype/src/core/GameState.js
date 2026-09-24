@@ -92,6 +92,7 @@ export class GameState {
     this.flags.set('LAST_CALL_SEEN', false);
     this.flags.set('GAME_COMPLETE', false);
     this.flags.set('POST_2117_RETURN_TO_DUTY_ROOM', false);
+    this.flags.set('POST_2117_DUTY_ROOM_TRIGGERED', false);
     this.flags.set('POST_2117_DUTY_CALL_DONE', false);
   }
 
