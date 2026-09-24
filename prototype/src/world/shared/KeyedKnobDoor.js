@@ -3,8 +3,8 @@ import { solid } from '../../art/ArtDetails.js';
 
 /** Single-leaf, normally closed wooden door with a traditional keyed round knob. */
 export class KeyedKnobDoor {
-  constructor(zone,{id='duty_room',x,z,yaw=0,width=1.4,title='醫師值班室',openDirection=-1}){
-    this.zone=zone;this.id=id;this.width=width;this.openDirection=openDirection>=0?1:-1;
+  constructor(zone,{id='duty_room',x,z,yaw=0,width=1.4,title='醫師值班室',openDirection=-1,interactionSide=1}){
+    this.zone=zone;this.id=id;this.width=width;this.openDirection=openDirection>=0?1:-1;this.interactionSide=interactionSide>=0?1:-1;
     const m=zone.gf.materials;
     this.root=new THREE.Group();this.root.name=`KeyedKnobDoor_${id}`;
     this.root.position.set(x,0,z);this.root.rotation.y=yaw;zone.zoneGroup.add(this.root);
@@ -27,7 +27,9 @@ export class KeyedKnobDoor {
     // crosshair raycast a stable E-interaction target for the keyed knob lock.
     const hitMaterial=new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false});
     this.hitPanel=new THREE.Mesh(new THREE.BoxGeometry(width+.18,2.25,.05),hitMaterial);
-    this.hitPanel.position.set(0,1.22,.13);
+    this.hitPanel.position.set(0,1.22,.18*this.interactionSide);
+    this.hitPanel.name=`DoorInteractionSensor_${id}`;
+    this.hitPanel.userData.sensorSide=this.interactionSide;
     this.hitPanel.userData=this.interactionData;
     this.root.add(this.hitPanel);
     zone.interactables.push(this.hitPanel);
