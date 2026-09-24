@@ -47,7 +47,11 @@ export function ordinaryRoom(zone,walls,{id,label=id+' 病房',rect,side,door,ki
   let accessDoorId=null,doorType='open';
   if(kind==='ward'){
     accessDoorId='room_'+id;doorType='knob';
-    new KeyedKnobDoor(zone,{id:accessDoorId,x,z,yaw:alongX?0:Math.PI/2,width:1.6,title:id+' 病房',openDirection:(side==='south'||side==='east')?1:-1});
+    new KeyedKnobDoor(zone,{
+      id:accessDoorId,x,z,yaw:alongX?0:Math.PI/2,width:1.6,title:id+' 病房',
+      openDirection:(side==='south'||side==='east')?1:-1,
+      interactionSide:(side==='south'||side==='east')?1:-1
+    });
   }else if(kind==='storage'){
     accessDoorId='storage_'+id;doorType='card';
     new AccessDoor(zone,{id:accessDoorId,x,z,yaw:alongX?0:Math.PI/2,width:1.6,title:'儲藏室',material:zone.gf.materials.doorWood,readerSide:1});
