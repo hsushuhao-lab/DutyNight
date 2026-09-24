@@ -53,6 +53,10 @@ export class GameState {
     this.flags.set('HIDDEN_SERVICE_DOOR_DISCOVERED', false);
     this.flags.set('CLUE_403_0409', false);
     this.flags.set('ADMIN_ROSTER_CHECKED', false);
+    this.flags.set('ADMIN_PRINTER_DOC_CHECKED', false);
+    this.flags.set('ADMIN_DRAWER_MANUAL_CHECKED', false);
+    this.flags.set('ADMIN_IDENTITY_PUZZLE_RESOLVED', false);
+    this.flags.set('ECHO_2117_KNOWN', false);
     this.flags.set('ADMIN_OFFICE_ENTERED', false);
   }
 
