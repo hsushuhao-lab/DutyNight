@@ -3,8 +3,8 @@ import { solid } from '../../art/ArtDetails.js';
 
 /** Single-leaf, normally closed wooden door with a traditional keyed round knob. */
 export class KeyedKnobDoor {
-  constructor(zone,{id='duty_room',x,z,yaw=0,width=1.4,title='醫師值班室'}){
-    this.zone=zone;this.id=id;this.width=width;
+  constructor(zone,{id='duty_room',x,z,yaw=0,width=1.4,title='醫師值班室',openDirection=-1}){
+    this.zone=zone;this.id=id;this.width=width;this.openDirection=openDirection>=0?1:-1;
     const m=zone.gf.materials;
     this.root=new THREE.Group();this.root.name=`KeyedKnobDoor_${id}`;
     this.root.position.set(x,0,z);this.root.rotation.y=yaw;zone.zoneGroup.add(this.root);
@@ -56,7 +56,7 @@ export class KeyedKnobDoor {
 
   setClosed(closed){
     this.closed=closed;
-    this.hinge.rotation.y=closed?0:-Math.PI/2;
+    this.hinge.rotation.y=closed?0:this.openDirection*Math.PI/2;
     const i=this.zone.colliders.indexOf(this.closedBox);
     if(closed&&i<0)this.zone.colliders.push(this.closedBox);
     if(!closed&&i>=0)this.zone.colliders.splice(i,1);
