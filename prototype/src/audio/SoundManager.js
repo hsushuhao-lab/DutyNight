@@ -229,6 +229,24 @@ export class SoundManager {
     } catch (e) {}
   }
 
+  playBed33KnockPattern() {
+    if(!this.ctx||this.isMuted)return;
+    try{
+      const now=this.ctx.currentTime;
+      const knockAt=(t)=>{
+        const osc=this.ctx.createOscillator(),gain=this.ctx.createGain(),filter=this.ctx.createBiquadFilter();
+        osc.type='triangle';osc.frequency.setValueAtTime(92,t);osc.frequency.exponentialRampToValueAtTime(42,t+.08);
+        filter.type='lowpass';filter.frequency.value=280;
+        gain.gain.setValueAtTime(.13,t);gain.gain.exponentialRampToValueAtTime(.001,t+.11);
+        osc.connect(filter);filter.connect(gain);gain.connect(this.ctx.destination);osc.start(t);osc.stop(t+.13);
+      };
+      let t=now;
+      for(let i=0;i<4;i++){knockAt(t);t+=.31;}
+      t+=1.18;
+      for(let i=0;i<9;i++){knockAt(t);t+=.28;}
+    }catch(e){}
+  }
+
   playDoorLockClack() {
     if(!this.ctx||this.isMuted)return;
     try{
