@@ -208,10 +208,19 @@ export class FirstCampus3F {
     patrolHit.userData={interactable:true,id:'316_SPARE_KEY',type:'spare_key_316',label:'檢查夜間警衛查哨點',targetGroup:hiddenKey};
     this.zoneGroup.add(patrolHit);this.interactables.push(patrolHit);this.spareKeyMesh=patrolHit;
 
-    const futureLogHit=new THREE.Mesh(new THREE.BoxGeometry(.66,.26,.30),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
-    futureLogHit.position.set(19,1.67,1.57);
-    futureLogHit.userData={interactable:false,id:'GUARD_LOG_2117',type:'guard_log_2117',label:'簽署夜間巡查紀錄'};
-    this.zoneGroup.add(futureLogHit);this.interactables.push(futureLogHit);this.guardLog2117=futureLogHit;
+    // 21:17 bootstrap is intentionally two-step: first notice the impossible wall record,
+    // then sign the actual logbook on the shelf. This prevents the mission from stalling
+    // when the player looks at the panel but never hits a tiny overlapping trigger.
+    const futureSignHit=new THREE.Mesh(new THREE.BoxGeometry(.82,.78,.30),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
+    futureSignHit.position.set(19,1.40,1.56);
+    futureSignHit.userData={interactable:false,id:'GUARD_SIGN_2117',type:'guard_sign_2117',label:'查看 21:17 查哨紀錄'};
+    this.zoneGroup.add(futureSignHit);this.interactables.push(futureSignHit);this.guardSign2117=futureSignHit;
+
+    const logBook=solid(this.zoneGroup,m.floorWood,[18.98,.98,1.48],[.52,.045,.34]);
+    logBook.rotation.y=.06;logBook.name='GuardLogBook_2117';logBook.visible=false;
+    logBook.userData={interactable:false,id:'GUARD_BOOK_2117',type:'guard_book_2117',label:'翻開三樓夜間巡查簽名簿'};
+    this.interactables.push(logBook);this.guardLog2117=logBook;
+
     this.guardPatrolPoint={id:'3F_GUARD_PATROL_POINT',position:[19,1.34,1.69],opposite:'3F_ARCHIVE_DOOR'};
 
     const shelfMat=this.gf.materials.floorWood,folderMat=this.gf.materials.doorWood;
@@ -377,7 +386,11 @@ export class FirstCampus3F {
       this.phaseRedLight.intensity=.55;
       if(this.phaseWetMarks)this.phaseWetMarks.visible=true;
       this.setPatrolFutureEntry();
-      if(this.guardLog2117)this.guardLog2117.userData.interactable=true;
+      if(this.guardSign2117)this.guardSign2117.userData.interactable=true;
+      if(this.guardLog2117){
+        this.guardLog2117.visible=true;
+        this.guardLog2117.userData.interactable=state.getFlag('GUARD_SIGN_EXAMINED')===true;
+      }
     }
   }
 
