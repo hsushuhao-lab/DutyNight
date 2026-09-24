@@ -518,8 +518,8 @@ export class UIManager {
 
   setFinalHandoffStatus(text){const el=document.getElementById('final-handoff-status');if(el)el.textContent=text;}
 
-  closeFinalHandoff(){
-    this.finalHandoffModal?.classList.remove('active');this.finalHandoffHandler=null;this.onTerminalClose?.();
+  closeFinalHandoff(resume=true){
+    this.finalHandoffModal?.classList.remove('active');this.finalHandoffHandler=null;if(resume)this.onTerminalClose?.();
   }
 
   showFinalSuccess(name){
