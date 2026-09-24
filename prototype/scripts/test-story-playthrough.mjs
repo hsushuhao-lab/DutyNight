@@ -12,7 +12,7 @@ const server=supplied?null:await preview({root,preview:{port:4173,strictPort:tru
 const base=(supplied||'http://localhost:4173/').replace(/\/+$/,'')+'/';
 const url=base+'?qa=story';
 const browser=await chromium.launch({channel:'chrome',headless:true});
-const report={url,started:new Date().toISOString(),milestones:[],screenshots:[],errors:[],method:'Browser-driven M2-M9 story checkpoint playthrough. Runtime interactions use the same controller.onInteract handlers; direct checkpoint setup is restricted to the opt-in ?qa=story bridge so long earlier segments do not need replay.'};
+const report={url,started:new Date().toISOString(),milestones:[],screenshots:[],screenshotWarnings:[],errors:[],method:'Browser-driven M2-M9 story checkpoint playthrough. Runtime interactions use the same controller.onInteract handlers; direct checkpoint setup is restricted to the opt-in ?qa=story bridge so long earlier segments do not need replay. Screenshots are best-effort evidence only because software WebGL readback can be slow on CI.'};
 let page;
 
 async function snap(){return page.evaluate(()=>window.__storyQA.snapshot());}
@@ -22,7 +22,14 @@ async function mark(label,extra={}){
   console.log(label,JSON.stringify({zone:s.zone,time:s.time,loop:s.memory.loopCount,erosion:s.memory.identityErosionLevel,...extra}));
 }
 async function shot(name){
-  const file=name+'.png';await page.screenshot({path:out+'/'+file,fullPage:false,timeout:10000});report.screenshots.push(file);
+  const file=name+'.png';
+  try{
+    await page.screenshot({path:out+'/'+file,fullPage:false,timeout:2000});
+    report.screenshots.push(file);
+  }catch(e){
+    report.screenshotWarnings.push({name,error:e.message});
+    console.log('SCREENSHOT_WARNING',name,e.message.split('\n')[0]);
+  }
 }
 async function q(fn,arg){return page.evaluate(fn,arg);}
 async function load(zone,spawn){await q(({zone,spawn})=>window.__storyQA.load(zone,spawn),{zone,spawn});await page.waitForTimeout(120);}
