@@ -88,6 +88,7 @@ export class WardFloorplan {
       if(this.floor===4)this.buildBed33Legend();
     }else{
       this.buildSecondDutyRoom(o);
+      if(this.floor===5)this.buildSecondCampusChestLegend(o);
     }
 
     this.entryPoint=[o,1.7,3.2];this.vestibulePoint=[o,1.7,1];this.hallPoint=[o,1.7,-1.2];
@@ -252,6 +253,36 @@ export class WardFloorplan {
     w.build();this.gf.buildCeilingLight(this.zoneGroup,o+11,3.15,6,.75,7);
     this.roomAreas.push({id:'SECOND_DUTY',label:'值班室',point:[o+9.5,1.7,6],door:[o+8,1.7,6],corridor:[o+6.5,1.7,6],protectedArea:false,kind:'duty_room',accessDoorId:'second_duty_room'});
   }
+  buildSecondCampusChestLegend(o){
+    const m=this.gf.materials;
+    const bx=o,bz=-13.0;
+    const bed=asset(this.zoneGroup,'hospitalBed',[bx,0,bz],[1,1,1],Math.PI/2);
+    if(bed)bed.name='SecondCampus_ExtraChestPainBed';
+    CollisionFactory.addBox(this.colliders,bx,.45,bz,2.15,.9,1.15);
+
+    const cardCanvas=document.createElement('canvas');cardCanvas.width=620;cardCanvas.height=360;
+    const ctx=cardCanvas.getContext('2d');ctx.fillStyle='#f2eee3';ctx.fillRect(0,0,620,360);
+    ctx.fillStyle='#40584c';ctx.fillRect(0,0,620,60);ctx.fillStyle='#fff';ctx.font='bold 28px sans-serif';ctx.fillText('第二院區｜臨時留置床',24,40);
+    ctx.fillStyle='#2f3934';ctx.font='24px sans-serif';ctx.fillText('主訴：胸痛',34,118);ctx.fillText('姓名：查無正式住院資料',34,170);
+    ctx.fillStyle='#8b2f29';ctx.font='bold 24px monospace';ctx.fillText('SOURCE: 00:33 / LEGACY',34,230);
+    ctx.font='18px sans-serif';ctx.fillStyle='#6b6e69';ctx.fillText('護理交班：李醫師已評估？',34,286);
+    const tex=new THREE.CanvasTexture(cardCanvas);tex.colorSpace=THREE.SRGBColorSpace;
+    const card=new THREE.Mesh(new THREE.PlaneGeometry(1.05,.62),new THREE.MeshBasicMaterial({map:tex}));
+    card.position.set(o+1.25,1.45,bz+.35);card.rotation.y=-Math.PI/2;this.zoneGroup.add(card);
+
+    const patientHit=new THREE.Mesh(new THREE.BoxGeometry(2.4,1.6,1.5),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
+    patientHit.position.set(bx,1.0,bz);
+    patientHit.userData={interactable:true,id:'SECOND_CHEST_PATIENT',type:'second_chest_patient',label:'評估多出來的胸痛病人'};
+    this.zoneGroup.add(patientHit);this.interactables.push(patientHit);
+
+    const form=solid(this.zoneGroup,m.lightWarm,[o+1.15,1.15,-6.15],[.42,.018,.30]);
+    form.name='SecondCampus_ChestTransferForm';
+    form.userData={interactable:true,id:'SECOND_CHEST_TRANSFER',type:'second_chest_transfer',label:'查看胸痛病人轉院單'};
+    this.interactables.push(form);
+
+    this.secondCampusLegend={id:'LEGEND_CHEST_PAIN',patient:'SECOND_CHEST_PATIENT',form:'SECOND_CHEST_TRANSFER'};
+  }
+
   setWardGateClosed(closed){this.wardDoor.setClosed(closed);this.wardGateClosed=closed;}
   setInnerWardGateClosed(closed){if(this.innerWardDoor)this.innerWardDoor.setClosed(closed);this.innerWardGateClosed=closed;}
   setGlassBypassClosed(closed){if(this.glassBypassDoor)this.glassBypassDoor.setClosed(closed);this.glassBypassClosed=closed;}
