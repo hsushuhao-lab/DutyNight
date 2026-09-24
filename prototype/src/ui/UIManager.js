@@ -1,5 +1,6 @@
 // UIManager.js - Handles HUD, HIS computer terminal, Duty Log, and Elevator transition
 import { soundManager } from '../audio/SoundManager.js';
+import { persistentMemory } from '../core/PersistentMemory.js';
 
 export class UIManager {
   constructor(gameState, onTerminalClose, onElevatorTransitionComplete) {
@@ -22,6 +23,11 @@ export class UIManager {
     this.inspect302Board = document.getElementById('inspect302-board');
     this.inspect302Clue = document.getElementById('inspect302-clue');
     this.inspect302FocusTimer = null;
+    this.journalModal = document.getElementById('journal-modal');
+    this.bed33Modal = document.getElementById('bed33-modal');
+    this.loopCutscene = document.getElementById('loop-cutscene');
+    this.bed33Handlers = null;
+    this.loopCutsceneTimers = [];
     this.archiveTitleEl = document.getElementById('archive-document-title');
     this.archivePageEl = document.getElementById('archive-document-page');
     this.archiveIndicatorEl = document.getElementById('archive-page-indicator');
@@ -42,6 +48,11 @@ export class UIManager {
       }
       if (evt === 'time_changed') this.updateTime();
       if (evt === 'flag_changed') this.updateTasks();
+      if (evt === 'loop_reset') {
+        this.updateTasks();
+        this.updateTime();
+        this.closeAllTransientOverlays();
+      }
     });
     this.updateTime();
   }
@@ -118,6 +129,7 @@ export class UIManager {
       const value=document.getElementById('locker-code')?.value.trim();
       const status=document.getElementById('locker-status');
       if(value!=='1700'){status.textContent='紅燈閃爍：密碼錯誤';soundManager.playClick();return;}
+      persistentMemory.learnCode('pass_1700');
       status.textContent='綠燈亮起：櫃門已解鎖';
       document.getElementById('locker-contents')?.classList.add('revealed');
       this.gameState.setFlag('LOCKER_OPENED',true);
@@ -134,6 +146,7 @@ export class UIManager {
       const code=document.getElementById('office302-code')?.value.trim();
       const status=document.getElementById('office302-status');
       if(code!=='3082'){status.textContent='ACCESS DENIED';soundManager.playClick();return;}
+      persistentMemory.learnCode('pass_3082');
       status.textContent='ACCESS GRANTED';
       this.gameState.setFlag('OFFICE_302_UNLOCKED',true);
       window.worldRouter?.activeZoneInstance?.unlock302?.();
@@ -145,8 +158,29 @@ export class UIManager {
     this.inspect302Clue?.addEventListener('pointerenter',()=>this.begin302ClueFocus());
     this.inspect302Clue?.addEventListener('pointerleave',()=>this.cancel302ClueFocus());
 
+    document.getElementById('btn-close-journal')?.addEventListener('click',()=>this.closeJournal());
+    document.getElementById('btn-bed33-defer')?.addEventListener('click',()=>{
+      this.closeBed33Assignment();
+      this.bed33Handlers?.onDefer?.();
+    });
+    document.getElementById('btn-bed33-reject')?.addEventListener('click',()=>{
+      this.closeBed33Assignment();
+      this.bed33Handlers?.onReject?.();
+    });
+    document.getElementById('btn-bed33-confirm')?.addEventListener('click',()=>{
+      this.closeBed33Assignment(false);
+      this.bed33Handlers?.onConfirm?.();
+    });
+    document.getElementById('btn-loop-skip')?.addEventListener('click',()=>this.finishLoopCutscene());
+
     // Debug toggle with Backquote (~)
     document.addEventListener('keydown', (e) => {
+      if(e.code==='Tab'){
+        e.preventDefault();
+        if(this.journalModal?.classList.contains('active'))this.closeJournal();
+        else this.openJournal();
+        return;
+      }
       if (e.code === 'Backquote' && (import.meta.env.DEV || new URLSearchParams(location.search).get('debug') === '1')) {
         this.toggleDebug();
       }
@@ -166,6 +200,8 @@ export class UIManager {
         if (this.office302Modal?.classList.contains('active')) this.close302Keypad();
         if (this.inspect302Modal?.classList.contains('active')) this.close302Inspect();
         if (this.anomalyModal?.classList.contains('active')) this.acknowledgeAnomaly();
+        if (this.journalModal?.classList.contains('active')) this.closeJournal();
+        if (this.bed33Modal?.classList.contains('active')) this.closeBed33Assignment();
       }
     });
   }
@@ -194,6 +230,10 @@ export class UIManager {
 
   showInitialDialogue() {
     setTimeout(() => {
+      if(persistentMemory.data.loopCount>0){
+        this.showSubtitle('李醫師','「……又是這裡。316、1700、3082。我記得。」',3600);
+        return;
+      }
       this.showSubtitle(
         '學長 (資深住院醫師)',
         '「我先走了，先把 316 鎖了，自己想辦法進去把今晚的交班做完吧，值班交給你了。」\n「有問題就去警衛查哨點看看。」',
@@ -242,6 +282,8 @@ export class UIManager {
     const contents=document.getElementById('locker-contents');
     contents?.classList.toggle('revealed',opened);
     document.getElementById('locker-status').textContent=opened?'櫃門已解鎖｜可再次查看值班物品':'櫃門鎖定中';
+    const input=document.getElementById('locker-code');
+    if(input&&!opened&&persistentMemory.data.knownCodes.pass_1700)input.value='1700';
     this.lockerModal?.classList.add('active');
   }
 
@@ -323,6 +365,8 @@ export class UIManager {
 
   open302Keypad() {
     document.exitPointerLock();
+    const input=document.getElementById('office302-code');
+    if(input&&persistentMemory.data.knownCodes.pass_3082)input.value='3082';
     this.office302Modal?.classList.add('active');
   }
 
@@ -352,6 +396,99 @@ export class UIManager {
   closeArchiveDocument() {
     this.archiveModal?.classList.remove('active');
     if(this.onTerminalClose)this.onTerminalClose();
+  }
+
+  setBed33Handlers(handlers){this.bed33Handlers=handlers;}
+
+  openJournal(){
+    document.exitPointerLock();
+    const notes=document.getElementById('journal-notes');
+    const count=document.getElementById('journal-loop-count');
+    if(count)count.textContent=persistentMemory.data.loopCount===0?'這是第一次值班。':`已經回到這個夜班 ${persistentMemory.data.loopCount} 次。`;
+    if(notes){
+      notes.replaceChildren();
+      if(!persistentMemory.data.journalNotes.length){
+        const empty=document.createElement('div');empty.className='journal-empty';empty.textContent='除了印好的醫療換算表，沒有其他筆記。';notes.appendChild(empty);
+      }else{
+        for(const item of persistentMemory.data.journalNotes){
+          const row=document.createElement('div');row.className='journal-note';row.textContent=item.text;notes.appendChild(row);
+        }
+      }
+    }
+    this.journalModal?.classList.add('active');
+  }
+
+  closeJournal(){
+    this.journalModal?.classList.remove('active');
+    this.onTerminalClose?.();
+  }
+
+  openBed33Assignment({canReject=false,rememberedRule=false}={}){
+    document.exitPointerLock();
+    const reject=document.getElementById('btn-bed33-reject');
+    if(reject)reject.hidden=!(canReject||rememberedRule);
+    const warning=document.getElementById('bed33-warning-text');
+    if(warning)warning.textContent=rememberedRule?'手腕那道勒痕讓你想起一件事：絕對不要簽 409A。':'急診留置床系統卡住，請值班醫師確認過床。';
+    this.bed33Modal?.classList.add('active');
+  }
+
+  closeBed33Assignment(resume=true){
+    this.bed33Modal?.classList.remove('active');
+    if(resume)this.onTerminalClose?.();
+  }
+
+  playBed33Override(onComplete){
+    document.exitPointerLock();
+    this.loopOverrideComplete=onComplete;
+    for(const t of this.loopCutsceneTimers)clearTimeout(t);
+    this.loopCutsceneTimers=[];
+    const title=document.getElementById('loop-stage-title');
+    const body=document.getElementById('loop-stage-body');
+    const band=document.getElementById('loop-wristband');
+    const card=document.getElementById('loop-gameover-card');
+    title.textContent='BED ASSIGNMENT COMPLETE';
+    body.textContent='床位分配完成。';
+    band?.classList.remove('visible');card?.classList.remove('visible');
+    this.loopCutscene?.classList.add('active');
+
+    const later=(ms,fn)=>this.loopCutsceneTimers.push(setTimeout(fn,ms));
+    later(900,()=>{title.textContent='';body.textContent='日光燈一格一格從視野上方滑過。\n推車輪子壓過地磚，發出規律的咕嚕聲。';});
+    later(2500,()=>{band?.classList.add('visible');body.textContent='你的手腕被套上病人手圈。\n「33床新收案，自稱是今晚的值班醫師。」';});
+    later(4400,()=>{body.textContent='「緊急安置醫囑已確認，先執行保護性處置。」\n皮帶扣環一個接一個拉緊。';});
+    later(6100,()=>{body.textContent='門口站著另一個穿白袍的「李醫師」。\n護理師說：「33床一直說自己才是值班醫師。」\n他只回答：「我知道。」';});
+    later(7900,()=>{title.textContent='';body.textContent='視線開始模糊。白噪音蓋過所有聲音。';});
+    later(9300,()=>{body.textContent='';card?.classList.add('visible');});
+    later(11300,()=>this.finishLoopCutscene());
+  }
+
+  finishLoopCutscene(){
+    if(!this.loopCutscene?.classList.contains('active'))return;
+    for(const t of this.loopCutsceneTimers)clearTimeout(t);
+    this.loopCutsceneTimers=[];
+    this.loopCutscene.classList.remove('active');
+    const cb=this.loopOverrideComplete;this.loopOverrideComplete=null;
+    cb?.();
+  }
+
+  closeAllTransientOverlays(){
+    document.querySelectorAll('.modal-overlay.active,.cutscene-overlay.active').forEach(el=>el.classList.remove('active'));
+  }
+
+  resetAfterLoop(){
+    document.getElementById('locker-contents')?.classList.remove('revealed');
+    const locker=document.getElementById('locker-code');if(locker)locker.value='';
+    const code302=document.getElementById('office302-code');if(code302)code302.value='';
+    const hisA=document.getElementById('his-account');if(hisA)hisA.value='';
+    const hisP=document.getElementById('his-password');if(hisP)hisP.value='';
+    document.getElementById('his-handoff-content')?.classList.remove('unlocked');
+    this.updateTasks();this.updateTime();
+  }
+
+  showLoopWakeup(loopCount){
+    const el=document.getElementById('loop-wake-flash');
+    el?.classList.remove('active');void el?.offsetWidth;el?.classList.add('active');
+    setTimeout(()=>this.showSubtitle('學長 (資深住院醫師)','「李醫師？發什麼呆，我先走了……」',3600),850);
+    setTimeout(()=>this.showSubtitle('李醫師',`「手腕……這不是夢。這已經是第 ${loopCount+1} 次了。」`,4200),4200);
   }
 
   openTravelSelector(destinations, currentZone, onSelect, kind = 'elevator') {
