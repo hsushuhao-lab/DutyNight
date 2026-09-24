@@ -98,7 +98,7 @@ try{
   await page.waitForSelector('#bed33-modal.active');
   assert.equal(await page.locator('#btn-bed33-reject').isVisible(),true);
   await domClick('#btn-bed33-reject');
-  s=await snap();assert.equal(s.flags.BED33_RESOLVED,true);assert.equal(s.memory.proofs.space,true);assert.equal(s.memory.trueNameFragments.frag_givenName_1,'昱');
+  s=await snap();assert.equal(s.flags.BED33_RESOLVED,true);assert.equal(s.memory.proofs.space,true);assert.equal(s.memory.trueNameFragments.frag_employeePrefix,'MED-87');
   await mark('M2 resolved by persistent cognition');
 
   // M3: Jane Doe happens during the normal 20:00 consult. 00:33 must NOT leak before the 21:17 bootstrap.
@@ -108,7 +108,7 @@ try{
   const preGhost=await q(()=>window.__storyQA.worldRouter.activeZoneInstance?.ghostRegistrationTerminal?.userData?.interactable===true);
   assert.equal(preGhost,false,'00:33 terminal must stay dormant during the first ER consult');
   await interact({action:'ER_ASSESS'});await interact({action:'ER_NOTE'});
-  s=await snap();assert.equal(s.flags.B_PANEL_KEY,true);assert.equal(s.memory.trueNameFragments.frag_surname,'林');
+  s=await snap();assert.equal(s.flags.B_PANEL_KEY,true);assert.equal(s.memory.trueNameFragments.frag_surname,null);
   await interact({id:'ER_EXIT_NOTICE'});
   assert((await page.locator('#subtitle-text').innerText()).includes('只進不出'));
 
@@ -126,22 +126,35 @@ try{
   s=await snap();assert.equal(s.flags.GHOST_REGISTRATION_AVAILABLE,true);assert.equal(s.time,'00:33');
   await interact({id:'ER_GHOST_REGISTRATION'});
   await page.waitForSelector('#story-choice-modal.active');await shot('m3-0033-registration');await secondary();
-  s=await snap();assert.equal(s.flags.LEGEND_ER0033_RESOLVED,true);assert.equal(s.flags.SECOND_CAMPUS_ACCESS,true);assert.equal(s.memory.proofs.time,true);
-  await mark('M3 Jane Doe + 21:17 + 00:33 gating resolved; second campus unlocked');
+  s=await snap();
+  assert.equal(s.flags.ER0033_SLIP_COLLECTED,true);
+  assert.equal(s.flags.LEGEND_ER0033_RESOLVED,false);
+  assert.equal(s.flags.SECOND_CAMPUS_ACCESS,false);
+
+  // M3 only resolves after the 1998-ER-0217 slip is carried back to the second 316 terminal.
+  await load('first_campus_3f');
+  await interact({id:'316_LEGACY_TERMINAL'});
+  s=await snap();
+  assert.equal(s.flags.M3_316_DECODED,true);
+  assert.equal(s.flags.LEGEND_ER0033_RESOLVED,true);
+  assert.equal(s.flags.SECOND_CAMPUS_ACCESS,true);
+  assert.equal(s.memory.proofs.time,true);
+  assert.equal(s.memory.trueNameFragments.frag_surname,'張');
+  await mark('M3 00:33 slip decoded at 316; second campus unlocked');
 
   // M4: second-campus chest-pain duplicate patient.
   await load('second_campus_5f');
   await interact({id:'SECOND_CHEST_PATIENT'});
   await interact({id:'SECOND_CHEST_TRANSFER'});
   await page.waitForSelector('#story-choice-modal.active');await shot('m4-chest-transfer');await secondary();
-  s=await snap();assert.equal(s.flags.M4_CHEST_RESOLVED,true);assert.equal(s.flags.OUTDOOR_ROUTE_ACCESS,true);assert.equal(s.flags.CHEST_RECORD_MATCH,true);
+  s=await snap();assert.equal(s.flags.M4_CHEST_RESOLVED,true);assert.equal(s.flags.OUTDOOR_ROUTE_ACCESS,true);assert.equal(s.flags.CHEST_RECORD_MATCH,true);assert.equal(s.memory.trueNameFragments.frag_givenName_1,'守');
   await mark('M4 chest-pain duplicate resolved');
 
   // M5A: skybridge rule.
   await load('skybridge');
   await interact({id:'BRIDGE_LOOP_EVENT'});
   await page.waitForSelector('#story-choice-modal.active');await shot('m5-bridge-double');await secondary();
-  s=await snap();assert.equal(s.flags.M5_BRIDGE_RESOLVED,true);assert.equal(s.flags.FLOOR6_AVAILABLE,true);assert.equal(s.memory.proofs.identity,true);assert.equal(s.memory.trueNameFragments.frag_givenName_2,'衡');
+  s=await snap();assert.equal(s.flags.M5_BRIDGE_RESOLVED,true);assert.equal(s.flags.FLOOR6_AVAILABLE,true);assert.equal(s.memory.proofs.identity,true);assert.equal(s.memory.trueNameFragments.frag_givenName_2,'恆');
   await mark('M5 bridge rule resolved');
 
   // M5B: alternate pond route is independently functional.
@@ -168,7 +181,7 @@ try{
   await page.waitForFunction(()=>window.__storyQA.worldRouter.activeZoneId==='b2_archive');
   await shot('m7-b2');
   await interact({id:'B2_ARCHIVE_TERMINAL'});
-  s=await snap();assert.equal(s.flags.M7_B2_RESOLVED,true);assert.equal(s.flags.M8_IDENTITY_BATTLE_ACTIVE,true);assert.equal(s.memory.trueNameResolved,true);assert.equal(s.memory.trueName,'林昱衡');
+  s=await snap();assert.equal(s.flags.M7_B2_RESOLVED,true);assert.equal(s.flags.M8_IDENTITY_BATTLE_ACTIVE,true);assert.equal(s.memory.trueNameResolved,true);assert.equal(s.memory.trueName,'張守恆');assert.equal(s.memory.trueNameFragments.frag_employeeFull,'MED-870409');
   await interact({id:'B2_RETURN_LIFT'});
   await page.waitForFunction(()=>window.__storyQA.worldRouter.activeZoneId==='first_campus_1f');
   s=await snap();assert.equal(s.flags.LAST_CALL_SEEN,true);
@@ -179,7 +192,7 @@ try{
   await flag('OPENED_316',true);
   await interact({id:'E_HANDOFF'});
   await page.waitForSelector('#final-handoff-modal.active');await shot('m9-final-handoff');
-  await page.locator('#final-true-name').fill('林昱衡');
+  await page.locator('#final-true-name').fill('張守恆');
   await domClick('#btn-submit-final-handoff');
   await page.waitForSelector('#final-success-modal.active');
   await shot('m9-success');
