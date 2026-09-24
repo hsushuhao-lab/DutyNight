@@ -153,6 +153,8 @@ try{
   assert.equal(s.flags.SECOND_CAMPUS_ACCESS,true);
   assert.equal(s.memory.proofs.time,true);
   assert.equal(s.memory.trueNameFragments.frag_surname,'張');
+  assert.equal(s.time,'01:15');
+  assert.equal(await q(()=>window.__storyQA.gameState.getDisplayTime()),'翌日 01:15');
   await mark('M3 00:33 slip decoded at 316; second campus unlocked');
 
   // M4: second-campus chest-pain duplicate patient.
@@ -160,14 +162,14 @@ try{
   await interact({id:'SECOND_CHEST_PATIENT'});
   await interact({id:'SECOND_CHEST_TRANSFER'});
   await page.waitForSelector('#story-choice-modal.active');await shot('m4-chest-transfer');await secondary();
-  s=await snap();assert.equal(s.flags.M4_CHEST_RESOLVED,true);assert.equal(s.flags.OUTDOOR_ROUTE_ACCESS,true);assert.equal(s.flags.CHEST_RECORD_MATCH,true);assert.equal(s.memory.trueNameFragments.frag_givenName_1,'守');
+  s=await snap();assert.equal(s.flags.M4_CHEST_RESOLVED,true);assert.equal(s.flags.OUTDOOR_ROUTE_ACCESS,true);assert.equal(s.flags.CHEST_RECORD_MATCH,true);assert.equal(s.memory.trueNameFragments.frag_givenName_1,'守');assert.equal(s.time,'01:45');
   await mark('M4 chest-pain duplicate resolved');
 
   // M5A: skybridge rule.
   await load('skybridge');
   await interact({id:'BRIDGE_LOOP_EVENT'});
   await page.waitForSelector('#story-choice-modal.active');await shot('m5-bridge-double');await secondary();
-  s=await snap();assert.equal(s.flags.M5_BRIDGE_RESOLVED,true);assert.equal(s.flags.FLOOR6_AVAILABLE,true);assert.equal(s.memory.proofs.identity,true);assert.equal(s.memory.trueNameFragments.frag_givenName_2,'恆');
+  s=await snap();assert.equal(s.flags.M5_BRIDGE_RESOLVED,true);assert.equal(s.flags.FLOOR6_AVAILABLE,true);assert.equal(s.memory.proofs.identity,true);assert.equal(s.memory.trueNameFragments.frag_givenName_2,'恆');assert.equal(s.time,'02:00');
   await mark('M5 bridge rule resolved');
 
   // M5B: alternate pond route is independently functional.
@@ -197,14 +199,14 @@ try{
   s=await snap();assert.equal(s.flags.M7_B2_RESOLVED,true);assert.equal(s.flags.M8_IDENTITY_BATTLE_ACTIVE,true);assert.equal(s.memory.trueNameResolved,true);assert.equal(s.memory.trueName,'張守恆');assert.equal(s.memory.trueNameFragments.frag_employeeFull,'MED-870409');
   await interact({id:'B2_RETURN_LIFT'});
   await page.waitForFunction(()=>window.__storyQA.worldRouter.activeZoneId==='first_campus_1f');
-  s=await snap();assert.equal(s.flags.LAST_CALL_SEEN,true);
+  s=await snap();assert.equal(s.flags.LAST_CALL_SEEN,true);assert.equal(s.time,'03:30');
   await mark('M7 B2 reveals true name; M8 identity battle active');
 
   // M9: return to 316 and complete the real handoff.
   await load('first_campus_3f');
   await flag('OPENED_316',true);
   await interact({id:'E_HANDOFF'});
-  await page.waitForSelector('#final-handoff-modal.active');await shot('m9-final-handoff');
+  await page.waitForSelector('#final-handoff-modal.active');s=await snap();assert.equal(s.time,'04:05');await shot('m9-final-handoff');
   await page.locator('#final-true-name').fill('張守恆');
   await domClick('#btn-submit-final-handoff');
   await page.waitForSelector('#final-success-modal.active');
