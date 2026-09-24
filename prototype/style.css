@@ -781,3 +781,33 @@ body.his-flicker #canvas-container{animation:his-power-flicker .42s linear}
 .anomaly-window.anomaly-typing h2{animation-delay:.28s}.anomaly-window.anomaly-typing p:nth-of-type(1){animation-delay:.62s}.anomaly-window.anomaly-typing p:nth-of-type(2){animation-delay:1.05s}.anomaly-window.anomaly-typing p:nth-of-type(3){animation-delay:1.48s}.anomaly-window.anomaly-typing .anomaly-last{animation-delay:1.92s}
 @keyframes anomaly-line-in{to{opacity:1}}
 #task-panel.no-guidance{display:none!important}
+
+/* Persistent journal */
+.journal-book{width:min(720px,92vw);max-height:86vh;background:#171612;color:#d9d0bb;border:1px solid #574f43;box-shadow:0 26px 80px rgba(0,0,0,.82);display:flex;flex-direction:column}
+.journal-header{display:flex;align-items:flex-start;justify-content:space-between;padding:18px 20px;border-bottom:1px solid #4e473d;background:#211e19}
+.journal-header small{color:#9a8f7b;letter-spacing:.08em}.journal-header h2{margin:4px 0 0;font-family:"Noto Serif TC","PMingLiU",serif}
+.journal-loop-count{padding:12px 22px;color:#9d927e;font-size:13px;border-bottom:1px solid #363027}
+.journal-notes{padding:24px 32px 34px;overflow:auto;min-height:280px;font-family:"Noto Serif TC","PMingLiU",serif;background:linear-gradient(90deg,rgba(255,255,255,.018),transparent 8%,transparent 92%,rgba(255,255,255,.015))}
+.journal-note{padding:11px 4px;border-bottom:1px dashed #3a342c;font-size:17px;line-height:1.7;color:#e1d4bd}
+.journal-note::before{content:"— ";color:#8b2f29}.journal-empty{color:#746b5c;font-style:italic}
+
+/* Legend 01 assignment form */
+.bed33-form{width:min(620px,92vw);background:#edf2ee;color:#202b26;border:1px solid #85978c;box-shadow:0 24px 72px rgba(0,0,0,.76)}
+.bed33-form-header{padding:14px 18px;background:#40584c;color:#fff;font-weight:800;letter-spacing:.05em}
+.bed33-form-body{padding:18px 22px}.bed33-form-row{display:flex;justify-content:space-between;padding:10px 4px;border-bottom:1px solid #c9d2cc}.bed33-form-row strong{font-family:ui-monospace,monospace}
+#bed33-warning-text{margin:18px 0 2px;color:#765032;line-height:1.6}.bed33-form-actions{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;padding:14px 18px;background:#dde5e0;border-top:1px solid #c0cbc4}
+#btn-bed33-reject[hidden]{display:none!important}
+
+/* Identity override / loop cutscene */
+.loop-cutscene{background:#050606;color:#eee;z-index:1000}.loop-cutscene-inner{position:relative;width:min(900px,94vw);min-height:520px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;overflow:hidden}
+.loop-stage-title{font:700 28px/1.2 ui-monospace,monospace;color:#86c49f;letter-spacing:.10em;margin-bottom:28px}
+.loop-stage-body{max-width:720px;white-space:pre-line;font:18px/1.9 "Noto Serif TC","PMingLiU",serif;color:#d8d5cb}
+.loop-wristband{display:none;margin-top:26px;padding:16px 22px;background:#f2eee5;color:#222;border:2px solid #999;transform:rotate(-2deg);font-family:ui-monospace,monospace;line-height:1.7;box-shadow:0 10px 30px rgba(0,0,0,.45)}
+.loop-wristband.visible{display:block;animation:wristband-in .45s ease both}.loop-gameover-card{display:none;flex-direction:column;gap:12px;letter-spacing:.06em}.loop-gameover-card.visible{display:flex;animation:loop-card-in .8s ease both}.loop-gameover-card>div{font-size:17px;color:#bdb8ad}.loop-gameover-card strong{font:700 30px ui-monospace,monospace}.loop-gameover-card span{color:#d6c6b1}
+.loop-skip{position:absolute;right:16px;bottom:16px}
+@keyframes wristband-in{from{opacity:0;transform:rotate(-2deg) translateY(18px)}to{opacity:1;transform:rotate(-2deg) translateY(0)}}
+@keyframes loop-card-in{from{opacity:0;filter:blur(8px)}to{opacity:1;filter:none}}
+
+.loop-wake-flash{pointer-events:none;position:fixed;inset:0;z-index:900;display:none;background:rgba(235,238,229,.96);color:#1d231f;align-items:center;justify-content:center;flex-direction:column}
+.loop-wake-flash.active{display:flex;animation:loop-wake-fade 2.6s ease forwards}.loop-wake-text{font:700 30px ui-monospace,monospace;letter-spacing:.20em}.loop-wrist-mark{position:absolute;right:8vw;bottom:10vh;width:180px;height:34px;border:4px solid rgba(150,35,35,.38);border-radius:40%;filter:blur(.4px);transform:rotate(-12deg);opacity:.8}
+@keyframes loop-wake-fade{0%{opacity:1}45%{opacity:1}100%{opacity:0;visibility:hidden}}
