@@ -490,6 +490,44 @@ controller.onInteract = (interactable) => {
       if(dutyLine)uiManager.showSubtitle(dutyLine.speaker,dutyLine.text);
       controller.enabled = true;
     }, interactable.kind);
+  } else if (interactable.type === 'second_chest_patient') {
+    if(!gameState.getFlag('SECOND_CAMPUS_ACCESS')){
+      uiManager.showSubtitle('李醫師','「我現在沒有第二院區權限。」',2200);
+      return;
+    }
+    if(!gameState.getFlag('SECOND_CHEST_PATIENT_SEEN')){
+      gameState.setFlag('SECOND_CHEST_PATIENT_SEEN',true);
+      persistentMemory.addJournalNote('CHEST_PATIENT','第二院區多出來的胸痛病人，資料來源欄寫著 00:33 / LEGACY。');
+      uiManager.showSubtitle('第二院區護理師','「李醫師，你剛才不是已經看過他了嗎？轉院單上還有你的簽名。」',4400);
+    }else uiManager.showSubtitle('胸痛病人','「醫師……你不是剛才才來過？」',2800);
+  } else if (interactable.type === 'second_chest_transfer') {
+    if(!gameState.getFlag('SECOND_CHEST_PATIENT_SEEN')){
+      uiManager.showSubtitle('李醫師','「先看病人，不能直接簽轉院單。」',2400);
+      return;
+    }
+    if(gameState.getFlag('M4_CHEST_RESOLVED')){
+      uiManager.showSubtitle('李醫師','「這張轉院單已經被撤回了。」',2200);
+      return;
+    }
+    controller.enabled=false;
+    uiManager.openStoryChoice({
+      title:'第二院區｜胸痛病人轉院單',
+      body:'病人姓名：查無正式住院資料\n來源：00:33 / legacy\n電子簽名：李住院醫師（已存在）\n\n是否確認轉院？',
+      primaryText:'確認轉院',
+      secondaryText:'拒絕，重新查核身分',
+      onPrimary:()=>loopManager.triggerLegendOverride('CHEST',{legend:'LEGEND 03 — 多出來的胸痛病人',reason:'你成了轉院對象。'}),
+      onSecondary:()=>{
+        gameState.setFlag('M4_CHEST_RESOLVED',true);
+        gameState.setFlag('CHEST_RECORD_MATCH',true);
+        gameState.setFlag('OUTDOOR_ROUTE_ACCESS',true);
+        gameState.setFlag('FLOOR6_AVAILABLE',true);
+        persistentMemory.resolveLegend('chestPain');
+        persistentMemory.addJournalNote('CHEST_RESOLVED','胸痛病人的轉院單早已有「李醫師」電子簽名；我沒有簽過。');
+        persistentMemory.raiseErosion(1);
+        uiManager.showSubtitle('第二院區護理師','「……可是系統顯示你已經簽過了。那剛才來的人是誰？」',4400);
+        controller.enabled=true;
+      }
+    });
   } else if (interactable.type === 'guard_log_2117') {
     if(!gameState.getFlag('NIGHT_PATROL_RETURN_3F'))return;
     if(!gameState.getFlag('BOOTSTRAP_2117_RESOLVED')){
