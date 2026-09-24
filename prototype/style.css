@@ -804,7 +804,7 @@ body.his-flicker #canvas-container{animation:his-power-flicker .42s linear}
 .loop-stage-body{max-width:720px;white-space:pre-line;font:18px/1.9 "Noto Serif TC","PMingLiU",serif;color:#d8d5cb}
 .loop-wristband{display:none;margin-top:26px;padding:16px 22px;background:#f2eee5;color:#222;border:2px solid #999;transform:rotate(-2deg);font-family:ui-monospace,monospace;line-height:1.7;box-shadow:0 10px 30px rgba(0,0,0,.45)}
 .loop-wristband.visible{display:block;animation:wristband-in .45s ease both}.loop-gameover-card{display:none;flex-direction:column;gap:12px;letter-spacing:.06em}.loop-gameover-card.visible{display:flex;animation:loop-card-in .8s ease both}.loop-gameover-card>div{font-size:17px;color:#bdb8ad}.loop-gameover-card strong{font:700 30px ui-monospace,monospace}.loop-gameover-card span{color:#d6c6b1}
-.loop-skip{position:absolute;right:16px;bottom:16px}
+.loop-skip{display:block!important;visibility:visible!important;opacity:1!important;position:absolute;right:16px;bottom:16px;z-index:4;background:#ddd;color:#222;border:1px solid #888;pointer-events:auto}
 @keyframes wristband-in{from{opacity:0;transform:rotate(-2deg) translateY(18px)}to{opacity:1;transform:rotate(-2deg) translateY(0)}}
 @keyframes loop-card-in{from{opacity:0;filter:blur(8px)}to{opacity:1;filter:none}}
 
