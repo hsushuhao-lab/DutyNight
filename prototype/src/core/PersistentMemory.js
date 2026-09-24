@@ -1,8 +1,8 @@
-export const TRUE_NAME_CANON='林昱衡';
+export const TRUE_NAME_CANON='張守恆';
 const STORAGE_KEY='DutyNight_PersistentData';
 
 const defaults=()=>({
-  version:1,
+  version:2,
   loopCount:0,
   hasSeenOverride_Bed33:false,
   identityErosionLevel:0,
@@ -29,10 +29,12 @@ const defaults=()=>({
     neverChaseFloor6:false
   },
   trueNameFragments:{
+    frag_employeePrefix:null,
     frag_surname:null,
     frag_givenName_1:null,
     frag_givenName_2:null,
-    frag_title:null
+    frag_title:null,
+    frag_employeeFull:null
   },
   journalNotes:[]
 });
@@ -71,7 +73,24 @@ export class PersistentMemory {
   load(){
     try{
       const raw=this.storage.getItem(STORAGE_KEY);
-      return raw?merge(defaults(),JSON.parse(raw)):defaults();
+      if(!raw)return defaults();
+      const parsed=JSON.parse(raw);
+      const data=merge(defaults(),parsed);
+
+      // v2 changed the canonical True Name. Preserve loop knowledge/rules, but
+      // invalidate obsolete identity fragments from the earlier placeholder name.
+      if((parsed.version||1)<2 || parsed.trueName==='林昱衡'){
+        data.version=2;
+        data.trueNameResolved=false;
+        data.trueName=null;
+        data.gameComplete=false;
+        data.trueNameFragments={
+          ...defaults().trueNameFragments,
+          frag_employeePrefix: parsed.trueNameFragments?.frag_employeePrefix||null
+        };
+        data.journalNotes=data.journalNotes.filter(n=>!['TRUE_NAME','B2_316'].includes(n.id));
+      }
+      return data;
     }catch(e){
       return defaults();
     }
@@ -127,11 +146,22 @@ export class PersistentMemory {
 
   hasAllProofs(){return this.data.proofs.space&&this.data.proofs.identity&&this.data.proofs.time;}
 
+  canReconstructTrueName(){
+    const f=this.data.trueNameFragments;
+    return f.frag_employeePrefix==='MED-87'
+      && f.frag_surname==='張'
+      && f.frag_givenName_1==='守'
+      && f.frag_givenName_2==='恆'
+      && f.frag_title==='住院醫師';
+  }
+
   resolveTrueName(name){
+    if(name!==TRUE_NAME_CANON || !this.canReconstructTrueName())return false;
     this.data.trueName=name;
     this.data.trueNameResolved=true;
     this.addJournalNote('TRUE_NAME',`我的名字是「${name}」。不是李醫師。`);
     this.save();
+    return true;
   }
 
   completeGame(){
