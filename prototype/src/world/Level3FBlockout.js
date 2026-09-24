@@ -699,6 +699,23 @@ export class Level3FBlockout {
         this.scene.add(wsHitbox);
         this.interactables.push(wsHitbox);
         this.workstationMesh = wsHitbox;
+      } else {
+        // The second 316 terminal is an older archive client. It looks like an
+        // ordinary ward-information screen until the 00:33 slip is brought back.
+        const legacyHitbox = new THREE.Mesh(
+          new THREE.BoxGeometry(0.8, 0.7, 0.9),
+          new THREE.MeshBasicMaterial({ visible: false })
+        );
+        legacyHitbox.position.set(9.8, 1.2, 5.5 + offsetZ);
+        legacyHitbox.userData = {
+          interactable: true,
+          id: '316_LEGACY_TERMINAL',
+          label: '查看 316 舊資料終端',
+          type: 'legacy_terminal_316'
+        };
+        this.scene.add(legacyHitbox);
+        this.interactables.push(legacyHitbox);
+        this.legacyTerminalMesh = legacyHitbox;
       }
     });
   }
