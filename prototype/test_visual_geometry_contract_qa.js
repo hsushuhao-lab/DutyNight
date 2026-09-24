@@ -13,17 +13,34 @@ global.document={
 
 const router=new WorldRouter(new THREE.Scene(),new THREE.PerspectiveCamera(),null);
 
-// 4F: paperwork must sit on real workstation tops; keyed doors must have explicit inward swing.
+// 4F: paperwork must sit on the actual workstation tops; interaction sensors must face corridors/readers.
 let zone=router.loadZone('first_campus_4f');
-for(const [name,expectedY] of [['Bed33_HIS409Sheet',.82],['Bed33_AssignmentForm',.82]]){
+const wsA=zone.workstations.find(w=>w.id==='first_station_A');
+const wsB=zone.workstations.find(w=>w.id==='first_station_B');
+for(const [name,desk] of [['Bed33_HIS409Sheet',wsB?.desk],['Bed33_AssignmentForm',wsA?.desk]]){
   const obj=zone.zoneGroup.getObjectByName(name);
   assert(obj,`${name} missing`);
   const box=new THREE.Box3().setFromObject(obj);
-  assert(Math.abs(box.min.y-expectedY)<.005,`${name} floats: bottom=${box.min.y}, expected ${expectedY}`);
+  const expectedY=desk?new THREE.Box3().setFromObject(desk).max.y:.82;
+  assert(Math.abs(box.min.y-expectedY)<.006,`${name} floats: bottom=${box.min.y}, deskTop=${expectedY}`);
 }
 assert.equal(zone.dutyDoor?.openDirection,1,'4F duty-room door must swing inward');
 assert.equal(zone.dutyBathroomDoor?.openDirection,1,'4F bathroom door must swing inward');
 assert.equal(zone.keyedDoors['room_409']?.openDirection,-1,'409 west-wall patient door must swing into the room');
+for(const room of zone.roomAreas.filter(r=>r.kind==='ward')){
+  const door=zone.keyedDoors[room.accessDoorId];
+  assert(door?.hitPanel,`${room.id} interaction sensor missing`);
+  const sensor=door.hitPanel.getWorldPosition(new THREE.Vector3());
+  const corridor=new THREE.Vector3(...room.corridor);
+  const roomPoint=new THREE.Vector3(...room.point);
+  assert(sensor.distanceTo(corridor)<sensor.distanceTo(roomPoint),`${room.id} interaction sensor must face the corridor`);
+}
+for(const id of ['first_ward','first_ward_inner','first_ward_glass','first_station_ward']){
+  const door=zone.accessDoors[id];
+  if(!door)continue;
+  assert(door.readerSensor,`${id} must interact at the jamb reader, not the door leaf`);
+  assert(door.leaves.every(leaf=>leaf.userData.interactable===false),`${id} leaves must not be fake reader targets`);
+}
 
 // 3F: admin door swings inward and 21:17 checkpoint is a two-step visible interaction.
 gameState.resetForLoop();
@@ -34,6 +51,9 @@ zone.applyGamePhase('Phase3_2117_NightPatrol',gameState);
 assert.equal(zone.guardSign2117?.userData?.interactable,true,'21:17 checkpoint sign must be interactable');
 assert.equal(zone.guardLog2117?.visible,true,'21:17 logbook must be physically visible');
 assert.equal(zone.guardLog2117?.userData?.interactable,false,'21:17 logbook must require noticing the sign first');
+assert(zone.guardSign2117.geometry.parameters.width>=1.5,'21:17 sign sensor must be large enough for first-person interaction');
+assert(zone.guardLog2117.geometry.parameters.width>=1.1,'21:17 logbook sensor must not be a tiny paper-only target');
+assert(zone.guardLog2117Visual?.visible===true,'21:17 visual logbook must be visible in night-patrol phase');
 
 // 2F: the 00:33 terminal must be dormant during the first ER visit.
 gameState.resetForLoop();
