@@ -474,6 +474,7 @@ controller.onInteract = (interactable) => {
     controller.enabled = false;
     const travelFrom=worldRouter.activeZoneId;
     uiManager.openTravelSelector(worldRouter.floorDestinations(interactable.kind), travelFrom, destination => {
+      if(destination.zoneId==='phantom_6f')gameState.setFlag('PHANTOM6_RETURN_ZONE',travelFrom);
       if(interactable.kind==='elevator'&&travelFrom==='first_campus_2f'&&destination.zoneId==='first_campus_4f'&&gameState.getFlag('FORCE_3F_ELEVATOR_STOP')&&!gameState.getFlag('FORCED_3F_ELEVATOR_STOP_DONE')){
         gameState.setFlag('FORCED_3F_ELEVATOR_STOP_DONE',true);
         gameState.setFlag('STAIR_SHORTCUT_3F_4F',true);
@@ -571,6 +572,20 @@ controller.onInteract = (interactable) => {
         controller.enabled=true;
       }
     });
+  } else if (interactable.type === 'floor6_chase') {
+    loopManager.triggerLegendOverride('FLOOR6',{legend:'LEGEND 06 — 不存在的六樓',reason:'查無此樓層。'});
+  } else if (interactable.type === 'floor6_safe_return') {
+    if(!gameState.getFlag('M6_FLOOR6_RESOLVED')){
+      gameState.setFlag('M6_FLOOR6_RESOLVED',true);
+      gameState.setFlag('VERTICAL_PROOF_FRAGMENT',true);
+      persistentMemory.resolveLegend('floor6');
+      persistentMemory.addJournalNote('FLOOR6_SAFE','6F 不存在。走廊盡頭卻有另一個「316」；它像是 B2 的倒影。');
+      persistentMemory.raiseErosion(1);
+    }
+    const returnZone=gameState.getFlag('PHANTOM6_RETURN_ZONE')||'second_campus_5f';
+    worldRouter.loadZone(returnZone);
+    controller.enabled=true;
+    uiManager.showSubtitle('李醫師','「不要追。這層根本不在樓層圖上。」',2800);
   } else if (interactable.type === 'guard_log_2117') {
     if(!gameState.getFlag('NIGHT_PATROL_RETURN_3F'))return;
     if(!gameState.getFlag('BOOTSTRAP_2117_RESOLVED')){
