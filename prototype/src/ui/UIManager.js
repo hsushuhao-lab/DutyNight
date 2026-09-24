@@ -729,7 +729,7 @@ export class UIManager {
   }
 
   updateTime() {
-    if (this.timeEl) this.timeEl.textContent = `${this.gameState.gameTime} ｜ 第一線值班：李住院醫師`;
+    if (this.timeEl) this.timeEl.textContent = `${this.gameState.getDisplayTime?.()||this.gameState.gameTime} ｜ 第一線值班：李住院醫師`;
   }
 
   renderTaskBoard(header, items) {
@@ -805,7 +805,30 @@ export class UIManager {
     }
 
     if(this.gameState.getFlag('BOOTSTRAP_2117_RESOLVED')){
-      document.getElementById('task-panel')?.classList.add('no-guidance');
+      if(!this.gameState.getFlag('POST_2117_DUTY_CALL_DONE')){
+        const at4F=currentZone==='first_campus_4f';
+        this.renderTaskBoard('21:17 之後｜故事仍在繼續',[
+          {
+            id:'task-post2117-duty',
+            text:at4F?'回值班室，在桌邊整理今晚的異常紀錄':'回 4F 值班室',
+            state:'ready'
+          }
+        ]);
+      }else if(!this.gameState.getFlag('GHOST_REGISTRATION_AVAILABLE')&&!this.gameState.getFlag('ER0033_SLIP_COLLECTED')){
+        this.renderTaskBoard('翌日 00:30｜值班電話',[
+          {id:'task-post2117-er',text:'前往 2F 急診檢傷站查看舊格式掛號異常',state:'ready'}
+        ]);
+      }else if(this.gameState.getFlag('ER0033_SLIP_COLLECTED')&&!this.gameState.getFlag('M3_316_DECODED')){
+        this.renderTaskBoard('00:33｜1998-ER-0217',[
+          {id:'task-m3-316',text:'把掛號聯帶回 3F 316，用舊終端查封存索引',state:'ready'}
+        ]);
+      }else if(this.gameState.getFlag('M3_316_DECODED')&&!this.gameState.getFlag('SECOND_CAMPUS_ACCESS')){
+        this.renderTaskBoard('等待院內來電',[
+          {id:'task-second-call',text:'留意第二院區來電',state:'ready'}
+        ]);
+      }else{
+        document.getElementById('task-panel')?.classList.add('no-guidance');
+      }
       return;
     }
 
