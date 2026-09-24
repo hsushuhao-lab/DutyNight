@@ -245,7 +245,10 @@ export function applyAct1CollisionHotfix(level) {
   buildModeledOppositeWall(level);
   buildDutyNoticeInside316(level);
 
+  // The 316 leaf is intentionally locked/closed at scene start. Its own
+  // collider must not be mistaken for an architectural doorway obstruction.
   const doorwayBlocked = level.colliders.some((box) =>
+    box !== level.officeDoorCollider &&
     intersectsAtPlayerHeight(box, 2.4, 2.48, 0.30)
   );
   const oppositeWallSolid = level.colliders.some((box) =>
