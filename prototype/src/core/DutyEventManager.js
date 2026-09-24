@@ -32,7 +32,7 @@ export class DutyEventManager {
     if(zoneId==='first_campus_2f' && this.gameState.isTaskComplete('P1_REST_DONE') && !this.gameState.isTaskComplete('P1_ER_ASSESSMENT_DONE')){
       this.gameState.setGameTime('20:05');
       if(this.gameState.getFlag('HOOK_0217')){
-        return {speaker:'急診護理師',text:'「李醫師，這位無名氏沒有證件，只有一條 1998 年格式的舊手圈。現行 HIS 讀不出來，先麻煩你完成精神科評估。」'};
+        return {speaker:'急診護理師',text:'「李醫師，這位無名氏沒有證件，只有一條 1998 年格式的舊住院手圈。現行 HIS 讀不出來，先麻煩你完成精神科評估。」'};
       }
       return {speaker:'急診護理師',text:'「醫師您好，這位病人最近壓力大、兩天沒睡好，今晚心悸焦慮，所以來急診。」'};
     }
