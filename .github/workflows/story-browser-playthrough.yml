@@ -1,0 +1,54 @@
+name: Story Browser Playthrough
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: story-browser-playthrough
+  cancel-in-progress: true
+
+jobs:
+  story-playthrough:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: prototype/package-lock.json
+      - name: Install locked dependencies
+        working-directory: prototype
+        run: npm ci
+      - name: Build exact source
+        working-directory: prototype
+        run: |
+          node scripts/write-build-info.mjs
+          npm run build
+      - name: Install Chromium
+        working-directory: prototype
+        run: npx playwright install --with-deps chromium
+      - name: Local production M2-M9 browser playthrough
+        timeout-minutes: 30
+        working-directory: prototype
+        run: node scripts/test-story-playthrough.mjs qa-results/story-local
+      - name: Wait for matching public Pages build
+        timeout-minutes: 8
+        working-directory: prototype
+        env:
+          GITHUB_SHA: ${{ github.sha }}
+        run: node scripts/verify-live-build.mjs 'https://hsushuhao-lab.github.io/DutyNight/'
+      - name: Public Pages M2-M9 browser playthrough
+        timeout-minutes: 30
+        working-directory: prototype
+        run: node scripts/test-story-playthrough.mjs qa-results/story-live 'https://hsushuhao-lab.github.io/DutyNight/'
+      - name: Preserve browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: story-browser-evidence
+          path: prototype/qa-results/
+          retention-days: 30
