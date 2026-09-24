@@ -120,10 +120,23 @@ try{
   s=await snap();assert.equal(s.flags.GUARD_SIGN_EXAMINED,true);assert.equal(s.flags.BOOTSTRAP_2117_RESOLVED,false);
   await interact({id:'GUARD_BOOK_2117'});
   s=await snap();assert.equal(s.flags.BOOTSTRAP_2117_RESOLVED,true);assert.equal(s.time,'21:17');
+  assert.equal(s.flags.GHOST_REGISTRATION_ARMED,false,'00:33 must not arm immediately at 21:17');
 
-  // Only a later re-entry to 2F materializes the 00:33 registration.
+  // 21:17 must actively push the player back to the 4F duty room. The duty-room
+  // phone then advances the narrative clock and sends the player to 2F.
+  await enter('first_campus_4f');
+  await interact({action:'END_SHIFT'});
+  await page.waitForFunction(()=>window.__storyQA.gameState.getFlag('POST_2117_DUTY_CALL_DONE')===true,null,{timeout:10000});
+  s=await snap();
+  assert.equal(s.time,'00:30');
+  assert.equal(s.flags.GHOST_REGISTRATION_ARMED,true);
+  assert.equal(await q(()=>window.__storyQA.gameState.getDisplayTime()),'翌日 00:30');
+  await mark('21:17 pushes player to duty room and 00:30 ER call');
+
+  // Only after the duty-room call does re-entry to 2F materialize the 00:33 registration.
   await enter('first_campus_2f');
   s=await snap();assert.equal(s.flags.GHOST_REGISTRATION_AVAILABLE,true);assert.equal(s.time,'00:33');
+  assert.equal(await q(()=>window.__storyQA.gameState.getDisplayTime()),'翌日 00:33');
   await interact({id:'ER_GHOST_REGISTRATION'});
   await page.waitForSelector('#story-choice-modal.active');await shot('m3-0033-registration');await secondary();
   s=await snap();
