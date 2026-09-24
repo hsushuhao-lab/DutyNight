@@ -132,6 +132,28 @@ uiManager.setBed33Handlers({
   }
 });
 
+function triggerPost2117DutyRoomSequence(){
+  if(!gameState.getFlag('BOOTSTRAP_2117_RESOLVED'))return false;
+  if(gameState.getFlag('POST_2117_DUTY_CALL_DONE')||gameState.getFlag('POST_2117_DUTY_ROOM_TRIGGERED'))return false;
+
+  gameState.setFlag('POST_2117_DUTY_ROOM_TRIGGERED',true);
+  gameState.setFlag('POST_2117_RETURN_TO_DUTY_ROOM',false);
+  gameState.setGameTime('23:55');
+  uiManager.showSubtitle('李醫師','「先把今晚看到的東西寫下來……21:17、316、409。等等，已經快午夜了？」',4300);
+  uiManager.updateTasks();
+
+  setTimeout(()=>{
+    if(gameState.getFlag('POST_2117_DUTY_CALL_DONE'))return;
+    gameState.setGameTime('00:30');
+    gameState.setFlag('POST_2117_DUTY_CALL_DONE',true);
+    gameState.setFlag('GHOST_REGISTRATION_ARMED',true);
+    soundManager.playPhoneRingPattern();
+    uiManager.showSubtitle('2F 急診值班電話','☎「李醫師，剛才那位無名氏的資料又卡住了。檢傷台有一筆很舊的掛號格式，我們沒人敢動，麻煩你下來看一下。」',6200);
+    uiManager.updateTasks();
+  },2200);
+  return true;
+}
+
 function unlockSecondCampusAccess(){
   if(gameState.getFlag('SECOND_CAMPUS_ACCESS'))return;
   gameState.setFlag('SECOND_CAMPUS_ACCESS',true);
@@ -816,16 +838,7 @@ controller.onInteract = (interactable) => {
       if(!gameState.isTaskComplete('P1_RETURN_4F')) return uiManager.showSubtitle('李醫師','「還沒到可以休息的時候。」',2500);
 
       if(gameState.getFlag('BOOTSTRAP_2117_RESOLVED')&&!gameState.getFlag('POST_2117_DUTY_CALL_DONE')){
-        gameState.setFlag('POST_2117_RETURN_TO_DUTY_ROOM',false);
-        gameState.setGameTime('00:30');
-        uiManager.showSubtitle('李醫師','「21:17、316、409……我把能記的都寫下來了。不知不覺已經過了午夜。」',4200);
-        setTimeout(()=>{
-          gameState.setFlag('POST_2117_DUTY_CALL_DONE',true);
-          gameState.setFlag('GHOST_REGISTRATION_ARMED',true);
-          soundManager.playPhoneRingPattern();
-          uiManager.showSubtitle('2F 急診值班電話','☎「李醫師，剛才那位無名氏的資料又卡住了。檢傷台有一筆很舊的掛號格式，我們沒人敢動，麻煩你下來看一下。」',6200);
-          uiManager.updateTasks();
-        },1400);
+        triggerPost2117DutyRoomSequence();
         return;
       }
 
@@ -873,6 +886,24 @@ function animate() {
 
   controller.update(delta);
   worldRouter.update();
+
+  // After the 21:17 bootstrap the player is explicitly sent back to the 4F duty room.
+  // Crossing into the room automatically advances the story; no hidden E target is required.
+  if(
+    worldRouter.activeZoneId==='first_campus_4f' &&
+    gameState.getFlag('POST_2117_RETURN_TO_DUTY_ROOM') &&
+    !gameState.getFlag('POST_2117_DUTY_CALL_DONE')
+  ){
+    const bounds=worldRouter.activeZoneInstance?.dutyRoom?.bounds;
+    if(bounds){
+      const [x1,z1,x2,z2]=bounds;
+      const p=controller.position;
+      if(p.x>=Math.min(x1,x2)&&p.x<=Math.max(x1,x2)&&p.z>=Math.min(z1,z2)&&p.z<=Math.max(z1,z2)){
+        triggerPost2117DutyRoomSequence();
+      }
+    }
+  }
+
   composer.render();
 }
 
