@@ -36,9 +36,18 @@ async function load(zone,spawn){await q(({zone,spawn})=>window.__storyQA.load(zo
 async function flag(k,v=true){await q(({k,v})=>window.__storyQA.setFlag(k,v),{k,v});}
 async function task(id){await q(id=>window.__storyQA.task(id),id);}
 async function interact(query){await q(query=>window.__storyQA.interact(query),query);await page.waitForTimeout(100);}
-async function closeArchive(){if(await page.locator('#archive-modal.active').count())await page.locator('#btn-close-archive').click();}
-async function secondary(){await page.locator('#story-choice-modal.active #btn-story-secondary').click();await page.waitForTimeout(120);}
-async function primary(){await page.locator('#story-choice-modal.active #btn-story-primary').click();await page.waitForTimeout(120);}
+async function domClick(selector){
+  await page.evaluate(selector=>{
+    const el=document.querySelector(selector);
+    if(!el)throw new Error('DOM click target missing '+selector);
+    if(el.disabled)throw new Error('DOM click target disabled '+selector);
+    el.click();
+  },selector);
+  await page.waitForTimeout(120);
+}
+async function closeArchive(){if(await page.locator('#archive-modal.active').count())await domClick('#btn-close-archive');}
+async function secondary(){await domClick('#story-choice-modal.active #btn-story-secondary');}
+async function primary(){await domClick('#story-choice-modal.active #btn-story-primary');}
 async function setM2Checkpoint(){
   await flag('STAFF_ACCESS_CARD',true);await flag('HOOK_409_ZERO_ROOM',true);
   for(const id of ['WARD_ENTRY','P1_4F_REPORT','P1_DUTY_ROOM_READY','P1_ROUND_COMPLETE'])await task(id);
@@ -71,11 +80,11 @@ try{
   await interact({id:'BED33_ASSIGNMENT'});
   await page.waitForSelector('#bed33-modal.active');
   await shot('m2-bed33-assignment');
-  await page.locator('#btn-bed33-confirm').click();
+  await domClick('#btn-bed33-confirm');
   await page.waitForSelector('#loop-cutscene.active');
   assert.equal(await page.locator('#btn-loop-skip').isVisible(),true,'Loop fast-forward control must be visible while override is active');
   await shot('m2-override');
-  if(await page.locator('#loop-cutscene.active').count())await page.locator('#btn-loop-skip').click();
+  if(await page.locator('#loop-cutscene.active').count())await domClick('#btn-loop-skip');
   await page.waitForFunction(()=>window.__storyQA.worldRouter.activeZoneId==='first_campus_3f');
   s=await snap();
   assert.equal(s.memory.loopCount,1);assert.equal(s.memory.survivalRules.neverSignBed33,true);
@@ -87,7 +96,7 @@ try{
   await interact({id:'BED33_ASSIGNMENT'});
   await page.waitForSelector('#bed33-modal.active');
   assert.equal(await page.locator('#btn-bed33-reject').isVisible(),true);
-  await page.locator('#btn-bed33-reject').click();
+  await domClick('#btn-bed33-reject');
   s=await snap();assert.equal(s.flags.BED33_RESOLVED,true);assert.equal(s.memory.proofs.space,true);assert.equal(s.memory.trueNameFragments.frag_givenName_1,'昱');
   await mark('M2 resolved by persistent cognition');
 
@@ -158,7 +167,7 @@ try{
   await interact({id:'E_HANDOFF'});
   await page.waitForSelector('#final-handoff-modal.active');await shot('m9-final-handoff');
   await page.locator('#final-true-name').fill('林昱衡');
-  await page.locator('#btn-submit-final-handoff').click();
+  await domClick('#btn-submit-final-handoff');
   await page.waitForSelector('#final-success-modal.active');
   await shot('m9-success');
   s=await snap();assert.equal(s.flags.GAME_COMPLETE,true);assert.equal(s.memory.gameComplete,true);
