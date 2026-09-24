@@ -174,14 +174,18 @@ export class WardFloorplan {
     w.build();this.gf.buildCeilingLight(this.zoneGroup,-11,3.15,6,.7,7,0xffebce);
     wallClock(this.zoneGroup,this.gf.materials,-10,2.1,2.15);
     this.dutyRoom={door:[-8,1.7,6],inside:[-9.5,1.7,6],outside:[-6.5,1.7,6],bounds:[-14,2,-8,10]};
+    const room403=this.roomAreas.find(r=>r.id==='403');
+    const room408=this.roomAreas.find(r=>r.id==='408');
+    const p403=room403?.corridor||[-6.9,1.4,-13];
+    const p408=room408?.corridor||[5.9,1.4,-9];
     this.interactables.push(
       {type:'p1_action',action:'NURSE_REPORT',label:'向護理站報到',position:new THREE.Vector3(0,1.4,-4.3),radius:1.8},
       {type:'p1_action',action:'DUTY_ROOM_PREP',label:'整理值班室',position:new THREE.Vector3(-10.0,1.2,6.0),radius:1.8},
       {type:'p1_action',action:'WARD_ROUND',label:'完成晚間巡房',position:new THREE.Vector3(0,1.4,-12.0),radius:2.0},
-      {type:'p1_action',action:'INSOMNIA_403',label:'評估 403 睡眠問題',position:new THREE.Vector3(-6.4,1.2,-17.0),radius:1.8},
-      {type:'p1_action',action:'NORMAL_EVENT',label:'處理一般病房事件',position:new THREE.Vector3(5.8,1.2,-9.0),radius:1.8},
+      {type:'p1_action',action:'INSOMNIA_403',label:'評估 403 睡眠問題',position:new THREE.Vector3(p403[0],1.35,p403[2]),radius:1.65,anchorRoom:'403'},
+      {type:'p1_action',action:'NORMAL_EVENT',label:'處理一般病房事件',position:new THREE.Vector3(p408[0],1.35,p408[2]),radius:1.65,anchorRoom:'408'},
       {type:'p1_action',action:'REST',label:'短暫休息',position:new THREE.Vector3(-12.5,1.0,7.8),radius:1.8},
-      {type:'p1_action',action:'END_SHIFT',label:'回值班室休息',position:new THREE.Vector3(-10.0,1.1,3.1),radius:1.8}
+      {type:'p1_action',action:'END_SHIFT',label:'回值班室／接聽值班電話',position:new THREE.Vector3(-10.0,1.1,3.1),radius:1.8}
     );
   }
   buildBed33Legend(){
@@ -207,9 +211,18 @@ export class WardFloorplan {
     };
     this.zoneGroup.add(board);this.interactables.push(board);
 
-    // Printed HIS discrepancy sits physically on workstation B instead of floating in open space.
-    const stationDeskTopY=.82;
-    const hisSheet=solid(this.zoneGroup,m.lightWarm,[-1.28,stationDeskTopY+.009,-2.16],[.38,.018,.28]);
+    // Ground both papers against the actual GLB work-desk surfaces, not a guessed Y.
+    const stationA=this.workstations.find(w=>w.id==='first_station_A');
+    const stationB=this.workstations.find(w=>w.id==='first_station_B');
+    const deskSurfaceY=(station)=>{
+      station?.desk?.updateWorldMatrix?.(true,true);
+      return station?.desk?new THREE.Box3().setFromObject(station.desk).max.y:.82;
+    };
+    const aY=deskSurfaceY(stationA),bY=deskSurfaceY(stationB);
+    const aPos=stationA?.desk?.position||new THREE.Vector3(-3.35,0,-2.35);
+    const bPos=stationB?.desk?.position||new THREE.Vector3(-1.35,0,-2.35);
+
+    const hisSheet=solid(this.zoneGroup,m.lightWarm,[bPos.x+.08,bY+.009,bPos.z+.18],[.38,.018,.28]);
     hisSheet.rotation.y=-.12;hisSheet.name='Bed33_HIS409Sheet';
     hisSheet.userData={
       interactable:true,id:'BED33_HIS_409',type:'bed33_his_status',label:'查看 409 系統狀態列印',
@@ -218,8 +231,8 @@ export class WardFloorplan {
     };
     this.interactables.push(hisSheet);
 
-    // Temporary assignment form is placed on workstation A; it must never float beside the station island.
-    const assignment=solid(this.zoneGroup,m.lightWarm,[-3.22,stationDeskTopY+.009,-2.18],[.40,.018,.30]);
+    // Temporary assignment form is physically seated on workstation A.
+    const assignment=solid(this.zoneGroup,m.lightWarm,[aPos.x+.13,aY+.009,aPos.z+.17],[.40,.018,.30]);
     assignment.rotation.y=.08;assignment.name='Bed33_AssignmentForm';
     assignment.userData={interactable:true,id:'BED33_ASSIGNMENT',type:'bed33_assignment',label:'查看臨時床位分配單'};
     this.interactables.push(assignment);
