@@ -70,6 +70,13 @@ export class WorldRouter {
     this.scene.add(this.lightingGroup);
   }
 
+  resetTransientState(){
+    this.dutyDoorClosed=true;
+    this.wardGateClosed=true;
+    this.acuteGateClosed=true;
+    this.doorStates={};
+  }
+
   /**
    * Loads a specific zone by ID and teleports player to a designated spawn point.
    */
