@@ -22,8 +22,15 @@ assert.equal(state.getGamePhase(),GamePhase.ELEVATOR_GLITCH);
 state.setFlag('NIGHT_PATROL_RETURN_3F',true);
 phases.setPhase(GamePhase.NIGHT_PATROL);
 line=duty.onZoneEntered('first_campus_3f');
-assert.equal(state.gameTime,'21:17');
-assert.match(line.text,/21:17/);
+assert.equal(state.gameTime,'21:16');
+assert.match(line.text,/查哨點/);
+state.setFlag('BOOTSTRAP_2117_RESOLVED',true);
+state.setFlag('GHOST_REGISTRATION_ARMED',true);
+state.markTaskComplete('P1_ER_NOTE_DONE');
+line=duty.onZoneEntered('first_campus_2f');
+assert.equal(state.gameTime,'00:33');
+assert.equal(state.getFlag('GHOST_REGISTRATION_AVAILABLE'),true);
+assert.match(line.text,/00:33/);
 
 const main=readFileSync('./src/main.js','utf8');
 const workflow=readFileSync('../.github/workflows/deploy-pages.yml','utf8');
