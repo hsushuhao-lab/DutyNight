@@ -85,6 +85,7 @@ export class WardFloorplan {
 
     if(!second){
       this.buildDutyRoom();
+      if(this.floor===4)this.buildBed33Legend();
     }else{
       this.buildSecondDutyRoom(o);
     }
@@ -174,6 +175,72 @@ export class WardFloorplan {
       {type:'p1_action',action:'END_SHIFT',label:'回值班室休息',position:new THREE.Vector3(-10.0,1.1,3.1),radius:1.8}
     );
   }
+  buildBed33Legend(){
+    const m=this.gf.materials;
+
+    // Legend 01 clue board: a single old slot claims bed 33 = 409A.
+    const boardCanvas=document.createElement('canvas');boardCanvas.width=760;boardCanvas.height=520;
+    const ctx=boardCanvas.getContext('2d');
+    ctx.fillStyle='#e9ece7';ctx.fillRect(0,0,760,520);ctx.fillStyle='#435b4f';ctx.fillRect(0,0,760,62);
+    ctx.fillStyle='#fff';ctx.font='bold 28px sans-serif';ctx.fillText('4F 晚間床位板',24,42);
+    ctx.fillStyle='#34443b';ctx.font='22px monospace';
+    ['29  408A','30  408B','31  408C','32  408D'].forEach((t,i)=>ctx.fillText(t,52,122+i*62));
+    ctx.fillStyle='#8a332b';ctx.font='bold 25px monospace';ctx.fillText('33  409A',420,308);
+    ctx.font='16px sans-serif';ctx.fillStyle='#777';ctx.fillText('舊卡片／未列入現行床位統計',420,344);
+    const boardTex=new THREE.CanvasTexture(boardCanvas);boardTex.colorSpace=THREE.SRGBColorSpace;
+    const board=new THREE.Mesh(new THREE.PlaneGeometry(1.55,1.05),new THREE.MeshStandardMaterial({map:boardTex,roughness:.92}));
+    board.position.set(-4.47,1.62,-4.4);board.rotation.y=Math.PI/2;
+    board.name='Bed33_WardBoard';
+    board.userData={
+      interactable:true,id:'BED33_BOARD',type:'bed33_board',label:'查看 4F 晚間床位板',
+      documentTitle:'4F 晚間床位板',
+      pages:['現行床位表列至 32 床後，右側卻夾著一張褪色舊卡：\n\n33　409A\n\n旁註：「未列入現行床位統計」。']
+    };
+    this.zoneGroup.add(board);this.interactables.push(board);
+
+    // Printed HIS discrepancy kept near the station desk.
+    const hisSheet=solid(this.zoneGroup,m.lightWarm,[-1.55,1.14,-2.58],[.38,.018,.28]);
+    hisSheet.rotation.y=-.12;hisSheet.name='Bed33_HIS409Sheet';
+    hisSheet.userData={
+      interactable:true,id:'BED33_HIS_409',type:'bed33_his_status',label:'查看 409 系統狀態列印',
+      documentTitle:'HIS 房室狀態查詢',
+      pages:['房號：409\n狀態：整修封閉\n可用床數：0\n現行住院床統計：不計入\n\n然而護理站舊卡卻仍列著「33／409A」。']
+    };
+    this.interactables.push(hisSheet);
+
+    // Temporary assignment form: the tempting ordinary action.
+    const assignment=solid(this.zoneGroup,m.lightWarm,[.65,1.14,-2.62],[.40,.018,.30]);
+    assignment.rotation.y=.08;assignment.name='Bed33_AssignmentForm';
+    assignment.userData={interactable:true,id:'BED33_ASSIGNMENT',type:'bed33_assignment',label:'查看臨時床位分配單'};
+    this.interactables.push(assignment);
+
+    // 409 sealed-room presentation. The existing knob door remains physically closed;
+    // warning tape is render-only and the interaction is intercepted by main.js.
+    for(const y of [1.02,1.42]){
+      const tape=solid(this.zoneGroup,m.wallBumper,[6.88,y,-3.0],[.025,.09,1.45]);
+      tape.rotation.x=(y>1.2?.16:-.13);tape.name='Bed33_409_WarningTape';
+    }
+    const sealedHit=new THREE.Mesh(new THREE.BoxGeometry(.55,2.1,1.75),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
+    sealedHit.position.set(6.72,1.18,-3.0);
+    sealedHit.userData={
+      interactable:true,id:'BED33_409_SEALED',type:'bed33_409_sealed',label:'查看 409 整修封條',
+      documentTitle:'409 病房',
+      pages:['門把纏著黃色封條：「院區整修，暫停使用」。\n\n透過門上視窗只能看見一張鋪得過分平整的空病床。']
+    };
+    this.zoneGroup.add(sealedHit);this.interactables.push(sealedHit);
+
+    this.bed33Legend={
+      id:'LEGEND_BED33',
+      bedId:'409A',
+      wardBedNumber:33,
+      boardId:'BED33_BOARD',
+      hisStatusId:'BED33_HIS_409',
+      sealedDoorId:'BED33_409_SEALED',
+      assignmentId:'BED33_ASSIGNMENT',
+      checkpoint:'CP_EXIT_403'
+    };
+  }
+
   buildSecondDutyRoom(o){
     const w=new PlanWalls(this);w.rect(o+8,2,o+14,10);w.cut('z',o+8,6,1.4);
     this.gf.buildFloor(this.zoneGroup,this.walkables,o+11,0,6,6,8,this.gf.materials.floorWood);
