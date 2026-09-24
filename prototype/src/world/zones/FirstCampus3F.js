@@ -93,31 +93,71 @@ export class FirstCampus3F {
     this.adminOfficeDoor.setClosed(true);
     this.adminOfficeDoor.interactionData.label='3F 行政辦公室｜開門';
 
-    // Physician roster is moved inside this office, where it becomes an optional investigation task.
-    const rosterCanvas=document.createElement('canvas');rosterCanvas.width=1200;rosterCanvas.height=520;
+    // Administrative-office identity puzzle: three independent records that should agree, but do not.
+    const rosterCanvas=document.createElement('canvas');rosterCanvas.width=1200;rosterCanvas.height=620;
     const rctx=rosterCanvas.getContext('2d');
-    rctx.fillStyle='#e9ece7';rctx.fillRect(0,0,1200,520);
+    rctx.fillStyle='#e9ece7';rctx.fillRect(0,0,1200,620);
     rctx.fillStyle='#344d40';rctx.fillRect(0,0,1200,78);
     rctx.fillStyle='#fff';rctx.font='bold 34px sans-serif';rctx.fillText('青嶺醫療中心｜夜間醫師值勤名冊',28,51);
     const staff=[['林醫師','總醫師'],['周醫師','住院醫師'],['陳醫師','住院醫師'],['許醫師','主治醫師'],['江醫師','主治醫師'],['方醫師','值班支援']];
     staff.forEach(([name,role],i)=>{
-      const col=i%3,row=Math.floor(i/3),x=38+col*385,y=112+row*190;
-      rctx.fillStyle='#c9d1ca';rctx.beginPath();rctx.arc(x+58,y+56,42,0,Math.PI*2);rctx.fill();
-      rctx.fillStyle='#6f7c74';rctx.beginPath();rctx.arc(x+58,y+47,17,0,Math.PI*2);rctx.fill();rctx.fillRect(x+35,y+67,46,25);
-      rctx.fillStyle='#26372f';rctx.font='bold 27px sans-serif';rctx.fillText(name,x+118,y+48);
-      rctx.font='21px sans-serif';rctx.fillStyle='#657168';rctx.fillText(role,x+118,y+83);
-      rctx.strokeStyle='#b7beb8';rctx.strokeRect(x,y,340,135);
+      const col=i%3,row=Math.floor(i/3),x=38+col*385,y=106+row*180;
+      rctx.fillStyle='#c9d1ca';rctx.beginPath();rctx.arc(x+58,y+52,38,0,Math.PI*2);rctx.fill();
+      rctx.fillStyle='#6f7c74';rctx.beginPath();rctx.arc(x+58,y+44,15,0,Math.PI*2);rctx.fill();rctx.fillRect(x+37,y+62,42,23);
+      rctx.fillStyle='#26372f';rctx.font='bold 25px sans-serif';rctx.fillText(name,x+112,y+44);
+      rctx.font='19px sans-serif';rctx.fillStyle='#657168';rctx.fillText(role,x+112,y+76);
+      rctx.strokeStyle='#b7beb8';rctx.strokeRect(x,y,340,126);
     });
+    rctx.fillStyle='#f5f3eb';rctx.fillRect(38,470,1120,108);
+    rctx.strokeStyle='#9ea79f';rctx.strokeRect(38,470,1120,108);
+    rctx.fillStyle='#26372f';rctx.font='bold 26px sans-serif';rctx.fillText('4F 精神科夜間值班',64,510);
+    rctx.fillStyle='#8b2f28';rctx.font='bold 30px sans-serif';rctx.fillText('________________________',365,512);
+    rctx.font='18px sans-serif';rctx.fillStyle='#69746d';rctx.fillText('系統欄位未填／人工補登待確認',365,548);
+
     const rosterTex=new THREE.CanvasTexture(rosterCanvas);rosterTex.colorSpace=THREE.SRGBColorSpace;
-    const rosterFace=new THREE.Mesh(new THREE.PlaneGeometry(2.65,1.15),new THREE.MeshStandardMaterial({map:rosterTex,roughness:.9}));
-    rosterFace.position.set(-19,1.92,11.365);rosterFace.rotation.y=Math.PI;
-    rosterFace.userData={interactable:true,id:'3F_ADMIN_ROSTER_TASK',type:'admin_roster_3f',label:'核對夜間醫師值勤名冊'};
+    const rosterFace=new THREE.Mesh(new THREE.PlaneGeometry(2.65,1.36),new THREE.MeshStandardMaterial({map:rosterTex,roughness:.9}));
+    rosterFace.position.set(-19,1.88,11.365);rosterFace.rotation.y=Math.PI;
+    rosterFace.name='AdminPuzzle_OfficialRoster';
+    rosterFace.userData={
+      interactable:true,id:'3F_ADMIN_ROSTER_TASK',type:'admin_roster_3f',label:'核對正式夜間醫師值勤名冊',
+      documentTitle:'正式夜間醫師值勤名冊',
+      pages:[
+        '各科夜間值勤欄位都已填妥，唯獨「4F 精神科夜間值班」是一片空白。\n\n李醫師：\n「名冊是空的？那學長剛才到底把哪一班交給我？」',
+        '名冊右下角有淡淡的修正液痕跡。逆光看得到原本似乎寫過一個「李」字，但後面的名字已完全刮掉。'
+      ]
+    };
     this.zoneGroup.add(rosterFace);this.interactables.push(rosterFace);
 
-    // A loose, faded photocopy is the reward for checking the roster: suggestive, not explanatory.
-    const oldSheet=solid(this.zoneGroup,m.lightWarm,[-18.55,.845,5.53],[.34,.018,.25]);
-    oldSheet.rotation.y=-.14;oldSheet.userData={decorative:true,clue:'old_roster_lee_316'};
-    this.adminRosterTask={id:'3F_ADMIN_ROSTER_TASK',optional:true,reward:'OLD_ROSTER_LEE_316',room:'3F_CORE_OFFICE'};
+    // Printer output: a future administrative record, already bearing the player's duty identity.
+    printerPaper.userData={
+      interactable:true,id:'3F_ADMIN_PRINTER_DOC',type:'admin_printer_doc_3f',label:'抽出印表機卡住的補登單',
+      documentTitle:'夜間值勤補登單',
+      pages:[
+        '夜間值勤補登\n\n第一線：李住院醫師\n補登時間：21:17:42\n狀態：三樓巡查完成',
+        '現在明明才剛過 17:00。\n\n李醫師：\n「21:17……這張單子是誰印的？還是我待會真的會回來？」'
+      ]
+    };
+    this.interactables.push(printerPaper);
+
+    // Secretary memo hidden in the lowest pedestal drawer; it closes the local 302 clue loop.
+    const drawerHit=new THREE.Mesh(new THREE.BoxGeometry(.48,.20,.16),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
+    drawerHit.position.set(-18.45,.20,5.20);
+    drawerHit.name='AdminPuzzle_SecretaryMemoDrawer';
+    drawerHit.userData={
+      interactable:true,id:'3F_ADMIN_DRAWER_MANUAL',type:'admin_drawer_manual_3f',label:'打開最下層抽屜',
+      documentTitle:'科秘書備忘錄',
+      pages:[
+        '夜間行政備援：若 302 電子門禁於週一重設，請依「行政主管代號＋夜間備援代號」輸入四碼。',
+        '另註：夜間值勤名冊若漏登，以「最後完成電子交班」之紀錄為準。\n\n這句話被紅筆重重畫了兩次。'
+      ]
+    };
+    this.zoneGroup.add(drawerHit);this.interactables.push(drawerHit);
+
+    this.adminRosterTask={
+      id:'3F_ADMIN_IDENTITY_PUZZLE',optional:true,room:'3F_CORE_OFFICE',
+      pieces:['3F_ADMIN_ROSTER_TASK','3F_ADMIN_PRINTER_DOC','3F_ADMIN_DRAWER_MANUAL'],
+      reward:'ECHO_2117_KNOWN'
+    };
 
     const officeSignCanvas=document.createElement('canvas');officeSignCanvas.width=720;officeSignCanvas.height=200;
     const osctx=officeSignCanvas.getContext('2d');
