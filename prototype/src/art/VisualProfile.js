@@ -16,13 +16,15 @@ const zones = {
   second_campus_std: { lamps: [[72, 6], [76, -2], [72, -9], [72, -15], [81, -8], [65, -8], [83, 6]], intensity: 3.8 },
   second_campus_1f: { lamps: [[72, -4], [72, -11]], intensity: 3.5 },
   hillside_route: { lamps: [], intensity: 0 },
-  ecology_pond: { lamps: [], intensity: 0 }
+  ecology_pond: { lamps: [], intensity: 0 },
+  phantom_6f: { lamps: [[0,-1],[0,-6],[0,-11]], intensity: 1.35, width: 2.4, color: 0x8a5b4b, night: true },
+  b2_archive: { lamps: [[0,-1],[0,-6],[0,-11]], intensity: 1.15, width: 2.2, color: 0x6b5146, night: true }
 };
 
 export function applyZoneLighting(group, scene, zoneId) {
   group.traverse(object => { if (object.isLight) object.shadow?.dispose(); });
   group.clear();
-  const zone = zones[zoneId];
+  const zone = zones[zoneId] || { lamps: [], intensity: 0, night: true };
   const profile = zone.night ? VisualProfile.NIGHT_NORMAL : VisualProfile.ACT1_DUSK_NORMAL;
   scene.background = new THREE.Color(profile.background);
   scene.fog = null;
