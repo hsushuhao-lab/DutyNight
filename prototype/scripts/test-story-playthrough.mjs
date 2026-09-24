@@ -22,7 +22,7 @@ async function mark(label,extra={}){
   console.log(label,JSON.stringify({zone:s.zone,time:s.time,loop:s.memory.loopCount,erosion:s.memory.identityErosionLevel,...extra}));
 }
 async function shot(name){
-  const file=name+'.png';await page.screenshot({path:out+'/'+file,fullPage:true});report.screenshots.push(file);
+  const file=name+'.png';await page.screenshot({path:out+'/'+file,fullPage:false,timeout:10000});report.screenshots.push(file);
 }
 async function q(fn,arg){return page.evaluate(fn,arg);}
 async function load(zone,spawn){await q(({zone,spawn})=>window.__storyQA.load(zone,spawn),{zone,spawn});await page.waitForTimeout(120);}
@@ -66,8 +66,9 @@ try{
   await shot('m2-bed33-assignment');
   await page.locator('#btn-bed33-confirm').click();
   await page.waitForSelector('#loop-cutscene.active');
+  assert.equal(await page.locator('#btn-loop-skip').isVisible(),true,'Loop fast-forward control must be visible while override is active');
   await shot('m2-override');
-  await page.locator('#btn-loop-skip').click();
+  if(await page.locator('#loop-cutscene.active').count())await page.locator('#btn-loop-skip').click();
   await page.waitForFunction(()=>window.__storyQA.worldRouter.activeZoneId==='first_campus_3f');
   s=await snap();
   assert.equal(s.memory.loopCount,1);assert.equal(s.memory.survivalRules.neverSignBed33,true);
