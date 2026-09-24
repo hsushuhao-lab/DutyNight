@@ -18,7 +18,7 @@ export class SignAnchor {
       code = '4F',
       title = '護理站',
       subtitle = 'NURSING STATION',
-      header = '松德醫療中心 ｜ 臨床醫療區'
+      header = '青嶺醫療中心 ｜ 臨床醫療區'
     } = options;
 
     const group = new THREE.Group();
