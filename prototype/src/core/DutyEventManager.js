@@ -46,6 +46,7 @@ export class DutyEventManager {
     }
     if(zoneId==='first_campus_2f'
       && this.gameState.getFlag('GHOST_REGISTRATION_ARMED')
+      && this.gameState.getFlag('POST_2117_DUTY_CALL_DONE')
       && this.gameState.getFlag('BOOTSTRAP_2117_RESOLVED')
       && this.gameState.isTaskComplete('P1_ER_NOTE_DONE')
       && !this.gameState.getFlag('GHOST_REGISTRATION_AVAILABLE')
