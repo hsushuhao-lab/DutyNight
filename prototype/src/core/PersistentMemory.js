@@ -4,6 +4,13 @@ const defaults=()=>({
   version:1,
   loopCount:0,
   hasSeenOverride_Bed33:false,
+  identityErosionLevel:0,
+  proofs:{space:false,identity:false,time:false},
+  legends:{
+    bed33:false,er0033:false,chestPain:false,bridge:false,pond:false,floor6:false,lastCall:false
+  },
+  trueNameResolved:false,
+  trueName:null,
   knownCodes:{
     pass_1700:false,
     pass_3082:false,
@@ -14,8 +21,10 @@ const defaults=()=>({
   survivalRules:{
     neverSignBed33:false,
     neverCreateGhostRecord:false,
+    neverSignChestTransfer:false,
     neverLookBackOnBridge:false,
-    ignorePondReflection:false
+    ignorePondReflection:false,
+    neverChaseFloor6:false
   },
   trueNameFragments:{
     frag_surname:null,
@@ -44,6 +53,8 @@ function merge(base,loaded){
     ...base,...loaded,
     knownCodes:{...base.knownCodes,...loaded?.knownCodes},
     survivalRules:{...base.survivalRules,...loaded?.survivalRules},
+    proofs:{...base.proofs,...loaded?.proofs},
+    legends:{...base.legends,...loaded?.legends},
     trueNameFragments:{...base.trueNameFragments,...loaded?.trueNameFragments},
     journalNotes:Array.isArray(loaded?.journalNotes)?[...loaded.journalNotes]:[]
   };
@@ -97,15 +108,52 @@ export class PersistentMemory {
     this.save();return true;
   }
 
+  raiseErosion(delta=1){
+    this.data.identityErosionLevel=Math.max(0,Math.min(5,this.data.identityErosionLevel+delta));
+    this.save();return this.data.identityErosionLevel;
+  }
+
+  resolveLegend(key){
+    if(key in this.data.legends)this.data.legends[key]=true;
+    this.save();
+  }
+
+  setProof(key,value=true){
+    if(key in this.data.proofs)this.data.proofs[key]=value;
+    this.save();
+  }
+
+  hasAllProofs(){return this.data.proofs.space&&this.data.proofs.identity&&this.data.proofs.time;}
+
+  resolveTrueName(name){
+    this.data.trueName=name;
+    this.data.trueNameResolved=true;
+    this.addJournalNote('TRUE_NAME',`我的名字是「${name}」。不是李醫師。`);
+    this.save();
+  }
+
   recordOverride(id){
     this.data.loopCount+=1;
-    if(id==='BED33'){
-      this.data.hasSeenOverride_Bed33=true;
-      this.data.survivalRules.neverSignBed33=true;
-      this.data.knownCodes.code_0409=true;
-      this.addJournalNote('RULE_BED33','不要簽 409A 的床位。');
-      this.addJournalNote('CODE_0409','04:09 不是時間，是 409。');
-      this.addJournalNote('IDENTITY_DOCTOR','如果我被登記成病人，另一個「李醫師」就會接手我的工作。');
+    this.raiseErosion(1);
+    const configs={
+      BED33:{legend:'bed33',rule:'neverSignBed33',notes:[
+        ['RULE_BED33','不要簽 409A 的床位。'],
+        ['CODE_0409','04:09 不是時間，是 409。'],
+        ['IDENTITY_DOCTOR','如果我被登記成病人，另一個「李醫師」就會接手我的工作。']
+      ]},
+      ER0033:{legend:'er0033',rule:'neverCreateGhostRecord',notes:[['RULE_ER0033','00:33 的無名掛號只能查閱，不能建立新病歷。']]},
+      CHEST:{legend:'chestPain',rule:'neverSignChestTransfer',notes:[['RULE_CHEST','第二院區多出的胸痛病人，不能替他簽轉院單。']]},
+      BRIDGE:{legend:'bridge',rule:'neverLookBackOnBridge',notes:[['RULE_BRIDGE','天橋過中線後，不要回頭。']]},
+      POND:{legend:'pond',rule:'ignorePondReflection',notes:[['RULE_POND','生態池的倒影如果沒有跟著我停下，就離開水邊。']]},
+      FLOOR6:{legend:'floor6',rule:'neverChaseFloor6',notes:[['RULE_FLOOR6','電梯停在不存在的 6F 時，不要追走廊裡的白袍。']]},
+      FINAL:{legend:'lastCall',rule:null,notes:[['RULE_FINAL','316 只接受真正的姓名。錯的名字會把我重新送回第33床。']]}
+    };
+    const cfg=configs[id];
+    if(id==='BED33'){this.data.hasSeenOverride_Bed33=true;this.data.knownCodes.code_0409=true;}
+    if(cfg){
+      if(cfg.legend)this.data.legends[cfg.legend]=true;
+      if(cfg.rule)this.data.survivalRules[cfg.rule]=true;
+      for(const [nid,text] of cfg.notes)this.addJournalNote(nid,text);
     }
     this.save();
   }
@@ -118,6 +166,12 @@ export class PersistentMemory {
     gameState.setFlag('MEMORY_CODE_0316',this.data.knownCodes.code_0316);
     gameState.setFlag('MEMORY_CODE_0409',this.data.knownCodes.code_0409);
     gameState.setFlag('MEMORY_NEVER_SIGN_BED33',this.data.survivalRules.neverSignBed33);
+    gameState.setFlag('IDENTITY_EROSION_LEVEL',this.data.identityErosionLevel);
+    gameState.setFlag('SPACE_PROOF',this.data.proofs.space);
+    gameState.setFlag('IDENTITY_PROOF',this.data.proofs.identity);
+    gameState.setFlag('TIME_PROOF',this.data.proofs.time);
+    gameState.setFlag('TRUE_NAME_RESOLVED',this.data.trueNameResolved);
+    if(this.data.trueName)gameState.setFlag('TRUE_NAME',this.data.trueName);
   }
 }
 
