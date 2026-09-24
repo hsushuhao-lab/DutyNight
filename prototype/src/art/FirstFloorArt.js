@@ -93,7 +93,9 @@ export function applyFirstFloorArt(level) {
   box(10.775,.09,5.5,.045,.18,5.6,m.wallBumper);
   for (let x=-3;x<16;x+=1.4) {
     box(x,1.02,-2.24,.055,.14,.12);
-    if (x<1.6 || x>3.2) box(x,1.02,2.28,.055,.14,.12);
+    const clear316Door=x>=1.6&&x<=3.2;
+    const clearStorageDoor=x>=12.75&&x<=14.25;
+    if (!clear316Door && !clearStorageDoor) box(x,1.02,2.28,.055,.14,.12);
   }
   // Standard 600 mm acoustic ceiling T-grid, with actual depth at each joint.
   [[-8,0,8,7],[6,0,20,5],[6,5.5,10,6]].forEach(([x,z,w,d]) => {
