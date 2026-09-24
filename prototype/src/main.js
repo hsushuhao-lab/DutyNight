@@ -520,11 +520,54 @@ controller.onInteract = (interactable) => {
         gameState.setFlag('M4_CHEST_RESOLVED',true);
         gameState.setFlag('CHEST_RECORD_MATCH',true);
         gameState.setFlag('OUTDOOR_ROUTE_ACCESS',true);
-        gameState.setFlag('FLOOR6_AVAILABLE',true);
         persistentMemory.resolveLegend('chestPain');
         persistentMemory.addJournalNote('CHEST_RESOLVED','胸痛病人的轉院單早已有「李醫師」電子簽名；我沒有簽過。');
         persistentMemory.raiseErosion(1);
         uiManager.showSubtitle('第二院區護理師','「……可是系統顯示你已經簽過了。那剛才來的人是誰？」',4400);
+        controller.enabled=true;
+      }
+    });
+  } else if (interactable.type === 'bridge_loop_event') {
+    if(gameState.getFlag('M5_BRIDGE_RESOLVED')){
+      uiManager.showSubtitle('李醫師','「一直往前。不要回頭。」',2200);return;
+    }
+    controller.enabled=false;
+    uiManager.openStoryChoice({
+      title:'天橋中央｜遠處的白袍',
+      body:'前方有一個穿著和你相同白袍的人。玻璃反光讓你無法確認那張臉。\n\n你忽然很想回頭確認第二院區入口還在不在。',
+      primaryText:'回頭確認',
+      secondaryText:'不要回頭，繼續往前',
+      onPrimary:()=>loopManager.triggerLegendOverride('BRIDGE',{legend:'LEGEND 04 — 不能回頭的天橋',reason:'另一位值班醫師已通過。'}),
+      onSecondary:()=>{
+        gameState.setFlag('M5_BRIDGE_RESOLVED',true);
+        gameState.setFlag('M5_ROUTE_RESOLVED',true);
+        gameState.setFlag('FLOOR6_AVAILABLE',true);
+        persistentMemory.resolveLegend('bridge');
+        persistentMemory.setTrueNameFragment('frag_givenName_2','衡');
+        persistentMemory.addJournalNote('BRIDGE_SAFE','天橋中線後不要回頭。遠處白袍胸牌最後一個字像是「衡」。');
+        if(gameState.getFlag('CHEST_RECORD_MATCH')){gameState.setFlag('IDENTITY_PROOF',true);persistentMemory.setProof('identity',true);}
+        controller.enabled=true;
+      }
+    });
+  } else if (interactable.type === 'pond_reflection_event') {
+    if(gameState.getFlag('M5_POND_RESOLVED')){
+      uiManager.showSubtitle('李醫師','「水裡那個人不是我的倒影。」',2200);return;
+    }
+    controller.enabled=false;
+    uiManager.openStoryChoice({
+      title:'生態池｜不同步的倒影',
+      body:'你停下腳步後，水中的白袍仍往前走了半步才停。\n它抬起頭，像是在等你靠近。',
+      primaryText:'走近水邊看清楚',
+      secondaryText:'離開水邊，不再看它',
+      onPrimary:()=>loopManager.triggerLegendOverride('POND',{legend:'LEGEND 05 — 生態池裡的人影',reason:'你留在水裡了。'}),
+      onSecondary:()=>{
+        gameState.setFlag('M5_POND_RESOLVED',true);
+        gameState.setFlag('M5_ROUTE_RESOLVED',true);
+        gameState.setFlag('FLOOR6_AVAILABLE',true);
+        persistentMemory.resolveLegend('pond');
+        persistentMemory.setTrueNameFragment('frag_givenName_2','衡');
+        persistentMemory.addJournalNote('POND_SAFE','倒影沒有跟著我停下。它胸前的名牌末字是「衡」。');
+        if(gameState.getFlag('CHEST_RECORD_MATCH')){gameState.setFlag('IDENTITY_PROOF',true);persistentMemory.setProof('identity',true);}
         controller.enabled=true;
       }
     });
