@@ -4,6 +4,7 @@ import { applyPondArt } from '../../art/LandscapeArt.js';
 import { disposeZoneArt } from '../../art/ArtResources.js';
 import { CollisionFactory } from '../shared/CollisionFactory.js';
 import { SignAnchor } from '../shared/SignAnchor.js';
+import { gameState } from '../../core/GameState.js';
 
 export class EcologyPond {
   constructor(scene, geometryFactory) {
@@ -158,7 +159,7 @@ export class EcologyPond {
       code: 'POND',
       title: '生態池觀景平台 (深水請注意安全)',
       subtitle: 'ECOLOGICAL POND OBSERVATION DECK',
-      header: '松德醫療中心 ｜ 後山生態景觀區'
+      header: '青嶺醫療中心 ｜ 後山生態景觀區'
     });
 
     // ==========================================
@@ -169,6 +170,18 @@ export class EcologyPond {
     water.rotation.x = -Math.PI / 2;
     water.position.set(66.5, -1.05, -52.5);
     this.zoneGroup.add(water);
+
+    // Non-synchronous reflection: a simplified white-coated double beneath the water plane.
+    const reflection=new THREE.Group();reflection.name='Pond_DoppelgangerReflection';
+    const body=new THREE.Mesh(new THREE.BoxGeometry(.42,.92,.16),new THREE.MeshStandardMaterial({color:0xdfe4e1,transparent:true,opacity:.48,roughness:.35}));
+    body.position.y=.46;reflection.add(body);
+    const rhead=new THREE.Mesh(new THREE.SphereGeometry(.14,14,10),new THREE.MeshStandardMaterial({color:0xbba891,transparent:true,opacity:.44}));
+    rhead.position.y=1.08;reflection.add(rhead);
+    reflection.position.set(61.5,-1.62,-53.6);reflection.rotation.x=Math.PI;reflection.visible=gameState.getFlag('M4_CHEST_RESOLVED');this.zoneGroup.add(reflection);
+    const reflectionHit=new THREE.Mesh(new THREE.BoxGeometry(4.5,1.6,2.8),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
+    reflectionHit.position.set(61.5,-.35,-51.2);
+    reflectionHit.userData={interactable:gameState.getFlag('M4_CHEST_RESOLVED'),id:'POND_REFLECTION_EVENT',type:'pond_reflection_event',label:'觀察水面的倒影'};
+    this.zoneGroup.add(reflectionHit);this.interactables.push(reflectionHit);this.pondReflection=reflection;
 
     // Shoreline stone borders along pond
     const shoreMat = this.gf.materials.wallDark;
