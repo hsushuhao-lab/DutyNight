@@ -17,7 +17,7 @@ add('hill_from_first','hillside_route',[11.5,1.27,-34.55],-Math.PI/2,'山路第�
 add('first_er_return','first_campus_2f',[28.2,1.7,0],Math.PI/2,'第一院區 2F 山側入口');
 add('pond_from_hill','ecology_pond',[53,1.12,-36.8],0,'生態池步道入口');
 add('hill_from_pond','hillside_route',[48.8,1.195,-33.5],.67,'返回山路叉路');
-add('phantom_6f_lift','phantom_6f',[0,1.7,1.0],Math.PI,'不存在的 6F 電梯口');
+add('phantom_6f_lift','phantom_6f',[0,1.7,1.0],0,'不存在的 6F 電梯口');
 add('b2_archive_lift','b2_archive',[0,1.7,1.0],Math.PI,'B2 舊貨梯');
 
 export const ROUTE_PORTALS=[

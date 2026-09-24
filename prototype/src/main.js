@@ -167,7 +167,17 @@ function unlockSecondCampusAccess(){
   gameState.setFlag('SECOND_CAMPUS_ACCESS',true);
   gameState.setFlag('BRIDGE_ACCESS',true);
   persistentMemory.addJournalNote('SECOND_CAMPUS_CALL','第二院區護理站主動開了天橋權限；在這之前我根本沒有跨院區資格。');
-  uiManager.showSubtitle('第二院區護理站','☎「醫師，我們這邊有一床胸痛病人請你評估。我幫你開天橋通過權限。」',5600);
+  uiManager.showSubtitle('第二院區護理師','「第二院區 5F 有一位胸痛病人需要精神科評估，天橋門禁已經幫你開了。」',5600);
+}
+
+function completeM5IfReady(){
+  if(!gameState.getFlag('M5_ROUTE_CHOICE_RESOLVED')||!gameState.getFlag('M5_NAME_CLUE_FOUND'))return false;
+  gameState.setGameTime('02:00');
+  gameState.setFlag('M5_ROUTE_RESOLVED',true);
+  gameState.setFlag('FLOOR6_AVAILABLE',true);
+  if(gameState.getFlag('CHEST_RECORD_MATCH')){gameState.setFlag('IDENTITY_PROOF',true);persistentMemory.setProof('identity',true);}
+  uiManager.updateTasks();
+  return true;
 }
 
 function resolveAdminIdentityPuzzleIfReady() {
@@ -237,6 +247,11 @@ controller.onInteract = (interactable) => {
     const door=worldRouter.activeZoneInstance.accessDoors?.[interactable.doorId];
     if(!door)return;
     if(door.portal){
+      if(interactable.doorId==='BRIDGE_SECOND'&&gameState.getFlag('M5_BRIDGE_COMMITTED')){
+        soundManager.playDoorLockClack();
+        uiManager.showSubtitle('門禁','「通往第二院區的門已從另一側鎖上。繼續往第一院區走。」',3200);
+        return;
+      }
       if(['BRIDGE_ACCESS','BRIDGE_FIRST','BRIDGE_SECOND'].includes(interactable.doorId)&&!canAccess(gameState,interactable.doorId==='BRIDGE_ACCESS'?'FIRST_TO_SECOND_BRIDGE':'SECOND_TO_FIRST_BRIDGE')){
         soundManager.playDoorLockClack();
         uiManager.showSubtitle('門禁','「夜間跨院區權限尚未開啟。」',2800);
@@ -415,11 +430,28 @@ controller.onInteract = (interactable) => {
       uiManager.showPrompt(null);
     }
   } else if (interactable.type === 'office_phone_316') {
-    if(gameState.getFlag('PHONE_RING_ACTIVE')&&!gameState.getFlag('PHONE_ANSWERED')){
+    if(gameState.getFlag('SECOND_CAMPUS_PHONE_PENDING')){
+      gameState.setFlag('SECOND_CAMPUS_PHONE_PENDING',false);
+      gameState.setFlag('PHONE_ANSWERED',true);
+      soundManager.playClick();
+      uiManager.showSubtitle('李醫師','「……怎麼知道我在 316 辦公室？」',2600);
+      setTimeout(()=>unlockSecondCampusAccess(),1800);
+    }else if(gameState.getFlag('PHONE_RING_ACTIVE')&&!gameState.getFlag('PHONE_ANSWERED')){
       gameState.setFlag('PHONE_ANSWERED',true);
       gameState.setFlag('PHONE_RING_ACTIVE',false);
       soundManager.playClick();
       soundManager.duckAmbient(.18,4300);
+      const loopCount=persistentMemory.data.loopCount;
+      if(loopCount>0){
+        const lines=['「……你還在三樓嗎？」','「嘻嘻，你還在三樓。」','「嘻嘻，你逃不掉的。」','「你又回來了。」'];
+        uiManager.showSubtitle('電話',`（三秒雜音）\\n${lines[Math.min(loopCount,lines.length-1)]}`,4300);
+        return;
+      }
+      if(interactable.doorId==='SECOND_1F_HILLSIDE'&&!gameState.getFlag('OUTDOOR_ROUTE_ACCESS')){
+        soundManager.playDoorLockClack();
+        uiManager.showSubtitle('門禁','「夜間山側通行權限尚未開啟。」',2800);
+        return;
+      }
       uiManager.showSubtitle('電話','（三秒雜音）\n「……你還在三樓嗎？」\n嘟——　嘟——　嘟——',4300);
     }else{
       uiManager.showSubtitle('李醫師','「普通的院內電話。」',1800);
@@ -447,7 +479,7 @@ controller.onInteract = (interactable) => {
       return;
     }
     if(gameState.getFlag('M3_316_DECODED')){
-      uiManager.showSubtitle('316 舊資料終端','「1998-ER-0217｜責任醫師工號前綴 MED-87｜姓氏：張。」',3600);
+      uiManager.showSubtitle('316 舊資料終端','「1998-ER-0217｜責任醫師員編前綴 MED-87｜姓氏：張。」',3600);
       return;
     }
     gameState.setFlag('M3_316_DECODED',true);
@@ -455,26 +487,28 @@ controller.onInteract = (interactable) => {
     gameState.setFlag('ER0033_INDEX_MATCH',true);
     persistentMemory.resolveLegend('er0033');
     persistentMemory.setTrueNameFragment('frag_surname','張');
-    persistentMemory.addJournalNote('ER0033_DECODED','316 舊終端解出 1998-ER-0217：責任醫師工號以 MED-87 開頭，姓氏是「張」。');
+    persistentMemory.addJournalNote('ER0033_DECODED','316 舊終端解出 1998-ER-0217：責任醫師員編以 MED-87 開頭，姓氏是「張」。');
     if(gameState.getFlag('TIME_PROOF_FRAGMENT')){
       gameState.setFlag('TIME_PROOF',true);
       persistentMemory.setProof('time',true);
     }
-    unlockSecondCampusAccess();
-    uiManager.showSubtitle('316 舊資料終端','「1998-ER-0217｜責任醫師：張○○｜工號前綴：MED-87。」',5200);
+    gameState.setFlag('SECOND_CAMPUS_PHONE_PENDING',true);
+    soundManager.playPhoneRingPattern();
+    uiManager.showSubtitle('316 舊資料終端','「1998-ER-0217｜責任醫師：張○○｜員編前綴：MED-87。」\\n\\n終端機停止後，桌上的院內電話立刻響起。',5200);
   } else if (interactable.type === 'workstation') {
     if(gameState.getFlag('M8_IDENTITY_BATTLE_ACTIVE')&&worldRouter.activeZoneId==='first_campus_3f'){
       gameState.setGameTime('04:05');
       controller.enabled=false;
-      uiManager.openFinalHandoff((value)=>{
-        if(value===TRUE_NAME_CANON&&persistentMemory.data.trueNameResolved&&persistentMemory.hasAllProofs()){
+      uiManager.openFinalHandoff(({name,employeeId})=>{
+        if(name===TRUE_NAME_CANON&&employeeId==='MED-870409'&&persistentMemory.data.trueNameResolved&&persistentMemory.hasAllProofs()){
           gameState.setFlag('GAME_COMPLETE',true);
           persistentMemory.completeGame();
           uiManager.showFinalSuccess(TRUE_NAME_CANON);
           controller.enabled=false;
         }else{
-          uiManager.setFinalHandoffStatus(value?'IDENTITY MISMATCH / HANDOFF ALREADY COMPLETED':'NAME REQUIRED');
-          if(value){
+          const hasInput=name||employeeId;
+          uiManager.setFinalHandoffStatus(hasInput?'姓名或員編不符｜交班遭另一個「李醫師」接管':'請輸入姓名與員編');
+          if(hasInput){
             setTimeout(()=>{
               uiManager.closeFinalHandoff(false);
               loopManager.triggerLegendOverride('FINAL',{legend:'最終覆寫 — 晨間交班',reason:'今日值班醫師已確認；你已被收治。'});
@@ -482,7 +516,7 @@ controller.onInteract = (interactable) => {
           }
         }
       });
-      uiManager.setFinalHandoffStatus('另一個「李醫師」已在 316 登入｜請輸入真正姓名');
+    uiManager.setFinalHandoffStatus('另一個「李醫師」已在 316 登入｜請核對真正姓名與員編');
       return;
     }
     controller.enabled = false;
@@ -579,7 +613,7 @@ controller.onInteract = (interactable) => {
     persistentMemory.setTrueNameFragment('frag_employeeFull','MED-870409');
     const restored=persistentMemory.resolveTrueName(TRUE_NAME_CANON);
     if(!restored){
-      uiManager.showSubtitle('UNREGISTERED MESSAGE / ARCHIVE','「身分碎片不足。工號、姓氏與姓名記錄仍無法完成一致性驗證。」',4600);
+      uiManager.showSubtitle('UNREGISTERED MESSAGE / ARCHIVE','「身分碎片不足。員編、姓氏與姓名記錄仍無法完成一致性驗證。」',4600);
       return;
     }
     gameState.setFlag('M7_B2_RESOLVED',true);
@@ -624,6 +658,15 @@ controller.onInteract = (interactable) => {
     controller.enabled = false;
     const travelFrom=worldRouter.activeZoneId;
     uiManager.openTravelSelector(worldRouter.floorDestinations(interactable.kind), travelFrom, destination => {
+      if(interactable.kind==='elevator'&&destination.zoneId.startsWith('first_campus_')&&gameState.getFlag('FLOOR6_AVAILABLE')&&!gameState.getFlag('M6_FLOOR6_RESOLVED')){
+        gameState.setFlag('PHANTOM6_RETURN_ZONE',destination.zoneId);
+        gameState.setFlag('FLOOR6_AVAILABLE',false);
+        floorStateManager.setPhase(GamePhase.ELEVATOR_GLITCH);
+        worldRouter.loadZone('phantom_6f','phantom_6f_lift');
+        uiManager.showSubtitle('電梯樓層顯示器','6',2200);
+        controller.enabled=true;
+        return;
+      }
       if(destination.zoneId==='phantom_6f')gameState.setFlag('PHANTOM6_RETURN_ZONE',travelFrom);
       if(interactable.kind==='elevator'&&travelFrom==='first_campus_2f'&&destination.zoneId==='first_campus_4f'&&gameState.getFlag('FORCE_3F_ELEVATOR_STOP')&&!gameState.getFlag('FORCED_3F_ELEVATOR_STOP_DONE')){
         gameState.setFlag('FORCED_3F_ELEVATOR_STOP_DONE',true);
@@ -649,39 +692,56 @@ controller.onInteract = (interactable) => {
     }
     if(!gameState.getFlag('SECOND_CHEST_PATIENT_SEEN')){
       gameState.setFlag('SECOND_CHEST_PATIENT_SEEN',true);
-      persistentMemory.addJournalNote('CHEST_PATIENT','第二院區多出來的胸痛病人，資料來源欄寫著 00:33 / LEGACY。');
-      uiManager.showSubtitle('第二院區護理師','「李醫師，你剛才不是已經看過他了嗎？轉院單上還有你的簽名。」',4400);
-    }else uiManager.showSubtitle('胸痛病人','「醫師……你不是剛才才來過？」',2800);
+      persistentMemory.addJournalNote('CHEST_PATIENT','陳怡君因胸悶、心悸與焦慮前來；生命徵象穩定，表現符合焦慮伴隨換氣過度。');
+      uiManager.showSubtitle('李醫師','「生命徵象穩定，心電圖也沒有急性變化。先陪她放慢呼吸，這比較像焦慮引起的換氣過度。」',5200);
+    }else uiManager.showSubtitle('陳怡君','「胸口好多了，謝謝醫師。」',2800);
+  } else if (interactable.type === 'second_chest_roster_clue') {
+    if(!gameState.getFlag('M4_CHEST_RESOLVED')){
+      uiManager.showSubtitle('李醫師','「先完成病人評估與轉院單查核，再看這張舊名冊。」',2800);
+      return;
+    }
+    if(!gameState.getFlag('M4_NAME_CLUE_FOUND')){
+      persistentMemory.setTrueNameFragment('frag_givenName_1','守');
+      persistentMemory.addJournalNote('TRUE_NAME_SHOU','第二院區病床旁的舊名冊殘頁：第一線：張 守 [墨漬]。');
+      gameState.setFlag('M4_NAME_CLUE_FOUND',true);
+      controller.enabled=false;
+      uiManager.openArchiveDocument({title:interactable.documentTitle,pages:interactable.pages});
+    }
+  } else if (interactable.type === 'true_name_clue_2') {
+    if(!gameState.getFlag('M4_CHEST_RESOLVED'))return;
+    persistentMemory.setTrueNameFragment('frag_givenName_2','恆');
+    gameState.setFlag('M5_NAME_CLUE_FOUND',true);
+    persistentMemory.addJournalNote('TRUE_NAME_HENG','安妮留下的舊聽診器銘牌刻著「祝 守恆 醫師　1997 執業誌慶」。');
+    uiManager.showSubtitle('舊聽診器銘牌','「祝 守恆 醫師　1997 執業誌慶」',3600);
+    completeM5IfReady();
   } else if (interactable.type === 'second_chest_transfer') {
     if(!gameState.getFlag('SECOND_CHEST_PATIENT_SEEN')){
-      uiManager.showSubtitle('李醫師','「先看病人，不能直接簽轉院單。」',2400);
+      uiManager.showSubtitle('李醫師','「先評估病人，不能直接簽轉院單。」',2400);
       return;
     }
     if(gameState.getFlag('M4_CHEST_RESOLVED')){
-      uiManager.showSubtitle('李醫師','「這張轉院單已經被撤回了。」',2200);
+      uiManager.showSubtitle('李醫師','「這張轉院單目的地是第一院區 409A，而且已經有我的名字。」',3000);
       return;
     }
     controller.enabled=false;
     uiManager.openStoryChoice({
       title:'第二院區｜胸痛病人轉院單',
-      body:'病人姓名：查無正式住院資料\n來源：00:33 / legacy\n電子簽名：李住院醫師（已存在）\n\n是否確認轉院？',
-      primaryText:'確認轉院',
-      secondaryText:'拒絕，重新查核身分',
-      onPrimary:()=>loopManager.triggerLegendOverride('CHEST',{legend:'LEGEND 03 — 多出來的胸痛病人',reason:'你成了轉院對象。'}),
+      body:'陳怡君，主訴胸悶與心悸。生命徵象穩定，心電圖沒有急性變化；評估符合焦慮伴隨換氣過度。\\n\\n轉院單卻已經填妥：目的地「第一院區 409A」，開立醫師「李○○」。\\n\\n護理師：「李醫師，單子不是你早就填好的嗎？快補簽名吧。」',
+      primaryText:'補上簽名',
+      secondaryText:'拒絕簽署並重新查核',
+      onPrimary:()=>loopManager.triggerLegendOverride('CHEST',{legend:'LEGEND 03 — 事先填妥的轉院單',reason:'轉院目的地是 409A。'}),
       onSecondary:()=>{
         gameState.setGameTime('01:45');
         gameState.setFlag('M4_CHEST_RESOLVED',true);
         gameState.setFlag('CHEST_RECORD_MATCH',true);
         gameState.setFlag('OUTDOOR_ROUTE_ACCESS',true);
         persistentMemory.resolveLegend('chestPain');
-        persistentMemory.setTrueNameFragment('frag_givenName_1','守');
-        persistentMemory.addJournalNote('CHEST_RESOLVED','胸痛病人的轉院單早已有「李醫師」電子簽名；第二院區舊名冊殘頁則留下名字中的「守」字。');
+        persistentMemory.addJournalNote('CHEST_RESOLVED','焦慮引起的胸悶已改善；轉院單卻事先填妥第一院區 409A，並留有「李○○」簽名。');
         persistentMemory.raiseErosion(1);
-        uiManager.showSubtitle('第二院區護理師','「……可是系統顯示你已經簽過了。那剛才來的人是誰？」',4400);
+        uiManager.showSubtitle('第二院區護理師','「李醫師，單子不是你早就填好的嗎？……可是你說從沒看過這張單。」',4400);
         controller.enabled=true;
       }
-    });
-  } else if (interactable.type === 'bridge_loop_event') {
+    });  } else if (interactable.type === 'bridge_loop_event') {
     if(gameState.getFlag('M5_BRIDGE_RESOLVED')){
       uiManager.showSubtitle('李醫師','「一直往前。不要回頭。」',2200);return;
     }
@@ -695,12 +755,11 @@ controller.onInteract = (interactable) => {
       onSecondary:()=>{
         gameState.setGameTime('02:00');
         gameState.setFlag('M5_BRIDGE_RESOLVED',true);
-        gameState.setFlag('M5_ROUTE_RESOLVED',true);
-        gameState.setFlag('FLOOR6_AVAILABLE',true);
+        gameState.setFlag('M5_BRIDGE_COMMITTED',true);
+        gameState.setFlag('M5_ROUTE_CHOICE_RESOLVED',true);
         persistentMemory.resolveLegend('bridge');
-        persistentMemory.setTrueNameFragment('frag_givenName_2','恆');
-        persistentMemory.addJournalNote('BRIDGE_SAFE','天橋中線後不要回頭。遠處白袍胸牌最後一個字像是「恆」。');
-        if(gameState.getFlag('CHEST_RECORD_MATCH')){gameState.setFlag('IDENTITY_PROOF',true);persistentMemory.setProof('identity',true);}
+        persistentMemory.addJournalNote('BRIDGE_SAFE','越過天橋中線後不要回頭。橋邊留下了一件刻有姓名的舊聽診器。');
+        completeM5IfReady();
         controller.enabled=true;
       }
     });
@@ -718,12 +777,10 @@ controller.onInteract = (interactable) => {
       onSecondary:()=>{
         gameState.setGameTime('02:00');
         gameState.setFlag('M5_POND_RESOLVED',true);
-        gameState.setFlag('M5_ROUTE_RESOLVED',true);
-        gameState.setFlag('FLOOR6_AVAILABLE',true);
+        gameState.setFlag('M5_ROUTE_CHOICE_RESOLVED',true);
         persistentMemory.resolveLegend('pond');
-        persistentMemory.setTrueNameFragment('frag_givenName_2','恆');
-        persistentMemory.addJournalNote('POND_SAFE','倒影沒有跟著我停下。它胸前的名牌末字是「恆」。');
-        if(gameState.getFlag('CHEST_RECORD_MATCH')){gameState.setFlag('IDENTITY_PROOF',true);persistentMemory.setProof('identity',true);}
+        persistentMemory.addJournalNote('POND_SAFE','倒影沒有跟著我停下。岸邊留著一件舊聽診器。');
+        completeM5IfReady();
         controller.enabled=true;
       }
     });
@@ -805,11 +862,12 @@ controller.onInteract = (interactable) => {
     if(action==='NURSE_REPORT'){
       if(!gameState.isTaskComplete('WARD_ENTRY')) return uiManager.showSubtitle('李醫師','「先正式抵達 4F 再報到。」',2500);
       dutyEvents.complete('P1_4F_REPORT','17:15');
-      uiManager.showSubtitle('晚班護理師','「李醫師，你來啦。今晚 4F 滿床，總共 36 床。403 老先生一直說隔壁在敲牆，待會巡房麻煩你幫忙看一下。」',5200);
+      uiManager.showSubtitle('晚班護理師','「李醫師，今晚四樓滿床，總共 32 床。403 說睡不好；另外 408C 的老先生一直說隔壁有人敲牆，待會巡房麻煩你幫忙看看。」',5600);
     } else if(action==='DUTY_ROOM_PREP'){
       if(!gameState.isTaskComplete('P1_4F_REPORT')) return uiManager.showSubtitle('李醫師','「先去護理站報到。」',2500);
       dutyEvents.complete('P1_DUTY_ROOM_READY','17:30');
-      uiManager.showSubtitle('李醫師','「值班電話正常……等等，桌上怎麼已經有一杯熱咖啡？值班室鑰匙剛才明明在我身上。」',5200);
+      if(persistentMemory.claimOnce('hotCoffee'))uiManager.showSubtitle('李醫師','「值班電話正常……等等，桌上怎麼已經有一杯熱咖啡？值班室鑰匙剛才明明在我身上。」',5200);
+      else uiManager.showSubtitle('李醫師','「值班室整理好了，電話與門鎖都正常。」',3000);
     } else if(action==='WARD_ROUND'){
       if(!gameState.isTaskComplete('P1_DUTY_ROOM_READY')) return uiManager.showSubtitle('李醫師','「先把值班室整理好再巡房。」',2500);
       dutyEvents.complete('P1_ROUND_COMPLETE','18:00');
@@ -820,14 +878,14 @@ controller.onInteract = (interactable) => {
       if(gameState.getFlag('HOOK_409_ZERO_ROOM')){
         gameState.setFlag('CLUE_403_0409',true);
         registerBed33Clue('KNOCK_403_49');
-        soundManager.playBed33KnockPattern();
-        uiManager.showSubtitle('403 病人','「醫師，我一直睡不著……不是這間，是那邊一直在敲。四下、停一下、九下。每晚都一樣。」',6200);
-      }else uiManager.showSubtitle('403 病人','「醫師，我一直睡不著。」');
+      }
+      uiManager.showSubtitle('403 病人','「醫師，我一直睡不著。」');
     } else if(action==='NORMAL_EVENT'){
       if(!gameState.isTaskComplete('P1_INSOMNIA_DONE')) return uiManager.showSubtitle('李醫師','「先處理 403 的睡眠問題。」',2500);
       if(!gameState.getFlag('BED33_RESOLVED')) return uiManager.showSubtitle('李醫師','「護理站那張 409A 臨時床位單還沒釐清，不能就這樣簽掉。」',3200);
       dutyEvents.complete('P1_NORMAL_EVENT_DONE','19:30');
-      uiManager.showSubtitle('晚班護理師',`「19 點這位病人有些${dutyEvents.normalEvent.label}，目前處理完都穩定。」`);
+      soundManager.playBed33KnockPattern();
+      uiManager.showSubtitle('408C 老先生','「李醫師！隔壁又在敲了！每次都敲四下，停一下，又敲九下……」',5600);
     } else if(action==='REST'){
       if(!gameState.isTaskComplete('P1_NORMAL_EVENT_DONE')) return uiManager.showSubtitle('李醫師','「先把剛才的病房事件處理完。」',2500);
       dutyEvents.complete('P1_REST_DONE','20:00');
@@ -899,7 +957,7 @@ function animate() {
   const delta = Math.min(clock.getDelta(), 0.1);
 
   controller.update(delta);
-  worldRouter.update();
+  worldRouter.update(delta);
 
   // After the 21:17 bootstrap the player is explicitly sent back to the 4F duty room.
   // Crossing into the room automatically advances the story; no hidden E target is required.

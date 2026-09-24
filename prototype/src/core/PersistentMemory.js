@@ -4,6 +4,8 @@ const STORAGE_KEY='DutyNight_PersistentData';
 const defaults=()=>({
   version:2,
   loopCount:0,
+  hasSeenHandoffAcknowledgement:false,
+  seenOnce:{hotCoffee:false,unregisteredMessage3F:false},
   hasSeenOverride_Bed33:false,
   identityErosionLevel:0,
   proofs:{space:false,identity:false,time:false},
@@ -146,13 +148,28 @@ export class PersistentMemory {
 
   hasAllProofs(){return this.data.proofs.space&&this.data.proofs.identity&&this.data.proofs.time;}
 
+  claimHandoffAcknowledgement(){
+    if(this.data.hasSeenHandoffAcknowledgement)return false;
+    this.data.hasSeenHandoffAcknowledgement=true;
+    this.save();
+    return true;
+  }
+
+  claimOnce(eventId){
+    if(this.data.seenOnce[eventId])return false;
+    this.data.seenOnce[eventId]=true;
+    this.save();
+    return true;
+  }
+
   canReconstructTrueName(){
     const f=this.data.trueNameFragments;
     return f.frag_employeePrefix==='MED-87'
       && f.frag_surname==='張'
       && f.frag_givenName_1==='守'
       && f.frag_givenName_2==='恆'
-      && f.frag_title==='住院醫師';
+      && f.frag_title==='住院醫師'
+      && f.frag_employeeFull==='MED-870409';
   }
 
   resolveTrueName(name){

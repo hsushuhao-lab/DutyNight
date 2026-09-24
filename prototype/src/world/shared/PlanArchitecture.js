@@ -38,7 +38,7 @@ function mountBedWallPlaque(zone,{rect,bx,bz,roomId,bedInRoom}){
   return {wall:p.wall,x:p.x,y:1.42,z:p.z,rotationY:p.rotationY};
 }
 
-export function ordinaryRoom(zone,walls,{id,label=id+' 病房',rect,side,door,kind='ward',protectedArea=true}) {
+export function ordinaryRoom(zone,walls,{id,label=id+' 病房',rect,side,door,kind='ward',protectedArea=true,bedLimit=Infinity,storageLock='card'}) {
   const [x1,z1,x2,z2]=rect,cx=(x1+x2)/2,cz=(z1+z2)/2;
   walls.rect(...rect);const alongX=side==='north'||side==='south';
   const x=alongX?door:(side==='west'?x1:x2),z=alongX?(side==='north'?z1:z2):door;
@@ -53,8 +53,9 @@ export function ordinaryRoom(zone,walls,{id,label=id+' 病房',rect,side,door,ki
       interactionSide:(side==='south'||side==='east')?1:-1
     });
   }else if(kind==='storage'){
-    accessDoorId='storage_'+id;doorType='card';
-    new AccessDoor(zone,{id:accessDoorId,x,z,yaw:alongX?0:Math.PI/2,width:1.6,title:'儲藏室',material:zone.gf.materials.doorWood,readerSide:1});
+    accessDoorId='storage_'+id;doorType=storageLock;
+    if(storageLock==='knob')new KeyedKnobDoor(zone,{id:accessDoorId,x,z,yaw:alongX?0:Math.PI/2,width:1.6,title:'儲藏室'});
+    else new AccessDoor(zone,{id:accessDoorId,x,z,yaw:alongX?0:Math.PI/2,width:1.6,title:'儲藏室',material:zone.gf.materials.doorWood,readerSide:1});
   }else{
     const opening=Doorway.build({scene:zone.zoneGroup,colliders:zone.colliders,x,z,width:1.6,height:2.4,wallHeight:3.2,isAlongX:alongX,isOpen:true,doorMaterial:zone.gf.materials.doorWood});
     opening.name=`RoomDoor_${id}`;
@@ -75,11 +76,13 @@ export function ordinaryRoom(zone,walls,{id,label=id+' 病房',rect,side,door,ki
     zone.bedAreas??=[];
     spots.forEach(([bx,bz],index)=>{
       const bedIndex=index+1,bedInRoom=letters[index],bedId=`${id}${bedInRoom}`,wardBedNumber=(roomOrdinal-1)*4+bedIndex;
+      if(wardBedNumber>bedLimit&&!(id==='409'&&bedIndex===1&&bedLimit===32))return;
+      const anomalous=wardBedNumber>bedLimit;
       const model=asset(zone.zoneGroup,'hospitalBed',[bx,0,bz],[1,1,1]);
-      if(model){model.name=`Bed_${bedId}`;model.userData={...model.userData,roomId:id,bedInRoom,bedIndex,bedId,wardBedNumber};}
+      if(model){model.name=`Bed_${bedId}`;model.userData={...model.userData,roomId:id,bedInRoom,bedIndex,bedId,wardBedNumber,anomalous};}
       CollisionFactory.addBox(zone.colliders,bx,.5,bz,1.15,1,2.15);
       const plaque=mountBedWallPlaque(zone,{rect,bx,bz,roomId:id,bedInRoom});
-      zone.bedAreas.push({id:bedId,roomId:id,bedInRoom,bedIndex,wardBedNumber,position:[bx,0,bz],plaque});
+      zone.bedAreas.push({id:bedId,roomId:id,bedInRoom,bedIndex,wardBedNumber,anomalous,position:[bx,0,bz],plaque});
     });
   }
 

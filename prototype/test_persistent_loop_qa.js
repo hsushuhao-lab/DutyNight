@@ -25,6 +25,8 @@ const reloaded=new PersistentMemory(storage);
 assert.equal(reloaded.data.loopCount,1);
 assert.equal(reloaded.data.knownCodes.pass_1700,true);
 assert.equal(reloaded.data.knownCodes.pass_3082,true);
+assert.equal(reloaded.claimOnce('hotCoffee'),true);
+assert.equal(new PersistentMemory(storage).claimOnce('hotCoffee'),false);
 
 const state=new GameState();
 let resets=0;state.addListener(evt=>{if(evt==='loop_reset')resets++;});

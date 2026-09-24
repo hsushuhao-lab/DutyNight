@@ -3,9 +3,9 @@ import * as THREE from 'three';
 import { buildHillsidePreview } from '../../art/LandscapeArt.js';
 import { artRoot, solid, asset, monitor, counterFront, wallTrim } from '../../art/ArtDetails.js';
 import { disposeZoneArt } from '../../art/ArtResources.js';
-import { Doorway } from '../shared/Doorway.js';
 import { SignAnchor } from '../shared/SignAnchor.js';
 import { CollisionFactory } from '../shared/CollisionFactory.js';
+import { AccessDoor } from '../shared/AccessDoor.js';
 
 export class SecondCampus1F {
   constructor(scene, geometryFactory) {
@@ -49,20 +49,7 @@ export class SecondCampus1F {
     this.gf.buildWall(this.zoneGroup, this.colliders, 75.75, 1.6, -8.0, 4.5, 3.2, 0.4);
 
     // Exterior exit doorway (x: 70.5 to 73.5, width 2.4m double door)
-    Doorway.build({
-      scene: this.zoneGroup,
-      colliders: this.colliders,
-      x: 72.0,
-      y: 0,
-      z: -8.0,
-      width: 2.4,
-      height: 2.5,
-      wallHeight: 3.2,
-      wallThickness: 0.4,
-      isAlongX: true,
-      isOpen: true,
-      doorMaterial: this.gf.materials.metal
-    });
+    new AccessDoor(this,{id:'SECOND_1F_HILLSIDE',x:72,z:-8,width:2.4,title:'山側步道感應門',material:this.gf.materials.metal,portal:'hill_from_second',readers:true,readerSide:-1});
 
     // ==========================================
     // 2. COVERED OUTDOOR CONCRETE LANDING (z: -8 to -14)
@@ -129,14 +116,6 @@ export class SecondCampus1F {
     solid(art,this.gf.materials.lightWarm,[72,2.68,-8.30],[.34,.11,.045]);
 
     for(const x of [70.65,73.35])solid(art,this.gf.materials.wall,[x,1.6,-8],[.3,3.2,.4]);
-    const exitDoor=this.zoneGroup.getObjectByName('Doorway_72_-8');
-    for(const mesh of exitDoor.children)if(mesh.geometry?.parameters.depth===2.32)mesh.visible=false;
-    for(const x of [70.92,73.08]) {
-      solid(art,this.gf.materials.metal,[x,1.225,-7.42],[.055,2.45,1.16]);
-      solid(art,this.gf.materials.stainless,[x,1.05,-7.06],[.09,.04,.45]);
-      solid(art,this.gf.materials.stainless,[x,.21,-7.42],[.07,.3,1.06]);
-      for(const y of [.25,1.25,2.15])solid(art,this.gf.materials.stainless,[x,y,-7.97],[.075,.13,.06]);
-    }
     wallTrim(this.zoneGroup,this.gf.materials);
     return this;
   }

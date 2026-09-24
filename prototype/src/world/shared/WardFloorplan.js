@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { solid, asset, wallClock } from '../../art/ArtDetails.js';
+import { solid, asset } from '../../art/ArtDetails.js';
 import { disposeZoneArt } from '../../art/ArtResources.js';
 import { PlanWalls, ordinaryRoom, nursingStationV5, workstation } from './PlanArchitecture.js';
 import { AccessDoor } from './AccessDoor.js';
@@ -26,7 +26,7 @@ export class WardFloorplan {
     walls.line('x',0,o-7,o-4.6);
     walls.line('x',0,o+4.6,o+7);walls.cut('x',0,o+6.0,1.4);
 
-    const room=(n,r,side,d,kind='ward',label)=>ordinaryRoom(this,walls,{id:String(this.floor*100+n),label,rect:[r[0]+o,r[1],r[2]+o,r[3]],side,door:d+(side==='north'||side==='south'?o:0),kind});
+    const room=(n,r,side,d,kind='ward',label)=>ordinaryRoom(this,walls,{id:String(this.floor*100+n),label,rect:[r[0]+o,r[1],r[2]+o,r[3]],side,door:d+(side==='north'||side==='south'?o:0),kind,bedLimit:!second&&this.floor===4?32:Infinity});
     const roomIds=Array.from({length:9},(_,i)=>String(this.floor*100+i+1));
 
     // V5 perimeter geometry: 401/501 bottom-left -> 403/503 upper-left,
@@ -42,7 +42,14 @@ export class WardFloorplan {
     room(9,[7,-6,12,0],'west',-3);
 
     // Entrance vestibule storage room on the left, plant bay on the right.
-    ordinaryRoom(this,walls,{id:'STORE_ENTRY',label:'儲藏室',rect:[o-12,0,o-7,2],side:'east',door:1,kind:'storage',protectedArea:false});
+    ordinaryRoom(this,walls,{id:'STORE_ENTRY',label:'儲藏室',rect:[o-12,0,o-7,2],side:'east',door:1,kind:'storage',protectedArea:false,storageLock:second?'card':'knob'});
+    if(!second&&this.floor===4){
+      const annie=new THREE.Group();annie.name='Annie_4F_Storage';annie.position.set(-9.2,0,.7);this.zoneGroup.add(annie);
+      const coat=new THREE.Mesh(new THREE.BoxGeometry(.34,1.0,.52),new THREE.MeshStandardMaterial({color:0xd9e0d9,roughness:.92}));coat.position.y=.9;annie.add(coat);
+      const head=new THREE.Mesh(new THREE.SphereGeometry(.17,12,10),new THREE.MeshStandardMaterial({color:0xbabdb3,roughness:1}));head.position.set(0,1.53,0);annie.add(head);
+      const hair=new THREE.Mesh(new THREE.SphereGeometry(.19,12,8),new THREE.MeshStandardMaterial({color:0x242729,roughness:1}));hair.scale.set(1.05,.62,1);hair.position.set(0,1.62,-.025);annie.add(hair);
+      const light=new THREE.PointLight(0xc6d9d5,.12,1.3,2);light.position.set(0,1.2,.35);annie.add(light);
+    }
     const plant=asset(this.zoneGroup,'plant',[o+9.4,0,1],[1.15,1.15,1.15]);
     if(plant){plant.name=`${second?'Second':'First'}WardEntrancePlant`;plant.userData={...plant.userData,fixture:'WARD_ENTRY_PLANT'};}
     CollisionFactory.addBox(this.colliders,o+9.4,.45,1,.9,.9,.9);
@@ -74,7 +81,7 @@ export class WardFloorplan {
       stationWorkstationCount:4,
       stationClinicalProps:true,
       entrancePlant:true,
-      bedCapacity:36,
+      bedCapacity:!second&&this.floor===4?32:36,
       bedLabels:['A','B','C','D'],
       bed33Room:roomIds[8],
       bed33Id:roomIds[8]+'A',
@@ -106,7 +113,7 @@ export class WardFloorplan {
     this.gf.buildCeiling(this.zoneGroup,-11,3.2,6,6,8);
     this.dutyDoor=new KeyedKnobDoor(this,{id:'duty_room',x:-8,z:6,yaw:Math.PI/2,width:1.4,title:'醫師值班室',openDirection:1});
     this.dutyDoor.setClosed(true);this.dutyDoorClosed=true;
-    SignAnchor.buildWallPlaque({scene:this.zoneGroup,x:-7.885,y:1.78,z:4.95,rotationY:Math.PI/2,width:1.18,height:.34,code:'4F',title:'醫師值班室',subtitle:'ON-CALL ROOM',header:''});
+    SignAnchor.buildWallPlaque({scene:this.zoneGroup,x:-7.885,y:2.62,z:6,rotationY:Math.PI/2,width:1.18,height:.34,code:'4F',title:'醫師值班室',subtitle:'ON-CALL ROOM',header:''});
     asset(this.zoneGroup,'hospitalBed',[-12.5,0,7.8],[1.2,.95,.97]);CollisionFactory.addBox(this.colliders,-12.5,.45,7.8,1.4,.9,2.2);
     solid(this.zoneGroup,this.gf.materials.doorWood,[-11.25,.28,8.1],[.5,.56,.5]);
     solid(this.zoneGroup,this.gf.materials.lightWarm,[-11.25,.76,8.1],[.19,.24,.19]);
@@ -172,12 +179,12 @@ export class WardFloorplan {
       visualRefinement:'V5_2_DUTY_BATHROOM_REFINEMENT'
     };
     w.build();this.gf.buildCeilingLight(this.zoneGroup,-11,3.15,6,.7,7,0xffebce);
-    wallClock(this.zoneGroup,this.gf.materials,-10,2.1,2.15);
     this.dutyRoom={door:[-8,1.7,6],inside:[-9.5,1.7,6],outside:[-6.5,1.7,6],bounds:[-14,2,-8,10]};
     const room403=this.roomAreas.find(r=>r.id==='403');
     const room408=this.roomAreas.find(r=>r.id==='408');
     const p403=room403?.corridor||[-6.9,1.4,-13];
-    const p408=room408?.corridor||[5.9,1.4,-9];
+    const bed408c=this.bedAreas.find(b=>b.id==='408C');
+    const p408=bed408c?.position||room408?.corridor||[5.9,1.4,-9];
     this.interactables.push(
       {type:'p1_action',action:'NURSE_REPORT',label:'向護理站報到',position:new THREE.Vector3(0,1.4,-4.3),radius:1.8},
       {type:'p1_action',action:'DUTY_ROOM_PREP',label:'整理值班室',position:new THREE.Vector3(-10.0,1.2,6.0),radius:1.8},
@@ -239,10 +246,12 @@ export class WardFloorplan {
 
     // 409 sealed-room presentation. The existing knob door remains physically closed;
     // warning tape is render-only and the interaction is intercepted by main.js.
-    for(const y of [1.02,1.42]){
+    for(const y of [.92,1.24,1.56]){
       const tape=solid(this.zoneGroup,m.wallBumper,[6.88,y,-3.0],[.025,.09,1.45]);
       tape.rotation.x=(y>1.2?.16:-.13);tape.name='Bed33_409_WarningTape';
     }
+    SignAnchor.buildWallPlaque({scene:this.zoneGroup,x:6.75,y:2.22,z:-3.0,rotationY:Math.PI/2,width:1.38,height:.38,code:'',title:'環境消毒與管線重置',subtitle:'暫停使用',header:''});
+    const coldLight=new THREE.PointLight(0x9ac9c4,.32,2.2,2);coldLight.position.set(6.22,1.95,-3.0);coldLight.name='Bed33_409_ColdPeepholeLight';this.zoneGroup.add(coldLight);
     const sealedHit=new THREE.Mesh(new THREE.BoxGeometry(.55,2.1,1.75),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
     sealedHit.position.set(6.72,1.18,-3.0);
     sealedHit.userData={
@@ -285,23 +294,28 @@ export class WardFloorplan {
     const cardCanvas=document.createElement('canvas');cardCanvas.width=620;cardCanvas.height=360;
     const ctx=cardCanvas.getContext('2d');ctx.fillStyle='#f2eee3';ctx.fillRect(0,0,620,360);
     ctx.fillStyle='#40584c';ctx.fillRect(0,0,620,60);ctx.fillStyle='#fff';ctx.font='bold 28px sans-serif';ctx.fillText('第二院區｜臨時留置床',24,40);
-    ctx.fillStyle='#2f3934';ctx.font='24px sans-serif';ctx.fillText('主訴：胸痛',34,118);ctx.fillText('姓名：查無正式住院資料',34,170);
-    ctx.fillStyle='#8b2f29';ctx.font='bold 24px monospace';ctx.fillText('SOURCE: 00:33 / LEGACY',34,230);
-    ctx.font='18px sans-serif';ctx.fillStyle='#6b6e69';ctx.fillText('護理交班：李醫師已評估？',34,286);
+    ctx.fillStyle='#2f3934';ctx.font='24px sans-serif';ctx.fillText('主訴：胸悶、心悸',34,118);ctx.fillText('姓名：陳怡君',34,170);
+    ctx.font='20px sans-serif';ctx.fillText('評估：焦慮伴隨換氣過度',34,230);
+    ctx.font='18px sans-serif';ctx.fillStyle='#6b6e69';ctx.fillText('生命徵象穩定，心電圖無急性變化',34,286);
     const tex=new THREE.CanvasTexture(cardCanvas);tex.colorSpace=THREE.SRGBColorSpace;
     const card=new THREE.Mesh(new THREE.PlaneGeometry(1.05,.62),new THREE.MeshBasicMaterial({map:tex}));
     card.position.set(o+1.25,1.45,bz+.35);card.rotation.y=-Math.PI/2;this.zoneGroup.add(card);
 
     const patientHit=new THREE.Mesh(new THREE.BoxGeometry(2.4,1.6,1.5),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
     patientHit.position.set(bx,1.0,bz);
-    patientHit.userData={interactable:true,id:'SECOND_CHEST_PATIENT',type:'second_chest_patient',label:'評估多出來的胸痛病人'};
+    patientHit.userData={interactable:true,id:'SECOND_CHEST_PATIENT',type:'second_chest_patient',label:'評估胸痛病人'};
     this.zoneGroup.add(patientHit);this.interactables.push(patientHit);
 
     // The transfer form sits on the second-campus nursing-station workstation, not in mid-air.
     const form=solid(this.zoneGroup,m.lightWarm,[o-1.28,.829,-2.18],[.42,.018,.30]);
     form.name='SecondCampus_ChestTransferForm';
-    form.userData={interactable:true,id:'SECOND_CHEST_TRANSFER',type:'second_chest_transfer',label:'查看胸痛病人轉院單'};
+    form.userData={interactable:true,id:'SECOND_CHEST_TRANSFER',type:'second_chest_transfer',label:'查看已填妥的胸痛病人轉院單'};
     this.interactables.push(form);
+
+    const roster=solid(this.zoneGroup,m.lightWarm,[bx+.24,.79,bz+.28],[.25,.012,.12]);
+    roster.name='SecondCampus_TrueNameRosterFragment';
+    roster.userData={interactable:true,id:'SECOND_CHEST_NAME_CLUE',type:'second_chest_roster_clue',label:'檢查病床旁的舊名冊殘頁',documentTitle:'第一院區舊名冊殘頁',pages:['第一線：張 守 [墨漬]\\n\\n背面以鉛筆寫著：「守住 409 的門。」']};
+    this.interactables.push(roster);
 
     this.secondCampusLegend={id:'LEGEND_CHEST_PAIN',patient:'SECOND_CHEST_PATIENT',form:'SECOND_CHEST_TRANSFER'};
   }

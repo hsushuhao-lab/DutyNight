@@ -42,7 +42,7 @@ const probes={
 for(const portal of ROUTE_PORTALS){
  router.loadZone(portal.from);controller.teleport(...probes[portal.id][0]);
  if(portal.gated){
-  const door=Object.values(router.activeZoneInstance.accessDoors).find(d=>d.portal===portal.spawn);
+  const door=Object.values(router.activeZoneInstance.accessDoors||{}).find(d=>d.portal===portal.spawn);
   assert(door?.closed,`${portal.id}: missing closed access door`);
   router.update();assert.equal(router.activeZoneId,portal.from,`${portal.id}: proximity bypassed card access`);
   // Unit routing only: browser QA separately presses E on this door's real reader.

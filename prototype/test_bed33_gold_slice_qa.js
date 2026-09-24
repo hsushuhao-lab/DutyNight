@@ -12,6 +12,13 @@ global.document={
 const router=new WorldRouter(new THREE.Scene(),new THREE.PerspectiveCamera(),null);
 const zone=router.loadZone('first_campus_4f');
 
+assert.equal(zone.layoutPlan?.bedCapacity,32,'official census must be 32 beds');
+assert.equal(zone.bedAreas.filter(b=>!b.anomalous).length,32,'only 32 ordinary beds may be generated');
+assert.deepEqual(zone.bedAreas.filter(b=>b.roomId==='408').map(b=>[b.id,b.wardBedNumber]),[
+  ['408A',29],['408B',30],['408C',31],['408D',32]
+]);
+assert.equal(zone.bedAreas.filter(b=>b.roomId==='409'&&!b.anomalous).length,0,'sealed 409 must be outside the ordinary census');
+
 assert.equal(zone.layoutPlan?.bed33Id,'409A');
 const bed33=zone.bedAreas.find(b=>b.id==='409A');
 assert(bed33,'409A bed missing');
@@ -27,5 +34,8 @@ assert(zone.keyedDoors['room_409']?.closed,'409 patient-room door must remain cl
 assert(zone.zoneGroup.getObjectByName('Bed33_WardBoard'),'Bed33 ward board visual missing');
 assert(zone.zoneGroup.getObjectByName('Bed33_AssignmentForm'),'Bed33 assignment form visual missing');
 assert(zone.zoneGroup.getObjectByName('Bed33_409_WarningTape'),'409 warning tape missing');
+assert.equal(zone.zoneGroup.children.filter(o=>o.name==='Bed33_409_WarningTape').length,3,'409 needs three tape bands');
+assert(zone.zoneGroup.getObjectByName('Bed33_409_ColdPeepholeLight'),'409 needs restrained cold peephole light');
+assert(!zone.zoneGroup.getObjectByName('ClockFace'),'4F duty room must not show the wall clock');
 
 console.log('BED33 GOLD SLICE GEOMETRY QA PASS');

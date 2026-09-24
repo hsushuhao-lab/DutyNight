@@ -1,4 +1,7 @@
 # 《夜班迴廊：與避無可避的傳說》
+
+> **目前遊戲規格：M1–M9。** 本儲存庫的現行故事主線、視覺方向與 QA 權威文件位於 [`docs/20260925_m1_m9_rework/`](docs/20260925_m1_m9_rework/MASTER_REWORK_SPEC.md)。下方標示為 Act 1 / v0.1 的段落是歷史背景，不代表目前遊戲範圍；不得依舊規格刪除 409A、6F、B2 或 M1–M9 後續劇情。保留其「先常態、後驚悚」原則。
+
 ## —— 第一幕原型：今晚輪到你（Act 1 Prototype v0.1.1）——
 
 > 🌐 **線上 3D 體驗站**：https://hsushuhao-lab.github.io/DutyNight/  

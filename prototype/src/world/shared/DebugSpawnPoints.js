@@ -61,6 +61,14 @@ export const DEBUG_SPAWN_POINTS = {
     pitch: 0.0,
     milestone: 'M3'
   },
+  'm2_4f_409': {
+    zoneId: 'first_campus_4f',
+    name: '4F 409A 封閉病房門前',
+    pos: [5.8, 1.7, -3.0],
+    yaw: -Math.PI / 2,
+    pitch: 0.0,
+    milestone: 'M2'
+  },
 
   // M4: First Campus 2F ER
   'm4_2f_er_arrival': {

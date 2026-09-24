@@ -247,6 +247,15 @@ export class SoundManager {
     }catch(e){}
   }
 
+  playCprCompression(){
+    if(!this.ctx||this.isMuted)return;
+    const now=this.ctx.currentTime,osc=this.ctx.createOscillator(),gain=this.ctx.createGain(),filter=this.ctx.createBiquadFilter();
+    osc.type='sine';osc.frequency.setValueAtTime(74,now);osc.frequency.exponentialRampToValueAtTime(38,now+.16);
+    filter.type='lowpass';filter.frequency.value=150;
+    gain.gain.setValueAtTime(.11,now);gain.gain.exponentialRampToValueAtTime(.001,now+.19);
+    osc.connect(filter);filter.connect(gain);gain.connect(this.ctx.destination);osc.start(now);osc.stop(now+.20);
+  }
+
   playDoorLockClack() {
     if(!this.ctx||this.isMuted)return;
     try{

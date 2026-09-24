@@ -24,7 +24,7 @@ async function mark(label,extra={}){
 async function shot(name){
   const file=name+'.png';
   try{
-    await page.screenshot({path:out+'/'+file,fullPage:false,timeout:2000});
+    await page.screenshot({path:out+'/'+file,fullPage:false,timeout:5000});
     report.screenshots.push(file);
   }catch(e){
     report.screenshotWarnings.push({name,error:e.message});
@@ -67,6 +67,8 @@ try{
   await publicPage.goto(base,{waitUntil:'load',timeout:180000});
   await publicPage.waitForFunction(()=>window.worldRouter?.activeZoneInstance,null,{timeout:180000});
   assert.equal(await publicPage.evaluate(()=>typeof window.__storyQA),'undefined');
+  await publicPage.screenshot({path:out+'/m1-3f-normal-duty.png',fullPage:false,timeout:2000});
+  report.screenshots.push('m1-3f-normal-duty.png');
   await publicPage.close();
 
   await page.goto(url,{waitUntil:'load',timeout:180000});
@@ -75,6 +77,9 @@ try{
 
   // M2: deliberately fail first, verify identity override + soft reset + persistent cognition.
   await setM2Checkpoint();
+  await shot('m2-4f-nursing-station');
+  await load('first_campus_4f','m2_4f_409');await shot('m2-409-sealed');
+  await load('first_campus_4f','m3_4f_nursing_station');
   await interact({action:'INSOMNIA_403'});
   await interact({id:'BED33_BOARD'});await closeArchive();
   await interact({id:'BED33_HIS_409'});await closeArchive();
@@ -126,6 +131,7 @@ try{
   // 21:17 must actively push the player back to the 4F duty room. Merely entering
   // the room must trigger the sequence: no hidden E target or END_SHIFT fallback.
   await enter('first_campus_4f','m2_4f_duty_room');
+  await shot('m2-duty-room');
   // Software WebGL can block a frame longer than the 2.2 s 23:55 transition.
   // Do not race the transient frame; prove the durable outcome happened with no E interaction.
   await page.waitForFunction(()=>window.__storyQA.gameState.getFlag('POST_2117_DUTY_CALL_DONE')===true,null,{timeout:30000});
@@ -141,6 +147,7 @@ try{
 
   // Only after the duty-room call does re-entry to 2F materialize the 00:33 registration.
   await enter('first_campus_2f');
+  await load('first_campus_2f','m4_2f_er_triage');await shot('m3-er-triage-station');
   s=await snap();assert.equal(s.flags.GHOST_REGISTRATION_AVAILABLE,true);assert.equal(s.time,'00:33');
   assert.equal(await q(()=>window.__storyQA.gameState.getDisplayTime()),'翌日 00:33');
   await interact({id:'ER_GHOST_REGISTRATION'});
@@ -157,9 +164,15 @@ try{
   s=await snap();
   assert.equal(s.flags.M3_316_DECODED,true);
   assert.equal(s.flags.LEGEND_ER0033_RESOLVED,true);
-  assert.equal(s.flags.SECOND_CAMPUS_ACCESS,true);
+  assert.equal(s.flags.SECOND_CAMPUS_PHONE_PENDING,true);
+  assert.equal(s.flags.SECOND_CAMPUS_ACCESS,false);
   assert.equal(s.memory.proofs.time,true);
   assert.equal(s.memory.trueNameFragments.frag_surname,'張');
+  assert.equal(s.time,'00:33');
+  await interact({id:'316_PHONE'});
+  assert.match(await page.locator('#subtitle-text').innerText(),/怎麼知道我在 316 辦公室/);
+  await page.waitForFunction(()=>window.__storyQA.gameState.getFlag('SECOND_CAMPUS_ACCESS')===true,null,{timeout:10000});
+  s=await snap();assert.equal(s.flags.SECOND_CAMPUS_ACCESS,true);
   assert.equal(s.time,'01:15');
   assert.equal(await q(()=>window.__storyQA.gameState.getDisplayTime()),'翌日 01:15');
   assert.match(await taskText(),/第二院區 5F[\s\S]*胸痛/,'M3 resolution must leave a concrete second-campus objective');
@@ -167,24 +180,31 @@ try{
 
   // M4: second-campus chest-pain duplicate patient.
   await load('second_campus_5f');
+  await shot('m4-second-campus-ward');
   await interact({id:'SECOND_CHEST_PATIENT'});
   assert.match(await taskText(),/轉院單/,'seeing the M4 patient must advance the objective to the transfer form');
   await interact({id:'SECOND_CHEST_TRANSFER'});
   await page.waitForSelector('#story-choice-modal.active');await shot('m4-chest-transfer');await secondary();
-  s=await snap();assert.equal(s.flags.M4_CHEST_RESOLVED,true);assert.equal(s.flags.OUTDOOR_ROUTE_ACCESS,true);assert.equal(s.flags.CHEST_RECORD_MATCH,true);assert.equal(s.memory.trueNameFragments.frag_givenName_1,'守');assert.equal(s.time,'01:45');
+  s=await snap();assert.equal(s.flags.M4_CHEST_RESOLVED,true);assert.equal(s.flags.OUTDOOR_ROUTE_ACCESS,true);assert.equal(s.flags.CHEST_RECORD_MATCH,true);assert.equal(s.memory.trueNameFragments.frag_givenName_1,null);assert.equal(s.time,'01:45');
+  await interact({id:'SECOND_CHEST_NAME_CLUE'});await closeArchive();
+  s=await snap();assert.equal(s.flags.M4_NAME_CLUE_FOUND,true);assert.equal(s.memory.trueNameFragments.frag_givenName_1,'守');
   assert.match(await taskText(),/返回第一院區/,'M4 resolution must push the player toward the next route');
   await mark('M4 chest-pain duplicate resolved');
 
   // M5A: skybridge rule.
   await load('skybridge');
+  await shot('m5-annie-bridge');
   await interact({id:'BRIDGE_LOOP_EVENT'});
   await page.waitForSelector('#story-choice-modal.active');await shot('m5-bridge-double');await secondary();
-  s=await snap();assert.equal(s.flags.M5_BRIDGE_RESOLVED,true);assert.equal(s.flags.FLOOR6_AVAILABLE,true);assert.equal(s.memory.proofs.identity,true);assert.equal(s.memory.trueNameFragments.frag_givenName_2,'恆');assert.equal(s.time,'02:00');
-  assert.match(await taskText(),/6F/,'M5 resolution must reveal the 6F objective');
+  s=await snap();assert.equal(s.flags.M5_BRIDGE_RESOLVED,true);assert.equal(s.flags.M5_ROUTE_RESOLVED,false);assert.equal(s.flags.FLOOR6_AVAILABLE,false);assert.equal(s.memory.proofs.identity,false);assert.equal(s.memory.trueNameFragments.frag_givenName_2,null);assert.equal(s.time,'02:00');
+  await interact({id:'ANNIE_TRUE_NAME_CLUE'});
+  s=await snap();assert.equal(s.flags.M5_ROUTE_RESOLVED,true);assert.equal(s.flags.FLOOR6_AVAILABLE,true);assert.equal(s.memory.proofs.identity,true);assert.equal(s.memory.trueNameFragments.frag_givenName_2,'恆');
+  assert.match(await taskText(),/搭乘一般電梯返回第一院區/,'M5 resolution must reveal the return-to-ward elevator objective');
   await mark('M5 bridge rule resolved');
 
   // M5B: alternate pond route is independently functional.
   await load('ecology_pond');
+  await shot('m5-annie-pond');
   await interact({id:'POND_REFLECTION_EVENT'});
   await page.waitForSelector('#story-choice-modal.active');await shot('m5-pond-reflection');await secondary();
   s=await snap();assert.equal(s.flags.M5_POND_RESOLVED,true);
@@ -203,6 +223,7 @@ try{
   assert.equal((await snap()).memory.proofs.identity,true);
   assert.equal((await snap()).memory.proofs.time,true);
   await load('first_campus_1f');
+  await shot('m7-first-campus-guard-post');
   await interact({id:'1F_HIDDEN_SERVICE_DOOR'});
   await page.waitForSelector('#story-choice-modal.active');await shot('m7-0217-choice');await secondary();
   await page.waitForFunction(()=>window.__storyQA.worldRouter.activeZoneId==='b2_archive');
@@ -222,6 +243,7 @@ try{
   await interact({id:'E_HANDOFF'});
   await page.waitForSelector('#final-handoff-modal.active');s=await snap();assert.equal(s.time,'04:05');await shot('m9-final-handoff');
   await page.locator('#final-true-name').fill('張守恆');
+  await page.locator('#final-employee-id').fill('MED-870409');
   await domClick('#btn-submit-final-handoff');
   await page.waitForSelector('#final-success-modal.active');
   await shot('m9-success');

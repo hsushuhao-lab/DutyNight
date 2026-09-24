@@ -11,6 +11,10 @@ const gf=new GeometryFactory();
 // 1F night-access policy: public glass entrance and pharmacy/drug-storage glass bay are physically closed.
 {
   const scene=new THREE.Scene(),zone=new FirstCampus1F(scene,gf).build();
+  assert(zone.guardPost,'visible old 1F guard post missing');
+  assert(zone.zoneGroup.getObjectByName('OldGuardPost_CCTVMonitor'),'guard post CCTV monitor missing');
+  assert(zone.zoneGroup.getObjectByName('OldGuardPost_NightLogbook'),'guard post night logbook missing');
+  assert(zone.hiddenServiceDoor&&zone.guardPost.serviceDoor===zone.hiddenServiceDoor.id,'hidden service route must sit behind the old guard post');
   zone.setEntranceClosed(true);
   assert.equal(CollisionFactory.testPoint(zone.colliders,1,1.7,-8,.2).collided,true,'1F main glass entrance must be closed at night');
   assert.equal(CollisionFactory.testPoint(zone.colliders,17.88,1.7,-4,.15).collided,true,'1F pharmacy/drug-storage glass frontage must block entry');

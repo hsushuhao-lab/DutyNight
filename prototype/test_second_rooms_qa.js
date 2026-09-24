@@ -11,4 +11,8 @@ assert.equal(z.bedAreas.length,36);assert.equal(z.bedAreas.find(b=>b.wardBedNumb
 assert(z.roomAreas.some(r=>r.id==='SECOND_DUTY'&&r.label==='值班室'));
 for(const room of z.roomAreas){travel(room.corridor,room.point);travel(room.point,room.corridor);}
 assert(!r.floorDestinations().some(f=>f.floorNum===4));
+const firstFloor=r.loadZone('second_campus_1f');
+assert(firstFloor.accessDoors?.SECOND_1F_HILLSIDE?.closed,'second-campus hillside entrance must be closed by default');
+assert.equal(firstFloor.accessDoors.SECOND_1F_HILLSIDE.portal,'hill_from_second');
+assert(firstFloor.interactables.some(i=>i.userData?.doorId==='SECOND_1F_HILLSIDE'&&i.userData?.type==='access_door'),'hillside sensor must be interactable');
 console.log('SECOND ROOMS V5.2 PASS: 501–509 x4 beds, bed 33 in 509, entrance storage/plant, duty room, no public 4F button');

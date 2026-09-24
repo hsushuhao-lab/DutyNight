@@ -236,6 +236,17 @@ export class FirstCampus1F {
     this.zoneGroup.add(hiddenHit);this.interactables.push(hiddenHit);
     this.hiddenServiceDoor={id:'1F_HIDDEN_SERVICE_DOOR',position:[-13.78,1.18,4.55],requires:'FIRST_FLOOR_GUARD_KEY',revealedBy:'HOOK_1F_HIDDEN_DOOR'};
 
+    const guardPost=new THREE.Group();guardPost.name='FirstCampus1F_OldGuardPost';guardPost.position.set(-10.7,0,3.2);this.zoneGroup.add(guardPost);
+    solid(guardPost,this.gf.materials.doorWood,[0,.53,0],[2.1,1.06,.78]);
+    solid(guardPost,this.gf.materials.counterTop,[0,1.10,0],[2.18,.08,.84]);
+    const cctv=monitor(guardPost,this.gf.materials,-.48,1.17,-.18,0);cctv.name='OldGuardPost_CCTVMonitor';
+    solid(guardPost,this.gf.materials.metal,[.50,1.15,-.1],[.30,.12,.22]);
+    solid(guardPost,this.gf.materials.lightWarm,[.06,1.155,.08],[.36,.018,.24]).name='OldGuardPost_NightLogbook';
+    asset(guardPost,'storageCabinet',[-1.25,0,-.16],[.45,.9,.55]);
+    CollisionFactory.addBox(this.colliders,-10.7,.55,3.2,2.2,1.1,.9);
+    SignAnchor.buildWallPlaque({scene:this.zoneGroup,x:-12.9,y:2.05,z:3.2,rotationY:Math.PI/2,width:1.2,height:.34,code:'SECURITY',title:'舊警衛台',subtitle:'NIGHT SECURITY POST',header:''});
+    this.guardPost={id:'OLD_GUARD_POST',position:[-10.7,0,3.2],cctv:'OldGuardPost_CCTVMonitor',logbook:'OldGuardPost_NightLogbook',serviceDoor:'1F_HIDDEN_SERVICE_DOOR'};
+
     // ==========================================
     // 2. CENTRAL INFORMATION & REGISTRATION RECEPTION (x: -1 to 5, z: -2 to 1)
     // ==========================================

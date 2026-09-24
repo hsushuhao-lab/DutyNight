@@ -185,8 +185,9 @@ export class UIManager {
     });
     document.getElementById('btn-close-final-handoff')?.addEventListener('click',()=>this.closeFinalHandoff());
     document.getElementById('btn-submit-final-handoff')?.addEventListener('click',()=>{
-      const value=document.getElementById('final-true-name')?.value.trim()||'';
-      this.finalHandoffHandler?.(value);
+      const name=document.getElementById('final-true-name')?.value.trim()||'';
+      const employeeId=document.getElementById('final-employee-id')?.value.trim()||'';
+      this.finalHandoffHandler?.({name,employeeId});
     });
 
     // Debug toggle with Backquote (~)
@@ -315,6 +316,13 @@ export class UIManager {
     this.gameState.setFlag('ARCHIVE_OBJECTIVE',true);
     this.gameState.setFlag('HIS_ANOMALY_SEEN',true);
     this.gameState.setFlag('ANNE_STAGE',1);
+    const firstMessage=persistentMemory.claimOnce('unregisteredMessage3F');
+    const handoffTitle=this.anomalyModal?.querySelector('h2');
+    if(handoffTitle&&(!firstMessage||!persistentMemory.claimHandoffAcknowledgement()))handoffTitle.textContent='未註冊訊息';
+    if(!firstMessage){
+      const paragraphs=this.anomalyModal?.querySelectorAll('.anomaly-window p');
+      if(paragraphs?.length)paragraphs[0].textContent='你記得先前也看過一則訊息，但內容已不再顯示。';
+    }
     document.body.classList.add('his-flicker');
     setTimeout(()=>document.body.classList.remove('his-flicker'),460);
     const win=this.anomalyModal?.querySelector('.anomaly-window');
@@ -512,6 +520,7 @@ export class UIManager {
     document.exitPointerLock();
     this.finalHandoffHandler=handler;
     const input=document.getElementById('final-true-name');if(input)input.value='';
+    const employeeId=document.getElementById('final-employee-id');if(employeeId)employeeId.value='';
     document.getElementById('final-handoff-status').textContent='IDENTITY VERIFICATION REQUIRED';
     this.finalHandoffModal?.classList.add('active');
   }
@@ -838,11 +847,11 @@ export class UIManager {
         ]);
       }else if(this.gameState.getFlag('M4_CHEST_RESOLVED')&&!this.gameState.getFlag('M5_ROUTE_RESOLVED')){
         this.renderTaskBoard('翌日 01:45｜離開第二院區',[
-          {id:'task-m5-route',text:'返回第一院區；可走天橋，或從第二院區 1F 山側步道經生態池繞回',state:'ready'}
+          {id:'task-m5-route',text:this.gameState.getFlag('M5_ROUTE_CHOICE_RESOLVED')?'找回安妮留下的舊聽診器，讀取銘牌':'返回第一院區；可走天橋，或從第二院區 1F 山側步道經生態池繞回',state:'ready'}
         ]);
       }else if(this.gameState.getFlag('M5_ROUTE_RESOLVED')&&!this.gameState.getFlag('M6_FLOOR6_RESOLVED')){
-        this.renderTaskBoard('翌日 02:00｜樓層異常',[
-          {id:'task-m6-floor6',text:'回到院區電梯，確認突然出現在樓層選單裡的「6F」',state:'ready'}
+        this.renderTaskBoard('翌日 02:00｜返回第一院區',[
+          {id:'task-m6-elevator',text:'搭乘一般電梯返回第一院區',state:'ready'}
         ]);
       }else if(this.gameState.getFlag('M6_FLOOR6_RESOLVED')&&!this.gameState.getFlag('M7_B2_OPEN')){
         this.renderTaskBoard('翌日 02:17 前｜B-Panel',[

@@ -2,7 +2,8 @@ import * as THREE from 'three';
 
 export const VisualProfile = Object.freeze({
   ACT1_DUSK_NORMAL: { fill: 0.42, sky: 0xe6e5de, ground: 0xd0c7b6, background: 0xabb4b4 },
-  NIGHT_NORMAL: { fill: 0.38, sky: 0xa6b9be, ground: 0x8a9283, background: 0x1b252b }
+  NIGHT_NORMAL: { fill: 0.34, sky: 0x718187, ground: 0x3c4540, background: 0x10171b },
+  NIGHT_HORROR: { fill: 0.22, sky: 0x3f555b, ground: 0x202a26, background: 0x080d10 }
 });
 
 const zones = {
@@ -21,11 +22,14 @@ const zones = {
   b2_archive: { lamps: [[0,-1],[0,-6],[0,-11]], intensity: 1.15, width: 2.2, color: 0x6b5146, night: true }
 };
 
-export function applyZoneLighting(group, scene, zoneId) {
+export function applyZoneLighting(group, scene, zoneId, storyTime='17:00') {
   group.traverse(object => { if (object.isLight) object.shadow?.dispose(); });
   group.clear();
   const zone = zones[zoneId] || { lamps: [], intensity: 0, night: true };
-  const profile = zone.night ? VisualProfile.NIGHT_NORMAL : VisualProfile.ACT1_DUSK_NORMAL;
+  const timeOrder={'21:17':1,'23:55':1,'00:30':1,'00:33':2,'01:15':2,'01:45':2,'02:00':3,'02:17':3,'03:30':3,'04:05':3};
+  const stage=timeOrder[storyTime]??0;
+  const profile = stage>=3?VisualProfile.NIGHT_HORROR:stage>=1||zone.night?VisualProfile.NIGHT_NORMAL:VisualProfile.ACT1_DUSK_NORMAL;
+  const practicalScale=stage===0?1:stage===1?.78:stage===2?.62:.48;
   scene.background = new THREE.Color(profile.background);
   scene.fog = null;
   group.userData.profile = zone.night ? 'NIGHT_NORMAL' : 'ACT1_DUSK_NORMAL';
@@ -55,9 +59,14 @@ export function applyZoneLighting(group, scene, zoneId) {
     group.add(readingLight);
   }
   for (const [x, z] of zone.lamps) {
-    const panel = new THREE.RectAreaLight(zone.color || 0xfff0d9, zone.intensity, zone.width || 3.6, 1.2);
+    const panel = new THREE.RectAreaLight(zone.color || 0xfff0d9, zone.intensity*practicalScale, zone.width || 3.6, 1.2);
     panel.position.set(x, zone.y || 3.05, z);
     panel.lookAt(x, 0, z);
     group.add(panel);
+  }
+  if(stage>=2&&['first_campus_3f','first_campus_4f','first_campus_2f','first_campus_1f'].includes(zoneId)){
+    const emergency=new THREE.PointLight(0x63b982,stage===2?.48:.72,5.5,2);
+    emergency.position.set(zoneId==='first_campus_4f'?6:0,2.45,zoneId==='first_campus_4f'?-3:0);
+    emergency.name='LocalizedGreenEmergencySpill';group.add(emergency);
   }
 }

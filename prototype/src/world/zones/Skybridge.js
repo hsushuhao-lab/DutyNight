@@ -252,6 +252,13 @@ export class Skybridge {
     bridgeEvent.userData={interactable:gameState.getFlag('M4_CHEST_RESOLVED'),id:'BRIDGE_LOOP_EVENT',type:'bridge_loop_event',label:'停下來確認遠處白袍'};
     this.zoneGroup.add(bridgeEvent);this.interactables.push(bridgeEvent);this.bridgeDoppelganger=doubleGroup;
 
+    const bridgeRelic=new THREE.Group();bridgeRelic.name='Annie_EngravedStethoscope_Bridge';bridgeRelic.position.set(30,.12,.35);this.zoneGroup.add(bridgeRelic);
+    const stethoscope=new THREE.Mesh(new THREE.TorusGeometry(.16,.025,8,24),this.gf.materials.stainless);stethoscope.rotation.y=Math.PI/2;stethoscope.position.y=.34;bridgeRelic.add(stethoscope);
+    const engraving=solid(bridgeRelic,this.gf.materials.lightWarm,[0,.20,.03],[.32,.025,.10]);engraving.name='Annie_Bridge_Engraving';
+    SignAnchor.buildWallPlaque({scene:bridgeRelic,x:0,y:.48,z:-.04,width:.58,height:.22,rotationY:0,code:'1997',title:'祝 守恆 醫師',subtitle:'執業誌慶',header:''});
+    const relicHit=new THREE.Mesh(new THREE.BoxGeometry(.8,.65,.7),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));relicHit.position.y=.32;
+    relicHit.userData={interactable:true,id:'ANNIE_TRUE_NAME_CLUE',type:'true_name_clue_2',label:'查看安妮留下的舊聽診器'};bridgeRelic.add(relicHit);this.interactables.push(relicHit);
+
     new AccessDoor(this,{id:'BRIDGE_FIRST',x:0,z:0,yaw:Math.PI/2,width:2.4,title:'第一院區感應門',portal:'first_bridge_return'});
     new AccessDoor(this,{id:'BRIDGE_SECOND',x:60,z:0,yaw:Math.PI/2,width:2.4,title:'第二院區感應門',portal:'second_bridge_return'});
     return this;

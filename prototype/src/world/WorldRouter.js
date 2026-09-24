@@ -35,6 +35,12 @@ export class WorldRouter {
     this.doorStates = {};
     this.activeZoneId = null;
     this.activeZoneInstance = null;
+    this.lightingZoneId=null;
+    gameState.addListener((event)=>{
+      if((event==='phase_changed'||event==='time_changed')&&this.lightingZoneId){
+        applyZoneLighting(this.lightingGroup,this.scene,this.lightingZoneId,gameState.gameTime);
+      }
+    });
 
     this.zones = {
       'first_campus_3f': FirstCampus3F,
@@ -109,7 +115,8 @@ export class WorldRouter {
 
     console.info(`[WorldRouter] Loading Zone: ${zoneId}`);
     const lightingZone = (zoneId === 'second_campus_4f_story' || zoneId === 'second_campus_5f') ? 'second_campus_std' : zoneId;
-    applyZoneLighting(this.lightingGroup, this.scene, lightingZone);
+    this.lightingZoneId=lightingZone;
+    applyZoneLighting(this.lightingGroup, this.scene, lightingZone,gameState.gameTime);
     const ZoneClass = this.zones[zoneId];
     const floorMatch = zoneId.match(/_([0-9])f(?:_|$)/);
     this.activeZoneInstance = new ZoneClass(this.scene, this.gf, { floor: Number(floorMatch?.[1] || 5) });
@@ -204,8 +211,8 @@ export class WorldRouter {
     }
   }
 
-  update() {
-    this.activeZoneInstance?.update?.(this.camera);
+  update(delta) {
+    this.activeZoneInstance?.update?.(this.camera,delta);
     if (!this.controller?.enabled) return;
     const portal = ROUTE_PORTALS.find(p => {
       const allowed=!p.gated||(p.requiresFlag&&gameState.getFlag(p.requiresFlag));
@@ -235,9 +242,6 @@ export class WorldRouter {
       }
       return { floorNum: f, zoneId, spawn, label };
     });
-    if(gameState.getFlag('FLOOR6_AVAILABLE')){
-      mapped.push({floorNum:6,zoneId:'phantom_6f',spawn:'phantom_6f_lift',label:'6F'});
-    }
     return mapped;
   }
 

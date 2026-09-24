@@ -22,7 +22,8 @@ for(const [zoneId,prefix] of [['first_campus_4f','40'],['second_campus_5f','50']
   assert.equal(zone.layoutPlan.stationWardDoor,true);
   assert.equal(zone.layoutPlan.stationWardDoorFaces,prefix+'6');
   assert.equal(zone.layoutPlan.entrancePlant,true);
-  assert.equal(zone.layoutPlan.bedCapacity,36);
+  const firstCampus4F=zoneId==='first_campus_4f';
+  assert.equal(zone.layoutPlan.bedCapacity,firstCampus4F?32:36);
   assert.deepEqual(zone.layoutPlan.bedLabels,['A','B','C','D']);
   assert.deepEqual(zone.layoutPlan.storage,['STORE_ENTRY']);
   assert.equal(zone.layoutPlan.allControlledDoorsDefaultClosed,true);
@@ -64,10 +65,11 @@ for(const [zoneId,prefix] of [['first_campus_4f','40'],['second_campus_5f','50']
     assert(room.accessDoorId,'Ward room missing knob door');
     assert.equal(room.doorType,'knob');
     assert(zone.keyedDoors[room.accessDoorId]?.closed,room.id+' knob door must default closed');
-    const beds=zone.bedAreas.filter(b=>b.roomId===room.id);
-    assert.equal(beds.length,4,room.id+' must contain four beds');
-    assert.deepEqual(beds.map(b=>b.bedInRoom),['A','B','C','D']);
-    assert.deepEqual(beds.map(b=>b.id),['A','B','C','D'].map(letter=>room.id+letter));
+    const beds=zone.bedAreas.filter(b=>b.roomId===room.id&&!b.anomalous);
+    const expectedBeds=firstCampus4F&&room.id==='409'?0:4;
+    assert.equal(beds.length,expectedBeds,room.id+' official bed count');
+    assert.deepEqual(beds.map(b=>b.bedInRoom),expectedBeds?['A','B','C','D']:[]);
+    assert.deepEqual(beds.map(b=>b.id),expectedBeds?['A','B','C','D'].map(letter=>room.id+letter):[]);
     for(const bed of beds){
       assert(['north','south','west','east'].includes(bed.plaque.wall));
       const [x1,z1,x2,z2]=room.rect;
@@ -75,14 +77,15 @@ for(const [zoneId,prefix] of [['first_campus_4f','40'],['second_campus_5f','50']
       assert(onWall,bed.id+' plaque must be wall-mounted');
     }
   }
-  assert.equal(zone.bedAreas.length,36);
+  assert.equal(zone.bedAreas.filter(b=>!b.anomalous).length,firstCampus4F?32:36);
+  assert.equal(zone.bedAreas.length,firstCampus4F?33:36);
   const bed33=zone.bedAreas.find(b=>b.wardBedNumber===33);
   assert.equal(bed33.id,prefix+'9A');
   assert.equal(bed33.bedInRoom,'A');
 
   const storage=zone.roomAreas.find(r=>r.id==='STORE_ENTRY');
   assert(storage?.accessDoorId);
-  assert(zone.accessDoors[storage.accessDoorId]?.closed);
+  assert(zone.accessDoors[storage.accessDoorId]?.closed||zone.keyedDoors[storage.accessDoorId]?.closed);
   assert(zone.entrancePlant);
 
   if(zoneId==='second_campus_5f'){
