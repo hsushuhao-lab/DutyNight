@@ -183,6 +183,12 @@ controller.onInteract = (interactable) => {
     }
     controller.currentInteractable=null;uiManager.showPrompt(null);
   } else if (interactable.type === 'duty_door') {
+    if(interactable.doorId==='room_409'){
+      registerBed33Clue('DOOR_409_SEALED');
+      soundManager.playDoorLockClack();
+      uiManager.showSubtitle('李醫師','「409 整修封閉中……可護理站那張舊床位卡卻還寫著 409A。」',3400);
+      return;
+    }
     if(interactable.doorId==='3F_ADMIN_OFFICE_DOOR'){
       const zone=worldRouter.activeZoneInstance;
       const keyedDoor=zone.keyedDoors?.[interactable.doorId];
@@ -364,6 +370,9 @@ controller.onInteract = (interactable) => {
       gameState.setFlag('ANNE_STAGE',2);
       gameState.setFlag('GUARD_FUTURE_ENTRY',true);
       gameState.setFlag('HOOK_409_ZERO_ROOM',true);
+      registerBed33Clue('ARCHIVE_0409');
+      persistentMemory.learnCode('code_0217');
+      persistentMemory.learnCode('code_0316');
       gameState.setFlag('HOOK_0316_COMMAND_POINT',true);
       gameState.setFlag('HOOK_1F_HIDDEN_DOOR',true);
       gameState.setFlag('HOOK_0217',true);
@@ -371,6 +380,28 @@ controller.onInteract = (interactable) => {
       worldRouter.activeZoneInstance?.applyGamePhase?.(GamePhase.AFTER_ARCHIVE,gameState);
       worldRouter.activeZoneInstance?.syncHorrorState?.();
     }
+  } else if (interactable.type === 'bed33_board') {
+    registerBed33Clue('BEDBOARD_33_409A');
+    controller.enabled=false;
+    uiManager.openArchiveDocument({title:interactable.documentTitle,pages:interactable.pages});
+  } else if (interactable.type === 'bed33_his_status') {
+    registerBed33Clue('HIS_409_CLOSED');
+    controller.enabled=false;
+    uiManager.openArchiveDocument({title:interactable.documentTitle,pages:interactable.pages});
+  } else if (interactable.type === 'bed33_409_sealed') {
+    registerBed33Clue('DOOR_409_SEALED');
+    controller.enabled=false;
+    uiManager.openArchiveDocument({title:interactable.documentTitle,pages:interactable.pages});
+  } else if (interactable.type === 'bed33_assignment') {
+    if(!gameState.isTaskComplete('P1_INSOMNIA_DONE')){
+      uiManager.showSubtitle('夜班護理師','「這張先放著，醫師先去看 403。」',2500);
+      return;
+    }
+    controller.enabled=false;
+    uiManager.openBed33Assignment({
+      canReject:legendState.isBed33Understood(),
+      rememberedRule:persistentMemory.data.survivalRules.neverSignBed33
+    });
   } else if (interactable.type === 'acute_gate') {
     const changed = worldRouter.activeZoneInstance.toggleAcuteGate(controller.position);
     if (changed) {
@@ -457,10 +488,13 @@ controller.onInteract = (interactable) => {
       dutyEvents.complete('P1_INSOMNIA_DONE','18:30');
       if(gameState.getFlag('HOOK_409_ZERO_ROOM')){
         gameState.setFlag('CLUE_403_0409',true);
-        uiManager.showSubtitle('403 病人','「醫師，我一直睡不著……不是這間，是那邊一直在敲。四下、停一下、九下。每晚都一樣。」',5200);
+        registerBed33Clue('KNOCK_403_49');
+        soundManager.playBed33KnockPattern();
+        uiManager.showSubtitle('403 病人','「醫師，我一直睡不著……不是這間，是那邊一直在敲。四下、停一下、九下。每晚都一樣。」',6200);
       }else uiManager.showSubtitle('403 病人','「醫師，我一直睡不著。」');
     } else if(action==='NORMAL_EVENT'){
       if(!gameState.isTaskComplete('P1_INSOMNIA_DONE')) return uiManager.showSubtitle('李醫師','「先處理 403 的睡眠問題。」',2500);
+      if(!gameState.getFlag('BED33_RESOLVED')) return uiManager.showSubtitle('李醫師','「護理站那張 409A 臨時床位單還沒釐清，不能就這樣簽掉。」',3200);
       dutyEvents.complete('P1_NORMAL_EVENT_DONE','19:30');
       uiManager.showSubtitle('晚班護理師',`「19 點這位病人有些${dutyEvents.normalEvent.label}，目前處理完都穩定。」`);
     } else if(action==='REST'){
