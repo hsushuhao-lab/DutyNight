@@ -156,6 +156,7 @@ function triggerPost2117DutyRoomSequence(){
 
 function unlockSecondCampusAccess(){
   if(gameState.getFlag('SECOND_CAMPUS_ACCESS'))return;
+  gameState.setGameTime('01:15');
   gameState.setFlag('SECOND_CAMPUS_ACCESS',true);
   gameState.setFlag('BRIDGE_ACCESS',true);
   persistentMemory.addJournalNote('SECOND_CAMPUS_CALL','第二院區護理站主動開了天橋權限；在這之前我根本沒有跨院區資格。');
@@ -455,6 +456,7 @@ controller.onInteract = (interactable) => {
     uiManager.showSubtitle('316 舊資料終端','「1998-ER-0217｜責任醫師：張○○｜工號前綴：MED-87。」',5200);
   } else if (interactable.type === 'workstation') {
     if(gameState.getFlag('M8_IDENTITY_BATTLE_ACTIVE')&&worldRouter.activeZoneId==='first_campus_3f'){
+      gameState.setGameTime('04:05');
       controller.enabled=false;
       uiManager.openFinalHandoff((value)=>{
         if(value===TRUE_NAME_CANON&&persistentMemory.data.trueNameResolved&&persistentMemory.hasAllProofs()){
@@ -579,6 +581,7 @@ controller.onInteract = (interactable) => {
     uiManager.showSubtitle('UNREGISTERED MESSAGE / ARCHIVE',`「IDENTITY VERIFIED：MED-870409｜${TRUE_NAME_CANON}。\n3F-316：另一個使用者已登入。」`,5800);
   } else if (interactable.type === 'b2_return_lift') {
     if(!gameState.getFlag('M7_B2_RESOLVED')) return uiManager.showSubtitle('李醫師','「先看那台舊終端機。」',2400);
+    gameState.setGameTime('03:30');
     worldRouter.loadZone('first_campus_1f');
     gameState.setFlag('LAST_CALL_SEEN',true);
     persistentMemory.resolveLegend('lastCall');
@@ -658,6 +661,7 @@ controller.onInteract = (interactable) => {
       secondaryText:'拒絕，重新查核身分',
       onPrimary:()=>loopManager.triggerLegendOverride('CHEST',{legend:'LEGEND 03 — 多出來的胸痛病人',reason:'你成了轉院對象。'}),
       onSecondary:()=>{
+        gameState.setGameTime('01:45');
         gameState.setFlag('M4_CHEST_RESOLVED',true);
         gameState.setFlag('CHEST_RECORD_MATCH',true);
         gameState.setFlag('OUTDOOR_ROUTE_ACCESS',true);
@@ -681,12 +685,13 @@ controller.onInteract = (interactable) => {
       secondaryText:'不要回頭，繼續往前',
       onPrimary:()=>loopManager.triggerLegendOverride('BRIDGE',{legend:'LEGEND 04 — 不能回頭的天橋',reason:'另一位值班醫師已通過。'}),
       onSecondary:()=>{
+        gameState.setGameTime('02:00');
         gameState.setFlag('M5_BRIDGE_RESOLVED',true);
         gameState.setFlag('M5_ROUTE_RESOLVED',true);
         gameState.setFlag('FLOOR6_AVAILABLE',true);
         persistentMemory.resolveLegend('bridge');
         persistentMemory.setTrueNameFragment('frag_givenName_2','恆');
-        persistentMemory.addJournalNote('BRIDGE_SAFE','天橋中線後不要回頭。遠處白袍胸牌最後一個字像是「衡」。');
+        persistentMemory.addJournalNote('BRIDGE_SAFE','天橋中線後不要回頭。遠處白袍胸牌最後一個字像是「恆」。');
         if(gameState.getFlag('CHEST_RECORD_MATCH')){gameState.setFlag('IDENTITY_PROOF',true);persistentMemory.setProof('identity',true);}
         controller.enabled=true;
       }
@@ -703,6 +708,7 @@ controller.onInteract = (interactable) => {
       secondaryText:'離開水邊，不再看它',
       onPrimary:()=>loopManager.triggerLegendOverride('POND',{legend:'LEGEND 05 — 生態池裡的人影',reason:'你留在水裡了。'}),
       onSecondary:()=>{
+        gameState.setGameTime('02:00');
         gameState.setFlag('M5_POND_RESOLVED',true);
         gameState.setFlag('M5_ROUTE_RESOLVED',true);
         gameState.setFlag('FLOOR6_AVAILABLE',true);
