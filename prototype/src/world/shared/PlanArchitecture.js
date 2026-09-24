@@ -47,7 +47,7 @@ export function ordinaryRoom(zone,walls,{id,label=id+' 病房',rect,side,door,ki
   let accessDoorId=null,doorType='open';
   if(kind==='ward'){
     accessDoorId='room_'+id;doorType='knob';
-    new KeyedKnobDoor(zone,{id:accessDoorId,x,z,yaw:alongX?0:Math.PI/2,width:1.6,title:id+' 病房'});
+    new KeyedKnobDoor(zone,{id:accessDoorId,x,z,yaw:alongX?0:Math.PI/2,width:1.6,title:id+' 病房',openDirection:(side==='south'||side==='east')?1:-1});
   }else if(kind==='storage'){
     accessDoorId='storage_'+id;doorType='card';
     new AccessDoor(zone,{id:accessDoorId,x,z,yaw:alongX?0:Math.PI/2,width:1.6,title:'儲藏室',material:zone.gf.materials.doorWood,readerSide:1});
@@ -61,7 +61,8 @@ export function ordinaryRoom(zone,walls,{id,label=id+' 病房',rect,side,door,ki
   const corridor=[x+outward[0]*1.1,1.7,z+outward[1]*1.1];
   const point=kind==='ward'?(alongX?[x,1.7,cz]:[cx,1.7,z]):[x-outward[0]*1.25,1.7,z-outward[1]*1.25];
   const yaw=side==='north'?Math.PI:side==='south'?0:side==='west'?-Math.PI/2:Math.PI/2;
-  SignAnchor.buildWallPlaque({scene:zone.zoneGroup,x:x+(alongX?-1.5:outward[0]*.15),y:1.75,z:z+(alongX?outward[1]*.15:-1.5),rotationY:yaw,width:1,height:.34,code:id,title:label.replace(id,'').trim(),subtitle:'',header:''});
+  const plaqueOffset=.115;
+  SignAnchor.buildWallPlaque({scene:zone.zoneGroup,x:x+(alongX?-1.5:outward[0]*plaqueOffset),y:1.75,z:z+(alongX?outward[1]*plaqueOffset:-1.5),rotationY:yaw,width:1,height:.34,code:id,title:label.replace(id,'').trim(),subtitle:'',header:''});
 
   if(kind==='ward'){
     const dx=Math.min(1.4,(x2-x1)*.28),dz=Math.min(2.2,(z2-z1)*.28);
