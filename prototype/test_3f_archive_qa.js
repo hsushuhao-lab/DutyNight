@@ -48,6 +48,23 @@ assert.equal(zone.coreOffice3F?.doorId,'3F_ADMIN_OFFICE_DOOR');
 assert.equal(zone.coreOffice3F?.taskId,'3F_ADMIN_ROSTER_TASK');
 assert(zone.keyedDoors['3F_ADMIN_OFFICE_DOOR']?.closed,'3F administrative office door must default closed');
 assert(zone.interactables.some(o=>o.userData?.type==='admin_roster_3f'),'3F administrative office roster task missing');
+assert(zone.interactables.some(o=>o.userData?.type==='admin_printer_doc_3f'),'3F administrative office future printer document missing');
+assert(zone.interactables.some(o=>o.userData?.type==='admin_drawer_manual_3f'),'3F administrative office secretary memo missing');
+assert.deepEqual(zone.adminRosterTask?.pieces,['3F_ADMIN_ROSTER_TASK','3F_ADMIN_PRINTER_DOC','3F_ADMIN_DRAWER_MANUAL']);
+
+for(const name of ['AdminDesk_Printer','AdminDesk_MonitorBase','AdminDesk_Keyboard','AdminDesk_PrinterPaper']){
+  const obj=zone.zoneGroup.getObjectByName(name);
+  assert(obj,`${name} missing`);
+  const box=new THREE.Box3().setFromObject(obj);
+  assert(Math.abs(box.min.y-.82)<.006,`${name} must physically touch the .82m desk surface; got bottom ${box.min.y}`);
+}
+
+const storageRailClearance=new THREE.Box3(new THREE.Vector3(12.76,.96,2.20),new THREE.Vector3(14.24,1.14,2.40));
+for(const name of ['RailNorthEast_WestOfStorage','RailNorthEast_EastOfStorage']){
+  const rail=zone.zoneGroup.getObjectByName(name);
+  assert(rail,`${name} missing`);
+  assert(!new THREE.Box3().setFromObject(rail).intersectsBox(storageRailClearance),`${name} intrudes into CPR storage doorway clearance`);
+}
 assert.deepEqual(zone.coreOffice3F?.bounds,[-22,3.5,-16,11.5]);
 assert.deepEqual(zone.coreOffice3F?.door,[-16,1.7,7.5]);
 
