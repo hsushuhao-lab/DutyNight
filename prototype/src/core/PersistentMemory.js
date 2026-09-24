@@ -1,3 +1,4 @@
+export const TRUE_NAME_CANON='林昱衡';
 const STORAGE_KEY='DutyNight_PersistentData';
 
 const defaults=()=>({
