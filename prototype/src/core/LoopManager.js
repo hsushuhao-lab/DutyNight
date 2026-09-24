@@ -7,10 +7,14 @@ export class LoopManager {
   }
 
   triggerBed33Override(){
-    persistentMemory.recordOverride('BED33');
-    legendState.override('LEGEND_BED33');
+    this.triggerLegendOverride('BED33',{legend:'LEGEND 01 — 第 33 床',reason:'你已被收治。'});
+  }
+
+  triggerLegendOverride(id,{legend='夜班紀錄已被覆寫',reason='你已被重新分類。'}={}){
+    persistentMemory.recordOverride(id);
+    if(id==='BED33')legendState.override('LEGEND_BED33');
     this.controller.enabled=false;
-    this.uiManager.playBed33Override(()=>this.softResetTo1700());
+    this.uiManager.playLegendOverride({legend,reason},()=>this.softResetTo1700());
   }
 
   softResetTo1700(){
