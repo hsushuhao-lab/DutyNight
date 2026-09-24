@@ -104,7 +104,7 @@ export class WardFloorplan {
     const w=new PlanWalls(this);w.rect(-14,2,-8,10);w.cut('z',-8,6,1.4);
     this.gf.buildFloor(this.zoneGroup,this.walkables,-11,0,6,6,8,this.gf.materials.floorWood);
     this.gf.buildCeiling(this.zoneGroup,-11,3.2,6,6,8);
-    this.dutyDoor=new KeyedKnobDoor(this,{id:'duty_room',x:-8,z:6,yaw:Math.PI/2,width:1.4,title:'醫師值班室'});
+    this.dutyDoor=new KeyedKnobDoor(this,{id:'duty_room',x:-8,z:6,yaw:Math.PI/2,width:1.4,title:'醫師值班室',openDirection:1});
     this.dutyDoor.setClosed(true);this.dutyDoorClosed=true;
     asset(this.zoneGroup,'hospitalBed',[-12.5,0,7.8],[1.2,.95,.97]);CollisionFactory.addBox(this.colliders,-12.5,.45,7.8,1.4,.9,2.2);
     solid(this.zoneGroup,this.gf.materials.doorWood,[-11.25,.28,8.1],[.5,.56,.5]);
@@ -117,7 +117,7 @@ export class WardFloorplan {
     w.rect(-14,2,-11.5,5.2);w.cut('z',-11.5,4.0,1.1);
     this.gf.buildFloor(this.zoneGroup,this.walkables,-12.75,.006,3.6,2.5,3.2,this.gf.materials.floorTile);
     this.gf.buildCeiling(this.zoneGroup,-12.75,3.2,3.6,2.5,3.2);
-    this.dutyBathroomDoor=new KeyedKnobDoor(this,{id:'duty_bathroom',x:-11.5,z:4.0,yaw:Math.PI/2,width:1.1,title:'值班室洗手間'});
+    this.dutyBathroomDoor=new KeyedKnobDoor(this,{id:'duty_bathroom',x:-11.5,z:4.0,yaw:Math.PI/2,width:1.1,title:'值班室洗手間',openDirection:1});
     this.dutyBathroomDoor.setClosed(true);
 
     // Toilet with cistern and seat.
