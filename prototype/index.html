@@ -341,6 +341,46 @@
     <div class="loop-wrist-mark"></div>
   </div>
 
+  <!-- Generic late-game story choice -->
+  <div id="story-choice-modal" class="modal-overlay">
+    <div class="bed33-form">
+      <div id="story-choice-title" class="bed33-form-header">夜班事件</div>
+      <div class="bed33-form-body">
+        <p id="story-choice-body"></p>
+      </div>
+      <div class="bed33-form-actions">
+        <button id="btn-story-secondary" class="btn-secondary">暫緩</button>
+        <button id="btn-story-primary" class="btn-primary">確認</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- M9 final 316 handoff -->
+  <div id="final-handoff-modal" class="modal-overlay">
+    <div class="locker-window">
+      <div class="locker-header">
+        <div><strong>316｜最終交班驗證</strong><small>值班醫師身分核對</small></div>
+        <button id="btn-close-final-handoff" class="btn-win-close" aria-label="關閉最終交班">✕</button>
+      </div>
+      <div class="locker-body">
+        <p>請輸入本夜真正完成值班之醫師姓名。</p>
+        <input id="final-true-name" autocomplete="off" placeholder="完整姓名" />
+        <button id="btn-submit-final-handoff" class="btn-primary">完成交班</button>
+        <div id="final-handoff-status">IDENTITY VERIFICATION REQUIRED</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="final-success-modal" class="modal-overlay">
+    <div class="anomaly-window">
+      <div class="anomaly-code">HANDOFF ACCEPTED</div>
+      <h2>CURRENT DUTY PHYSICIAN VERIFIED</h2>
+      <p>夜班紀錄已完成。</p>
+      <p>另一個「李醫師」的登入狀態正在從系統中消失。</p>
+      <p class="anomaly-last">你第一次記得自己的名字。</p>
+    </div>
+  </div>
+
   <!-- Archive document reader -->
   <div id="archive-modal" class="modal-overlay">
     <div class="archive-reader">
