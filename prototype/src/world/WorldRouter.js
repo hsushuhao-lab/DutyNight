@@ -6,6 +6,7 @@ import { WORLD_SPAWNS as DEBUG_SPAWN_POINTS, ROUTE_PORTALS, FIRST_FLOORS, SECOND
 import { addTravelFixtures } from './shared/TravelFixtures.js';
 import { CollisionFactory } from './shared/CollisionFactory.js';
 import { floorStateManager } from '../core/FloorStateManager.js';
+import { gameState } from '../core/GameState.js';
 
 import { FirstCampus3F } from './zones/FirstCampus3F.js';
 import { FirstCampus4F } from './zones/FirstCampus4F.js';
@@ -200,7 +201,10 @@ export class WorldRouter {
   update() {
     this.activeZoneInstance?.update?.(this.camera);
     if (!this.controller?.enabled) return;
-    const portal = ROUTE_PORTALS.find(p => !p.gated && p.from === this.activeZoneId && new THREE.Box3(new THREE.Vector3(...p.bounds[0]), new THREE.Vector3(...p.bounds[1])).containsPoint(this.controller.position));
+    const portal = ROUTE_PORTALS.find(p => {
+      const allowed=!p.gated||(p.requiresFlag&&gameState.getFlag(p.requiresFlag));
+      return allowed&&p.from===this.activeZoneId&&new THREE.Box3(new THREE.Vector3(...p.bounds[0]),new THREE.Vector3(...p.bounds[1])).containsPoint(this.controller.position);
+    });
     if (portal) this.teleportToSpawn(portal.spawn);
   }
 
