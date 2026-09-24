@@ -84,8 +84,8 @@ try{
   await page.waitForSelector('#loop-cutscene.active');
   assert.equal(await page.locator('#btn-loop-skip').isVisible(),true,'Loop fast-forward control must be visible while override is active');
   await shot('m2-override');
-  if(await page.locator('#loop-cutscene.active').count())await domClick('#btn-loop-skip');
-  await page.waitForFunction(()=>window.__storyQA.worldRouter.activeZoneId==='first_campus_3f');
+  if(await page.locator('#loop-cutscene.active #btn-loop-skip').isVisible().catch(()=>false))await domClick('#btn-loop-skip');
+  await page.waitForFunction(()=>window.__storyQA.worldRouter.activeZoneId==='first_campus_3f',null,{timeout:30000});
   s=await snap();
   assert.equal(s.memory.loopCount,1);assert.equal(s.memory.survivalRules.neverSignBed33,true);
   assert(s.memory.journalNotes.some(n=>n.id==='RULE_BED33'));
