@@ -18,6 +18,8 @@ const html=readFileSync('./index.html','utf8');
 
 assert(er.includes("type:'er_ghost_registration'"),'M3 ghost registration terminal missing');
 assert(er.includes("type:'er_exit_notice'")&&er.includes('此門只進不出'),'M3 ER entry-only exit warning missing');
+assert(!routes.includes("id:'er_to_hill'"),'2F ER exterior must never allow outbound travel');
+assert(routes.includes("id:'hill_to_er'"),'Hillside return into the ER side must remain available');
 assert(main.includes("LEGEND 02 — 00:33 急診掛號")&&main.includes("ER0033_SLIP_COLLECTED")&&main.includes("legacy_terminal_316")&&level3.includes("316_LEGACY_TERMINAL")&&main.includes("SECOND_CAMPUS_ACCESS"),'M3 two-stage ER-to-316 resolve or campus call missing');
 
 assert(ward.includes("type:'second_chest_patient'")&&ward.includes("type:'second_chest_transfer'"),'M4 chest-pain patient/form missing');
