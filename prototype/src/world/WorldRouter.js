@@ -19,6 +19,7 @@ import { SecondCampusStandardFloor } from './zones/SecondCampusStandardFloor.js'
 import { SecondCampus1F } from './zones/SecondCampus1F.js';
 import { HillsideRoute } from './zones/HillsideRoute.js';
 import { EcologyPond } from './zones/EcologyPond.js';
+import { Phantom6F } from './zones/Phantom6F.js';
 
 export class WorldRouter {
   constructor(scene, camera, controller) {
@@ -47,7 +48,8 @@ export class WorldRouter {
       'second_campus_std': SecondCampusStandardFloor,
       'second_campus_1f': SecondCampus1F,
       'hillside_route': HillsideRoute,
-      'ecology_pond': EcologyPond
+      'ecology_pond': EcologyPond,
+      'phantom_6f': Phantom6F
     };
 
     this.zoneLabels = {
@@ -63,7 +65,8 @@ export class WorldRouter {
       'second_campus_std': '8. 第二院區 5F 病房護理站 (M8)',
       'second_campus_1f': '9. 第二院區 1F 警衛台與山側後門 (M10)',
       'hillside_route': '10. 山側景觀步道與叉路 (M11)',
-      'ecology_pond': '11. 生態池觀景木棧台 (M12)'
+      'ecology_pond': '11. 生態池觀景木棧台 (M12)',
+      'phantom_6f': '不存在的 6F'
     };
 
     this.lightingGroup = new THREE.Group();
@@ -210,8 +213,8 @@ export class WorldRouter {
 
   floorDestinations(kind = 'elevator') {
     const campus = this.activeZoneId.startsWith('first') ? 'first' : 'second';
-    const floors = campus === 'first' ? FIRST_FLOORS : SECOND_FLOORS;
-    return floors.map(f => {
+    const floors = campus === 'first' ? [...FIRST_FLOORS] : [...SECOND_FLOORS];
+    const mapped=floors.map(f => {
       let zoneId = `${campus}_campus_${f}f`;
       if (campus === 'second' && f === 5) zoneId = 'second_campus_5f';
       const spawn = kind === 'stairs' ? `${campus}_${f}f_stairs` : `${campus}_${f}f_lift`;
@@ -229,6 +232,10 @@ export class WorldRouter {
       }
       return { floorNum: f, zoneId, spawn, label };
     });
+    if(campus==='second'&&gameState.getFlag('FLOOR6_AVAILABLE')){
+      mapped.push({floorNum:6,zoneId:'phantom_6f',spawn:'phantom_6f_lift',label:'6F'});
+    }
+    return mapped;
   }
 
   /**
