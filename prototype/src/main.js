@@ -154,6 +154,35 @@ function resolveAdminIdentityPuzzleIfReady() {
   uiManager.showSubtitle('李醫師','「名冊是空的，補登單卻寫我 21:17 已完成巡查……而備忘錄又說最後完成交班的人才算值班醫師。這三份資料不可能同時是真的。」',6200);
 }
 
+if(new URLSearchParams(location.search).get('qa')==='story'){
+  const findInteractable=({id,type,action}={})=>{
+    const list=worldRouter.activeZoneInstance?.interactables||[];
+    return list.find(o=>{
+      const d=o?.userData||o;
+      return (!id||d.id===id)&&(!type||d.type===type)&&(!action||d.action===action);
+    });
+  };
+  window.__storyQA={
+    gameState,persistentMemory,legendState,worldRouter,uiManager,loopManager,dutyEvents,GamePhase,floorStateManager,
+    load:(zone,spawn)=>worldRouter.loadZone(zone,spawn),
+    setFlag:(k,v=true)=>gameState.setFlag(k,v),
+    task:id=>gameState.markTaskComplete(id),
+    phase:p=>{floorStateManager.setPhase(p);worldRouter.activeZoneInstance?.applyGamePhase?.(p,gameState);},
+    interact:(query)=>{
+      const obj=findInteractable(query);
+      if(!obj)throw new Error('QA interactable missing '+JSON.stringify(query));
+      controller.onInteract(obj.userData||obj);
+    },
+    snapshot:()=>({
+      zone:worldRouter.activeZoneId,time:gameState.gameTime,
+      flags:Object.fromEntries(gameState.flags),
+      tasks:[...gameState.completedTasks],
+      memory:JSON.parse(JSON.stringify(persistentMemory.data)),
+      legend:legendState.getState('LEGEND_BED33')
+    })
+  };
+}
+
 // Setup Raycast Hover & Interaction
 controller.onHoverChange = (interactable) => {
   if (interactable) {
