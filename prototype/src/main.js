@@ -98,6 +98,37 @@ uiManager = new UIManager(
   }
 );
 
+const loopManager=new LoopManager({gameState,worldRouter,controller,uiManager});
+
+function registerBed33Clue(clueId){
+  const previous=legendState.getState('LEGEND_BED33');
+  const state=legendState.registerClue('LEGEND_BED33',clueId);
+  if(state===NodeState.UNDERSTOOD&&previous!==NodeState.UNDERSTOOD){
+    gameState.setFlag('BED33_UNDERSTOOD',true);
+    gameState.setFlag('WHERE_0409',true);
+    persistentMemory.learnCode('code_0409');
+    persistentMemory.addJournalNote('INFER_0409','04:09……不是時間。是 409？');
+    uiManager.showSubtitle('李醫師','「04:09……不是時間。是 409？」',3600);
+  }
+  return state;
+}
+
+uiManager.setBed33Handlers({
+  onConfirm:()=>loopManager.triggerBed33Override(),
+  onDefer:()=>uiManager.showSubtitle('李醫師','「先別簽。床位板、HIS 和 409 的狀態對不起來。」',3200),
+  onReject:()=>{
+    legendState.resolve('LEGEND_BED33');
+    gameState.setFlag('BED33_RESOLVED',true);
+    gameState.setFlag('WHERE_0409',true);
+    gameState.markTaskComplete('LEGEND_BED33_RESOLVED');
+    gameState.addEvidence(1);
+    persistentMemory.learnCode('code_0409');
+    persistentMemory.setTrueNameFragment('frag_givenName_1','FRAG_409_A');
+    persistentMemory.addJournalNote('BED33_RESOLVED','409A 的床位單不是正常流程；上面的電子簽名也不是我留下的。');
+    uiManager.showSubtitle('夜班護理師','「409 整修中？……奇怪，這張不是我印的。可是上面是你的電子簽名。」',5200);
+  }
+});
+
 function resolveAdminIdentityPuzzleIfReady() {
   if(gameState.getFlag('ADMIN_IDENTITY_PUZZLE_RESOLVED')) return;
   const complete=
