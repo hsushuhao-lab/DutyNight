@@ -6,6 +6,7 @@ import { buildCampusBackdrop } from '../../art/CampusBackdrop.js';
 import { disposeZoneArt } from '../../art/ArtResources.js';
 import { CollisionFactory } from '../shared/CollisionFactory.js';
 import { SignAnchor } from '../shared/SignAnchor.js';
+import { gameState } from '../../core/GameState.js';
 
 export class Skybridge {
   constructor(scene, geometryFactory) {
@@ -132,7 +133,7 @@ export class Skybridge {
       z: 0,
       ceilingY: 3.2,
       rotationY: -Math.PI / 2, // Facing returning players
-      text: '◀ 第一院區 8F 行政大樓 ｜ 松德院史長廊'
+      text: '◀ 第一院區 8F 行政大樓 ｜ 青嶺院史長廊'
     });
 
     // Central heritage gallery overhead banner
@@ -143,7 +144,7 @@ export class Skybridge {
       z: 0,
       ceilingY: 3.2,
       rotationY: Math.PI / 2,
-      text: '松德院史長廊 ｜ 歷任院長與重大貢獻者紀念展 (1979 - 2026)'
+      text: '青嶺院史長廊 ｜ 歷任院長與重大貢獻者紀念展 (1979 - 2026)'
     });
 
     SignAnchor.buildHangingSign({
@@ -238,6 +239,19 @@ export class Skybridge {
     }
     for(let x=10;x<60;x+=10) solid(art,this.gf.materials.wallDark,[x,.004,0],[.025,.008,3.98]);
     wallTrim(this.zoneGroup,this.gf.materials);
+
+    // Doppelgänger appears only after the second-campus chest-pain discrepancy is resolved.
+    const doubleGroup=new THREE.Group();doubleGroup.name='Skybridge_Doppelganger';
+    const coat=new THREE.Mesh(new THREE.BoxGeometry(.46,1.05,.20),new THREE.MeshStandardMaterial({color:0xe6e8e3,roughness:.9}));
+    coat.position.y=.78;doubleGroup.add(coat);
+    const head=new THREE.Mesh(new THREE.SphereGeometry(.16,16,12),new THREE.MeshStandardMaterial({color:0xc9b49d,roughness:.92}));
+    head.position.y=1.45;doubleGroup.add(head);
+    doubleGroup.position.set(46,0,0);doubleGroup.visible=gameState.getFlag('M4_CHEST_RESOLVED');this.zoneGroup.add(doubleGroup);
+    const bridgeEvent=new THREE.Mesh(new THREE.BoxGeometry(2.2,2.5,3.2),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
+    bridgeEvent.position.set(31,1.2,0);
+    bridgeEvent.userData={interactable:gameState.getFlag('M4_CHEST_RESOLVED'),id:'BRIDGE_LOOP_EVENT',type:'bridge_loop_event',label:'停下來確認遠處白袍'};
+    this.zoneGroup.add(bridgeEvent);this.interactables.push(bridgeEvent);this.bridgeDoppelganger=doubleGroup;
+
     new AccessDoor(this,{id:'BRIDGE_FIRST',x:0,z:0,yaw:Math.PI/2,width:2.4,title:'第一院區感應門',portal:'first_bridge_return'});
     new AccessDoor(this,{id:'BRIDGE_SECOND',x:60,z:0,yaw:Math.PI/2,width:2.4,title:'第二院區感應門',portal:'second_bridge_return'});
     return this;
