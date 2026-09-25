@@ -110,6 +110,8 @@ export class GeometryFactory {
     scene.add(emitter);
 
     emitter.material.color.setHex(color);
+    emitter.userData.practicalEmitter = true;
+    emitter.userData.baseColor = color;
     return { fixture, emitter, light: null };
   }
 }

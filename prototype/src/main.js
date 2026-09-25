@@ -203,8 +203,8 @@ if(new URLSearchParams(location.search).get('qa')==='story'){
     });
   };
   window.__storyQA={
-    gameState,persistentMemory,legendState,worldRouter,uiManager,loopManager,dutyEvents,GamePhase,floorStateManager,
-    load:(zone,spawn)=>worldRouter.loadZone(zone,spawn),
+    gameState,persistentMemory,legendState,worldRouter,uiManager,loopManager,dutyEvents,GamePhase,floorStateManager,controller,
+    load:(zone,spawn)=>{worldRouter.loadZone(zone,spawn);worldRouter.activeZoneInstance?.syncStoryState?.();},
     enter:(zone,spawn)=>{
       worldRouter.loadZone(zone,spawn);
       const line=dutyEvents.onZoneEntered(zone);
@@ -237,6 +237,10 @@ if(new URLSearchParams(location.search).get('qa')==='story'){
       const rect={left:Math.max(0,minX),top:Math.max(0,minY),width:Math.min(width,maxX)-Math.max(0,minX),height:Math.min(height,maxY)-Math.max(0,minY)};
       if(rect.width<=2||rect.height<=2)throw new Error('Story QA anchor has no visible projected rectangle: '+anchorName);
       return {anchorName,rect,viewport:{width,height}};
+    },
+    lookAt:(target)=>{
+      const dx=target[0]-controller.position.x,dy=target[1]-controller.position.y,dz=target[2]-controller.position.z;
+      controller.yaw=Math.atan2(-dx,-dz);controller.pitch=Math.atan2(dy,Math.hypot(dx,dz));controller.updateCameraRotation();
     },
     interact:(query)=>{
       const obj=findInteractable(query);
@@ -599,7 +603,22 @@ controller.onInteract = (interactable) => {
     }
     controller.currentInteractable = null;
     uiManager.showPrompt(null);
+  } else if (interactable.type === 'guard_post_inspection') {
+    if(!gameState.getFlag('B_PANEL_KEY')||!gameState.getFlag('M6_FLOOR6_RESOLVED')){
+      uiManager.showSubtitle('李醫師','CCTV 螢幕停在夜間走廊，值勤簿翻到最後一頁，鑰匙櫃裡只剩空鉤。這些紀錄目前還沒有指向我。',4000);
+      return;
+    }
+    if(!gameState.getFlag('HIDDEN_SERVICE_DOOR_DISCOVERED')){
+      gameState.setFlag('HIDDEN_SERVICE_DOOR_DISCOVERED',true);
+      worldRouter.activeZoneInstance?.syncStoryState?.();
+      soundManager.playClick();
+      uiManager.showSubtitle('李醫師','CCTV、值勤簿、鑰匙櫃……Jane Doe 說的是警衛台後面。牆上的接縫和紫燈，剛才還沒有。',4800);
+    }else uiManager.showSubtitle('李醫師','舊門框就在警衛台後面，鑰匙孔旁的紫燈亮了。',3000);
   } else if (interactable.type === 'hidden_service_door_1f') {
+    if(!gameState.getFlag('HIDDEN_SERVICE_DOOR_DISCOVERED')){
+      uiManager.showSubtitle('李醫師','先檢查警衛台上的 CCTV、值勤簿和鑰匙櫃。',2600);
+      return;
+    }
     if(!gameState.getFlag('B_PANEL_KEY')){
       uiManager.showSubtitle('李醫師','「牆面接縫不像一般裝修……但 Jane Doe 提到的舊配電鑰匙還不在我手上。」',3200);
       return;

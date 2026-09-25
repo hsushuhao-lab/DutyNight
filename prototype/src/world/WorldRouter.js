@@ -89,6 +89,7 @@ export class WorldRouter {
     applyZoneLighting({
       group:this.lightingGroup,
       scene:this.scene,
+      zoneGroup:this.activeZoneInstance?.zoneGroup,
       zoneId:this.lightingZoneId,
       storyTime:gameState.gameTime,
       roomLamps:this.roomLamps

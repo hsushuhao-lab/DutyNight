@@ -21,7 +21,7 @@ const requiredShots=[
   'm6-annie-cpr-long.png','m6-annie-cpr.png','m6-annie-cpr-close.png','m7-1f-guard-post.png','m7-b-panel-concealed-door.png','m7-b2-mirror-316.png',
   'm9-dual-identity-form.png','m9-successful-dawn-ending.png'
 ];
-const report={url,sourceSha:process.env.GITHUB_SHA||'local-working-tree',started:new Date().toISOString(),milestones:[],screenshots:[],motionScreenshots:[],screenshotWarnings:[],errors:[],method:'Browser-driven M2-M9 story checkpoint playthrough with named scene-anchor frustum checks, 26 required full-resolution captures, and bridge-idle/CPR motion frames.'};
+const report={url,sourceSha:process.env.GITHUB_SHA||'local-working-tree',started:new Date().toISOString(),milestones:[],screenshots:[],motionScreenshots:[],functionalScreenshots:[],functionalFlows:[],screenshotWarnings:[],errors:[],method:'Browser-driven M2-M9 story checkpoint playthrough with named scene-anchor frustum checks, 26 required full-resolution captures, bridge-idle/CPR motion frames, and physical M7 guard-post-to-B-Panel interaction.'};
 let page;
 
 async function snap(){return page.evaluate(()=>window.__storyQA.snapshot());}
@@ -94,6 +94,26 @@ async function enter(zone,spawn){await q(({zone,spawn})=>window.__storyQA.enter(
 async function flag(k,v=true){await q(({k,v})=>window.__storyQA.setFlag(k,v),{k,v});}
 async function task(id){await q(id=>window.__storyQA.task(id),id);}
 async function interact(query){await q(query=>window.__storyQA.interact(query),query);await page.waitForTimeout(100);}
+async function walkTo(x,z,{radius=.42,timeout=20000}={}){
+  await q(point=>window.__storyQA.lookAt(point),[x,1.7,z]);
+  await page.keyboard.down('w');
+  try{
+    await page.waitForFunction(({x,z,radius})=>{
+      const p=window.__storyQA.controller.position;
+      return Math.hypot(p.x-x,p.z-z)<=radius;
+    },{x,z,radius},{timeout});
+  }finally{await page.keyboard.up('w');}
+  await page.waitForTimeout(180);
+}
+async function functionalShot(file){
+  await mkdir(out+'/functional',{recursive:true});
+  const path=out+'/functional/'+file;
+  const buffer=await page.screenshot({path,fullPage:false,timeout:90000});
+  const image=await readFile(path);
+  assert(buffer.length>1024,'Functional screenshot was empty: '+file);
+  report.functionalScreenshots.push({file:'functional/'+file,bytes:image.length,sha256:createHash('sha256').update(image).digest('hex')});
+  await writeFile(out+'/progress.json',JSON.stringify(report,null,2));
+}
 async function domClick(selector){
   await page.evaluate(selector=>{
     const el=document.querySelector(selector);
@@ -305,17 +325,34 @@ try{
 
   await interact({id:'FLOOR6_SAFE_RETURN'});
   s=await snap();assert.equal(s.flags.M6_FLOOR6_RESOLVED,true);assert.equal(s.zone,'second_campus_5f');
-  assert.match(await taskText(),/第一院區 1F[\s\S]*隱藏服務門/,'M6 resolution must push the player to the 1F service door');
+  assert((await taskText()).includes('檢查舊警衛台'),'M6 resolution must direct the player to inspect the 1F guard post');
   await mark('M6 nonexistent 6F resolved');
 
   // M7: 02:17 decision + B2 convergence.
   assert.equal((await snap()).memory.proofs.space,true);
   assert.equal((await snap()).memory.proofs.identity,true);
   assert.equal((await snap()).memory.proofs.time,true);
-  await load('first_campus_1f');
+  await load('first_campus_1f','m5_1f_lobby_entrance');
   await shot('m7-1f-guard-post',null,null,'FirstCampus1F_OldGuardPost',[-7.8,1.7,3.2],[-10.7,1.0,3.2]);
   await shot('m7-b-panel-concealed-door',null,null,'FirstFloor_BPanel_ConcealedDoor',[-11.2,1.7,4.55],[-13.78,1.18,4.55]);
-  await interact({id:'1F_HIDDEN_SERVICE_DOOR'});
+  await load('first_campus_1f','m5_1f_lobby_entrance');
+  await walkTo(-10.7,3.2,{radius:2.0});
+  await q(point=>window.__storyQA.lookAt(point),[-10.7,1.03,3.2]);
+  await page.waitForFunction(()=>window.__storyQA.controller.currentInteractable?.id==='OLD_GUARD_POST',null,{timeout:5000});
+  assert.match(await page.locator('#interaction-prompt').innerText(),/\[E\].*檢查舊警衛台/,'the real crosshair must offer the guard-post E interaction');
+  await functionalShot('m7-guard-post-approach.png');
+  await page.keyboard.press('e');
+  await page.waitForFunction(()=>window.__storyQA.gameState.getFlag('HIDDEN_SERVICE_DOOR_DISCOVERED')===true,null,{timeout:5000});
+  assert(await q(()=>{const zone=window.__storyQA.worldRouter.activeZoneInstance;return zone.hiddenServiceFrame.visible&&zone.hiddenServiceKeyhole.visible}),'the discovered door frame and keyhole must be visible in the live scene');
+  assert.match(await taskText(),/檢查警衛台後方浮現的舊門框/,'inspecting the post must reveal the updated service-door objective');
+  await walkTo(-12.4,1.65);
+  await walkTo(-12.55,4.5);
+  await q(point=>window.__storyQA.lookAt(point),[-13.58,1.18,4.55]);
+  await page.waitForFunction(()=>window.__storyQA.controller.currentInteractable?.id==='1F_HIDDEN_SERVICE_DOOR',null,{timeout:5000});
+  assert.match(await page.locator('#interaction-prompt').innerText(),/\[E\].*舊門框/,'the revealed physical hitbox must show an E prompt');
+  await functionalShot('m7-b-panel-e-prompt.png');
+  report.functionalFlows.push({name:'M7 GUARD POST TO B-PANEL',steps:['spawned at 1F main entrance','walked with W to guard desk','crosshair showed [E] inspect old guard post','pressed E and revealed door seams/purple indicator','walked around desk to the physical service-door hitbox','crosshair showed [E] inspect revealed door']});
+  await page.keyboard.press('e');
   await page.waitForSelector('#story-choice-modal.active');await secondary();
   await page.waitForFunction(()=>window.__storyQA.worldRouter.activeZoneId==='b2_archive');
   await shot('m7-b2-mirror-316',null,null,'B2_Mirror316_Frame',[0,1.7,-11.0],[0,1.7,-14.65]);
@@ -349,6 +386,8 @@ try{
   assert.deepEqual(report.screenshots.map(shot=>shot.file),requiredShots,'Story QA must produce the exact ordered 26-image manifest');
   assert.equal(report.screenshotWarnings.length,0,'Screenshot warnings are not accepted');
   assert.equal(report.motionScreenshots.length,6,'Three bridge idle and three CPR animation frames are required');
+  assert.equal(report.functionalScreenshots.length,2,'M7 must include real guard-post and B-Panel interaction screenshots');
+  assert.equal(report.functionalFlows.length,1,'M7 physical interaction flow evidence is required');
   const pngFiles=(await readdir(out)).filter(file=>file.endsWith('.png')).sort();
   assert.deepEqual(pngFiles,[...requiredShots].sort(),'Output must contain exactly the 26 required screenshots');
   report.verdict='PASS';

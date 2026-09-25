@@ -221,31 +221,73 @@ export class FirstCampus1F {
     const seamMat=new THREE.MeshStandardMaterial({color:0x8f918d,roughness:.95});
     for(const zOff of [-.57,.57]){
       const seam=new THREE.Mesh(new THREE.BoxGeometry(.012,2.16,.018),seamMat);
+      seam.name=`FirstFloor_BPanel_Seam_${zOff}`;
       seam.position.set(-13.77,1.18,4.55+zOff);this.zoneGroup.add(seam);
     }
     const topSeam=new THREE.Mesh(new THREE.BoxGeometry(.012,.018,1.16),seamMat);
+    topSeam.name='FirstFloor_BPanel_Seam_Top';
     topSeam.position.set(-13.77,2.25,4.55);this.zoneGroup.add(topSeam);
     const oldKeyhole=new THREE.Mesh(new THREE.CircleGeometry(.022,12),new THREE.MeshBasicMaterial({color:0x4a4239}));
-    oldKeyhole.position.set(-13.755,1.05,4.86);oldKeyhole.rotation.y=Math.PI/2;this.zoneGroup.add(oldKeyhole);
+    oldKeyhole.name='FirstFloor_BPanel_OldKeyhole';oldKeyhole.position.set(-13.755,1.05,4.86);oldKeyhole.rotation.y=Math.PI/2;this.zoneGroup.add(oldKeyhole);
+    const discoveredFrame=new THREE.Group();
+    discoveredFrame.name='FirstFloor_BPanel_DiscoveredFrame';discoveredFrame.visible=false;this.zoneGroup.add(discoveredFrame);
+    const frameMat=new THREE.MeshStandardMaterial({color:0x75664b,metalness:.32,roughness:.78,emissive:0x201a10,emissiveIntensity:.22});
+    const addFramePiece=(name,size,position)=>{
+      const piece=new THREE.Mesh(new THREE.BoxGeometry(...size),frameMat);
+      piece.name=name;piece.position.set(...position);discoveredFrame.add(piece);
+    };
+    addFramePiece('FirstFloor_BPanel_Frame_Left',[.045,2.18,.045],[-13.72,1.18,3.95]);
+    addFramePiece('FirstFloor_BPanel_Frame_Right',[.045,2.18,.045],[-13.72,1.18,5.15]);
+    addFramePiece('FirstFloor_BPanel_Frame_Top',[.045,.045,1.24],[-13.72,2.25,4.55]);
+    addFramePiece('FirstFloor_BPanel_Frame_Bottom',[.045,.045,1.24],[-13.72,.11,4.55]);
+    const lockPlate=new THREE.Mesh(new THREE.BoxGeometry(.026,.17,.09),this.gf.materials.wallDark);
+    lockPlate.name='FirstFloor_BPanel_LockPlate';lockPlate.position.set(-13.675,1.05,4.86);discoveredFrame.add(lockPlate);
+    oldKeyhole.position.x=-13.655;discoveredFrame.add(oldKeyhole);
+    const discoveredLed=new THREE.Mesh(new THREE.CircleGeometry(.036,20),new THREE.MeshBasicMaterial({color:0x382646}));
+    discoveredLed.name='FirstFloor_BPanel_PurpleIndicator';discoveredLed.position.set(-13.655,1.05,4.72);discoveredLed.rotation.y=Math.PI/2;discoveredLed.visible=false;this.zoneGroup.add(discoveredLed);
+    const discoveredLight=new THREE.PointLight(0x9a69c1,0,2.2,2);
+    discoveredLight.name='FirstFloor_BPanel_DiscoverySpill';discoveredLight.position.set(-13.45,1.48,4.55);this.zoneGroup.add(discoveredLight);
     const hiddenHit=new THREE.Mesh(new THREE.BoxGeometry(.38,2.3,1.35),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
+    hiddenHit.name='FirstFloor_BPanel_InteractionHitbox';
     hiddenHit.position.set(-13.58,1.18,4.55);
     hiddenHit.userData={
-      interactable:gameState.getFlag('HOOK_1F_HIDDEN_DOOR')||gameState.getFlag('FIRST_FLOOR_GUARD_KEY'),
-      id:'1F_HIDDEN_SERVICE_DOOR',type:'hidden_service_door_1f',label:'檢查牆面的舊門框痕跡'
+      interactable:false,
+      id:'1F_HIDDEN_SERVICE_DOOR',type:'hidden_service_door_1f',label:'檢查警衛台後方浮現的舊門框'
     };
     this.zoneGroup.add(hiddenHit);this.interactables.push(hiddenHit);
+    this.hiddenServiceHit=hiddenHit;this.hiddenServiceFrame=discoveredFrame;this.hiddenServiceKeyhole=oldKeyhole;this.hiddenServiceLed=discoveredLed;this.hiddenServiceLight=discoveredLight;
     this.hiddenServiceDoor={id:'1F_HIDDEN_SERVICE_DOOR',position:[-13.78,1.18,4.55],requires:'FIRST_FLOOR_GUARD_KEY',revealedBy:'HOOK_1F_HIDDEN_DOOR'};
 
-    const guardPost=new THREE.Group();guardPost.name='FirstCampus1F_OldGuardPost';guardPost.position.set(-10.7,0,3.2);this.zoneGroup.add(guardPost);
+    const guardPost=new THREE.Group();guardPost.name='FirstCampus1F_OldGuardPost';guardPost.position.set(-10.7,0,3.2);guardPost.rotation.y=2.30;
+    guardPost.userData={interactable:true,id:'OLD_GUARD_POST',type:'guard_post_inspection',label:'檢查舊警衛台'};
+    this.zoneGroup.add(guardPost);this.guardPostObject=guardPost;this.interactables.push(guardPost);
     solid(guardPost,this.gf.materials.doorWood,[0,.53,0],[2.1,1.06,.78]);
     solid(guardPost,this.gf.materials.counterTop,[0,1.10,0],[2.18,.08,.84]);
     const cctv=monitor(guardPost,this.gf.materials,-.48,1.17,-.18,0);cctv.name='OldGuardPost_CCTVMonitor';
     solid(guardPost,this.gf.materials.metal,[.50,1.15,-.1],[.30,.12,.22]);
     solid(guardPost,this.gf.materials.lightWarm,[.06,1.155,.08],[.36,.018,.24]).name='OldGuardPost_NightLogbook';
+    const deskPhone=new THREE.Group();deskPhone.name='OldGuardPost_DeskPhone';deskPhone.position.set(.72,1.15,.20);guardPost.add(deskPhone);
+    solid(deskPhone,this.gf.materials.wallDark,[0,.045,0],[.30,.07,.20],.015);
+    solid(deskPhone,this.gf.materials.metal,[0,.092,-.025],[.24,.018,.08],.006);
+    const phoneCord=new THREE.CatmullRomCurve3([
+      new THREE.Vector3(-.11,.08,.03),new THREE.Vector3(-.18,.06,.12),
+      new THREE.Vector3(-.10,.03,.20),new THREE.Vector3(-.17,.01,.27)
+    ]);
+    deskPhone.add(new THREE.Mesh(new THREE.TubeGeometry(phoneCord,24,.004,6,false),this.gf.materials.wallDark));
+    const keyRing=new THREE.Mesh(new THREE.TorusGeometry(.075,.009,8,24),this.gf.materials.stainless);
+    keyRing.name='OldGuardPost_KeyRing';keyRing.rotation.x=Math.PI/2;keyRing.position.set(.76,.03,-.22);guardPost.add(keyRing);
+    for(let i=0;i<3;i++){
+      const key=new THREE.Mesh(new THREE.CylinderGeometry(.008,.008,.12,8),this.gf.materials.stainless);
+      key.name=`OldGuardPost_ServiceKey_${i+1}`;key.position.set(.70+i*.055,.03,-.30);key.rotation.z=(i-1)*.16;guardPost.add(key);
+    }
+    const taskLamp=new THREE.Group();taskLamp.name='OldGuardPost_TaskLamp';taskLamp.position.set(-.92,1.14,.20);guardPost.add(taskLamp);
+    const lampStem=new THREE.Mesh(new THREE.CylinderGeometry(.012,.016,.30,12),this.gf.materials.metal);lampStem.position.y=.15;taskLamp.add(lampStem);
+    const lampHead=new THREE.Mesh(new THREE.ConeGeometry(.09,.10,20,1,true),this.gf.materials.wallBumper);lampHead.position.set(0,.31,.03);lampHead.rotation.x=Math.PI;taskLamp.add(lampHead);
+    const lampLight=new THREE.PointLight(0xe9dfc0,.18,1.8,2);lampLight.name='OldGuardPost_WarmTaskLight';lampLight.position.set(0,.28,.08);taskLamp.add(lampLight);
     asset(guardPost,'storageCabinet',[-1.25,0,-.16],[.45,.9,.55]);
-    CollisionFactory.addBox(this.colliders,-10.7,.55,3.2,2.2,1.1,.9);
+    CollisionFactory.addBox(this.colliders,-10.7,.55,3.2,2.3,1.1,1.9);
     SignAnchor.buildWallPlaque({scene:this.zoneGroup,x:-12.9,y:2.05,z:3.2,rotationY:Math.PI/2,width:1.2,height:.34,code:'SECURITY',title:'舊警衛台',subtitle:'NIGHT SECURITY POST',header:''});
-    this.guardPost={id:'OLD_GUARD_POST',position:[-10.7,0,3.2],cctv:'OldGuardPost_CCTVMonitor',logbook:'OldGuardPost_NightLogbook',serviceDoor:'1F_HIDDEN_SERVICE_DOOR'};
+    this.guardPost={id:'OLD_GUARD_POST',position:[-10.7,0,3.2],cctv:'OldGuardPost_CCTVMonitor',logbook:'OldGuardPost_NightLogbook',phone:'OldGuardPost_DeskPhone',keys:'OldGuardPost_KeyRing',lamp:'OldGuardPost_TaskLamp',serviceDoor:'1F_HIDDEN_SERVICE_DOOR'};
 
     // ==========================================
     // 2. CENTRAL INFORMATION & REGISTRATION RECEPTION (x: -1 to 5, z: -2 to 1)
@@ -314,6 +356,7 @@ export class FirstCampus1F {
     wallTrim(this.zoneGroup,this.gf.materials);
     const exterior=buildCampusBackdrop(this.zoneGroup);
     exterior.position.y=11.5;
+    this.syncStoryState();
     return this;
   }
 
@@ -332,6 +375,21 @@ export class FirstCampus1F {
       if (idx !== -1) this.colliders.splice(idx, 1);
       this.entranceCollider = null;
     }
+  }
+
+  syncStoryState(){
+    const discovered=gameState.getFlag('HIDDEN_SERVICE_DOOR_DISCOVERED')===true;
+    if(this.guardPostObject)this.guardPostObject.userData.interactable=!discovered;
+    if(this.hiddenServiceHit)this.hiddenServiceHit.userData.interactable=discovered;
+    if(this.hiddenServiceFrame)this.hiddenServiceFrame.visible=discovered;
+    if(this.hiddenServiceKeyhole)this.hiddenServiceKeyhole.visible=discovered;
+    if(this.hiddenServiceLed)this.hiddenServiceLed.visible=discovered;
+    if(this.hiddenServiceLight)this.hiddenServiceLight.intensity=discovered ? .42 : 0;
+    const panel=this.zoneGroup.getObjectByName('FirstFloor_BPanel_ConcealedDoor');
+    if(panel)panel.material.color.setHex(discovered?0xc7c0ae:0xd8d6cf);
+    this.zoneGroup.traverse(object=>{
+      if(object.name.startsWith('FirstFloor_BPanel_Seam'))object.material.color.setHex(discovered?0x76654c:0x8f918d);
+    });
   }
 
   cleanup() {

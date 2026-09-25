@@ -14,6 +14,7 @@ No single state-machine PASS is sufficient. A release requires the current stati
 - One shared `prototype/src/art/AnnieArt.js` factory across 3F storage, bridge manifestation, and 6F CPR; rounded mannequin geometry (no Annie `BoxGeometry`), blank synthetic face with one nose only, no eyes/mouth/chest items, mold seams, overlapped bridge/CPR hands, static storage, moving CPR, and exact inscription on the separate stethoscope clue prop.
 - 6F is elevator-hijack-only and absent from ordinary floors/task text; B2 grants full employee number; reconstruction and M9 require the complete exact identity pair.
 - Duty-room washroom plaque absent, bathroom retained; no permanent wall clocks in key story spaces; bedside desk/phone and 0.8m circulation; no floating/occluded/penetrating props; ER monitor is separated from glass.
+- M7 1F guard-post flow must be played from the main-lobby spawn: walk to the physical desk, aim at its CCTV/work surface, confirm `[E] 檢查舊警衛台`, press E, and confirm the objective changes while the frame, lock and purple indicator become visible. Walk to the physical frame, confirm its `[E]` prompt, then press E and reach the 02:17 choice; do not call either interaction handler directly in browser QA.
 
 Run the existing mandatory suite from `prototype/` plus all V2 tests, then `npm run build`.
 

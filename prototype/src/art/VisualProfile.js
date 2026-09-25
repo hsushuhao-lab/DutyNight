@@ -23,14 +23,19 @@ const zones = {
   b2_archive: { lamps: [[0,-1],[0,-6],[0,-11]], intensity: 4.0, width: 2.2, color: 0x6b5146, night: true }
 };
 
-export function applyZoneLighting({group,scene,zoneId,storyTime='17:00',roomLamps=[]}) {
+export function applyZoneLighting({group,scene,zoneGroup,zoneId,storyTime='17:00',roomLamps=[]}) {
   group.traverse(object => { if (object.isLight) object.shadow?.dispose(); });
   group.clear();
   const zone = zones[zoneId] || { lamps: [], intensity: 0, night: true };
   const timeOrder={'21:17':1,'23:55':1,'00:30':1,'00:33':2,'01:15':2,'01:45':2,'02:00':3,'02:17':3,'03:30':3,'04:05':3};
   const stage=timeOrder[storyTime]??0;
   const profile = stage>=3?VisualProfile.NIGHT_HORROR:stage>=2?VisualProfile.NIGHT_LATE:stage>=1||zone.night?VisualProfile.NIGHT_NORMAL:VisualProfile.ACT1_DUSK_NORMAL;
-  const practicalScale=stage===0?1:stage===1?.82:stage===2?.42:.32;
+  const practicalScale=stage===0?1:stage===1?.76:stage===2?.30:.12;
+  const fixtureScale=stage===0?1:stage===1?.90:stage===2?.66:.42;
+  zoneGroup?.traverse(object=>{
+    if(!object.userData.practicalEmitter)return;
+    object.material.color.setHex(object.userData.baseColor).multiplyScalar(fixtureScale);
+  });
   scene.background = new THREE.Color(profile.background);
   scene.fog = null;
   group.userData.profile = zone.night ? 'NIGHT_NORMAL' : 'ACT1_DUSK_NORMAL';

@@ -855,7 +855,7 @@ export class UIManager {
         ]);
       }else if(this.gameState.getFlag('M6_FLOOR6_RESOLVED')&&!this.gameState.getFlag('M7_B2_OPEN')){
         this.renderTaskBoard('翌日 02:17 前｜B-Panel',[
-          {id:'task-m7-service-door',text:'前往第一院區 1F，查看舊警衛台後方的隱藏服務門',state:'ready'}
+          {id:'task-m7-service-door',text:this.gameState.getFlag('HIDDEN_SERVICE_DOOR_DISCOVERED')?'檢查警衛台後方浮現的舊門框':'前往第一院區 1F，檢查舊警衛台',state:'ready'}
         ]);
       }else if(this.gameState.getFlag('M7_B2_OPEN')&&!this.gameState.getFlag('M7_B2_RESOLVED')){
         this.renderTaskBoard('翌日 02:17｜B2',[
@@ -915,7 +915,7 @@ export class UIManager {
       {id:'task-duty-room',task:'P1_DUTY_ROOM_READY',text:'17:30 開啟值班室、放置物品並確認值班電話'},
       {id:'task-round',task:'P1_ROUND_COMPLETE',text:'18:00 完成 401–408 晚間巡房'},
       {id:'task-403',task:'P1_INSOMNIA_DONE',text:'18:30 評估 403 睡眠問題'},
-      {id:'task-normal-event',task:'P1_NORMAL_EVENT_DONE',text:'19:30 處理一般病房事件'},
+      {id:'task-408c-event',task:'P1_NORMAL_EVENT_DONE',text:'19:30 查看 408C 反映的敲牆聲'},
       {id:'task-rest',task:'P1_REST_DONE',text:'20:00 回值班室短暫休息並等待急診通知'}
     ]));
   }

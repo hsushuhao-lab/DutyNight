@@ -218,6 +218,59 @@ export function nursingStationV5(zone,{x,z=-4.3,id}){
   asset(zone.zoneGroup,'storageCabinet',[x-3.6,0,z+3.1],[1,1,1],Math.PI/2);
   asset(zone.zoneGroup,'printer',[x-1.35,.8,z+1.95],[.7,.7,.7]);
   const clinicalPropIds=buildNursingStationClinicalProps(zone,{x,z,id});
+
+  if(zone.campus==='first'&&zone.floor===4){
+    const board=new THREE.Group();board.name='FourF_NursingHandoverBoard';
+    board.position.set(x-2.0,1.78,north+.105);zone.zoneGroup.add(board);
+    solid(board,m.wallBumper,[0,0,0],[2.72,1.12,.055],.018);
+    const canvas=document.createElement('canvas');canvas.width=1024;canvas.height=480;
+    const ctx=canvas.getContext('2d');
+    ctx.fillStyle='#f1efe6';ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle='#345343';ctx.fillRect(0,0,canvas.width,82);
+    ctx.fillStyle='#f5f3eb';ctx.font='bold 42px sans-serif';ctx.textBaseline='middle';
+    ctx.fillText('4F 今日值班',42,42);
+    ctx.fillStyle='#233b30';ctx.font='bold 34px sans-serif';
+    const rows=[
+      '第一線：李住院醫師　｜　總醫師：316 室',
+      '病房現況：滿床 32 床　｜　408C：防跌倒、易躁動',
+      '特別交班：409 封閉整修，禁止推床入內'
+    ];
+    rows.forEach((text,index)=>{
+      const y=160+index*96;
+      if(index===1){ctx.fillStyle='#e4e9df';ctx.fillRect(22,y-39,980,72);}
+      ctx.fillStyle=index===2?'#754d39':'#28332d';ctx.fillText(text,42,y,940);
+      ctx.strokeStyle='#bdc2b5';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(32,y+44);ctx.lineTo(992,y+44);ctx.stroke();
+    });
+    const texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;
+    const face=new THREE.Mesh(new THREE.PlaneGeometry(2.66,1.06),new THREE.MeshBasicMaterial({map:texture,side:THREE.DoubleSide}));
+    face.name='FourF_NursingHandoverBoard_Face';face.position.z=.031;board.add(face);
+    for(const [sx,sy] of [[-1.29,-.50],[1.29,-.50],[-1.29,.50],[1.29,.50]]){
+      const screw=new THREE.Mesh(new THREE.SphereGeometry(.018,12,8),m.stainless);
+      screw.position.set(sx,sy,.039);board.add(screw);
+    }
+    board.userData.text=rows;
+
+    const deskSet=new THREE.Group();deskSet.name='FourF_StationDesktopSet';
+    deskSet.position.set(x-3.35,.80,z+1.95);zone.zoneGroup.add(deskSet);
+    const binder=(name,color,px)=>{
+      const cover=new THREE.Mesh(new THREE.BoxGeometry(.23,.035,.30),new THREE.MeshStandardMaterial({color,roughness:.9}));
+      cover.name=name;cover.position.set(px,.012,-.23);deskSet.add(cover);
+      const label=new THREE.Mesh(new THREE.PlaneGeometry(.16,.12),new THREE.MeshStandardMaterial({color:0xe5e0d0,roughness:.9}));
+      label.position.set(px,.032,-.23);label.rotation.x=-Math.PI/2;deskSet.add(label);
+    };
+    binder('FourF_StationGreenHandoverBinder',0x526b59,-.36);
+    binder('FourF_StationBlueHandoverBinder',0x536573,-.08);
+    const tissue=new THREE.Mesh(new THREE.BoxGeometry(.19,.105,.17),new THREE.MeshStandardMaterial({color:0xe7e5dc,roughness:.94}));
+    tissue.name='FourF_StationTissueBox';tissue.position.set(.34,.065,-.20);deskSet.add(tissue);
+    const cup=new THREE.Mesh(new THREE.CylinderGeometry(.042,.037,.105,20),new THREE.MeshStandardMaterial({color:0xd7d2c2,roughness:.88}));
+    cup.name='FourF_StationColdCoffee';cup.position.set(.47,.052,.18);deskSet.add(cup);
+    const coffee=new THREE.Mesh(new THREE.CircleGeometry(.032,20),new THREE.MeshBasicMaterial({color:0x37271d}));
+    coffee.rotation.x=-Math.PI/2;coffee.position.set(.47,.106,.18);deskSet.add(coffee);
+    for(let i=0;i<3;i++){
+      const pen=new THREE.Mesh(new THREE.CylinderGeometry(.005,.005,.20,8),new THREE.MeshStandardMaterial({color:[0x30455b,0x35533e,0x7b4e3b][i],roughness:.7}));
+      pen.name=`FourF_StationPen_${i+1}`;pen.position.set(.56,.025+i*.004,.23+i*.025);pen.rotation.z=Math.PI/2;deskSet.add(pen);
+    }
+  }
   zone.gf.buildCeilingLight(zone.zoneGroup,x,3.15,z,.8,8);
 
   SignAnchor.buildWallPlaque({scene:zone.zoneGroup,x:x-2.0,y:2.64,z:north+.10,rotationY:0,width:1.7,height:.32,code:'',title:'護理站',subtitle:'',header:''});
