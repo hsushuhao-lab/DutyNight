@@ -306,6 +306,10 @@ try{
   assert.match(await taskText(),/轉院單/,'seeing the M4 patient must advance the objective to the transfer form');
   await interact({id:'SECOND_CHEST_TRANSFER'});
   await page.waitForSelector('#story-choice-modal.active');
+  const transferBody=await page.locator('#story-choice-body').textContent();
+  assert(transferBody.includes('\n'),'the transfer form paragraphs must use real line breaks');
+  assert(!transferBody.includes('\\n'),'the transfer form must not show literal newline escapes');
+  assert.equal(await page.locator('#story-choice-body').evaluate(element=>getComputedStyle(element).whiteSpace),'pre-line');
   await shot('m4-transfer-form',null,null,'SecondCampus_ChestTransferForm',[70.9,1.5,-1.2],[70.72,.83,-2.18]);await secondary();
   s=await snap();assert.equal(s.flags.M4_CHEST_RESOLVED,true);assert.equal(s.flags.CHEST_RECORD_MATCH,true);assert.equal(s.memory.trueNameFragments.frag_givenName_1,null);assert.equal(s.time,'01:45');
   await interact({id:'SECOND_CHEST_NAME_CLUE'});await closeArchive();
@@ -338,7 +342,7 @@ try{
   await shot('m6-elevator-display-6',null,null,'Phantom6F_ElevatorDisplay',[0,2.48,.6],[0,2.48,1.78]);
   await shot('m6-annie-cpr-long',null,null,'Annie_FLOOR6_CPR',[0,2.8,1.2],[.6,.9,-7.3]);
   await interact({id:'FLOOR6_STETHOSCOPE_SEARCH'});
-  await shot('m6-stethoscope-relic',null,null,'Floor6_Stethoscope_Engraving',[-1.37,.72,-7.72],[-1.37,.14,-8.09]);
+  await shot('m6-stethoscope-relic',null,null,'Floor6_Stethoscope_Engraving',[-1.37,.42,-7.97],[-1.37,.14,-8.09]);
   await interact({id:'FLOOR6_STETHOSCOPE_INSPECT'});
   await page.waitForSelector('#story-choice-modal.active');
   await primary();

@@ -822,7 +822,9 @@ controller.onInteract = (interactable) => {
     controller.enabled=false;
     uiManager.openStoryChoice({
       title:'6F｜老舊聽診器近距離檢視',
-      body:'金屬表面氧化，胸件周圍滿是刮痕，黑色管線已經龜裂。刻字被灰塵和污垢覆住。\\n\\n要翻到胸件背面，還是先擦掉表面的灰塵？',
+      body:`金屬表面氧化，胸件周圍滿是刮痕，黑色管線已經龜裂。刻字被灰塵和污垢覆住。
+
+要翻到胸件背面，還是先擦掉表面的灰塵？`,
       primaryText:'翻到胸件背面',
       secondaryText:'擦掉表面灰塵',
       onPrimary:revealTrueName,
@@ -849,7 +851,11 @@ controller.onInteract = (interactable) => {
     controller.enabled=false;
     uiManager.openStoryChoice({
       title:'第二院區｜胸痛病人轉院單',
-      body:'陳怡君，主訴胸悶與心悸。生命徵象穩定，心電圖沒有急性變化；評估符合焦慮伴隨換氣過度。\\n\\n轉院單卻已經填妥：目的地「第一院區 409A」，開立醫師「李○○」。\\n\\n護理師：「李醫師，單子不是你早就填好的嗎？快補簽名吧。」',
+      body:`陳怡君，主訴胸悶與心悸。生命徵象穩定，心電圖沒有急性變化；評估符合焦慮伴隨換氣過度。
+
+轉院單卻已經填妥：目的地「第一院區 409A」，開立醫師「李○○」。
+
+護理師：「李醫師，單子不是你早就填好的嗎？快補簽名吧。」`,
       primaryText:'補上簽名',
       secondaryText:'拒絕簽署並重新查核',
       onPrimary:()=>loopManager.triggerLegendOverride('CHEST',{legend:'LEGEND 03 — 事先填妥的轉院單',reason:'轉院目的地是 409A。'}),

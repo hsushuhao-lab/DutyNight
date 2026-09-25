@@ -269,6 +269,10 @@ kbd {
   color: #f5f5f5;
 }
 
+#story-choice-body {
+  white-space: pre-line;
+}
+
 /* Modals General */
 .modal-overlay {
   display: none;
