@@ -88,6 +88,14 @@ async function motionShot(name,anchorName,position,target,motionValue){
   return motionValue;
 }
 async function q(fn,arg){return page.evaluate(fn,arg);}
+async function waitForPageCondition(target,predicate,timeout=10000){
+  const deadline=Date.now()+timeout;
+  while(Date.now()<deadline){
+    if(await target.evaluate(predicate))return;
+    await new Promise(resolve=>setTimeout(resolve,100));
+  }
+  throw new Error(`page condition timed out after ${timeout}ms`);
+}
 async function taskText(){return q(()=>document.getElementById('task-panel')?.innerText||'');}
 async function load(zone,spawn){await q(({zone,spawn})=>window.__storyQA.load(zone,spawn),{zone,spawn});await page.waitForTimeout(120);}
 async function enter(zone,spawn){await q(({zone,spawn})=>window.__storyQA.enter(zone,spawn),{zone,spawn});await page.waitForTimeout(160);}
@@ -147,12 +155,12 @@ try{
   // Public mode must not expose the story QA bridge.
   const publicPage=await browser.newPage({viewport:{width:900,height:600}});
   await publicPage.goto(base,{waitUntil:'load',timeout:180000});
-  await publicPage.waitForFunction(()=>window.worldRouter?.activeZoneInstance,null,{timeout:180000,polling:100});
+  await waitForPageCondition(publicPage,()=>window.worldRouter?.activeZoneInstance,180000);
   assert.equal(await publicPage.evaluate(()=>typeof window.__storyQA),'undefined');
   await publicPage.close();
 
   await page.goto(url,{waitUntil:'load',timeout:180000});
-  await page.waitForFunction(()=>window.__storyQA?.worldRouter?.activeZoneInstance,null,{timeout:180000,polling:100});
+  await waitForPageCondition(page,()=>window.__storyQA?.worldRouter?.activeZoneInstance,180000);
   await mark('Story QA bridge ready');
   await shot('m1-3f-admin-316','first_campus_3f','m0_316_office','AdminDesk_Monitor',[-19.25,1.7,3.65],[-19.25,1.25,5.18]);
   await shot('m1-3f-storage-annie-static','first_campus_3f','m0_3f_corridor','Annie_STORAGE_STATIC',[14.8,1.7,5.85],[14.2,.9,5.15]);
@@ -187,7 +195,7 @@ try{
       resolve();
     },500);
   }));
-  await page.waitForFunction(()=>window.__storyQA.worldRouter.activeZoneId==='first_campus_3f',null,{timeout:30000,polling:100});
+  await waitForPageCondition(page,()=>window.__storyQA.worldRouter.activeZoneId==='first_campus_3f',30000);
   s=await snap();
   assert.equal(s.memory.loopCount,1);assert.equal(s.memory.survivalRules.neverSignBed33,true);
   assert(s.memory.journalNotes.some(n=>n.id==='RULE_BED33'));
@@ -207,12 +215,12 @@ try{
   await load('first_campus_4f','m2_4f_duty_room');
   await q(()=>window.__storyQA.gameState.setGameTime('20:00'));
   await pressEAt([-8,1.2,6],'duty_room');
-  await page.waitForFunction(()=>window.__storyQA.gameState.getFlag('PHONE_RING_ACTIVE')&&window.__storyQA.gameState.getFlag('PHONE_CALL_KIND')==='ER_JANE_2005',null,{timeout:10000,polling:100});
+  await waitForPageCondition(page,()=>window.__storyQA.gameState.getFlag('PHONE_RING_ACTIVE')&&window.__storyQA.gameState.getFlag('PHONE_CALL_KIND')==='ER_JANE_2005');
   s=await snap();assert.equal(s.flags.P1_ER_CALL_ANSWERED,false);assert.equal(s.flags.ER_JANE_PRESENT,false);assert.equal(s.time,'20:00');
   assert.equal((await taskText()).trim(),'','the next objective waits for the 20:05 phone answer');
   await walkTo(-9.62,4.7);
   await pressEAt([-9.62,.89,3.1],'4F_DUTY_PHONE');
-  await page.waitForFunction(()=>window.__storyQA.gameState.getFlag('P1_ER_CALL_ANSWERED')===true,null,{timeout:10000,polling:100});
+  await waitForPageCondition(page,()=>window.__storyQA.gameState.getFlag('P1_ER_CALL_ANSWERED')===true);
   s=await snap();assert.equal(s.flags.PHONE_RING_ACTIVE,false);assert.equal(s.flags.PHONE_ANSWERED,true);assert.equal(s.flags.ER_JANE_PRESENT,true);assert.equal(s.time,'20:05');
   assert.equal(await page.locator('#task-er-assess').count(),1,'answering the 20:05 call reveals the ER assessment objective');
   await enter('first_campus_2f');
@@ -228,12 +236,12 @@ try{
   // Then the 21:15 call returns the player to 3F; noticing the panel is not enough — the logbook must be signed.
   await enter('first_campus_4f','m2_4f_duty_room');
   await interact({action:'END_SHIFT'});
-  await page.waitForFunction(()=>window.__storyQA.gameState.getFlag('PHONE_RING_ACTIVE')&&window.__storyQA.gameState.getFlag('PHONE_CALL_KIND')==='NIGHT_PATROL_2115',null,{timeout:10000,polling:100});
+  await waitForPageCondition(page,()=>window.__storyQA.gameState.getFlag('PHONE_RING_ACTIVE')&&window.__storyQA.gameState.getFlag('PHONE_CALL_KIND')==='NIGHT_PATROL_2115');
   s=await snap();assert.equal(s.flags.NIGHT_PATROL_RETURN_3F,false);assert.equal(s.time,'21:15');
   assert.equal((await taskText()).trim(),'','the 21:15 return objective waits for the phone answer');
   await walkTo(-9.62,4.7);
   await pressEAt([-9.62,.89,3.1],'4F_DUTY_PHONE');
-  await page.waitForFunction(()=>window.__storyQA.gameState.getFlag('NIGHT_PATROL_RETURN_3F')===true,null,{timeout:10000,polling:100});
+  await waitForPageCondition(page,()=>window.__storyQA.gameState.getFlag('NIGHT_PATROL_RETURN_3F')===true);
   s=await snap();assert.equal(s.flags.PHONE_RING_ACTIVE,false);assert.equal(s.flags.PHONE_ANSWERED,true);assert.equal(s.time,'21:15');
   assert.equal(await page.locator('#task-night-return').count(),1,'answering the 21:15 call reveals the return-to-3F objective');
   await enter('first_campus_3f');
@@ -245,7 +253,7 @@ try{
 
   // Entering the 4F duty room starts the 23:55 beat, then the player must answer the 00:30 call.
   await enter('first_campus_4f','m2_4f_duty_room');
-  await page.waitForFunction(()=>window.__storyQA.gameState.getFlag('PHONE_RING_ACTIVE')&&window.__storyQA.gameState.getFlag('PHONE_CALL_KIND')==='ER_GHOST_0033',null,{timeout:30000,polling:100});
+  await waitForPageCondition(page,()=>window.__storyQA.gameState.getFlag('PHONE_RING_ACTIVE')&&window.__storyQA.gameState.getFlag('PHONE_CALL_KIND')==='ER_GHOST_0033',30000);
   s=await snap();
   assert.equal(s.flags.POST_2117_DUTY_ROOM_TRIGGERED,true,'entering the duty room must auto-trigger the post-21:17 sequence');
   assert.equal(s.time,'00:30');
@@ -257,7 +265,7 @@ try{
   assert.equal((await taskText()).trim(),'','the 00:33 registration objective waits for the call answer');
   await walkTo(-9.62,4.7);
   await pressEAt([-9.62,.89,3.1],'4F_DUTY_PHONE');
-  await page.waitForFunction(()=>window.__storyQA.gameState.getFlag('POST_2117_DUTY_CALL_DONE')===true,null,{timeout:10000,polling:100});
+  await waitForPageCondition(page,()=>window.__storyQA.gameState.getFlag('POST_2117_DUTY_CALL_DONE')===true);
   s=await snap();assert.equal(s.flags.PHONE_RING_ACTIVE,false);assert.equal(s.flags.PHONE_ANSWERED,true);assert.equal(s.time,'00:33');
   assert.equal(s.flags.GHOST_REGISTRATION_ARMED,true);assert.equal(s.flags.GHOST_REGISTRATION_AVAILABLE,true);
   assert.equal(await page.locator('#task-post2117-er').count(),1,'answering the 00:30 call reveals the ER registration objective');
@@ -292,7 +300,7 @@ try{
   assert.doesNotMatch(await page.locator('#subtitle-text').innerText(),/\\n/,'316 terminal subtitle must use real line breaks');
   await interact({id:'316_PHONE'});
   assert.match(await page.locator('#subtitle-text').innerText(),/怎麼知道我在 316 辦公室/);
-  await page.waitForFunction(()=>window.__storyQA.gameState.getFlag('SECOND_CAMPUS_ACCESS')===true,null,{timeout:10000,polling:100});
+  await waitForPageCondition(page,()=>window.__storyQA.gameState.getFlag('SECOND_CAMPUS_ACCESS')===true);
   s=await snap();assert.equal(s.flags.SECOND_CAMPUS_ACCESS,true);
   assert.equal(s.time,'01:15');
   assert.equal(await q(()=>window.__storyQA.gameState.getDisplayTime()),'翌日 01:15');
@@ -378,30 +386,30 @@ try{
   await load('first_campus_1f','m5_1f_lobby_entrance');
   await walkTo(-10.7,3.2,{radius:2.0});
   await q(point=>window.__storyQA.lookAt(point),[-10.7,1.03,3.2]);
-  await page.waitForFunction(()=>window.__storyQA.controller.currentInteractable?.id==='OLD_GUARD_POST',null,{timeout:5000,polling:100});
+  await waitForPageCondition(page,()=>window.__storyQA.controller.currentInteractable?.id==='OLD_GUARD_POST',5000);
   assert.match(await page.locator('#interaction-prompt').innerText(),/\[E\].*檢查舊警衛台/,'the real crosshair must offer the old guard-post E interaction');
   await functionalShot('m7-guard-post-approach.png');
   await page.keyboard.press('e');
-  await page.waitForFunction(()=>window.__storyQA.gameState.getFlag('HIDDEN_SERVICE_DOOR_DISCOVERED')===true,null,{timeout:5000,polling:100});
+  await waitForPageCondition(page,()=>window.__storyQA.gameState.getFlag('HIDDEN_SERVICE_DOOR_DISCOVERED')===true,5000);
   assert(await q(()=>{const zone=window.__storyQA.worldRouter.activeZoneInstance;return zone.hiddenServiceFrame.visible&&zone.hiddenServiceKeyhole.visible}),'the discovered door frame and keyhole must be visible in the live scene');
   assert.match(await taskText(),/檢查警衛台後方浮現的舊門框/,'inspecting the post must reveal the updated service-door objective');
   await walkTo(-12.4,1.65);
   await walkTo(-12.55,4.5);
   await q(point=>window.__storyQA.lookAt(point),[-13.58,1.18,4.55]);
-  await page.waitForFunction(()=>window.__storyQA.controller.currentInteractable?.id==='1F_HIDDEN_SERVICE_DOOR',null,{timeout:5000,polling:100});
+  await waitForPageCondition(page,()=>window.__storyQA.controller.currentInteractable?.id==='1F_HIDDEN_SERVICE_DOOR',5000);
   assert.match(await page.locator('#interaction-prompt').innerText(),/\[E\].*舊門框/,'the revealed physical hitbox must show an E prompt');
   await functionalShot('m7-b-panel-e-prompt.png');
   report.functionalFlows.push({name:'M7 GUARD POST TO B-PANEL',steps:['spawned at 1F main entrance','walked with W to guard desk','crosshair showed [E] inspect old guard post','pressed E and revealed door seams/purple indicator','walked around desk to the physical service-door hitbox','crosshair showed [E] inspect revealed door']});
   await page.keyboard.press('e');
   await page.waitForSelector('#story-choice-modal.active');await secondary();
-  await page.waitForFunction(()=>window.__storyQA.worldRouter.activeZoneId==='b2_archive',null,{timeout:30000,polling:100});
+  await waitForPageCondition(page,()=>window.__storyQA.worldRouter.activeZoneId==='b2_archive',30000);
   await shot('m7-b2-mirror-316',null,null,'B2_Mirror316_Frame',[0,1.7,-11.0],[0,1.7,-14.65]);
 
   await interact({id:'B2_ARCHIVE_TERMINAL'});
   s=await snap();assert.equal(s.flags.M7_B2_RESOLVED,true);assert.equal(s.flags.M8_IDENTITY_BATTLE_ACTIVE,true);assert.equal(s.memory.trueNameResolved,true);assert.equal(s.memory.trueName,'張守恆');assert.equal(s.memory.trueNameFragments.frag_employeeFull,'MED-870409');
   assert.match(await taskText(),/舊貨梯[\s\S]*離開 B2/,'B2 verification must explicitly tell the player how to leave');
   await interact({id:'B2_RETURN_LIFT'});
-  await page.waitForFunction(()=>window.__storyQA.worldRouter.activeZoneId==='first_campus_1f',null,{timeout:30000,polling:100});
+  await waitForPageCondition(page,()=>window.__storyQA.worldRouter.activeZoneId==='first_campus_1f',30000);
   s=await snap();assert.equal(s.flags.LAST_CALL_SEEN,true);assert.equal(s.time,'03:30');
   assert.match(await taskText(),/3F[\s\S]*316/,'last call must push the player back to 3F 316 for the final handoff');
   await mark('M7 B2 reveals true name; M8 identity battle active');
