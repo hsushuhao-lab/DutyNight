@@ -1,6 +1,6 @@
 // Level3FBlockout.js - 3F Administration Blockout with Sunset Warmth
 import * as THREE from 'three';
-import {createAnnieArt,createZhangStethoscopeProp} from '../art/AnnieArt.js';
+import {createAnnieArt} from '../art/AnnieArt.js';
 import { getMaterials, materialForSurface } from '../art/MaterialRegistry.js';
 
 export class Level3FBlockout {
@@ -345,13 +345,15 @@ export class Level3FBlockout {
     const cart=new THREE.Group();cart.position.set(13.5,0,5.15);this.scene.add(cart);
     const bed=new THREE.Mesh(new THREE.BoxGeometry(1.70,.12,.72),this.materials.wall);bed.position.y=.76;cart.add(bed);
     for(const x of [-.72,.72])for(const z of [-.25,.25]){const leg=new THREE.Mesh(new THREE.CylinderGeometry(.025,.025,.62,8),cartMat);leg.position.set(x,.42,z);cart.add(leg);}
-    const anne=createAnnieArt(this.scene,{materials:this.materials,state:'STORAGE_STATIC',position:[13.48,0,3.18],rotationY:0});
+    const anne=createAnnieArt(this.scene,{materials:this.materials,state:'STORAGE_STATIC',position:[14.2,.84,5.15],rotationY:0});
+    anne.rotation.z=Math.PI/2;
     this.anneGroup=anne;this.anneHead=anne.getObjectByName('Annie_Head');this.anneStage=0;
-    this.anneStethoscopeProp=createZhangStethoscopeProp(this.scene,{position:[13.8,.82,5.15],rotationX:-Math.PI/2,scale:.82});
-    const anneHit=new THREE.Mesh(new THREE.BoxGeometry(.95,1.9,.95),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
-    anneHit.position.set(13.48,1.0,3.18);anneHit.userData={interactable:true,id:'CPR_ANNE',type:'cpr_anne',label:'查看 CPR 訓練假人「安妮」'};
-    this.scene.add(anneHit);this.interactables.push(anneHit);this.anneHit=anneHit;
     this.anneStool=anne.getObjectByName('Annie_Stool');
+    if(this.anneStool)this.anneStool.visible=false;
+    const anneHit=new THREE.Mesh(new THREE.BoxGeometry(.95,1.9,.95),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
+    anneHit.position.set(13.48,1.0,5.15);anneHit.userData={interactable:true,id:'CPR_ANNE',type:'cpr_anne',label:'查看 CPR 訓練假人「安妮」'};
+    this.scene.add(anneHit);this.interactables.push(anneHit);this.anneHit=anneHit;
+    this.anneTrainingCart=cart;
     this.storageRoom={id:'3F_STORAGE',label:'器材儲藏室',anne:true,bounds:[11,2.5,16,6.5]};
   }
 
@@ -360,12 +362,14 @@ export class Level3FBlockout {
     this.anneStage=stage;
     this.anneGroup.visible=stage<3;this.anneHit.visible=stage<3;
     this.anneHit.userData.interactable=stage<3;
-    if(stage<3){
-      this.anneGroup.position.set(13.48,0,3.18);this.anneGroup.rotation.set(0,0,0);
-      this.anneHead.rotation.set(0,0,0);this.anneStool.visible=true;
-      this.anneHit.position.set(13.48,1.0,3.18);
+    if(stage===0){
+      this.anneGroup.position.set(14.2,.84,5.15);this.anneGroup.rotation.set(0,0,Math.PI/2);
+      this.anneStool.visible=false;this.anneHit.position.set(13.48,1.0,5.15);
     }
-    if(stage>=3&&this.storageDoor){this.storageDoor.position.set(12.95,1.15,3.03);this.storageDoor.rotation.y=-Math.PI/2;}
+    if(stage===1){
+      this.anneGroup.position.set(13.48,0,3.3);this.anneGroup.rotation.set(0,Math.PI,0);
+      this.anneStool.visible=false;this.anneHit.position.set(13.48,1.0,3.3);
+    }
   }
 
   buildDutyOffice() {
@@ -434,7 +438,7 @@ export class Level3FBlockout {
     for(const y of [.08,.52,.96,1.40,1.84]){const sh=new THREE.Mesh(new THREE.BoxGeometry(1.54,.08,.42),shelfMat);sh.position.set(0,y,0);hintShelf.add(sh);}
     const hintDefs=[
       ['316_HINT_1F_SECURITY',-.43,.72,'一樓警衛查哨紀錄影本',[
-        '夜間巡邏紀錄提到：一樓舊警衛台後方仍保留早期鑰匙標籤櫃。\n\n其中幾個標籤已褪色，但仍有人在深夜更動位置。',
+        '夜間巡邏紀錄提到：一樓警衛台後方仍保留早期鑰匙標籤櫃。\n\n其中幾個標籤已褪色，但仍有人在深夜更動位置。',
         '附註欄反覆出現同一句：「02:17 後不要單獨巡舊服務走道。」\n\n簽名欄卻沒有任何人承認寫過這句話。'
       ]],
       ['316_HINT_1F_SERVICE',0,.72,'一樓設備維護單',[

@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import * as THREE from 'three';
 import {WorldRouter} from './src/world/WorldRouter.js';
 import {ANNIE_STATES, updateAnnieArt} from './src/art/AnnieArt.js';
+import {gameState} from './src/core/GameState.js';
 
 const context=new Proxy({measureText:t=>({width:t.length*20})},{get:(o,k)=>o[k]||(()=>({addColorStop(){}}))});
 global.document={querySelector:()=>null,addEventListener(){},createElement:()=>({width:0,height:0,getContext:()=>context})};
@@ -38,14 +39,10 @@ const threeF=router.loadZone('first_campus_3f');
 const storage=threeF.levelInstance.anneGroup;
 assertAnnie(storage,ANNIE_STATES.STORAGE_STATIC);
 assert(storage.getObjectByName('Annie_Stool'),'M1 Annie must sit on the storage stool');
-const storageStethoscope=threeF.levelInstance.anneStethoscopeProp;
-assert(storageStethoscope?.getObjectByName('Zhang_Stethoscope_1997_Inscription'),'engraved stethoscope remains a separate nearby prop');
-assert.equal(storageStethoscope.userData.inscription,'祝 守恆 醫師 1997 執業誌慶');
+assert.equal(threeF.levelInstance.anneStethoscopeProp,undefined,'the stethoscope clue belongs to the 6F investigation');
 const storageElapsed=storage.userData.rig.elapsed;
 updateAnnieArt(storage,1);
 assert.equal(storage.userData.rig.elapsed,storageElapsed,'M1 storage mannequin remains completely static');
-assertAnnie(router.loadZone('first_campus_4f').zoneGroup.getObjectByName('Annie_STORAGE_STATIC'),ANNIE_STATES.STORAGE_STATIC);
-
 const bridge=router.loadZone('skybridge').bridgeDoppelganger;
 assertAnnie(bridge,ANNIE_STATES.BRIDGE_MANIFEST);
 updateAnnieArt(bridge,.5);
@@ -55,14 +52,32 @@ assert(bridge.getObjectByName('Annie_OverlappedHands'),'bridge pose must hold bo
 bridge.updateMatrixWorld(true);
 assert(bridge.getObjectByName('Annie_HandStack_Top').getWorldPosition(new THREE.Vector3()).y>1.05,'bridge hands remain lifted and extended');
 
-const cpr=router.loadZone('phantom_6f').zoneGroup.getObjectByName('Annie_FLOOR6_CPR');
+gameState.setFlag('FLOOR6_STETHOSCOPE_FOUND',false);
+gameState.setFlag('FLOOR6_STETHOSCOPE_INSPECTED',false);
+const phantom6F=router.loadZone('phantom_6f');
+const stethoscope=phantom6F.stethoscopeProp;
+assert.equal(stethoscope.visible,false,'the 6F stethoscope stays buried until searched');
+assert.equal(phantom6F.stethoscopeSearch.userData.interactable,true);
+assert.equal(phantom6F.stethoscopeInspect.userData.interactable,false);
+assert(stethoscope.getObjectByName('Floor6_Stethoscope_Engraving'),'the close inspection prop needs a visible engraved plate');
+assert.equal(stethoscope.userData.inscription,'祝 守恆 醫師 1997 執業誌慶');
+gameState.setFlag('FLOOR6_STETHOSCOPE_FOUND',true);
+phantom6F.syncStoryState();
+assert.equal(stethoscope.visible,true,'searching reveals the stethoscope');
+assert.equal(phantom6F.stethoscopeSearch.userData.interactable,false);
+assert.equal(phantom6F.stethoscopeInspect.userData.interactable,true);
+gameState.setFlag('FLOOR6_STETHOSCOPE_INSPECTED',true);
+phantom6F.syncStoryState();
+assert.equal(phantom6F.stethoscopeInspect.userData.interactable,false,'inspection cannot be repeated after reading the engraving');
+
+const cpr=phantom6F.zoneGroup.getObjectByName('Annie_FLOOR6_CPR');
 assertAnnie(cpr,ANNIE_STATES.FLOOR6_CPR);
 updateAnnieArt(cpr,0);
 assert(cpr.getObjectByName('Annie_OverlappedHands'),'CPR uses overlapped hands');
 assert(cpr.getObjectByName('Annie_Local_CoolWhite_Practical')?.castShadow,'Annie needs local cool-white shadowed light');
 cpr.updateMatrixWorld(true);
 const cprHands=cpr.getObjectByName('Annie_HandStack_Top').getWorldPosition(new THREE.Vector3());
-const patient=router.loadZone('phantom_6f').zoneGroup.getObjectByName('Annie_Patient_CPR_Target');
+const patient=phantom6F.zoneGroup.getObjectByName('Annie_Patient_CPR_Target');
 patient.updateWorldMatrix(true,false);
 const patientCenter=patient.getWorldPosition(new THREE.Vector3());
 assert(cprHands.distanceTo(patientCenter)<0.35,'overlapped CPR hands must reach the burned patient contact point');

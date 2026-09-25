@@ -12,9 +12,9 @@ assert.equal(state.getGamePhase(),GamePhase.FIRST_ARRIVAL);
 state.setFlag('HOOK_0217',true);
 state.markTaskComplete('P1_REST_DONE');
 let line=duty.onZoneEntered('first_campus_2f');
-assert.equal(state.gameTime,'20:05');
-assert.match(line.text,/無名氏/);
-assert.match(line.text,/舊.*住院手圈/);
+assert.equal(line,null,'20:05 story content must wait for the player to answer the duty-room phone');
+assert.equal(state.gameTime,'17:00');
+assert.equal(state.getFlag('ER_JANE_PRESENT'),false,'Jane Doe must not materialize on 2F entry');
 
 phases.setPhase(GamePhase.ELEVATOR_GLITCH);
 assert.equal(state.getGamePhase(),GamePhase.ELEVATOR_GLITCH);
@@ -33,13 +33,15 @@ state.setFlag('GHOST_REGISTRATION_ARMED',true);
 state.markTaskComplete('P1_ER_ASSESSMENT_DONE');
 state.markTaskComplete('P1_ER_NOTE_DONE');
 line=duty.onZoneEntered('first_campus_2f');
-assert.equal(state.gameTime,'00:33');
-assert.equal(state.getDisplayTime(),'翌日 00:33');
-assert.equal(state.getFlag('GHOST_REGISTRATION_AVAILABLE'),true);
-assert.match(line.text,/00:33/);
+assert.equal(line,null,'00:33 must wait for the player to answer the emergency phone');
+assert.equal(state.gameTime,'21:17');
+assert.equal(state.getDisplayTime(),'21:17');
+assert.equal(state.getFlag('GHOST_REGISTRATION_AVAILABLE'),false);
 
 const main=readFileSync('./src/main.js','utf8');
 const workflow=readFileSync('../.github/workflows/deploy-pages.yml','utf8');
+assert(main.includes("callKind==='ER_JANE_2005'")&&main.includes("callKind==='ER_GHOST_0033'"),'20:05 and 00:33 story triggers must be phone-answer branches');
+assert(main.includes("callKind==='NIGHT_PATROL_2115'"),'21:15 return mission must be a phone-answer branch');
 assert(main.includes("gameState.isTaskComplete('ACT1_NORMAL_FLOW')||gameState.getFlag('NIGHT_PATROL_RETURN_3F')"),'21:15 call must be one-shot');
 assert(workflow.includes('Refuse stale queued push')&&workflow.includes("steps.freshness.outputs.current == 'true'"),'Pages workflow must refuse stale queued commits');
 

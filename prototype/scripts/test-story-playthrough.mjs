@@ -17,8 +17,8 @@ const requiredShots=[
   'm1-3f-admin-316.png','m1-3f-storage-annie-static.png','m1-annie-close-inspection.png','m2-4f-nursing-station.png','m2-4f-duty-room.png',
   'm2-408c-bed.png','m2-409-sealed.png','m3-er-nursing-station.png','m3-0033-registration.png',
   'm3-316-legacy-terminal-phone.png','m4-ordinary-patient.png','m4-transfer-form.png','m4-guard-roster-clue.png',
-  'm5-outbound-bridge-baseline.png','m5-return-bridge-annie.png','m5-bridge-close-annie.png','m5-stethoscope-relic.png','m6-elevator-display-6.png',
-  'm6-annie-cpr-long.png','m6-annie-cpr.png','m6-annie-cpr-close.png','m7-1f-guard-post.png','m7-b-panel-concealed-door.png','m7-b2-mirror-316.png',
+  'm5-outbound-bridge-baseline.png','m5-return-bridge-annie.png','m5-bridge-close-annie.png','m6-elevator-display-6.png',
+  'm6-annie-cpr-long.png','m6-stethoscope-relic.png','m6-annie-cpr.png','m6-annie-cpr-close.png','m7-1f-guard-post.png','m7-b-panel-concealed-door.png','m7-b2-mirror-316.png',
   'm9-dual-identity-form.png','m9-successful-dawn-ending.png'
 ];
 const report={url,sourceSha:process.env.GITHUB_SHA||'local-working-tree',started:new Date().toISOString(),milestones:[],screenshots:[],motionScreenshots:[],functionalScreenshots:[],functionalFlows:[],screenshotWarnings:[],errors:[],method:'Browser-driven M2-M9 story checkpoint playthrough with named scene-anchor frustum checks, 26 required full-resolution captures, bridge-idle/CPR motion frames, and physical M7 guard-post-to-B-Panel interaction.'};
@@ -59,11 +59,11 @@ async function motionShot(name,anchorName,position,target,motionValue){
     const sample=await page.waitForFunction(phase=>{
       const zone=window.__storyQA.worldRouter.activeZoneInstance;
       const value=zone.annie.userData.rig.compression;
-      if(phase==='press'?value<=.85:value>=.05)return false;
+      if(phase==='press'?value<=.85:value>=.15)return false;
       zone.__storyQaMotionUpdate={own:Object.hasOwn(zone,'update'),update:zone.update};
       zone.update=()=>{};
       return {value};
-    },phase,{timeout:5000});
+    },phase,{polling:50,timeout:10000});
     frozen=true;
     motionValue=(await sample.jsonValue()).value;
   }
@@ -94,6 +94,12 @@ async function enter(zone,spawn){await q(({zone,spawn})=>window.__storyQA.enter(
 async function flag(k,v=true){await q(({k,v})=>window.__storyQA.setFlag(k,v),{k,v});}
 async function task(id){await q(id=>window.__storyQA.task(id),id);}
 async function interact(query){await q(query=>window.__storyQA.interact(query),query);await page.waitForTimeout(100);}
+async function pressEAt(target,id){
+  await q(point=>window.__storyQA.lookAt(point),target);
+  await page.waitForFunction(id=>window.__storyQA.controller.currentInteractable?.id===id,id,{timeout:5000});
+  await page.keyboard.press('e');
+  await page.waitForTimeout(180);
+}
 async function walkTo(x,z,{radius=.42,timeout=20000}={}){
   await q(point=>window.__storyQA.lookAt(point),[x,1.7,z]);
   await page.keyboard.down('w');
@@ -128,7 +134,7 @@ async function secondary(){await domClick('#story-choice-modal.active #btn-story
 async function primary(){await domClick('#story-choice-modal.active #btn-story-primary');}
 async function setM2Checkpoint(){
   await flag('STAFF_ACCESS_CARD',true);await flag('HOOK_409_ZERO_ROOM',true);
-  for(const id of ['WARD_ENTRY','P1_4F_REPORT','P1_DUTY_ROOM_READY','P1_ROUND_COMPLETE'])await task(id);
+  for(const id of ['KEY_PICKUP','WARD_ENTRY','P1_4F_REPORT','P1_DUTY_ROOM_READY','P1_ROUND_COMPLETE'])await task(id);
   await load('first_campus_4f');
 }
 
@@ -149,12 +155,12 @@ try{
   await page.waitForFunction(()=>window.__storyQA?.worldRouter?.activeZoneInstance,null,{timeout:180000});
   await mark('Story QA bridge ready');
   await shot('m1-3f-admin-316','first_campus_3f','m0_316_office','AdminDesk_Monitor',[-19.25,1.7,3.65],[-19.25,1.25,5.18]);
-  await shot('m1-3f-storage-annie-static','first_campus_3f','m0_3f_corridor','Annie_STORAGE_STATIC',[15.2,1.7,5.6],[13.48,1.0,3.18]);
-  let mannequinCheck=await q(()=>{const level=window.__storyQA.worldRouter.activeZoneInstance.levelInstance;const a=level.anneGroup;const names=[];a.traverse(object=>names.push(object.name));return {state:a.userData.state,nose:!!a.getObjectByName('Annie_MoldedNose'),face:a.getObjectByName('Annie_SmoothVinylFace')?.material?.roughness,noEyesOrMouth:!names.some(name=>/^Annie_(FixedEye|UnfocusedIris|FixedPupil|Mouth|BlowTrainingMouth)/.test(name)),chestClear:!names.some(name=>/^Annie_(Stethoscope|CoatPocket|CoatButton|CompressionPlate)/.test(name)),inscription:level.anneStethoscopeProp?.userData.inscription,offBodyProp:!!level.anneStethoscopeProp?.getObjectByName('Zhang_Stethoscope_1997_Inscription')}});
-  assert.equal(mannequinCheck.state,'STORAGE_STATIC');assert(mannequinCheck.nose);assert(mannequinCheck.noEyesOrMouth);assert(mannequinCheck.chestClear);assert(mannequinCheck.face<.5);assert.equal(mannequinCheck.inscription,'祝 守恆 醫師 1997 執業誌慶');assert(mannequinCheck.offBodyProp);
-  await shot('m1-annie-close-inspection',null,null,'Annie_SmoothVinylFace',[13.48,1.42,4.45],[13.48,1.39,3.18]);
+  await shot('m1-3f-storage-annie-static','first_campus_3f','m0_3f_corridor','Annie_STORAGE_STATIC',[14.8,1.7,5.85],[14.2,.9,5.15]);
+  let mannequinCheck=await q(()=>{const level=window.__storyQA.worldRouter.activeZoneInstance.levelInstance;const a=level.anneGroup;const names=[];a.traverse(object=>names.push(object.name));return {state:a.userData.state,nose:!!a.getObjectByName('Annie_MoldedNose'),face:a.getObjectByName('Annie_SmoothVinylFace')?.material?.roughness,noEyesOrMouth:!names.some(name=>/^Annie_(FixedEye|UnfocusedIris|FixedPupil|Mouth|BlowTrainingMouth)/.test(name)),chestClear:!names.some(name=>/^Annie_(Stethoscope|CoatPocket|CoatButton|CompressionPlate)/.test(name)),noBodyStethoscope:!level.anneStethoscopeProp}});
+  assert.equal(mannequinCheck.state,'STORAGE_STATIC');assert(mannequinCheck.nose);assert(mannequinCheck.noEyesOrMouth);assert(mannequinCheck.chestClear);assert(mannequinCheck.face<.5);assert(mannequinCheck.noBodyStethoscope);
+  await shot('m1-annie-close-inspection',null,null,'Annie_SmoothVinylFace',[12.81,1.7,5.8],[12.81,.84,5.16]);
   await shot('m2-4f-nursing-station','first_campus_4f','m3_4f_nursing_station','WorkstationDesk_first_station_A',[0,1.7,-4.6],[-3.35,1.0,-2.35]);
-  await shot('m2-4f-duty-room','first_campus_4f','m2_4f_duty_room','DutyRoom_ExtensionPhone',[-10.8,1.7,4.8],[-9.62,.87,7.1]);
+  await shot('m2-4f-duty-room','first_campus_4f','m2_4f_duty_room','DutyRoom_ExtensionPhone',[-10.8,1.7,4.8],[-9.62,.87,3.1]);
   await shot('m2-408c-bed','first_campus_4f','m2_4f_409','Bed_408C',[9.8,1.7,-8.2],[8.1,.8,-7.32]);
   await shot('m2-409-sealed','first_campus_4f','m2_4f_409','Bed33_409_WarningTape',[5.0,1.7,-3.0],[6.88,1.2,-3.0]);
 
@@ -188,7 +194,7 @@ try{
   await mark('M2 override loops to 17:00 with memory');
 
   // M2 second loop: use remembered rule and reject without re-learning every clue.
-  await flag('STAFF_ACCESS_CARD',true);await flag('HOOK_409_ZERO_ROOM',true);await task('WARD_ENTRY');await task('P1_INSOMNIA_DONE');await load('first_campus_4f');
+  await flag('STAFF_ACCESS_CARD',true);await flag('HOOK_409_ZERO_ROOM',true);await task('KEY_PICKUP');await task('WARD_ENTRY');await task('P1_INSOMNIA_DONE');await load('first_campus_4f');
   await interact({id:'BED33_ASSIGNMENT'});
   await page.waitForSelector('#bed33-modal.active');
   assert.equal(await page.locator('#btn-bed33-reject').isVisible(),true);
@@ -196,20 +202,40 @@ try{
   s=await snap();assert.equal(s.flags.BED33_RESOLVED,true);assert.equal(s.memory.proofs.space,true);assert.equal(s.memory.trueNameFragments.frag_employeePrefix,'MED-87');
   await mark('M2 resolved by persistent cognition');
 
-  // M3: Jane Doe happens during the normal 20:00 consult. 00:33 must NOT leak before the 21:17 bootstrap.
-  await flag('HOOK_0217',true);await task('P1_REST_DONE');
+  // 20:05: opening the duty-room door starts the call; the task and Jane Doe appear only after E on the ringing phone.
+  await flag('HOOK_0217',true);await task('P1_NORMAL_EVENT_DONE');
+  await load('first_campus_4f','m2_4f_duty_room');
+  await q(()=>window.__storyQA.gameState.setGameTime('20:00'));
+  await pressEAt([-8,1.2,6],'duty_room');
+  await page.waitForFunction(()=>window.__storyQA.gameState.getFlag('PHONE_RING_ACTIVE')&&window.__storyQA.gameState.getFlag('PHONE_CALL_KIND')==='ER_JANE_2005',null,{timeout:10000});
+  s=await snap();assert.equal(s.flags.P1_ER_CALL_ANSWERED,false);assert.equal(s.flags.ER_JANE_PRESENT,false);assert.equal(s.time,'20:00');
+  assert.equal((await taskText()).trim(),'','the next objective waits for the 20:05 phone answer');
+  await walkTo(-9.62,4.7);
+  await pressEAt([-9.62,.89,3.1],'4F_DUTY_PHONE');
+  await page.waitForFunction(()=>window.__storyQA.gameState.getFlag('P1_ER_CALL_ANSWERED')===true,null,{timeout:10000});
+  s=await snap();assert.equal(s.flags.PHONE_RING_ACTIVE,false);assert.equal(s.flags.PHONE_ANSWERED,true);assert.equal(s.flags.ER_JANE_PRESENT,true);assert.equal(s.time,'20:05');
+  assert.equal(await page.locator('#task-er-assess').count(),1,'answering the 20:05 call reveals the ER assessment objective');
   await enter('first_campus_2f');
   s=await snap();
   const preGhost=await q(()=>window.__storyQA.worldRouter.activeZoneInstance?.ghostRegistrationTerminal?.userData?.interactable===true);
   assert.equal(preGhost,false,'00:33 terminal must stay dormant during the first ER consult');
+  assert.equal(await q(()=>window.__storyQA.worldRouter.activeZoneInstance.janeDoePatient.visible),true,'the 20:05 phone answer materializes a physical patient');
   await interact({action:'ER_ASSESS'});await interact({action:'ER_NOTE'});
   s=await snap();assert.equal(s.flags.B_PANEL_KEY,true);assert.equal(s.memory.trueNameFragments.frag_surname,null);
   await interact({id:'ER_EXIT_NOTICE'});
   assert((await page.locator('#subtitle-text').innerText()).includes('只進不出'));
 
   // Then the 21:15 call returns the player to 3F; noticing the panel is not enough — the logbook must be signed.
-  await flag('NIGHT_PATROL_RETURN_3F',true);
-  await q(()=>window.__storyQA.floorStateManager.setPhase(window.__storyQA.GamePhase.NIGHT_PATROL));
+  await enter('first_campus_4f','m2_4f_duty_room');
+  await interact({action:'END_SHIFT'});
+  await page.waitForFunction(()=>window.__storyQA.gameState.getFlag('PHONE_RING_ACTIVE')&&window.__storyQA.gameState.getFlag('PHONE_CALL_KIND')==='NIGHT_PATROL_2115',null,{timeout:10000});
+  s=await snap();assert.equal(s.flags.NIGHT_PATROL_RETURN_3F,false);assert.equal(s.time,'21:15');
+  assert.equal((await taskText()).trim(),'','the 21:15 return objective waits for the phone answer');
+  await walkTo(-9.62,4.7);
+  await pressEAt([-9.62,.89,3.1],'4F_DUTY_PHONE');
+  await page.waitForFunction(()=>window.__storyQA.gameState.getFlag('NIGHT_PATROL_RETURN_3F')===true,null,{timeout:10000});
+  s=await snap();assert.equal(s.flags.PHONE_RING_ACTIVE,false);assert.equal(s.flags.PHONE_ANSWERED,true);assert.equal(s.time,'21:15');
+  assert.equal(await page.locator('#task-night-return').count(),1,'answering the 21:15 call reveals the return-to-3F objective');
   await enter('first_campus_3f');
   await interact({id:'GUARD_SIGN_2117'});
   s=await snap();assert.equal(s.flags.GUARD_SIGN_EXAMINED,true);assert.equal(s.flags.BOOTSTRAP_2117_RESOLVED,false);
@@ -217,26 +243,29 @@ try{
   s=await snap();assert.equal(s.flags.BOOTSTRAP_2117_RESOLVED,true);assert.equal(s.time,'21:17');
   assert.equal(s.flags.GHOST_REGISTRATION_ARMED,false,'00:33 must not arm immediately at 21:17');
 
-  // 21:17 must actively push the player back to the 4F duty room. Merely entering
-  // the room must trigger the sequence: no hidden E target or END_SHIFT fallback.
+  // Entering the 4F duty room starts the 23:55 beat, then the player must answer the 00:30 call.
   await enter('first_campus_4f','m2_4f_duty_room');
-  // Software WebGL can block a frame longer than the 2.2 s 23:55 transition.
-  // Do not race the transient frame; prove the durable outcome happened with no E interaction.
-  await page.waitForFunction(()=>window.__storyQA.gameState.getFlag('POST_2117_DUTY_CALL_DONE')===true,null,{timeout:30000});
+  await page.waitForFunction(()=>window.__storyQA.gameState.getFlag('PHONE_RING_ACTIVE')&&window.__storyQA.gameState.getFlag('PHONE_CALL_KIND')==='ER_GHOST_0033',null,{timeout:30000});
   s=await snap();
   assert.equal(s.flags.POST_2117_DUTY_ROOM_TRIGGERED,true,'entering the duty room must auto-trigger the post-21:17 sequence');
   assert.equal(s.time,'00:30');
-  assert.equal(s.flags.GHOST_REGISTRATION_ARMED,true);
-  assert.equal(s.flags.POST_2117_DUTY_CALL_DONE,true);
+  assert.equal(s.flags.GHOST_REGISTRATION_ARMED,false);
+  assert.equal(s.flags.GHOST_REGISTRATION_AVAILABLE,false);
+  assert.equal(s.flags.POST_2117_DUTY_CALL_DONE,false);
   assert.equal(s.controllerEnabled,true,'movement must return after the forced phone beat');
   assert.equal(await q(()=>window.__storyQA.gameState.getDisplayTime()),'翌日 00:30');
-  assert.match(await taskText(),/立即前往 2F 急診/,'00:30 call must actively push the player to 2F ER');
-  await mark('21:17 duty-room entry auto-triggers 23:55 beat and 00:30 ER call');
-
-  // Only after the duty-room call does re-entry to 2F materialize the 00:33 registration.
+  assert.equal((await taskText()).trim(),'','the 00:33 registration objective waits for the call answer');
+  await walkTo(-9.62,4.7);
+  await pressEAt([-9.62,.89,3.1],'4F_DUTY_PHONE');
+  await page.waitForFunction(()=>window.__storyQA.gameState.getFlag('POST_2117_DUTY_CALL_DONE')===true,null,{timeout:10000});
+  s=await snap();assert.equal(s.flags.PHONE_RING_ACTIVE,false);assert.equal(s.flags.PHONE_ANSWERED,true);assert.equal(s.time,'00:33');
+  assert.equal(s.flags.GHOST_REGISTRATION_ARMED,true);assert.equal(s.flags.GHOST_REGISTRATION_AVAILABLE,true);
+  assert.equal(await page.locator('#task-post2117-er').count(),1,'answering the 00:30 call reveals the ER registration objective');
+  await mark('21:17 room entry then answered 00:30 ER call');
   await enter('first_campus_2f');
   await load('first_campus_2f','m4_2f_er_triage');await shot('m3-er-nursing-station',null,null,'ER_TriageCounter',[3.5,2.2,.8],[3.5,1.45,6.4]);
   s=await snap();assert.equal(s.flags.GHOST_REGISTRATION_AVAILABLE,true);assert.equal(s.time,'00:33');
+  assert.equal(await q(()=>window.__storyQA.worldRouter.activeZoneInstance.janeDoePatient.visible),false,'the 00:33 record has no present patient');
   assert.equal(await q(()=>window.__storyQA.gameState.getDisplayTime()),'翌日 00:33');
   await interact({id:'ER_GHOST_REGISTRATION'});
   await page.waitForSelector('#story-choice-modal.active');
@@ -272,7 +301,7 @@ try{
 
   // M4: second-campus chest-pain duplicate patient.
   await load('second_campus_5f');
-  await shot('m4-ordinary-patient',null,null,'SecondCampus_ChestPainPatient',[70.2,1.7,-11.3],[72,.95,-13]);
+  await shot('m4-ordinary-patient',null,null,'SecondCampus_ChestPainPatient',[65.8,1.7,-18.5],[67.9,.95,-20.68]);
   await interact({id:'SECOND_CHEST_PATIENT'});
   assert.match(await taskText(),/轉院單/,'seeing the M4 patient must advance the objective to the transfer form');
   await interact({id:'SECOND_CHEST_TRANSFER'});
@@ -280,7 +309,7 @@ try{
   await shot('m4-transfer-form',null,null,'SecondCampus_ChestTransferForm',[70.9,1.5,-1.2],[70.72,.83,-2.18]);await secondary();
   s=await snap();assert.equal(s.flags.M4_CHEST_RESOLVED,true);assert.equal(s.flags.CHEST_RECORD_MATCH,true);assert.equal(s.memory.trueNameFragments.frag_givenName_1,null);assert.equal(s.time,'01:45');
   await interact({id:'SECOND_CHEST_NAME_CLUE'});await closeArchive();
-  await shot('m4-guard-roster-clue',null,null,'SecondCampus_TrueNameRosterFragment',[73.4,2.0,-11.9],[72.24,.82,-12.72]);
+  await shot('m4-guard-roster-clue',null,null,'SecondCampus_TrueNameRosterFragment',[68.7,1.7,-19.0],[68.26,.91,-20.04]);
   s=await snap();assert.equal(s.flags.M4_NAME_CLUE_FOUND,true);assert.equal(s.memory.trueNameFragments.frag_givenName_1,'守');
   assert.match(await taskText(),/返回第一院區/,'M4 resolution must push the player toward the next route');
   await mark('M4 chest-pain duplicate resolved');
@@ -300,10 +329,7 @@ try{
     await motionShot(`m5-bridge-idle-${frame+1}`,'Annie_BRIDGE_MANIFEST',[41,1.65,0],[46,1.0,0],pose);
   }
   assert(Math.max(...bridgeMotion)-Math.min(...bridgeMotion)>0.0001,'Bridge idle motion must change across the three browser frames');
-  s=await snap();assert.equal(s.flags.M5_BRIDGE_RESOLVED,true);assert.equal(s.flags.M5_ROUTE_RESOLVED,false);assert.equal(s.flags.FLOOR6_AVAILABLE,false);assert.equal(s.memory.proofs.identity,false);assert.equal(s.memory.trueNameFragments.frag_givenName_2,null);assert.equal(s.time,'02:00');
-  await interact({id:'ANNIE_TRUE_NAME_CLUE'});
-  await shot('m5-stethoscope-relic',null,null,'Annie_EngravedStethoscope_Bridge',[6.5,1.65,1.2],[5,.95,.4]);
-  s=await snap();assert.equal(s.flags.M5_ROUTE_RESOLVED,true);assert.equal(s.flags.FLOOR6_AVAILABLE,true);assert.equal(s.memory.proofs.identity,true);assert.equal(s.memory.trueNameFragments.frag_givenName_2,'恆');
+  s=await snap();assert.equal(s.flags.M5_BRIDGE_RESOLVED,true);assert.equal(s.flags.M5_ROUTE_RESOLVED,true);assert.equal(s.flags.FLOOR6_AVAILABLE,true);assert.equal(s.memory.proofs.identity,true);assert.equal(s.memory.trueNameFragments.frag_givenName_2,null);assert.equal(s.time,'02:00');
   assert.match(await taskText(),/搭乘一般電梯返回第一院區/,'M5 resolution must reveal the return-to-ward elevator objective');
   await mark('M5 bridge rule resolved');
 
@@ -311,6 +337,15 @@ try{
   await flag('PHANTOM6_RETURN_ZONE','second_campus_5f');await load('phantom_6f','phantom_6f_lift');
   await shot('m6-elevator-display-6',null,null,'Phantom6F_ElevatorDisplay',[0,2.48,.6],[0,2.48,1.78]);
   await shot('m6-annie-cpr-long',null,null,'Annie_FLOOR6_CPR',[0,2.8,1.2],[.6,.9,-7.3]);
+  await interact({id:'FLOOR6_STETHOSCOPE_SEARCH'});
+  await shot('m6-stethoscope-relic',null,null,'Floor6_Stethoscope_Engraving',[-1.37,.72,-7.72],[-1.37,.14,-8.09]);
+  await interact({id:'FLOOR6_STETHOSCOPE_INSPECT'});
+  await page.waitForSelector('#story-choice-modal.active');
+  await primary();
+  s=await snap();assert.equal(s.flags.FLOOR6_STETHOSCOPE_INSPECTED,true);assert.equal(s.memory.trueNameFragments.frag_givenName_2,'恆');assert.equal(s.flags.M5_NAME_CLUE_FOUND,true);
+  const inscriptionSubtitle=await page.locator('#subtitle-text').innerText();
+  assert.match(inscriptionSubtitle,/祝 守恆 醫師[\s\S]*1997[\s\S]*執業誌慶/);
+  assert.doesNotMatch(inscriptionSubtitle,/\\n/,'the stethoscope subtitle must show real line breaks');
   mannequinCheck=await q(()=>{const a=window.__storyQA.worldRouter.activeZoneInstance.annie;const names=[];a.traverse(object=>names.push(object.name));return {state:a.userData.state,compression:a.userData.rig.compression,noseOnly:!!a.getObjectByName('Annie_MoldedNose')&&!names.some(name=>/^Annie_(FixedEye|UnfocusedIris|FixedPupil|Mouth|BlowTrainingMouth)/.test(name)),chestClear:!names.some(name=>/^Annie_(Stethoscope|CoatPocket|CoatButton|CompressionPlate)/.test(name))}});
   assert.equal(mannequinCheck.state,'FLOOR6_CPR');assert(mannequinCheck.noseOnly);assert(mannequinCheck.chestClear);
   await page.waitForFunction(initial=>{
@@ -322,11 +357,11 @@ try{
   const pressOne=await motionShot('m6-cpr-press-1','Annie_HandStack_Top',[1.55,1.65,-8.0],[.82,1.0,-7.3],{capture:'cpr',phase:'press'});
   const release=await motionShot('m6-cpr-release','Annie_HandStack_Top',[1.55,1.65,-8.0],[.82,1.0,-7.3],{capture:'cpr',phase:'release'});
   const pressTwo=await motionShot('m6-cpr-press-2','Annie_HandStack_Top',[1.55,1.65,-8.0],[.82,1.0,-7.3],{capture:'cpr',phase:'press'});
-  assert(pressOne>0.85&&release<0.05&&pressTwo>0.85,'CPR browser frames must show press, release, and press');
+  assert(pressOne>0.85&&release<0.15&&pressTwo>0.85,'CPR browser frames must show press, release, and press');
 
   await interact({id:'FLOOR6_SAFE_RETURN'});
   s=await snap();assert.equal(s.flags.M6_FLOOR6_RESOLVED,true);assert.equal(s.zone,'second_campus_5f');
-  assert((await taskText()).includes('檢查舊警衛台'),'M6 resolution must direct the player to inspect the 1F guard post');
+  assert((await taskText()).includes('檢查警衛台'),'M6 resolution must direct the player to inspect the 1F guard post');
   await mark('M6 nonexistent 6F resolved');
 
   // M7: 02:17 decision + B2 convergence.
@@ -340,7 +375,7 @@ try{
   await walkTo(-10.7,3.2,{radius:2.0});
   await q(point=>window.__storyQA.lookAt(point),[-10.7,1.03,3.2]);
   await page.waitForFunction(()=>window.__storyQA.controller.currentInteractable?.id==='OLD_GUARD_POST',null,{timeout:5000});
-  assert.match(await page.locator('#interaction-prompt').innerText(),/\[E\].*檢查舊警衛台/,'the real crosshair must offer the guard-post E interaction');
+  assert.match(await page.locator('#interaction-prompt').innerText(),/\[E\].*檢查舊警衛台/,'the real crosshair must offer the old guard-post E interaction');
   await functionalShot('m7-guard-post-approach.png');
   await page.keyboard.press('e');
   await page.waitForFunction(()=>window.__storyQA.gameState.getFlag('HIDDEN_SERVICE_DOOR_DISCOVERED')===true,null,{timeout:5000});

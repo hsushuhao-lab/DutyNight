@@ -336,15 +336,6 @@ export class FirstCampus2FER {
       text: '急診夜間出入口 ｜ 此門只進不出'
     });
 
-    if(gameState.getFlag('HOOK_0217')){
-      const bandMat=new THREE.MeshStandardMaterial({color:0xc9a94a,roughness:.82});
-      const band=new THREE.Mesh(new THREE.TorusGeometry(.095,.018,8,24),bandMat);
-      band.rotation.x=Math.PI/2;band.position.set(10.5,.92,7.26);this.zoneGroup.add(band);
-      const tag=new THREE.Mesh(new THREE.BoxGeometry(.20,.05,.08),new THREE.MeshStandardMaterial({color:0xe0cf87,roughness:.9}));
-      tag.position.set(10.58,.92,7.26);this.zoneGroup.add(tag);
-      this.janeDoeWristband={id:'2F_OLD_WRISTBAND',position:[10.5,.92,7.26],format:'legacy_unreadable'};
-    }
-
     const ghostTerminal=new THREE.Mesh(new THREE.BoxGeometry(.75,.55,.35),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
     ghostTerminal.name='ER_GhostRegistrationTerminal';
     ghostTerminal.position.set(13,1.18,-6.35);
@@ -357,7 +348,6 @@ export class FirstCampus2FER {
     this.zoneGroup.add(exitNotice);this.interactables.push(exitNotice);
 
     this.interactables.push(
-      {type:'p1_action',action:'ER_ASSESS',label:'進行精神科評估',position:new THREE.Vector3(10.5,1.2,7.5),radius:1.8},
       {type:'p1_action',action:'ER_NOTE',label:'完成急診評估紀錄',position:new THREE.Vector3(13,1.2,-6.5),radius:1.8}
     );
     this.buildArtDetails();
@@ -376,12 +366,17 @@ export class FirstCampus2FER {
     for(const child of exterior.children) {
       if(child.name.startsWith('ArtAsset/') && new THREE.Box3().setFromObject(child).intersectsBox(wingVolume)) child.visible=false;
     }
+    this.syncStoryState();
     return this;
   }
 
   syncStoryState(){
     if(this.ghostRegistrationTerminal){
       this.ghostRegistrationTerminal.userData.interactable=gameState.getFlag('GHOST_REGISTRATION_AVAILABLE')===true;
+    }
+    if(this.janeDoePatient){
+      this.janeDoePatient.visible=gameState.getFlag('ER_JANE_PRESENT')===true;
+      this.janeDoeHit.userData.interactable=this.janeDoePatient.visible;
     }
   }
 
@@ -408,6 +403,28 @@ export class FirstCampus2FER {
     const m=this.gf.materials;
     const add=(material,position,size)=>solid(this.art,material,position,size);
     wallTrim(this.zoneGroup,m);
+    this.janeDoePatient=new THREE.Group();
+    this.janeDoePatient.name='ER_JaneDoe_ObservationPatient';
+    this.janeDoePatient.position.set(10.5,.83,7.5);
+    this.janeDoePatient.visible=false;
+    this.zoneGroup.add(this.janeDoePatient);
+    const gown=new THREE.MeshStandardMaterial({color:0xd3d8d0,roughness:.96});
+    const skin=new THREE.MeshStandardMaterial({color:0xc8b7a7,roughness:.94});
+    const hair=new THREE.MeshStandardMaterial({color:0x383633,roughness:1});
+    const torso=new THREE.Mesh(new THREE.SphereGeometry(1,32,24),gown);torso.scale.set(.28,.19,.46);torso.position.z=-.06;this.janeDoePatient.add(torso);
+    const blanket=new THREE.Mesh(new THREE.SphereGeometry(1,32,24),m.bedSheet);blanket.scale.set(.34,.13,.32);blanket.position.set(0,-.04,-.43);this.janeDoePatient.add(blanket);
+    const head=new THREE.Mesh(new THREE.SphereGeometry(.15,24,18),skin);head.scale.set(.88,.82,1);head.position.set(0,.025,.64);this.janeDoePatient.add(head);
+    const hairCap=new THREE.Mesh(new THREE.SphereGeometry(.155,24,16),hair);hairCap.scale.set(1,.42,1);hairCap.position.set(0,.1,.65);this.janeDoePatient.add(hairCap);
+    for(const side of [-1,1]){
+      const arm=new THREE.Mesh(new THREE.CapsuleGeometry(.052,.34,5,10),skin);arm.rotation.z=side*.16;arm.position.set(side*.31,-.005,.05);this.janeDoePatient.add(arm);
+    }
+    const wristband=new THREE.Mesh(new THREE.TorusGeometry(.06,.013,8,20),new THREE.MeshStandardMaterial({color:0xc9a94a,roughness:.82}));
+    wristband.rotation.x=Math.PI/2;wristband.position.set(-.30,-.005,.25);this.janeDoePatient.add(wristband);
+    const tag=new THREE.Mesh(new THREE.BoxGeometry(.16,.045,.07),new THREE.MeshStandardMaterial({color:0xe0cf87,roughness:.9}));tag.position.set(-.35,-.005,.25);this.janeDoePatient.add(tag);
+    const janeHit=new THREE.Mesh(new THREE.BoxGeometry(.95,.65,1.45),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
+    janeHit.position.set(0,.08,.03);janeHit.userData={interactable:false,id:'2F_JANE_DOE_ASSESSMENT',type:'p1_action',action:'ER_ASSESS',label:'評估身分待確認女性病人'};
+    this.janeDoePatient.add(janeHit);this.janeDoeHit=janeHit;this.interactables.push(janeHit);
+    this.janeDoeWristband={id:'2F_OLD_WRISTBAND',format:'identity_unconfirmed'};
     counterFront(this.art,m,3.5,3.135,4.8,1.1);
     add(m.counterTop,[3.5,1.115,3.5],[4.95,.055,.77]);
     add(m.doorWood,[3.5,2.55,3.5],[5.1,.5,.2]);

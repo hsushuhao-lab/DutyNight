@@ -31,10 +31,14 @@ function mountBedWallPlaque(zone,{rect,bx,bz,roomId,bedInRoom}){
     {wall:'east',d:Math.abs(x2-bx),x:x2-margin,z:THREE.MathUtils.clamp(bz,z1+.45,z2-.45),rotationY:-Math.PI/2}
   ].sort((a,b)=>a.d-b.d);
   const p=choices[0];
-  SignAnchor.buildWallPlaque({
+  const plaqueObject=SignAnchor.buildWallPlaque({
     scene:zone.zoneGroup,x:p.x,y:1.42,z:p.z,rotationY:p.rotationY,
     width:.62,height:.23,code:bedInRoom,title:roomId,subtitle:`${roomId}${bedInRoom}`,header:'床位'
   });
+  if(roomId==='408'&&bedInRoom==='C'){
+    plaqueObject.userData={interactable:true,id:'408C_BED_PLAQUE',type:'p1_action',action:'NORMAL_EVENT',label:'查看 408C 反映的敲牆聲'};
+    zone.interactables.push(plaqueObject);
+  }
   return {wall:p.wall,x:p.x,y:1.42,z:p.z,rotationY:p.rotationY};
 }
 
@@ -67,7 +71,9 @@ export function ordinaryRoom(zone,walls,{id,label=id+' 病房',rect,side,door,ki
   const point=kind==='ward'?(alongX?[x,1.7,cz]:[cx,1.7,z]):[x-outward[0]*1.25,1.7,z-outward[1]*1.25];
   const yaw=side==='north'?Math.PI:side==='south'?0:side==='west'?-Math.PI/2:Math.PI/2;
   const plaqueOffset=.115;
-  SignAnchor.buildWallPlaque({scene:zone.zoneGroup,x:x+(alongX?-1.5:outward[0]*plaqueOffset),y:1.75,z:z+(alongX?outward[1]*plaqueOffset:-1.5),rotationY:yaw,width:1,height:.34,code:id,title:label.replace(id,'').trim(),subtitle:'',header:''});
+  const plaqueX=kind==='storage'?x:x+(alongX?-1.5:outward[0]*plaqueOffset);
+  const plaqueZ=kind==='storage'?z+outward[1]*plaqueOffset:z+(alongX?outward[1]*plaqueOffset:-1.5);
+  SignAnchor.buildWallPlaque({scene:zone.zoneGroup,x:plaqueX,y:kind==='storage'?2.62:1.75,z:plaqueZ,rotationY:yaw,width:1,height:.34,code:id,title:label.replace(id,'').trim(),subtitle:'',header:''});
 
   if(kind==='ward'){
     const dx=Math.min(1.4,(x2-x1)*.28),dz=Math.min(2.2,(z2-z1)*.28);

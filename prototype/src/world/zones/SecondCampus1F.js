@@ -39,7 +39,7 @@ export class SecondCampus1F {
       z: -2.0,
       ceilingY: 3.2,
       rotationY: 0,
-      text: '第二院區 1F ｜ 警衛室・山側步道・生態池'
+      text: '第二院區 1F ｜ 警衛室・急診入口・院內管制'
     });
 
     // South wall (z = -8.0) with heavy exterior exit doors
@@ -49,7 +49,7 @@ export class SecondCampus1F {
     this.gf.buildWall(this.zoneGroup, this.colliders, 75.75, 1.6, -8.0, 4.5, 3.2, 0.4);
 
     // Exterior exit doorway (x: 70.5 to 73.5, width 2.4m double door)
-    new AccessDoor(this,{id:'SECOND_1F_HILLSIDE',x:72,z:-8,width:2.4,title:'山側步道感應門',material:this.gf.materials.metal,portal:'hill_from_second',readers:true,readerSide:-1});
+    new AccessDoor(this,{id:'SECOND_1F_HILLSIDE',x:72,z:-8,width:2.4,title:'山側封閉門',material:this.gf.materials.metal,readers:true,readerSide:-1});
 
     // ==========================================
     // 2. COVERED OUTDOOR CONCRETE LANDING (z: -8 to -14)

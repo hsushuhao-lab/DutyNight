@@ -4,6 +4,7 @@ import { disposeZoneArt } from '../../art/ArtResources.js';
 import { SignAnchor } from '../shared/SignAnchor.js';
 import { createAnnieArt, updateAnnieArt } from '../../art/AnnieArt.js';
 import { soundManager } from '../../audio/SoundManager.js';
+import { gameState } from '../../core/GameState.js';
 
 export class Phantom6F {
   constructor(scene,geometryFactory){
@@ -64,6 +65,39 @@ export class Phantom6F {
     this.annie=annie;
     this.cprElapsed=0;this.nextCprSound=60/110*.25;
 
+    const search=new THREE.Mesh(new THREE.BoxGeometry(1.25,1.05,1.2),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
+    search.name='Floor6_StethoscopeSearch';search.position.set(-1.55,.68,-8.35);
+    search.userData={interactable:true,id:'FLOOR6_STETHOSCOPE_SEARCH',type:'floor6_stethoscope_search',label:'翻找焦黑器材'};
+    this.zoneGroup.add(search);this.interactables.push(search);this.stethoscopeSearch=search;
+
+    const inspect=new THREE.Mesh(new THREE.BoxGeometry(1.1,.7,.85),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
+    inspect.name='Floor6_StethoscopeInspection';inspect.position.set(-1.55,.48,-8.35);
+    inspect.userData={interactable:false,id:'FLOOR6_STETHOSCOPE_INSPECT',type:'floor6_stethoscope_inspect',label:'檢視老舊聽診器'};
+    this.zoneGroup.add(inspect);this.interactables.push(inspect);this.stethoscopeInspect=inspect;
+
+    const stethoscope=new THREE.Group();stethoscope.name='Floor6_OldStethoscope';stethoscope.position.set(-1.55,.08,-8.35);stethoscope.visible=false;stethoscope.userData.inscription='祝 守恆 醫師 1997 執業誌慶';this.zoneGroup.add(stethoscope);
+    const tubeMat=new THREE.MeshStandardMaterial({color:0x171a18,roughness:.9});
+    const tubePath=new THREE.CatmullRomCurve3([
+      new THREE.Vector3(-.24,.10,0),new THREE.Vector3(-.27,.18,0),new THREE.Vector3(-.20,.25,0),
+      new THREE.Vector3(0,.27,0),new THREE.Vector3(.20,.25,0),new THREE.Vector3(.27,.18,0),new THREE.Vector3(.24,.10,0),
+      new THREE.Vector3(.18,.05,.03),new THREE.Vector3(.14,.02,.10),new THREE.Vector3(.18,.02,.20)
+    ]);
+    stethoscope.add(new THREE.Mesh(new THREE.TubeGeometry(tubePath,48,.018,8,false),tubeMat));
+    const chestpiece=new THREE.Mesh(new THREE.CylinderGeometry(.09,.10,.045,24),new THREE.MeshStandardMaterial({color:0x766f61,metalness:.45,roughness:.72}));
+    chestpiece.rotation.x=Math.PI/2;chestpiece.position.set(.18,.02,.23);stethoscope.add(chestpiece);
+    const engravingCanvas=document.createElement('canvas');engravingCanvas.width=768;engravingCanvas.height=384;
+    const engravingContext=engravingCanvas.getContext('2d');engravingContext.fillStyle='#817969';engravingContext.fillRect(0,0,768,384);
+    engravingContext.fillStyle='#292721';engravingContext.font='bold 52px sans-serif';engravingContext.textAlign='center';engravingContext.textBaseline='middle';
+    engravingContext.fillText('祝 守恆 醫師',384,86);engravingContext.fillText('1997',384,192);engravingContext.fillText('執業誌慶',384,298);
+    const engravingTexture=new THREE.CanvasTexture(engravingCanvas);engravingTexture.colorSpace=THREE.SRGBColorSpace;
+    const engraving=new THREE.Mesh(new THREE.PlaneGeometry(.17,.12),new THREE.MeshBasicMaterial({map:engravingTexture,toneMapped:false,side:THREE.DoubleSide}));
+    engraving.name='Floor6_Stethoscope_Engraving';engraving.userData.inscription=stethoscope.userData.inscription;engraving.position.set(.18,.02,.257);stethoscope.add(engraving);
+    for(const x of [-.24,.24]){
+      const eartip=new THREE.Mesh(new THREE.SphereGeometry(.035,12,10),tubeMat);eartip.position.set(x,.11,0);stethoscope.add(eartip);
+    }
+    this.stethoscopeProp=stethoscope;
+    this.syncStoryState();
+
     this.phantomFloor={id:'PHANTOM_6F',safe:'FLOOR6_SAFE_RETURN',danger:'FLOOR6_CHASE'};
     return this;
   }
@@ -75,6 +109,14 @@ export class Phantom6F {
     this.patientTarget.position.y=this.patientRestY-compression*.025;
     this.patientTarget.scale.y=this.patientRestScaleY*(1-compression*.1);
     if(this.cprElapsed>=this.nextCprSound){soundManager.playCprCompression();this.nextCprSound=this.cprElapsed+60/110;}
+  }
+
+  syncStoryState(){
+    const found=gameState.getFlag('FLOOR6_STETHOSCOPE_FOUND')===true;
+    const inspected=gameState.getFlag('FLOOR6_STETHOSCOPE_INSPECTED')===true;
+    this.stethoscopeSearch.userData.interactable=!found;
+    this.stethoscopeInspect.userData.interactable=found&&!inspected;
+    this.stethoscopeProp.visible=found;
   }
 
   cleanup(){this.scene.remove(this.zoneGroup);disposeZoneArt(this.zoneGroup);this.colliders=[];this.walkables=[];this.interactables=[];}

@@ -265,6 +265,7 @@ kbd {
 #subtitle-text {
   font-size: 16px;
   line-height: 1.5;
+  white-space: pre-line;
   color: #f5f5f5;
 }
 

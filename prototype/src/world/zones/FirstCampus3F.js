@@ -288,7 +288,7 @@ export class FirstCampus3F {
         pages:[
           '封面沒有日期，也沒有歸檔編號。第一頁只有一句話：\n\n「如果你是從 316 的系統訊息找到這裡，代表它又開始了。」',
           '第二頁列出幾個重複時間：02:17、03:16、04:09。旁邊有人用紅筆寫：\n\n「不要把它當成樓層或房號。」',
-          '最後一頁只剩一行：\n\n「今晚先完成值班。真正要找的東西，不在病歷裡。」\n\n頁角蓋著模糊的舊院章。\n\n旁邊夾著一張殘缺索引：409／舊隔離零號房；316／夜間封鎖決策點；1F／舊警衛台後配電；2F／舊式手圈索引。'
+          '最後一頁只剩一行：\n\n「今晚先完成值班。真正要找的東西，不在病歷裡。」\n\n頁角蓋著模糊的舊院章。\n\n旁邊夾著一張殘缺索引：409／舊隔離零號房；316／夜間封鎖決策點；1F／警衛台後配電；2F／舊式手圈索引。'
         ]
       }
     ];
@@ -352,8 +352,8 @@ export class FirstCampus3F {
         if(this.levelInstance.museumKey302.userData.targetGroup)this.levelInstance.museumKey302.userData.targetGroup.visible=false;
       }
     }
-    const savedAnne=Number(gameState.getFlag('ANNE_STAGE')||0);
-    if(savedAnne>0)this.levelInstance.setAnneStage(savedAnne);
+    const storageVisits=Number(gameState.getFlag('STORAGE_ANNE_VISIT_COUNT')||0);
+    if(storageVisits>0)this.levelInstance.setAnneStage(Math.min(storageVisits-1,2));
     if(gameState.getFlag('GUARD_FUTURE_ENTRY'))this.setPatrolFutureEntry();
     this.updateElevatorLight(gameState.areRequiredTasksComplete());
 
@@ -390,7 +390,6 @@ export class FirstCampus3F {
     if(phase==='Phase2_2040_ElevatorGlitch'){
       this.phaseRedLight.intensity=2.6;
       state.setFlag('ANNE_STAGE',3);
-      this.levelInstance?.setAnneStage?.(3);
       return;
     }
 
@@ -478,9 +477,14 @@ export class FirstCampus3F {
 
   update(camera) {
     if(!camera||!this.levelInstance?.anneGroup)return;
-    const desired=Number(gameState.getFlag('ANNE_STAGE')||0);
-    if(desired<=this.levelInstance.anneStage)return;
-    if(!this.isAnneVisibleToPlayer(camera))this.levelInstance.setAnneStage(desired);
+    const p=camera.position;
+    const insideStorage=p.x>11&&p.x<16&&p.z>2.5&&p.z<6.5;
+    if(insideStorage&&!this.insideStorage){
+      const visits=Math.min(3,Number(gameState.getFlag('STORAGE_ANNE_VISIT_COUNT')||0)+1);
+      gameState.setFlag('STORAGE_ANNE_VISIT_COUNT',visits);
+      this.levelInstance.setAnneStage(Math.min(visits-1,2));
+    }
+    this.insideStorage=insideStorage;
   }
 
   updateElevatorLight(isReady) {

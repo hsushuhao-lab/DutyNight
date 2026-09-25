@@ -22,9 +22,9 @@ assert.equal(ward.bed33Legend?.bedId,'409A','the anomalous Bed 33 clue must rema
 assert(ward.keyedDoors['room_409']?.closed,'409 remains a closed room');
 assert(!ward.zoneGroup.getObjectByName('Bed_409A'),'409A must not be rendered as an ordinary bed');
 
-const actions=ward.interactables.filter(item=>item.type==='p1_action');
+const actions=ward.interactables.map(item=>item.userData??item).filter(item=>item.type==='p1_action');
 assert.equal(actions.find(item=>item.action==='INSOMNIA_403')?.anchorRoom,'403');
-assert.equal(actions.find(item=>item.action==='NORMAL_EVENT')?.anchorBedId,'408C');
+assert.equal(actions.find(item=>item.action==='NORMAL_EVENT')?.id,'408C_BED_PLAQUE');
 assert.doesNotMatch(mainSource,/KNOCK_403_49/,'403 cannot own the knock clue');
 assert.match(mainSource,/registerBed33Clue\('KNOCK_408C_49'\)/,'408C must own the knock clue');
 assert.match(uiSource,/19:30 查看 408C 反映的敲牆聲/,'the duty board must identify the real 408C event');

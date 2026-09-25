@@ -37,7 +37,7 @@ assert(main.includes("LEGEND 03 — 事先填妥的轉院單")&&main.includes("M
 
 assert(bridge.includes("type:'bridge_loop_event'")&&main.includes("LEGEND 04 — 不能回頭的天橋"),'M5 bridge legend missing');
 assert(main.includes("frag_givenName_2','恆'"),'M5 true-name fragment missing');
-assert(bridge.includes("type:'true_name_clue_2'"),'M5 bridge must expose the physical name clue');
+assert(!bridge.includes("type:'true_name_clue_2'")&&floor6.includes("type:'floor6_stethoscope_search'")&&floor6.includes("type:'floor6_stethoscope_inspect'")&&main.includes("FLOOR6_STETHOSCOPE_INSPECTED"),'the physical name clue must be searched and inspected on 6F');
 
 assert(floor6.includes("type:'floor6_safe_return'")&&floor6.includes("type:'floor6_chase'"),'M6 phantom floor interactions missing');
 assert(router.includes("'phantom_6f': Phantom6F")&&routes.includes("phantom_6f_lift"),'M6 route registration missing');
@@ -45,7 +45,7 @@ assert(main.includes("LEGEND 06 — 不存在的六樓")&&main.includes("M6_FLOO
 
 assert(b2.includes("type:'b2_archive_terminal'")&&b2.includes("type:'b2_return_lift'"),'M7 B2 convergence interactions missing');
 assert(router.includes("'b2_archive': B2Archive")&&routes.includes("b2_archive_lift"),'M7 B2 route registration missing');
-assert(main.includes("M7_B2_RESOLVED")&&main.includes("02:17｜舊警衛台後配電"),'M7 02:17/B2 logic missing');
+assert(main.includes("M7_B2_RESOLVED")&&main.includes("02:17｜警衛台後方 B-Panel"),'M7 02:17/B2 logic missing');
 
 assert(main.includes("M8_IDENTITY_BATTLE_ACTIVE")&&main.includes("LAST_CALL_SEEN"),'M8 identity battle/last call missing');
 assert(html.includes('final-handoff-modal')&&main.includes("TRUE_NAME_CANON")&&main.includes("GAME_COMPLETE"),'M9 true-name final handoff missing');

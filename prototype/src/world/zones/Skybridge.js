@@ -255,15 +255,6 @@ export class Skybridge {
     this.zoneGroup.add(bridgeEvent);this.interactables.push(bridgeEvent);this.bridgeDoppelganger=doubleGroup;this.annie=doubleGroup;
     this.bridgeAnomalyLight=new THREE.PointLight(0x6da28e,0,8,2);this.bridgeAnomalyLight.position.set(30,2.1,0);this.bridgeAnomalyLight.name='Bridge_LocalizedEmergencySpill';this.zoneGroup.add(this.bridgeAnomalyLight);
 
-    const bridgeRelic=new THREE.Group();bridgeRelic.name='Annie_EngravedStethoscope_Bridge';bridgeRelic.position.set(5,0,.35);this.zoneGroup.add(bridgeRelic);
-    solid(bridgeRelic,this.gf.materials.wallDark,[0,.45,0],[.78,.9,.48]);
-    solid(bridgeRelic,this.gf.materials.stainless,[0,.93,0],[.90,.06,.56]);
-    const stethoscope=new THREE.Mesh(new THREE.TorusGeometry(.16,.025,8,24),this.gf.materials.stainless);stethoscope.rotation.y=Math.PI/2;stethoscope.position.set(0,1.04,.04);bridgeRelic.add(stethoscope);
-    const engraving=solid(bridgeRelic,this.gf.materials.lightWarm,[0,1.22,.248],[.32,.025,.01]);engraving.name='Annie_Bridge_Engraving';
-    SignAnchor.buildWallPlaque({scene:bridgeRelic,x:0,y:1.42,z:.249,width:.58,height:.22,rotationY:0,code:'1997',title:'祝 守恆 醫師',subtitle:'執業誌慶',header:''});
-    const relicHit=new THREE.Mesh(new THREE.BoxGeometry(.95,1.5,.9),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));relicHit.position.y=.95;
-    relicHit.userData={interactable:true,id:'ANNIE_TRUE_NAME_CLUE',type:'true_name_clue_2',label:'查看安妮留下的舊聽診器'};bridgeRelic.add(relicHit);this.interactables.push(relicHit);
-
     new AccessDoor(this,{id:'BRIDGE_FIRST',x:0,z:0,yaw:Math.PI/2,width:2.4,title:'第一院區感應門',portal:'first_bridge_return'});
     new AccessDoor(this,{id:'BRIDGE_SECOND',x:60,z:0,yaw:Math.PI/2,width:2.4,title:'第二院區感應門',portal:'second_bridge_return'});
     return this;

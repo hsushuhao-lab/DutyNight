@@ -7,6 +7,8 @@ import { KeyedKnobDoor } from './KeyedKnobDoor.js';
 import { CollisionFactory } from './CollisionFactory.js';
 import { SignAnchor } from './SignAnchor.js';
 import {createAnnieMannequin} from './AnnieMannequin.js';
+import { persistentMemory } from '../../core/PersistentMemory.js';
+import { gameState } from '../../core/GameState.js';
 
 /** September 22 V5 user floorplan. Units are gameplay metres, not a real hospital survey. */
 export class WardFloorplan {
@@ -44,7 +46,7 @@ export class WardFloorplan {
 
     // Entrance vestibule storage room on the left, plant bay on the right.
     ordinaryRoom(this,walls,{id:'STORE_ENTRY',label:'儲藏室',rect:[o-12,0,o-7,2],side:'east',door:1,kind:'storage',protectedArea:false,storageLock:second?'card':'knob'});
-    if(!second&&this.floor===4){
+    if(!second&&this.floor===4&&persistentMemory.data.loopCount>=1){
       createAnnieMannequin(this.zoneGroup,{materials:this.gf.materials,state:'STORAGE_STATIC',position:[-9.2,0,.7],rotationY:0});
     }
     const plant=asset(this.zoneGroup,'plant',[o+9.4,0,1],[1.15,1.15,1.15]);
@@ -113,13 +115,14 @@ export class WardFloorplan {
     asset(this.zoneGroup,'hospitalBed',[-12.5,0,7.8],[1.2,.95,.97]);CollisionFactory.addBox(this.colliders,-12.5,.45,7.8,1.4,.9,2.2);
     solid(this.zoneGroup,this.gf.materials.doorWood,[-11.25,.28,8.1],[.5,.56,.5]);
     solid(this.zoneGroup,this.gf.materials.lightWarm,[-11.25,.76,8.1],[.19,.24,.19]);
-    workstation(this,{x:-10.0,z:7.1,id:'duty_desk'});
-    const phone=new THREE.Group();phone.name='DutyRoom_ExtensionPhone';phone.position.set(-9.62,0,7.1);phone.userData={fixture:'EXTENSION_PHONE',extension:'316'};this.zoneGroup.add(phone);
+    workstation(this,{x:-10.0,z:3.1,id:'duty_desk'});
+    const phone=new THREE.Group();phone.name='DutyRoom_ExtensionPhone';phone.position.set(-9.62,0,3.1);phone.userData={fixture:'EXTENSION_PHONE',extension:'316',interactable:true,id:'4F_DUTY_PHONE',type:'story_phone',label:'查看值班電話'};this.zoneGroup.add(phone);this.dutyPhone=phone;this.interactables.push(phone);
     solid(phone,this.gf.materials.wallDark,[0,.84,0],[.28,.07,.20]);
     solid(phone,this.gf.materials.metal,[0,.89,-.01],[.19,.018,.09]);
     solid(phone,this.gf.materials.bedSheet,[0,.92,-.055],[.25,.035,.055]);
     for(let row=0;row<3;row++)for(let col=0;col<3;col++)solid(phone,this.gf.materials.stainless,[-.065+col*.065,.885,.025+row*.035],[.025,.008,.016]);
-    const coffeeCup=new THREE.Group();coffeeCup.name='DutyRoom_HotCoffee';coffeeCup.position.set(-9.45,.82,3.05);this.zoneGroup.add(coffeeCup);
+    const coffeeCup=new THREE.Group();coffeeCup.name='DutyRoom_HotCoffee';this.zoneGroup.add(coffeeCup);
+    coffeeCup.position.set(-10.57,.762,2.98);
     const cupBody=new THREE.Mesh(new THREE.CylinderGeometry(.07,.06,.13,18),this.gf.materials.bedSheet);cupBody.position.y=.065;coffeeCup.add(cupBody);
     const coffee=new THREE.Mesh(new THREE.CircleGeometry(.055,18),new THREE.MeshBasicMaterial({color:0x3b2417,side:THREE.DoubleSide}));coffee.rotation.x=-Math.PI/2;coffee.position.y=.132;coffeeCup.add(coffee);
     const handle=new THREE.Mesh(new THREE.TorusGeometry(.045,.012,8,16,Math.PI),this.gf.materials.bedSheet);handle.rotation.y=Math.PI/2;handle.position.set(.07,.075,0);coffeeCup.add(handle);
@@ -180,18 +183,16 @@ export class WardFloorplan {
     w.build();this.gf.buildCeilingLight(this.zoneGroup,-11,3.15,6,.7,7,0xffebce);
     this.dutyRoom={door:[-8,1.7,6],inside:[-9.5,1.7,6],outside:[-6.5,1.7,6],bounds:[-14,2,-8,10]};
     const room403=this.roomAreas.find(r=>r.id==='403');
-    const room408=this.roomAreas.find(r=>r.id==='408');
     const p403=room403?.corridor||[-6.9,1.4,-13];
-    const bed408c=this.bedAreas.find(b=>b.id==='408C');
-    const p408=bed408c?.position||room408?.corridor||[5.9,1.4,-9];
+    const reportTarget=new THREE.Mesh(new THREE.BoxGeometry(.85,.24,.16),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
+    reportTarget.position.set(-3.35,1.22,-2.35);
+    reportTarget.userData={interactable:true,id:'4F_NURSING_REPORT',type:'p1_action',action:'NURSE_REPORT',label:'向護理站報到'};
+    this.zoneGroup.add(reportTarget);this.interactables.push(reportTarget);
     this.interactables.push(
-      {type:'p1_action',action:'NURSE_REPORT',label:'向護理站報到',position:new THREE.Vector3(0,1.4,-4.3),radius:1.8},
       {type:'p1_action',action:'DUTY_ROOM_PREP',label:'整理值班室',position:new THREE.Vector3(-10.0,1.2,6.0),radius:1.8},
       {type:'p1_action',action:'WARD_ROUND',label:'完成晚間巡房',position:new THREE.Vector3(0,1.4,-12.0),radius:2.0},
       {type:'p1_action',action:'INSOMNIA_403',label:'評估 403 睡眠問題',position:new THREE.Vector3(p403[0],1.35,p403[2]),radius:1.65,anchorRoom:'403'},
-      {type:'p1_action',action:'NORMAL_EVENT',label:'處理一般病房事件',position:new THREE.Vector3(p408[0],1.35,p408[2]),radius:1.65,anchorRoom:'408',anchorBedId:'408C'},
-      {type:'p1_action',action:'REST',label:'短暫休息',position:new THREE.Vector3(-12.5,1.0,7.8),radius:1.8},
-      {type:'p1_action',action:'END_SHIFT',label:'回值班室／接聽值班電話',position:new THREE.Vector3(-10.0,1.1,7.1),radius:1.8}
+      {type:'p1_action',action:'END_SHIFT',label:'回值班室／接聽值班電話',position:new THREE.Vector3(-10.0,1.1,3.1),radius:1.8}
     );
   }
   buildBed33Legend(){
@@ -285,25 +286,22 @@ export class WardFloorplan {
   }
   buildSecondCampusChestLegend(o){
     const m=this.gf.materials;
-    const bx=o,bz=-13.0;
-    const bed=asset(this.zoneGroup,'hospitalBed',[bx,0,bz],[1,1,1],Math.PI/2);
-    if(bed)bed.name='SecondCampus_ExtraChestPainBed';
-    CollisionFactory.addBox(this.colliders,bx,.45,bz,2.15,.9,1.15);
-
-    const patient=new THREE.Group();patient.name='SecondCampus_ChestPainPatient';patient.position.set(bx,.78,bz);this.zoneGroup.add(patient);
+    const chestBed=this.bedAreas.find(item=>item.id==='504B');
+    const [bx,,bz]=chestBed.position;
+    const patient=new THREE.Group();patient.name='SecondCampus_ChestPainPatient';patient.position.set(bx,.80,bz);this.zoneGroup.add(patient);
     const gown=new THREE.MeshStandardMaterial({color:0xd3ddd5,roughness:.96});
     const skin=new THREE.MeshStandardMaterial({color:0xc7b5a4,roughness:.94});
     const hair=new THREE.MeshStandardMaterial({color:0x383635,roughness:1});
-    const patientTorso=new THREE.Mesh(new THREE.BoxGeometry(.72,.28,.46),gown);patientTorso.name='SecondCampus_ChestPainPatient_Gown';patientTorso.position.set(-.10,.09,0);patient.add(patientTorso);
-    const blanket=new THREE.Mesh(new THREE.BoxGeometry(.96,.19,.56),this.gf.materials.bedSheet);blanket.name='SecondCampus_ChestPainPatient_Blanket';blanket.position.set(.47,.13,0);patient.add(blanket);
-    const pillow=new THREE.Mesh(new THREE.BoxGeometry(.48,.10,.54),this.gf.materials.bedSheet);pillow.position.set(-.78,.06,0);patient.add(pillow);
-    const face=new THREE.Mesh(new THREE.SphereGeometry(.135,16,12),skin);face.name='SecondCampus_ChestPainPatient_Face';face.scale.set(1,.78,1);face.position.set(-.78,.18,0);patient.add(face);
-    const hairCap=new THREE.Mesh(new THREE.SphereGeometry(.145,16,10),hair);hairCap.scale.set(1,.5,1);hairCap.position.set(-.80,.25,0);patient.add(hairCap);
+    const torso=new THREE.Mesh(new THREE.SphereGeometry(1,32,24),gown);torso.name='SecondCampus_ChestPainPatient_Gown';torso.scale.set(.27,.20,.48);patient.add(torso);
+    const blanket=new THREE.Mesh(new THREE.SphereGeometry(1,32,24),this.gf.materials.bedSheet);blanket.name='SecondCampus_ChestPainPatient_Blanket';blanket.scale.set(.34,.15,.36);blanket.position.set(0,-.02,-.40);patient.add(blanket);
+    const pillow=new THREE.Mesh(new THREE.SphereGeometry(1,24,16),this.gf.materials.bedSheet);pillow.name='SecondCampus_ChestPainPatient_Pillow';pillow.scale.set(.27,.08,.32);pillow.position.set(0,-.015,.62);patient.add(pillow);
+    const face=new THREE.Mesh(new THREE.SphereGeometry(.145,24,18),skin);face.name='SecondCampus_ChestPainPatient_Face';face.scale.set(.92,.78,1);face.position.set(0,.015,.72);patient.add(face);
+    const hairCap=new THREE.Mesh(new THREE.SphereGeometry(.15,24,16),hair);hairCap.scale.set(1,.48,1);hairCap.position.set(0,.09,.71);patient.add(hairCap);
     const armMat=new THREE.MeshStandardMaterial({color:0xc7b5a4,roughness:.94});
     for(const side of [-1,1]){
-      const arm=new THREE.Mesh(new THREE.CylinderGeometry(.055,.07,.50,10),armMat);arm.rotation.z=Math.PI/2;arm.rotation.x=side*.10;arm.position.set(-.05,.02,side*.31);patient.add(arm);
+      const arm=new THREE.Mesh(new THREE.CapsuleGeometry(.055,.38,5,10),armMat);arm.rotation.x=Math.PI/2;arm.position.set(side*.31,.015,.02);patient.add(arm);
     }
-    const wristband=new THREE.Mesh(new THREE.BoxGeometry(.12,.045,.09),this.gf.materials.lightWarm);wristband.name='SecondCampus_ChestPainPatient_Wristband';wristband.position.set(-.48,.08,.34);patient.add(wristband);
+    const wristband=new THREE.Mesh(new THREE.TorusGeometry(.062,.014,8,20),this.gf.materials.lightWarm);wristband.name='SecondCampus_ChestPainPatient_Wristband';wristband.rotation.x=Math.PI/2;wristband.position.set(.31,.015,.28);patient.add(wristband);
 
     const cardCanvas=document.createElement('canvas');cardCanvas.width=620;cardCanvas.height=360;
     const ctx=cardCanvas.getContext('2d');ctx.fillStyle='#f2eee3';ctx.fillRect(0,0,620,360);
@@ -313,9 +311,9 @@ export class WardFloorplan {
     ctx.font='18px sans-serif';ctx.fillStyle='#6b6e69';ctx.fillText('生命徵象穩定，心電圖無急性變化',34,286);
     const tex=new THREE.CanvasTexture(cardCanvas);tex.colorSpace=THREE.SRGBColorSpace;
     const card=new THREE.Mesh(new THREE.PlaneGeometry(1.05,.62),new THREE.MeshBasicMaterial({map:tex}));
-    card.position.set(o+1.25,1.45,bz+.35);card.rotation.y=-Math.PI/2;this.zoneGroup.add(card);
+    card.position.set(bx+1.25,1.45,bz+.35);card.rotation.y=-Math.PI/2;this.zoneGroup.add(card);
 
-    const patientHit=new THREE.Mesh(new THREE.BoxGeometry(2.4,1.6,1.5),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
+    const patientHit=new THREE.Mesh(new THREE.BoxGeometry(1.4,1.6,2.2),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
     patientHit.position.set(bx,1.0,bz);
     patientHit.userData={interactable:true,id:'SECOND_CHEST_PATIENT',type:'second_chest_patient',label:'評估胸痛病人'};
     this.zoneGroup.add(patientHit);this.interactables.push(patientHit);
@@ -326,12 +324,20 @@ export class WardFloorplan {
     form.userData={interactable:true,id:'SECOND_CHEST_TRANSFER',type:'second_chest_transfer',label:'查看已填妥的胸痛病人轉院單'};
     this.interactables.push(form);
 
-    const roster=solid(this.zoneGroup,m.lightWarm,[bx+.24,.79,bz+.28],[.25,.012,.12]);
+    const roster=solid(this.zoneGroup,m.lightWarm,[bx+.36,.91,bz+.64],[.25,.012,.12]);
     roster.name='SecondCampus_TrueNameRosterFragment';
     roster.userData={interactable:true,id:'SECOND_CHEST_NAME_CLUE',type:'second_chest_roster_clue',label:'檢查病床旁的舊名冊殘頁',documentTitle:'第一院區舊名冊殘頁',pages:['第一線：張 守 [墨漬]\\n\\n背面以鉛筆寫著：「守住 409 的門。」']};
     this.interactables.push(roster);
 
     this.secondCampusLegend={id:'LEGEND_CHEST_PAIN',patient:'SECOND_CHEST_PATIENT',form:'SECOND_CHEST_TRANSFER'};
+  }
+
+  syncStoryState(){
+    if(this.dutyPhone){
+      const ringing=gameState.getFlag('PHONE_RING_ACTIVE')===true;
+      this.dutyPhone.userData.interactable=ringing;
+      this.dutyPhone.userData.label=ringing?'接聽值班電話':'查看值班電話';
+    }
   }
 
   setWardGateClosed(closed){this.wardDoor.setClosed(closed);this.wardGateClosed=closed;}

@@ -452,9 +452,11 @@ export class UIManager {
   openBed33Assignment({canReject=false,rememberedRule=false}={}){
     document.exitPointerLock();
     const reject=document.getElementById('btn-bed33-reject');
-    if(reject)reject.hidden=!(canReject||rememberedRule);
+    if(reject)reject.hidden=false;
+    const defer=document.getElementById('btn-bed33-defer');
+    if(defer)defer.hidden=true;
     const warning=document.getElementById('bed33-warning-text');
-    if(warning)warning.textContent=rememberedRule?'手腕那道勒痕讓你想起一件事：絕對不要簽 409A。':'急診留置床系統卡住，請值班醫師確認過床。';
+    if(warning)warning.textContent='急診留置床系統卡住，請值班醫師確認過床。';
     this.bed33Modal?.classList.add('active');
   }
 
@@ -779,6 +781,18 @@ export class UIManager {
     const opened316=this.gameState.getFlag('OPENED_316');
     const currentZone=window.worldRouter?.activeZoneId || '';
 
+    if(this.gameState.getFlag('PHONE_RING_ACTIVE')&&['ER_JANE_2005','NIGHT_PATROL_2115','ER_GHOST_0033','FAST_PATH_316'].includes(this.gameState.getFlag('PHONE_CALL_KIND'))){
+      this.renderTaskBoard('',[]);
+      return;
+    }
+
+    if(this.gameState.getFlag('FAST_PATH_3F')&&!this.gameState.getFlag('FAST_PATH_316_CALL_DONE')){
+      this.renderTaskBoard('回溯後的值班',[
+        {id:'task-fastpath-316',text:'進入 316，取得感應卡與 4F 值班室鑰匙',state:'ready'}
+      ]);
+      return;
+    }
+
     if(!done('WARD_ENTRY')){
       const panel=document.getElementById('task-panel');
       if(this.gameState.getFlag('HIS_ANOMALY_SEEN')){
@@ -820,13 +834,13 @@ export class UIManager {
         this.renderTaskBoard(triggered?'23:55｜值班室｜異常正在逼近':'21:17 之後｜回值班室',[
           {
             id:'task-post2117-duty',
-            text:triggered?'把「21:17／316／409」寫進值班紀錄；不要離開，值班電話即將響起':(at4F?'立刻進入值班室；一進門就會觸發下一段事件':'立刻返回 4F 值班室；不要在院區漫遊'),
+            text:this.gameState.getFlag('PHONE_RING_ACTIVE')?'接聽值班室電話':(triggered?'把「21:17／316／409」寫進值班紀錄；不要離開，值班電話即將響起':(at4F?'立刻進入值班室；一進門就會觸發下一段事件':'立刻返回 4F 值班室；不要在院區漫遊')),
             state:'ready'
           }
         ]);
-      }else if(!this.gameState.getFlag('GHOST_REGISTRATION_AVAILABLE')&&!this.gameState.getFlag('ER0033_SLIP_COLLECTED')){
-        this.renderTaskBoard('翌日 00:30｜值班電話',[
-          {id:'task-post2117-er',text:'立即前往 2F 急診檢傷站；查看「無名氏」的舊格式掛號異常',state:'ready'}
+      }else if(this.gameState.getFlag('GHOST_REGISTRATION_AVAILABLE')&&!this.gameState.getFlag('ER0033_SLIP_COLLECTED')){
+        this.renderTaskBoard('翌日 00:33｜急診掛號異常',[
+          {id:'task-post2117-er',text:'前往 2F 急診查看異常掛號紀錄',state:'ready'}
         ]);
       }else if(this.gameState.getFlag('ER0033_SLIP_COLLECTED')&&!this.gameState.getFlag('M3_316_DECODED')){
         this.renderTaskBoard('00:33｜1998-ER-0217',[
@@ -847,15 +861,15 @@ export class UIManager {
         ]);
       }else if(this.gameState.getFlag('M4_CHEST_RESOLVED')&&!this.gameState.getFlag('M5_ROUTE_RESOLVED')){
         this.renderTaskBoard('翌日 01:45｜離開第二院區',[
-          {id:'task-m5-route',text:this.gameState.getFlag('M5_ROUTE_CHOICE_RESOLVED')?'找回安妮留下的舊聽診器，讀取銘牌':'穿越封閉天橋，返回第一院區',state:'ready'}
+          {id:'task-m5-route',text:'穿越封閉天橋，返回第一院區',state:'ready'}
         ]);
       }else if(this.gameState.getFlag('M5_ROUTE_RESOLVED')&&!this.gameState.getFlag('M6_FLOOR6_RESOLVED')){
         this.renderTaskBoard('翌日 02:00｜返回第一院區',[
-          {id:'task-m6-elevator',text:'搭乘一般電梯返回第一院區',state:'ready'}
+          {id:'task-m6-elevator',text:currentZone==='phantom_6f'?(this.gameState.getFlag('FLOOR6_STETHOSCOPE_FOUND')?'檢視老舊聽診器，翻面或擦去刻字上的灰塵':'翻找焦黑器材，尋找被埋住的金屬物件'):'搭乘一般電梯返回第一院區',state:'ready'}
         ]);
       }else if(this.gameState.getFlag('M6_FLOOR6_RESOLVED')&&!this.gameState.getFlag('M7_B2_OPEN')){
         this.renderTaskBoard('翌日 02:17 前｜B-Panel',[
-          {id:'task-m7-service-door',text:this.gameState.getFlag('HIDDEN_SERVICE_DOOR_DISCOVERED')?'檢查警衛台後方浮現的舊門框':'前往第一院區 1F，檢查舊警衛台',state:'ready'}
+          {id:'task-m7-service-door',text:this.gameState.getFlag('HIDDEN_SERVICE_DOOR_DISCOVERED')?'檢查警衛台後方浮現的舊門框':'前往第一院區 1F，檢查警衛台',state:'ready'}
         ]);
       }else if(this.gameState.getFlag('M7_B2_OPEN')&&!this.gameState.getFlag('M7_B2_RESOLVED')){
         this.renderTaskBoard('翌日 02:17｜B2',[
@@ -912,11 +926,8 @@ export class UIManager {
 
     this.renderTaskBoard('4F 病房值班｜17:15–20:00', sequential([
       {id:'task-4f-report',task:'P1_4F_REPORT',text:'17:15 向護理站報到並確認交班重點'},
-      {id:'task-duty-room',task:'P1_DUTY_ROOM_READY',text:'17:30 開啟值班室、放置物品並確認值班電話'},
-      {id:'task-round',task:'P1_ROUND_COMPLETE',text:'18:00 完成 401–408 晚間巡房'},
-      {id:'task-403',task:'P1_INSOMNIA_DONE',text:'18:30 評估 403 睡眠問題'},
       {id:'task-408c-event',task:'P1_NORMAL_EVENT_DONE',text:'19:30 查看 408C 反映的敲牆聲'},
-      {id:'task-rest',task:'P1_REST_DONE',text:'20:00 回值班室短暫休息並等待急診通知'}
+      {id:'task-rest',task:'P1_REST_DONE',text:'20:00 回值班室短暫休息'}
     ]));
   }
 

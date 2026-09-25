@@ -44,6 +44,15 @@ export class GameState {
     this.flags.set('FOUND_302_CODE', false);
     this.flags.set('PHONE_RING_ACTIVE', false);
     this.flags.set('PHONE_ANSWERED', false);
+    this.flags.set('PHONE_CALL_KIND', null);
+    this.flags.set('P1_ER_CALL_ANSWERED', false);
+    this.flags.set('ER_JANE_PRESENT', false);
+    this.flags.set('FAST_PATH_3F', false);
+    this.flags.set('FAST_PATH_316_ENTERED', false);
+    this.flags.set('FAST_PATH_316_CALL_DONE', false);
+    this.flags.set('STORAGE_ANNE_VISIT_COUNT', 0);
+    this.flags.set('FLOOR6_STETHOSCOPE_FOUND', false);
+    this.flags.set('FLOOR6_STETHOSCOPE_INSPECTED', false);
     this.flags.set('HIS_ANOMALY_SEEN', false);
     this.flags.set('ANOMALY_ACKNOWLEDGED', false);
     this.flags.set('ANNE_STAGE', 0);

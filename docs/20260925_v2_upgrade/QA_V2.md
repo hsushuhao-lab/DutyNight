@@ -7,10 +7,11 @@ No single state-machine PASS is sufficient. A release requires the current stati
 - `32` official first-campus 4F beds only: 401A–408D; 408C=31, 408D=32; 409 absent from census; 409A is anomalous bed 33.
 - 403 insomnia only; 408C is the only knock complaint and plays four knocks / 1.5s pause / nine knocks.
 - No player-facing 36-bed claim, 403 knock source, `KNOCK_403_49`, or `工號`.
-- 20:05 ER phone audibly rings before its call line; ring also remains audible for 316, 21:15, 00:30/00:33, elevator, bridge lock, and identity alarms.
+- 20:05 is a physical Jane Doe with unknown identity; the ER phone rings and must be answered before the consult objective. 00:33 is an existing 1998-ER-0217 registration with no patient in the ER; never reuse Jane Doe or frame it as another unidentified-patient encounter. The 00:30 ER call rings and must be answered before the registration objective.
+- All story calls (316, 20:05 ER, 21:15, 00:30/00:33) audibly ring before answer; the 21:15 and 00:33 objectives remain hidden until E answer.
 - No production portal, task, selector, or story choice reaches `hillside_route` or `ecology_pond`; M4 outbound and M5 return both use skybridge.
 - M4 ordinary patient remains present and calms; only physical roster inspection grants 守; reject signature and keep correct-path treatment ordinary.
-- M5 return threshold and look-back debounce/punishment progression; relic grants 恆 only on pickup.
+- M5 return threshold and look-back debounce/punishment progression; bridge Annie holds both arms straight with hands overlapped, and no true-name relic appears on the bridge. On 6F, search and inspect the separate stethoscope before its inscription grants 恆.
 - One shared `prototype/src/art/AnnieArt.js` factory across 3F storage, bridge manifestation, and 6F CPR; rounded mannequin geometry (no Annie `BoxGeometry`), blank synthetic face with one nose only, no eyes/mouth/chest items, mold seams, overlapped bridge/CPR hands, static storage, moving CPR, and exact inscription on the separate stethoscope clue prop.
 - 6F is elevator-hijack-only and absent from ordinary floors/task text; B2 grants full employee number; reconstruction and M9 require the complete exact identity pair.
 - Duty-room washroom plaque absent, bathroom retained; no permanent wall clocks in key story spaces; bedside desk/phone and 0.8m circulation; no floating/occluded/penetrating props; ER monitor is separated from glass.
@@ -38,9 +39,9 @@ Capture exactly these 26 named visual states at their explicit ART_QA spawns/cam
 14. M5 outbound bridge baseline
 15. M5 return bridge Annie
 16. M5 bridge Annie close
-17. M5 stethoscope relic
-18. M6 elevator display 6
-19. M6 Annie CPR long
+17. M6 elevator display 6
+18. M6 Annie CPR long
+19. M6 searched stethoscope relic and inscription
 20. M6 Annie CPR medium
 21. M6 Annie CPR close
 22. M7 first-campus 1F guard post

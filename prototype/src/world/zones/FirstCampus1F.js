@@ -286,7 +286,7 @@ export class FirstCampus1F {
     const lampLight=new THREE.PointLight(0xe9dfc0,.18,1.8,2);lampLight.name='OldGuardPost_WarmTaskLight';lampLight.position.set(0,.28,.08);taskLamp.add(lampLight);
     asset(guardPost,'storageCabinet',[-1.25,0,-.16],[.45,.9,.55]);
     CollisionFactory.addBox(this.colliders,-10.7,.55,3.2,2.3,1.1,1.9);
-    SignAnchor.buildWallPlaque({scene:this.zoneGroup,x:-12.9,y:2.05,z:3.2,rotationY:Math.PI/2,width:1.2,height:.34,code:'SECURITY',title:'舊警衛台',subtitle:'NIGHT SECURITY POST',header:''});
+    SignAnchor.buildWallPlaque({scene:guardPost,x:0,y:1.78,z:.43,rotationY:0,width:1.2,height:.34,code:'SECURITY',title:'警衛台',subtitle:'NIGHT SECURITY POST',header:''});
     this.guardPost={id:'OLD_GUARD_POST',position:[-10.7,0,3.2],cctv:'OldGuardPost_CCTVMonitor',logbook:'OldGuardPost_NightLogbook',phone:'OldGuardPost_DeskPhone',keys:'OldGuardPost_KeyRing',lamp:'OldGuardPost_TaskLamp',serviceDoor:'1F_HIDDEN_SERVICE_DOOR'};
 
     // ==========================================
