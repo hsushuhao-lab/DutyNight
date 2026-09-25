@@ -97,7 +97,7 @@ async function interact(query){await q(query=>window.__storyQA.interact(query),q
 async function pressEAt(target,id){
   await q(point=>window.__storyQA.lookAt(point),target);
   try{
-    await page.waitForFunction(id=>window.__storyQA.controller.currentInteractable?.id===id,id,{timeout:5000});
+    await page.waitForFunction(id=>window.__storyQA.controller.currentInteractable?.id===id,id,{timeout:5000,polling:100});
   }catch(error){
     const state=await q(()=>{
       const c=window.__storyQA.controller;
