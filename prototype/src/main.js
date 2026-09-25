@@ -248,6 +248,12 @@ if(new URLSearchParams(location.search).get('qa')==='story'){
       const dx=target[0]-controller.position.x,dy=target[1]-controller.position.y,dz=target[2]-controller.position.z;
       controller.yaw=Math.atan2(-dx,-dz);controller.pitch=Math.atan2(dy,Math.hypot(dx,dz));controller.updateCameraRotation();
       camera.updateMatrixWorld(true);controller.updateRaycast();
+      const hits=controller.raycaster.intersectObjects(controller.interactables.filter(o=>o?.isObject3D),true);
+      return {
+        current:controller.currentInteractable?.id||null,
+        position:controller.position.toArray(),
+        hits:hits.slice(0,6).map(hit=>({name:hit.object.name,id:hit.object.userData?.id,distance:hit.distance}))
+      };
     },
     interact:(query)=>{
       const obj=findInteractable(query);
