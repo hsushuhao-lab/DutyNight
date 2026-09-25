@@ -107,7 +107,7 @@ async function walkTo(x,z,{radius=.42,timeout=20000}={}){
     await page.waitForFunction(({x,z,radius})=>{
       const p=window.__storyQA.controller.position;
       return Math.hypot(p.x-x,p.z-z)<=radius;
-    },{x,z,radius},{timeout,polling:100});
+    },{x,z,radius},{timeout});
   }finally{await page.keyboard.up('w');}
   await page.waitForTimeout(180);
 }
