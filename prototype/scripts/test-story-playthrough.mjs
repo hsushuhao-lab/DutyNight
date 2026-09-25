@@ -96,7 +96,22 @@ async function task(id){await q(id=>window.__storyQA.task(id),id);}
 async function interact(query){await q(query=>window.__storyQA.interact(query),query);await page.waitForTimeout(100);}
 async function pressEAt(target,id){
   await q(point=>window.__storyQA.lookAt(point),target);
-  await page.waitForFunction(id=>window.__storyQA.controller.currentInteractable?.id===id,id,{timeout:5000});
+  try{
+    await page.waitForFunction(id=>window.__storyQA.controller.currentInteractable?.id===id,id,{timeout:5000});
+  }catch(error){
+    const state=await q(()=>{
+      const c=window.__storyQA.controller;
+      const hits=c.raycaster.intersectObjects(c.interactables.filter(o=>o?.isObject3D),true);
+      return {
+        position:c.position.toArray(),yaw:c.yaw,pitch:c.pitch,
+        cameraPosition:c.camera.position.toArray(),cameraWorldPosition:[c.camera.matrixWorld.elements[12],c.camera.matrixWorld.elements[13],c.camera.matrixWorld.elements[14]],
+        current:c.currentInteractable?.id||null,
+        hits:hits.slice(0,6).map(hit=>({name:hit.object.name,id:hit.object.userData?.id,distance:hit.distance}))
+      };
+    });
+    console.error('INTERACTION_AIM_FAILURE '+JSON.stringify({id,target,state}));
+    throw error;
+  }
   await page.keyboard.press('e');
   await page.waitForTimeout(180);
 }
