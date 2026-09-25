@@ -247,6 +247,7 @@ if(new URLSearchParams(location.search).get('qa')==='story'){
     lookAt:(target)=>{
       const dx=target[0]-controller.position.x,dy=target[1]-controller.position.y,dz=target[2]-controller.position.z;
       controller.yaw=Math.atan2(-dx,-dz);controller.pitch=Math.atan2(dy,Math.hypot(dx,dz));controller.updateCameraRotation();
+      camera.updateMatrixWorld(true);controller.updateRaycast();
     },
     interact:(query)=>{
       const obj=findInteractable(query);
