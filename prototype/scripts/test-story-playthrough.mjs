@@ -313,9 +313,10 @@ try{
   await shot('m6-annie-cpr-long',null,null,'Annie_FLOOR6_CPR',[0,2.8,1.2],[.6,.9,-7.3]);
   mannequinCheck=await q(()=>{const a=window.__storyQA.worldRouter.activeZoneInstance.annie;const names=[];a.traverse(object=>names.push(object.name));return {state:a.userData.state,compression:a.userData.rig.compression,noseOnly:!!a.getObjectByName('Annie_MoldedNose')&&!names.some(name=>/^Annie_(FixedEye|UnfocusedIris|FixedPupil|Mouth|BlowTrainingMouth)/.test(name)),chestClear:!names.some(name=>/^Annie_(Stethoscope|CoatPocket|CoatButton|CompressionPlate)/.test(name))}});
   assert.equal(mannequinCheck.state,'FLOOR6_CPR');assert(mannequinCheck.noseOnly);assert(mannequinCheck.chestClear);
-  await page.waitForTimeout(120);
-  const cprAfterFrame=await q(()=>window.__storyQA.worldRouter.activeZoneInstance.annie.userData.rig.compression);
-  assert.notEqual(cprAfterFrame,mannequinCheck.compression,'6F CPR pose must move during the live animation loop');
+  await page.waitForFunction(initial=>{
+    const current=window.__storyQA.worldRouter.activeZoneInstance.annie.userData.rig.compression;
+    return Math.abs(current-initial)>1e-6;
+  },mannequinCheck.compression,{polling:50,timeout:10000});
   await shot('m6-annie-cpr',null,null,'Annie_FLOOR6_CPR',[3.3,1.9,-9.3],[1.0,.95,-7.3]);
   await shot('m6-annie-cpr-close',null,null,'Annie_HandStack_Top',[1.55,1.65,-8.0],[.82,1.0,-7.3]);
   const pressOne=await motionShot('m6-cpr-press-1','Annie_HandStack_Top',[1.55,1.65,-8.0],[.82,1.0,-7.3],{capture:'cpr',phase:'press'});
