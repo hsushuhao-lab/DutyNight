@@ -254,7 +254,6 @@ export function createAnnieArt(parent, {materials, state, position, rotationY = 
   torso.add(coat);
 
   const shirt = ellipsoid(torso, 'Annie_Scrubs', [0, shoulderY - hipY - 0.19, 0.154], [0.105, 0.205, 0.028], scrubMaterial);
-  tube(torso, 'Annie_ScrubNeckline', [[-0.052, shoulderY - hipY + 0.02, 0.185], [0, shoulderY - hipY - 0.03, 0.191], [0.052, shoulderY - hipY + 0.02, 0.185]], 0.004, coatEdgeMaterial);
   for (const side of [-1, 1]) {
     const lapel = new THREE.Mesh(new THREE.CapsuleGeometry(0.037, 0.19, 6, 20), coatEdgeMaterial);
     lapel.name = `Annie_CoatLapel_${side}`;
@@ -277,7 +276,7 @@ export function createAnnieArt(parent, {materials, state, position, rotationY = 
       ? [side * 0.245, shoulderY - hipY - 0.34, 0.19]
       : isCpr
         ? [side * 0.145, shoulderY - hipY - 0.17, 0.29]
-        : [side * 0.125, shoulderY - hipY - 0.095, 0.31];
+        : [side * 0.096, shoulderY - hipY - 0.1025, 0.309];
     const wrist = isStorage
       ? [side * 0.17, hipY * 0.16, 0.29]
       : isCpr

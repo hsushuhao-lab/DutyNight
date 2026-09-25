@@ -156,7 +156,7 @@ try{
   await mark('Story QA bridge ready');
   await shot('m1-3f-admin-316','first_campus_3f','m0_316_office','AdminDesk_Monitor',[-19.25,1.7,3.65],[-19.25,1.25,5.18]);
   await shot('m1-3f-storage-annie-static','first_campus_3f','m0_3f_corridor','Annie_STORAGE_STATIC',[14.8,1.7,5.85],[14.2,.9,5.15]);
-  let mannequinCheck=await q(()=>{const level=window.__storyQA.worldRouter.activeZoneInstance.levelInstance;const a=level.anneGroup;const names=[];a.traverse(object=>names.push(object.name));return {state:a.userData.state,nose:!!a.getObjectByName('Annie_MoldedNose'),face:a.getObjectByName('Annie_SmoothVinylFace')?.material?.roughness,noEyesOrMouth:!names.some(name=>/^Annie_(FixedEye|UnfocusedIris|FixedPupil|Mouth|BlowTrainingMouth)/.test(name)),chestClear:!names.some(name=>/^Annie_(Stethoscope|CoatPocket|CoatButton|CompressionPlate)/.test(name)),noBodyStethoscope:!level.anneStethoscopeProp}});
+  let mannequinCheck=await q(()=>{const level=window.__storyQA.worldRouter.activeZoneInstance.levelInstance;const a=level.anneGroup;const names=[];a.traverse(object=>names.push(object.name));return {state:a.userData.state,nose:!!a.getObjectByName('Annie_MoldedNose'),face:a.getObjectByName('Annie_SmoothVinylFace')?.material?.roughness,noEyesOrMouth:!names.some(name=>/^Annie_(FixedEye|UnfocusedIris|FixedPupil|Mouth|BlowTrainingMouth)/.test(name)),chestClear:!names.some(name=>/^Annie_(Stethoscope|CoatPocket|CoatButton|CompressionPlate|ScrubNeckline)/.test(name)),noBodyStethoscope:!level.anneStethoscopeProp}});
   assert.equal(mannequinCheck.state,'STORAGE_STATIC');assert(mannequinCheck.nose);assert(mannequinCheck.noEyesOrMouth);assert(mannequinCheck.chestClear);assert(mannequinCheck.face<.5);assert(mannequinCheck.noBodyStethoscope);
   await shot('m1-annie-close-inspection',null,null,'Annie_SmoothVinylFace',[12.81,1.7,5.8],[12.81,.84,5.16]);
   await shot('m2-4f-nursing-station','first_campus_4f','m3_4f_nursing_station','WorkstationDesk_first_station_A',[0,1.7,-4.6],[-3.35,1.0,-2.35]);
@@ -346,7 +346,7 @@ try{
   const inscriptionSubtitle=await page.locator('#subtitle-text').innerText();
   assert.match(inscriptionSubtitle,/祝 守恆 醫師[\s\S]*1997[\s\S]*執業誌慶/);
   assert.doesNotMatch(inscriptionSubtitle,/\\n/,'the stethoscope subtitle must show real line breaks');
-  mannequinCheck=await q(()=>{const a=window.__storyQA.worldRouter.activeZoneInstance.annie;const names=[];a.traverse(object=>names.push(object.name));return {state:a.userData.state,compression:a.userData.rig.compression,noseOnly:!!a.getObjectByName('Annie_MoldedNose')&&!names.some(name=>/^Annie_(FixedEye|UnfocusedIris|FixedPupil|Mouth|BlowTrainingMouth)/.test(name)),chestClear:!names.some(name=>/^Annie_(Stethoscope|CoatPocket|CoatButton|CompressionPlate)/.test(name))}});
+  mannequinCheck=await q(()=>{const a=window.__storyQA.worldRouter.activeZoneInstance.annie;const names=[];a.traverse(object=>names.push(object.name));return {state:a.userData.state,compression:a.userData.rig.compression,noseOnly:!!a.getObjectByName('Annie_MoldedNose')&&!names.some(name=>/^Annie_(FixedEye|UnfocusedIris|FixedPupil|Mouth|BlowTrainingMouth)/.test(name)),chestClear:!names.some(name=>/^Annie_(Stethoscope|CoatPocket|CoatButton|CompressionPlate|ScrubNeckline)/.test(name))}});
   assert.equal(mannequinCheck.state,'FLOOR6_CPR');assert(mannequinCheck.noseOnly);assert(mannequinCheck.chestClear);
   await page.waitForFunction(initial=>{
     const current=window.__storyQA.worldRouter.activeZoneInstance.annie.userData.rig.compression;

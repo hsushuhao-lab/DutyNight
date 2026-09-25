@@ -23,7 +23,7 @@ function assertAnnie(group,state){
   assert(group.getObjectByName('Annie_NeckMoldSeam'),'neck mold seam missing');
   assert(group.getObjectByName('Annie_WristMoldSeam_-1'),'wrist mold seam missing');
   const names=[];group.traverse(object=>names.push(object.name));
-  assert(!names.some(name=>/^Annie_(FixedEye|UnfocusedIris|FixedPupil|Mouth|BlowTrainingMouth|CoatPocket|CoatButton|CompressionPlate)/.test(name)),'face must be nose-only and chest must have no attached items');
+  assert(!names.some(name=>/^Annie_(FixedEye|UnfocusedIris|FixedPupil|Mouth|BlowTrainingMouth|CoatPocket|CoatButton|CompressionPlate|ScrubNeckline)/.test(name)),'face must be nose-only and chest must have no attached items');
   assert(!Object.hasOwn(group.userData,'inscription'),'the mannequin does not own the stethoscope clue');
   assert.equal(group.userData.modelHeight,1.65,'standing reference height remains 165 cm');
   let meshCount=0;
@@ -51,6 +51,13 @@ assert.notEqual(bridge.userData.rig.head.rotation.z,0,'bridge idle keeps a tiny 
 assert(bridge.getObjectByName('Annie_OverlappedHands'),'bridge pose must hold both hands together');
 bridge.updateMatrixWorld(true);
 assert(bridge.getObjectByName('Annie_HandStack_Top').getWorldPosition(new THREE.Vector3()).y>1.05,'bridge hands remain lifted and extended');
+for(const side of [-1,1]){
+  const upper=bridge.getObjectByName(`Annie_CoatSleeveUpper_${side}`);
+  const forearm=bridge.getObjectByName(`Annie_CoatSleeveForearm_${side}`);
+  const upperAxis=new THREE.Vector3(0,1,0).applyQuaternion(upper.getWorldQuaternion(new THREE.Quaternion()));
+  const forearmAxis=new THREE.Vector3(0,1,0).applyQuaternion(forearm.getWorldQuaternion(new THREE.Quaternion()));
+  assert(upperAxis.dot(forearmAxis)>.995,'bridge arms remain straight from shoulder through wrists');
+}
 
 gameState.setFlag('FLOOR6_STETHOSCOPE_FOUND',false);
 gameState.setFlag('FLOOR6_STETHOSCOPE_INSPECTED',false);
