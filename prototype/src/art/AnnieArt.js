@@ -10,10 +10,6 @@ export const ANNIE_ART_TOKENS = Object.freeze({
   materials: Object.freeze({
     vinyl: Object.freeze({color: 0xd1cbb9, roughness: 0.48, metalness: 0, clearcoat: 0.08, clearcoatRoughness: 0.58}),
     seam: Object.freeze({color: 0xaaa698, roughness: 0.72}),
-    eye: Object.freeze({color: 0xc5c8bf, roughness: 0.38}),
-    iris: Object.freeze({color: 0x777e79, roughness: 0.54}),
-    pupil: Object.freeze({color: 0x303533, roughness: 0.56}),
-    airway: Object.freeze({color: 0x383a35, roughness: 0.82}),
     hair: Object.freeze({color: 0x34302b, roughness: 0.88}),
     coat: Object.freeze({color: 0xd7d1b7, roughness: 0.88, metalness: 0}),
     coatEdge: Object.freeze({color: 0xe3ddc8, roughness: 0.86}),
@@ -31,10 +27,6 @@ const CPR_PERIOD = 60 / 110;
 const sphereGeometry = new THREE.SphereGeometry(1, 48, 32);
 const vinylMaterial = new THREE.MeshPhysicalMaterial({...ANNIE_ART_TOKENS.materials.vinyl, name: 'Annie_Mat_Vinyl'});
 const vinylSeamMaterial = new THREE.MeshStandardMaterial(ANNIE_ART_TOKENS.materials.seam);
-const cloudyEyeMaterial = new THREE.MeshStandardMaterial(ANNIE_ART_TOKENS.materials.eye);
-const irisMaterial = new THREE.MeshStandardMaterial(ANNIE_ART_TOKENS.materials.iris);
-const pupilMaterial = new THREE.MeshStandardMaterial(ANNIE_ART_TOKENS.materials.pupil);
-const airwayMaterial = new THREE.MeshStandardMaterial(ANNIE_ART_TOKENS.materials.airway);
 const hairMaterial = new THREE.MeshStandardMaterial(ANNIE_ART_TOKENS.materials.hair);
 const coatMaterial = new THREE.MeshStandardMaterial({...ANNIE_ART_TOKENS.materials.coat, name: 'Annie_Mat_Coat'});
 const coatEdgeMaterial = new THREE.MeshStandardMaterial(ANNIE_ART_TOKENS.materials.coatEdge);
@@ -116,21 +108,7 @@ function buildHead(upperBody, localHeadY) {
   face.userData.materialIntent = 'smooth gray-ivory CPR-trainer vinyl';
   ring(head, 'Annie_FaceMoldSeam', [0, -0.055, 0], 0.074, vinylSeamMaterial);
 
-  for (const side of [-1, 1]) {
-    const eyeX = side * 0.029;
-    ellipsoid(head, `Annie_FixedEye_${side}`, [eyeX, 0.018, 0.071], [0.021, 0.013, 0.008], cloudyEyeMaterial);
-    ellipsoid(head, `Annie_UnfocusedIris_${side}`, [eyeX, 0.017, 0.078], [0.007, 0.008, 0.003], irisMaterial);
-    ellipsoid(head, `Annie_FixedPupil_${side}`, [eyeX, 0.017, 0.080], [0.0032, 0.004, 0.0015], pupilMaterial);
-  }
-
   ellipsoid(head, 'Annie_MoldedNose', [0, -0.018, 0.079], [0.012, 0.026, 0.012], vinylMaterial);
-  ellipsoid(head, 'Annie_MouthAirway', [0, -0.077, 0.073], [0.021, 0.009, 0.004], airwayMaterial);
-  const airwayRim = new THREE.Mesh(new THREE.TorusGeometry(0.019, 0.003, 7, 24), vinylMaterial);
-  airwayRim.name = 'Annie_BlowTrainingMouthRim';
-  airwayRim.scale.y = 0.52;
-  airwayRim.position.set(0, -0.077, 0.075);
-  head.add(airwayRim);
-
   ellipsoid(head, 'Annie_HairWigCap', [0, 0.083, -0.012], [0.09, 0.052, 0.081], hairMaterial);
   for (const side of [-1, 1]) {
     const lock = ellipsoid(head, `Annie_HairWigLock_${side}`, [side * 0.066, 0.005, -0.005], [0.024, 0.093, 0.047], hairMaterial);
@@ -157,13 +135,13 @@ function buildHand(parent, name, side, position) {
   return hand;
 }
 
-function buildStethoscope(upperBody, shoulderLocalY) {
+function buildStethoscope(prop, shoulderLocalY) {
   const stethoscope = new THREE.Group();
-  stethoscope.name = 'Annie_Stethoscope';
+  stethoscope.name = 'Zhang_Stethoscope_1997';
   stethoscope.userData.owner = '張守恆';
   stethoscope.userData.inscription = '祝 守恆 醫師 1997 執業誌慶';
-  upperBody.add(stethoscope);
-  tube(stethoscope, 'Annie_Stethoscope_OldRubberTube', [
+  prop.add(stethoscope);
+  tube(stethoscope, 'Zhang_Stethoscope_OldRubberTube', [
     [-0.09, shoulderLocalY + 0.05, 0.105], [-0.145, shoulderLocalY - 0.10, 0.135],
     [-0.12, shoulderLocalY - 0.27, 0.164], [0, shoulderLocalY - 0.34, 0.176],
     [0.12, shoulderLocalY - 0.27, 0.164], [0.145, shoulderLocalY - 0.10, 0.135],
@@ -171,20 +149,33 @@ function buildStethoscope(upperBody, shoulderLocalY) {
   ], 0.009, rubberMaterial);
 
   const bell = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.041, 0.018, 32), metalMaterial);
-  bell.name = 'Annie_StethoscopeBell';
+  bell.name = 'Zhang_StethoscopeBell';
   bell.rotation.x = Math.PI / 2;
   bell.position.set(0, shoulderLocalY - 0.36, 0.187);
   stethoscope.add(bell);
 
-  const plate = ellipsoid(stethoscope, 'Annie_StethoscopeEngravingPlate', [0, shoulderLocalY - 0.25, 0.196], [0.132, 0.081, 0.014], metalMaterial);
+  const plate = ellipsoid(stethoscope, 'Zhang_StethoscopeEngravingPlate', [0, shoulderLocalY - 0.25, 0.196], [0.132, 0.081, 0.014], metalMaterial);
   plate.userData.inscription = stethoscope.userData.inscription;
   const inscription = new THREE.Mesh(
     new THREE.PlaneGeometry(0.245, 0.118),
     new THREE.MeshBasicMaterial({map: makeInscriptionTexture(), toneMapped: false})
   );
-  inscription.name = 'Annie_StethoscopeInscription';
+  inscription.name = 'Zhang_Stethoscope_1997_Inscription';
   inscription.position.set(0, shoulderLocalY - 0.25, 0.210);
   stethoscope.add(inscription);
+}
+
+export function createZhangStethoscopeProp(parent, {position, rotationX = 0, scale = 1}) {
+  const prop = new THREE.Group();
+  prop.name = 'Zhang_Stethoscope_1997_Prop';
+  prop.userData.owner = '張守恆';
+  prop.userData.inscription = '祝 守恆 醫師 1997 執業誌慶';
+  prop.position.set(...position);
+  prop.rotation.x = rotationX;
+  prop.scale.setScalar(scale);
+  parent.add(prop);
+  buildStethoscope(prop, 0.45);
+  return prop;
 }
 
 function buildStool(parent, materials) {
@@ -236,8 +227,7 @@ export function createAnnieArt(parent, {materials, state, position, rotationY = 
   root.userData = {
     characterId: 'ANNIE_CPR_TRAINING_MANNEQUIN', state, pose: state,
     modelHeight: 1.65, materialIntent: 'gray-ivory synthetic mannequin vinyl',
-    clothingOwner: '張守恆', aggressor: false,
-    inscription: '祝 守恆 醫師 1997 執業誌慶'
+    clothingOwner: '張守恆', aggressor: false
   };
   parent.add(root);
 
@@ -272,10 +262,6 @@ export function createAnnieArt(parent, {materials, state, position, rotationY = 
     lapel.rotation.z = side * 0.27;
     lapel.scale.z = 0.48;
     torso.add(lapel);
-    ellipsoid(torso, `Annie_CoatPocket_${side}`, [side * 0.13, shoulderY - hipY - 0.22, 0.15], [0.055, 0.069, 0.014], coatEdgeMaterial);
-  }
-  for (const y of [shoulderY - hipY - 0.10, shoulderY - hipY - 0.19, shoulderY - hipY - 0.28]) {
-    ellipsoid(torso, `Annie_CoatButton_${y}`, [0, y, 0.185], [0.009, 0.009, 0.006], metalMaterial);
   }
   upperBody.add(torso);
 
@@ -338,10 +324,6 @@ export function createAnnieArt(parent, {materials, state, position, rotationY = 
   }
 
   if (isStorage) buildStool(root, materials);
-  buildStethoscope(upperBody, shoulderY - hipY + 0.01);
-
-  const compressionPlate = ellipsoid(upperBody, 'Annie_CompressionPlate', [0, shoulderY - hipY - 0.19, 0.192], [0.079, 0.105, 0.012], vinylSeamMaterial);
-  compressionPlate.userData.contactTarget = isCpr ? 'burned-bed patient silhouette' : 'training chest';
   const practical = new THREE.SpotLight(
     ANNIE_ART_TOKENS.lighting.color, ANNIE_ART_TOKENS.lighting.intensity,
     ANNIE_ART_TOKENS.lighting.distance, ANNIE_ART_TOKENS.lighting.angle,
@@ -360,12 +342,12 @@ export function createAnnieArt(parent, {materials, state, position, rotationY = 
   root.traverse(object => {
     if (object.isMesh) {
       object.castShadow = true;
-      if (object.name !== 'Annie_StethoscopeInscription') object.receiveShadow = true;
+      object.receiveShadow = true;
     }
   });
 
   root.userData.rig = {
-    upperBody, head, compressionPlate, compressionBaseY: compressionPlate.position.y,
+    upperBody, head,
     baseUpperBodyY: upperBody.position.y, baseLean: isCpr ? 0.025 : 0,
     elapsed: 0, compression: 0
   };
@@ -393,5 +375,4 @@ export function updateAnnieArt(annie, delta) {
   const travel = 0.04 * press;
   rig.upperBody.position.y = rig.baseUpperBodyY - travel;
   rig.upperBody.rotation.x = rig.baseLean + press * 0.018;
-  rig.compressionPlate.position.y = rig.compressionBaseY - travel * 0.35;
 }

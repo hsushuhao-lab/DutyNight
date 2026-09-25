@@ -41,4 +41,4 @@ Use reusable procedural set dressing and material helpers, not screenshot backgr
 
 Generated text, room labels, patient identifiers, clocks, and floorplan sketches inside the boards are not canon. Outdoor hillside/ecology scenes are deprecated for gameplay. The human Annie image is wardrobe/mood-only and is superseded by [`ANNIE_IDENTITY_BIBLE.md`](ANNIE_IDENTITY_BIBLE.md).
 
-Annie's current visual and animation target is [`ANNIE_VISUAL_REWORK_SPEC.md`](ANNIE_VISUAL_REWORK_SPEC.md): old CPR mannequin and white-coat medical echo, with the horror carried by rigid posture, CPR action, and fixed gaze.
+Annie's current visual and animation target is [`ANNIE_VISUAL_REWORK_SPEC.md`](ANNIE_VISUAL_REWORK_SPEC.md): old CPR mannequin and white-coat medical echo, with a blank nose-only face, clear chest, rigid posture, and CPR action. Any older eye, mouth, airway, or neck-stethoscope image detail is superseded by the latest direct user direction.

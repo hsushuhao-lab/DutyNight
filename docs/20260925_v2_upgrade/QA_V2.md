@@ -11,7 +11,7 @@ No single state-machine PASS is sufficient. A release requires the current stati
 - No production portal, task, selector, or story choice reaches `hillside_route` or `ecology_pond`; M4 outbound and M5 return both use skybridge.
 - M4 ordinary patient remains present and calms; only physical roster inspection grants 守; reject signature and keep correct-path treatment ordinary.
 - M5 return threshold and look-back debounce/punishment progression; relic grants 恆 only on pickup.
-- One shared `prototype/src/art/AnnieArt.js` factory across 3F storage, bridge manifestation, and 6F CPR; rounded mannequin geometry (no Annie `BoxGeometry`), fixed synthetic face, training airway, mold seams, overlapped bridge/CPR hands, static storage, moving CPR, and exact neck stethoscope inscription.
+- One shared `prototype/src/art/AnnieArt.js` factory across 3F storage, bridge manifestation, and 6F CPR; rounded mannequin geometry (no Annie `BoxGeometry`), blank synthetic face with one nose only, no eyes/mouth/chest items, mold seams, overlapped bridge/CPR hands, static storage, moving CPR, and exact inscription on the separate stethoscope clue prop.
 - 6F is elevator-hijack-only and absent from ordinary floors/task text; B2 grants full employee number; reconstruction and M9 require the complete exact identity pair.
 - Duty-room washroom plaque absent, bathroom retained; no permanent wall clocks in key story spaces; bedside desk/phone and 0.8m circulation; no floating/occluded/penetrating props; ER monitor is separated from glass.
 
@@ -23,7 +23,7 @@ Capture exactly these 26 named visual states at their explicit ART_QA spawns/cam
 
 1. M1 3F admin / 316
 2. M1 3F storage Annie static
-3. M1 Annie close inspection (vinyl face and neck stethoscope)
+3. M1 Annie close inspection (nose-only vinyl face and clear chest)
 4. M2 4F nursing station
 5. M2 4F duty room
 6. M2 408C
@@ -63,13 +63,13 @@ Run `node test_v2_annie_identity_qa.js` from `prototype/`, then run the full 26-
 | Story capture | State / distance | Required read |
 |---|---|---|
 | `m1-3f-storage-annie-static.png` | 3F static / room medium | Full seated mannequin, same coat/scrub palette, grounded shoes, readable storage context. |
-| `m1-annie-close-inspection.png` | 3F static / close | Smooth vinyl face, fixed eyes, airway and mold seams; neck-worn stethoscope and inscription. |
+| `m1-annie-close-inspection.png` | 3F static / close | Smooth vinyl face with one molded nose, no eyes or mouth, fine seam, and clear chest. |
 | `m5-outbound-bridge-baseline.png` | Bridge / 8–12 m | Full recognizable white-coated silhouette with arms extended and hands overlapped. |
 | `m5-return-bridge-annie.png` | Bridge / 3–5 m | Same geometry/material identity, rigid stance, held gaze, hands still lifted. |
-| `m5-bridge-close-annie.png` | Bridge / 0.8–1.5 m | Close held gaze, molded face, lifted overlapped hands, neck stethoscope. |
+| `m5-bridge-close-annie.png` | Bridge / 0.8–1.5 m | Close blank nose-only face, molded vinyl, lifted overlapped hands, and clear chest. |
 | `m6-annie-cpr-long.png` | 6F CPR / 8–12 m | Room context and the kneeling figure at the bedside. |
-| `m6-annie-cpr.png` | 6F CPR / medium (about 4 m, room-limited) | Kneeling relation to bed and patient silhouette, contact and contact shadow visible. |
-| `m6-annie-cpr-close.png` | 6F CPR / 0.8–1.5 m | Mechanical press/release, stacked hands touching the chest, head/coat material detail. |
+| `m6-annie-cpr.png` | 6F CPR / medium (about 3.2 m, side view) | Kneeling relation to bed and patient silhouette, contact and contact shadow visible. |
+| `m6-annie-cpr-close.png` | 6F CPR / 0.8–1.5 m | Mechanical press/release, stacked hands touching the patient, nose-only blank face, and coat material detail. |
 
 All eight captures must be fresh and composed correctly. Screenshots must be genuine browser captures at 1440 × 900, with valid named anchors in frame, no timeout/warnings/browser errors, and readable Traditional Chinese. The run also saves three bridge-idle frames and three CPR press/release frames with camera distance and SHA-256 evidence. The 26-story suite must pass all story milestones locally and on public Pages; the production build must pass; the deployed build fingerprint must match the exact pushed SHA. These conditions mark the procedural release complete without a Hero GLB.
 

@@ -1,6 +1,6 @@
 // Level3FBlockout.js - 3F Administration Blockout with Sunset Warmth
 import * as THREE from 'three';
-import {createAnnieArt} from '../art/AnnieArt.js';
+import {createAnnieArt,createZhangStethoscopeProp} from '../art/AnnieArt.js';
 import { getMaterials, materialForSurface } from '../art/MaterialRegistry.js';
 
 export class Level3FBlockout {
@@ -347,6 +347,7 @@ export class Level3FBlockout {
     for(const x of [-.72,.72])for(const z of [-.25,.25]){const leg=new THREE.Mesh(new THREE.CylinderGeometry(.025,.025,.62,8),cartMat);leg.position.set(x,.42,z);cart.add(leg);}
     const anne=createAnnieArt(this.scene,{materials:this.materials,state:'STORAGE_STATIC',position:[13.48,0,3.18],rotationY:0});
     this.anneGroup=anne;this.anneHead=anne.getObjectByName('Annie_Head');this.anneStage=0;
+    this.anneStethoscopeProp=createZhangStethoscopeProp(this.scene,{position:[13.8,.82,5.15],rotationX:-Math.PI/2,scale:.82});
     const anneHit=new THREE.Mesh(new THREE.BoxGeometry(.95,1.9,.95),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
     anneHit.position.set(13.48,1.0,3.18);anneHit.userData={interactable:true,id:'CPR_ANNE',type:'cpr_anne',label:'查看 CPR 訓練假人「安妮」'};
     this.scene.add(anneHit);this.interactables.push(anneHit);this.anneHit=anneHit;

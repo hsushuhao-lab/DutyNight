@@ -163,11 +163,11 @@ PHYSICAL IDENTITY:
 - female-coded training face, but clearly a mannequin on close inspection
 
 VISUAL TRAITS:
-- smooth molded vinyl face, nearly blank expression, and a small blow-training airway opening
-- fixed unfocused eyes and fine mold seams; facial features are not distorted or grotesque
+- smooth molded vinyl face with one small nose only and fine mold seams; no eyes, mouth, sockets, pupils, lashes, or airway opening
+- blank uninterrupted face and clear chest with no badge, buttons, pockets, jewelry, stethoscope, or attached prop
 - short untidy wig-like hair, long rigid proportions, and visible teaching hinges
 - slightly oversized yellowed white coat with a removed/blank staff badge area
-- aged stethoscope worn around the neck, engraved 「祝 守恆 醫師 1997 執業誌慶」
+- separate aged stethoscope clue placed beside the 3F training cart and at the M5 relic site, engraved 「祝 守恆 醫師 1997 執業誌慶」
 
 The latest model, materials, rig, animation, lighting, and close-up acceptance
 criteria are in [`ANNIE_VISUAL_REWORK_SPEC.md`](ANNIE_VISUAL_REWORK_SPEC.md).
@@ -200,8 +200,8 @@ ZHANG SHOU-HENG RELATION:
 The yellowed white coat and engraved stethoscope belong to 張守恆, NOT Annie.
 
 After the 1998 incident and forced patientization, his staff possessions were
-removed. The old coat and stethoscope eventually ended up stored on/with the
-training mannequin.
+removed. The old coat remained on the mannequin while the stethoscope was
+staged separately beside the 3F training cart and at the M5 relic site.
 
 Stethoscope engraving:
   「祝 守恆 醫師　1997 執業誌慶」
@@ -229,7 +229,7 @@ M1 / 3F STORAGE:
 - ordinary-looking static CPR mannequin
 - seated on a round stool, back partly toward corridor
 - yellowed white coat draped/worn
-- stethoscope partly hidden; engraving not readable yet
+- clear mannequin chest; separate stethoscope clue beside the training cart
 - player can plausibly dismiss it as staff training equipment
 - no overt movement
 
@@ -243,7 +243,7 @@ M5 / SKYBRIDGE RETURN:
 - same face / coat / proportions
 - intermittent fluorescent light makes mannequin traits alternate between
   "almost human" and "obviously synthetic"
-- uses a rigid standing pose and unfollowing fixed gaze
+- uses a rigid standing pose and a blank nose-only face
 - performs only tiny mechanical settling movement
 - does not speak normally
 - leaves/reveals 張守恆's stethoscope at the first-campus end

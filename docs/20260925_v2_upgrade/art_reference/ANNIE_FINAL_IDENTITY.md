@@ -15,7 +15,7 @@ Narrative identity:
 
 Zhang Shou-Heng relationship:
 - the yellowed white coat and engraved stethoscope belong to 張守恆, not Annie
-- after Zhang was stripped of staff identity in 1998, these objects were left on/with the training mannequin
+- after Zhang was stripped of staff identity in 1998, his coat remained on the mannequin while his stethoscope was staged separately nearby
 - the engraved stethoscope reads: 「祝 守恆 醫師 1997 執業誌慶」
 - Annie therefore carries the protagonist's lost professional identity without being the protagonist
 
@@ -23,8 +23,7 @@ Visual traits:
 - female-coded CPR training face but clearly a mannequin on close inspection
 - molded pale synthetic skin
 - faint jaw/neck seams
-- training airway opening inside the mouth
-- cloudy artificial eyes, NOT black-hole eyes
+- one small molded nose only; no eyes, sockets, brows, pupils, lashes, mouth, or airway opening
 - stiff joints and compression-mechanism movement
 - oversized yellowed white coat, blank/removed badge area
 

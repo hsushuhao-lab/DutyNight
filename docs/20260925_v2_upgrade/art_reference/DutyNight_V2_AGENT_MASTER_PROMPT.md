@@ -158,12 +158,11 @@ PHYSICAL IDENTITY:
 VISUAL TRAITS:
 - pale molded synthetic skin
 - faint jaw / neck mold seams
-- cloudy artificial eyes, not black voids
-- training airway opening inside the mouth
+- one small molded nose only; no eyes, sockets, brows, pupils, lashes, mouth, or airway opening
 - stiff shoulder/elbow/wrist behavior
 - slightly oversized yellowed white coat
 - removed/blank staff badge area
-- old oxidized stethoscope
+- no attached chest decoration or prop; Zhang's engraved stethoscope is staged nearby as a separate clue object
 
 NARRATIVE IDENTITY:
 Annie is a BODY WITHOUT A NAME.
@@ -193,8 +192,8 @@ ZHANG SHOU-HENG RELATION:
 The yellowed white coat and engraved stethoscope belong to 張守恆, NOT Annie.
 
 After the 1998 incident and forced patientization, his staff possessions were
-removed. The old coat and stethoscope eventually ended up stored on/with the
-training mannequin.
+removed. The old coat remained on the mannequin while the stethoscope was
+staged separately beside the 3F training cart and at the M5 relic site.
 
 Stethoscope engraving:
   「祝 守恆 醫師　1997 執業誌慶」
@@ -222,7 +221,7 @@ M1 / 3F STORAGE:
 - ordinary-looking static CPR mannequin
 - seated on a round stool, back partly toward corridor
 - yellowed white coat draped/worn
-- stethoscope partly hidden; engraving not readable yet
+- clear mannequin chest; separate stethoscope clue beside the training cart
 - player can plausibly dismiss it as staff training equipment
 - no overt movement
 
