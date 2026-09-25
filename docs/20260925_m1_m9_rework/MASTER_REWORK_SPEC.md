@@ -1,3 +1,7 @@
+# HISTORICAL SCOPE — SUPERSEDED BY DUTYNIGHT 2.0
+
+This document remains in GitHub for design history. Current story, world, art, Annie, and QA authority is [`docs/20260925_v2_upgrade/README.md`](../20260925_v2_upgrade/README.md). Do not use this historical specification to remove or defer current M1–M9 content, including 409A/Bed 33, 6F, B2, identity takeover, or the 316 handoff. Preserve its “normal first, horror second” principle.
+
 # ============================================================
 # DUTYNIGHT — FINAL M1–M9 REWORK MASTER DIRECTIVE
 # Taiwanese Medical Mystery / Horror World Rework

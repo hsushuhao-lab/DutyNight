@@ -1,6 +1,6 @@
 # 《夜班迴廊：與避無可避的傳說》
 
-> **目前遊戲規格：M1–M9。** 本儲存庫的現行故事主線、視覺方向與 QA 權威文件位於 [`docs/20260925_m1_m9_rework/`](docs/20260925_m1_m9_rework/MASTER_REWORK_SPEC.md)。下方標示為 Act 1 / v0.1 的段落是歷史背景，不代表目前遊戲範圍；不得依舊規格刪除 409A、6F、B2 或 M1–M9 後續劇情。保留其「先常態、後驚悚」原則。
+> **目前遊戲規格：DutyNight 2.0。** 本儲存庫的現行故事、室內世界、美術、Annie 身分與 QA 權威文件位於 [`docs/20260925_v2_upgrade/`](docs/20260925_v2_upgrade/README.md)，Annie 目前造型、rig、動畫與近看驗收規格見 [`ANNIE_VISUAL_REWORK_SPEC.md`](docs/20260925_v2_upgrade/ANNIE_VISUAL_REWORK_SPEC.md)。固定主線仍是正常值班 → 409A／第33床 → 21:17 → 00:33 → 316 身分線索 → 第二院區 → Annie／雙路徑 → 6F → 02:17／B2 → 身分奪權 → 316 真正交班。舊 `ACT1_MASTER_SPEC` 與 M1–M9 重整文件只供歷史脈絡參考；「Bed 33 / 6F 尚未做」是舊範圍描述，不是現在的待辦或回退指令。保留「先正常、後恐怖」原則。GitHub `master` 上的程式、規格、原圖參考與 QA 是長期依據；聊天紀錄不是唯一依據。
 
 ## —— 第一幕原型：今晚輪到你（Act 1 Prototype v0.1.1）——
 
