@@ -19,7 +19,7 @@ Run the existing mandatory suite from `prototype/` plus all V2 tests, then `npm 
 
 ## Required fresh screenshots, local and public
 
-Capture exactly these 24 named visual states at their explicit ART_QA spawns/camera targets:
+Capture exactly these 26 named visual states at their explicit ART_QA spawns/camera targets:
 
 1. M1 3F admin / 316
 2. M1 3F storage Annie static
@@ -36,27 +36,29 @@ Capture exactly these 24 named visual states at their explicit ART_QA spawns/cam
 13. M4 守 roster clue
 14. M5 outbound bridge baseline
 15. M5 return bridge Annie
-16. M5 stethoscope relic
-17. M6 elevator display 6
-18. M6 Annie CPR wide
-19. M6 Annie CPR close
-20. M7 first-campus 1F guard post
-21. M7 B-Panel / concealed door
-22. M7 B2 mirror 316
-23. M9 dual identity form
-24. M9 successful dawn ending
+16. M5 bridge Annie close
+17. M5 stethoscope relic
+18. M6 elevator display 6
+19. M6 Annie CPR long
+20. M6 Annie CPR medium
+21. M6 Annie CPR close
+22. M7 first-campus 1F guard post
+23. M7 B-Panel / concealed door
+24. M7 B2 mirror 316
+25. M9 dual identity form
+26. M9 successful dawn ending
 
-Screenshot timeout is a hard failure. Do not catch-and-warn or drop missing files. Every image must be a valid, fully rendered image at the requested viewport. Before capture, assert the named scene anchor is in the camera frustum and has a non-empty projected rectangle. Require the exact 24-file manifest, zero warnings, zero browser errors, and all 10 recorded story milestones.
+Screenshot timeout is a hard failure. Do not catch-and-warn or drop missing files. Every image must be a valid, fully rendered image at the requested viewport. Before capture, assert the named scene anchor is in the camera frustum and has a non-empty projected rectangle. Require the exact 26-file manifest, zero warnings, zero browser errors, and all 10 recorded story milestones.
 
 ## Visual review
 
-Review all 24 captures against the concept references and live scene anchors. Check wall/floor material, lighting phase, signage, furniture circulation, rail/door clipping, mannequin identity, framed subject, and Traditional-Chinese legibility. Hard failures are blockers. A focused code/design-system review and independent screenshot review must pass on the same source revision.
+Review all 26 captures against the concept references and live scene anchors. Check wall/floor material, lighting phase, signage, furniture circulation, rail/door clipping, mannequin identity, framed subject, and Traditional-Chinese legibility. Hard failures are blockers. A focused code/design-system review and independent screenshot review must pass on the same source revision.
 
 ## P0 Annie V2 procedural art release gate
 
 This gate replaces the former Hero GLB gate for this release. `BLOCKED_BY_HERO_ASSET` is not a release status here. Do not wait for external GLBs or run license research. A GLB is optional `FUTURE ART POLISH`.
 
-Run `node test_v2_annie_identity_qa.js` from `prototype/`, then run the full 24-shot story browser playthrough. Use these shots from that manifest as the Annie visual evidence set and save the actual camera-to-subject distance with the release QA record:
+Run `node test_v2_annie_identity_qa.js` from `prototype/`, then run the full 26-shot story browser playthrough. Use these shots from that manifest as the Annie visual evidence set and save the actual camera-to-subject distance with the release QA record:
 
 | Story capture | State / distance | Required read |
 |---|---|---|
@@ -64,19 +66,21 @@ Run `node test_v2_annie_identity_qa.js` from `prototype/`, then run the full 24-
 | `m1-annie-close-inspection.png` | 3F static / close | Smooth vinyl face, fixed eyes, airway and mold seams; neck-worn stethoscope and inscription. |
 | `m5-outbound-bridge-baseline.png` | Bridge / 8–12 m | Full recognizable white-coated silhouette with arms extended and hands overlapped. |
 | `m5-return-bridge-annie.png` | Bridge / 3–5 m | Same geometry/material identity, rigid stance, held gaze, hands still lifted. |
+| `m5-bridge-close-annie.png` | Bridge / 0.8–1.5 m | Close held gaze, molded face, lifted overlapped hands, neck stethoscope. |
+| `m6-annie-cpr-long.png` | 6F CPR / 8–12 m | Room context and the kneeling figure at the bedside. |
 | `m6-annie-cpr.png` | 6F CPR / medium (about 4 m, room-limited) | Kneeling relation to bed and patient silhouette, contact and contact shadow visible. |
-| `m6-annie-cpr-close.png` | 6F CPR / close | Mechanical compression pose, hands stacked at contact, face/stethoscope detail. |
+| `m6-annie-cpr-close.png` | 6F CPR / 0.8–1.5 m | Mechanical press/release, stacked hands touching the chest, head/coat material detail. |
 
-All six captures must be fresh and composed correctly. Screenshots must be genuine browser captures at 1440 × 900, with valid named anchors in frame, no timeout/warnings/browser errors, and readable Traditional Chinese. The run also saves three bridge-idle frames and three CPR press/release frames with camera distance and SHA-256 evidence. The 24-story suite must pass all story milestones locally and on public Pages; the production build must pass; the deployed build fingerprint must match the exact pushed SHA. These conditions mark the procedural release complete without a Hero GLB.
+All eight captures must be fresh and composed correctly. Screenshots must be genuine browser captures at 1440 × 900, with valid named anchors in frame, no timeout/warnings/browser errors, and readable Traditional Chinese. The run also saves three bridge-idle frames and three CPR press/release frames with camera distance and SHA-256 evidence. The 26-story suite must pass all story milestones locally and on public Pages; the production build must pass; the deployed build fingerprint must match the exact pushed SHA. These conditions mark the procedural release complete without a Hero GLB.
 
 The old `test_annie_hero_asset_qa.js` and the GLB/PBR/rig/export requirements in `ANNIE_VISUAL_REWORK_SPEC.md` are future-art-polish checks only. Their absence or failure must not block this procedural release.
 
 ## Release proof
 
-1. Local build/static suite and all 24 local shots pass on the candidate revision.
+1. Local build/static suite and all 26 local shots pass on the candidate revision.
 2. Fast Deploy Pages passes for the pushed commit.
 3. Public `build-info.json` exact commit SHA matches the expected SHA; production module loads.
-4. Public browser playthrough passes all story milestones and captures all 24 required images with zero screenshot warnings/errors.
+4. Public browser playthrough passes all story milestones and captures all 26 required images with zero screenshot warnings/errors.
 5. Final `HEAD` and `origin/master` match; record commit SHA, workflow URLs, counts, artifact paths, and any remaining blocker.
 
 Do not report COMPLETE if any functional, geometry, screenshot, visual-review, deployment, or SHA gate is missing or failed.

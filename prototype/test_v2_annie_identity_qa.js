@@ -52,8 +52,7 @@ assert(bridge.getObjectByName('Annie_HandStack_Top').getWorldPosition(new THREE.
 
 const cpr=router.loadZone('phantom_6f').zoneGroup.getObjectByName('Annie_FLOOR6_CPR');
 assertAnnie(cpr,ANNIE_STATES.FLOOR6_CPR);
-updateAnnieArt(cpr,.1);
-assert(cpr.userData.rig.compression>0,'M6 must animate repetitive mechanical CPR');
+updateAnnieArt(cpr,0);
 assert(cpr.getObjectByName('Annie_OverlappedHands'),'CPR uses overlapped hands');
 assert(cpr.getObjectByName('Annie_Local_CoolWhite_Practical')?.castShadow,'Annie needs local cool-white shadowed light');
 cpr.updateMatrixWorld(true);
@@ -62,5 +61,10 @@ const patient=router.loadZone('phantom_6f').zoneGroup.getObjectByName('Annie_Pat
 patient.updateWorldMatrix(true,false);
 const patientCenter=patient.getWorldPosition(new THREE.Vector3());
 assert(cprHands.distanceTo(patientCenter)<0.35,'overlapped CPR hands must reach the burned patient contact point');
+const patientTop=patientCenter.y+patient.geometry.parameters.radius*patient.scale.y;
+assert(Math.abs(cprHands.x-patientCenter.x)<0.1,'CPR hands must be centered over the patient chest');
+assert(Math.abs(cprHands.y-patientTop)<0.06,'CPR hands must touch the patient chest surface');
+updateAnnieArt(cpr,.1);
+assert(cpr.userData.rig.compression>0,'M6 must animate repetitive mechanical CPR');
 
 console.log('DUTYNIGHT V2 ANNIE IDENTITY QA PASS');

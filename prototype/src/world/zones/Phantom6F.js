@@ -53,11 +53,12 @@ export class Phantom6F {
     chase.userData={interactable:true,id:'FLOOR6_CHASE',type:'floor6_chase',label:'追上走廊深處的白袍'};
     this.zoneGroup.add(chase);this.interactables.push(chase);
 
-    const burntBed=new THREE.Group();burntBed.name='Annie_CPR_BurntBed';burntBed.position.set(.35,0,-7.3);this.zoneGroup.add(burntBed);
-    const charred=new THREE.MeshStandardMaterial({color:0x171918,roughness:1});
+    const burntBed=new THREE.Group();burntBed.name='Annie_CPR_BurntBed';burntBed.position.set(.6,0,-7.3);this.zoneGroup.add(burntBed);
+    const charred=new THREE.MeshStandardMaterial({color:0x77766d,roughness:0.94});
     solid(burntBed,m.wallDark,[0,.38,0],[1.18,.18,2.12]);solid(burntBed,charred,[0,.57,0],[1.24,.20,2.18]);
     solid(burntBed,m.wallDark,[0,.72,-.92],[1.25,.48,.12]);
-    const patient=new THREE.Mesh(new THREE.SphereGeometry(.34,24,16),charred);patient.name='Annie_Patient_CPR_Target';patient.scale.set(.72,.42,2.45);patient.position.set(0,.82,.02);burntBed.add(patient);
+    const patient=new THREE.Mesh(new THREE.SphereGeometry(.34,48,32),charred);patient.name='Annie_Patient_CPR_Target';patient.scale.set(.92,.42,2.25);patient.position.set(0,.82,.02);burntBed.add(patient);
+    this.patientTarget=patient;this.patientRestY=patient.position.y;this.patientRestScaleY=patient.scale.y;
 
     const annie=createAnnieArt(this.zoneGroup,{materials:m,state:'FLOOR6_CPR',position:[1.42,0,-7.3],rotationY:-Math.PI/2});
     this.annie=annie;
@@ -70,6 +71,9 @@ export class Phantom6F {
   update(_,delta=0){
     this.cprElapsed+=delta;
     updateAnnieArt(this.annie,delta);
+    const compression=this.annie.userData.rig.compression;
+    this.patientTarget.position.y=this.patientRestY-compression*.025;
+    this.patientTarget.scale.y=this.patientRestScaleY*(1-compression*.1);
     if(this.cprElapsed>=this.nextCprSound){soundManager.playCprCompression();this.nextCprSound=this.cprElapsed+60/110;}
   }
 

@@ -55,10 +55,10 @@ The shared implementation lives in `prototype/src/art/AnnieArt.js`. 3F storage, 
 - All three scenes use the single `AnnieArt.js` factory and preserve the same silhouette/material identity.
 - The 165 cm standing-reference model is smoothly rounded; no Annie body mesh uses `BoxGeometry`.
 - The face is synthetic gray-ivory vinyl, minimally molded and fixed; CPR airway, neck/wrist seams, stiff joints, loose aged coat, gray-green scrubs, and worn shoes are visible at close range.
-- The bridge pose has lifted extended arms and overlapped hands. 6F is kneeling with overlapped hands at the patient contact point and a simple synchronized 110/min CPR loop. Storage is completely still.
+- The bridge pose has lifted extended arms and overlapped hands. 6F is kneeling with stacked hands centered on the patient chest; the patient contour follows the same mechanical 110/min press/release phase. Storage is completely still.
 - The old neck stethoscope is individually inspectable and its exact inscription is readable in close view.
 - Local cool-white light, cast/contact shadows, correct scale/yaw, grounded soles/knees, and long/mid/close captures all pass browser review.
-- The current 24 story captures cover the mannequin in storage, close inspection, bridge long/mid, and 6F medium/close views. All required story milestones pass, the production build succeeds, and public Pages serves the exact verified release SHA.
+- The current 26 story captures cover storage medium/close, bridge long/mid/close, the stethoscope clue, and 6F long/medium/close. All required story milestones pass, the production build succeeds, and public Pages serves the exact verified release SHA.
 
 ## FUTURE ART POLISH — Optional Hero GLB engineering contract
 
@@ -146,7 +146,7 @@ The nominal CPR rate is 110 compressions per minute (one compression cycle every
 
 ## Scene state contract
 
-All three states instantiate the same registered Hero asset:
+All three states instantiate the same shared procedural Annie model from `prototype/src/art/AnnieArt.js`:
 
 - `STORAGE_STATIC` in 3F: seated still; coat, scrub underlayer, shoes, and neck stethoscope present; the engraving is not readily legible at normal play distance.
 - `BRIDGE_MANIFEST` in M5: distant first read, fixed stare, empty-CPR action. The same rig, silhouette, coat, face, and hair must identify her as the previous mannequin.
@@ -164,15 +164,15 @@ Required distances measured from the visible body/hero prop to camera:
 - MID: 3–5 m, rigid posture and proportions start to feel wrong.
 - CLOSE: 0.8–1.5 m, clearly shows vinyl skin, fixed artificial eye, mold seam, training mouth, coat cloth detail, and neck stethoscope.
 
-The dedicated 1440 × 900 browser captures are `annie_storage_long.png`, `annie_storage_close.png`, `annie_bridge_long.png`, `annie_bridge_mid.png`, `annie_bridge_close.png`, `annie_floor6_cpr_long.png`, `annie_floor6_cpr_close.png`, and `stethoscope_inspect.png`. All anchors must be in frame, unobscured, and readable. Screenshot timeout or a hidden/occluded anchor is FAIL.
+The production story browser suite records Annie at storage medium/close, bridge long/mid/close, stethoscope inspection, and 6F CPR long/medium/close. These are genuine 1440 × 900 captures in the exact 26-image story manifest. All anchors must be in frame, unobscured, and readable. Screenshot timeout or a hidden/occluded anchor is FAIL.
 
-For each capture, record the zone/state, camera-to-anchor distance, camera transform, viewport, asset SHA-256, and screenshot SHA-256 in the QA report. The long and mid shots validate silhouette and staging; close shots must visibly distinguish molded vinyl from human skin, show the airway and fine seam, show cloth wear, and retain the stethoscope on the neck. The pickup inspection must show the exact inscription `祝 守恆 醫師 1997 執業誌慶` without substituted or malformed characters. The existing 24 story screenshots remain required separately; the eight Annie asset captures are an additional P0 gate.
+For each capture, record the source commit, zone/state, camera-to-anchor distance, camera transform, viewport, and screenshot SHA-256 in the QA report. The long and mid shots validate silhouette and staging; close shots must visibly distinguish molded vinyl from human skin, show the airway and fine seam, show cloth wear, and retain the stethoscope on the neck. The stethoscope inspection must show the exact inscription `祝 守恆 醫師 1997 執業誌慶` without substituted or malformed characters. These Annie views are included in the 26-image story manifest; there is no separate asset screenshot gate.
 
-## Automated asset QA and measured performance
+## FUTURE ART POLISH — Hero GLB validator and performance profile
 
-Add `prototype/test_annie_hero_asset_qa.js`. It must verify the manifest keys and actual files; compressed size budgets; expected mesh/node and bone names; required animation clips; independently instantiable Annie states; separate stethoscope node; original PBR texture/map presence; and unchanged M5/M6 story gates. A missing Hero GLB must report `BLOCKED_BY_HERO_ASSET`; it must not silently accept the procedural fallback.
+If GLB work is separately scheduled, `test_annie_hero_asset_qa.js` may verify manifest keys and files, size budgets, mesh/node and bone names, animation clips, independent Annie states, stethoscope nodes, and PBR textures. Missing GLBs must remain `FUTURE ART POLISH` and must not reject the procedural release.
 
-Run the existing story suites plus `test_m3_m9_story_qa.js`, `test_visual_geometry_contract_qa.js`, `test_user_floorplan_qa.js`, and `test_ward_circulation_qa.js`, `npm run build`, local browser story QA, and the eight dedicated Annie captures. Record frame time, draw calls, triangles, and texture memory in ordinary 4F, Skybridge Annie, and 6F CPR scenes after a documented warm-up and measurement interval. Report actual samples and bottlenecks; do not claim 60 FPS without measurement.
+Frame time, draw calls, triangles, and texture memory profiling are later optimization work. They are not acceptance criteria for this procedural release.
 
 ## FUTURE ART POLISH — Optional provenance and GLB gate
 

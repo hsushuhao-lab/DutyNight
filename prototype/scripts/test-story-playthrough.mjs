@@ -17,11 +17,11 @@ const requiredShots=[
   'm1-3f-admin-316.png','m1-3f-storage-annie-static.png','m1-annie-close-inspection.png','m2-4f-nursing-station.png','m2-4f-duty-room.png',
   'm2-408c-bed.png','m2-409-sealed.png','m3-er-nursing-station.png','m3-0033-registration.png',
   'm3-316-legacy-terminal-phone.png','m4-ordinary-patient.png','m4-transfer-form.png','m4-guard-roster-clue.png',
-  'm5-outbound-bridge-baseline.png','m5-return-bridge-annie.png','m5-stethoscope-relic.png','m6-elevator-display-6.png',
-  'm6-annie-cpr.png','m6-annie-cpr-close.png','m7-1f-guard-post.png','m7-b-panel-concealed-door.png','m7-b2-mirror-316.png',
+  'm5-outbound-bridge-baseline.png','m5-return-bridge-annie.png','m5-bridge-close-annie.png','m5-stethoscope-relic.png','m6-elevator-display-6.png',
+  'm6-annie-cpr-long.png','m6-annie-cpr.png','m6-annie-cpr-close.png','m7-1f-guard-post.png','m7-b-panel-concealed-door.png','m7-b2-mirror-316.png',
   'm9-dual-identity-form.png','m9-successful-dawn-ending.png'
 ];
-const report={url,started:new Date().toISOString(),milestones:[],screenshots:[],motionScreenshots:[],screenshotWarnings:[],errors:[],method:'Browser-driven M2-M9 story checkpoint playthrough with named scene-anchor frustum checks, 24 required full-resolution captures, and bridge-idle/CPR motion frames.'};
+const report={url,sourceSha:process.env.GITHUB_SHA||'local-working-tree',started:new Date().toISOString(),milestones:[],screenshots:[],motionScreenshots:[],screenshotWarnings:[],errors:[],method:'Browser-driven M2-M9 story checkpoint playthrough with named scene-anchor frustum checks, 26 required full-resolution captures, and bridge-idle/CPR motion frames.'};
 let page;
 
 async function snap(){return page.evaluate(()=>window.__storyQA.snapshot());}
@@ -271,6 +271,7 @@ try{
   await interact({id:'BRIDGE_LOOP_EVENT'});
   await page.waitForSelector('#story-choice-modal.active');await secondary();
   await shot('m5-return-bridge-annie',null,null,'Annie_BRIDGE_MANIFEST',[41,1.65,0],[46,1.0,0]);
+  await shot('m5-bridge-close-annie',null,null,'Annie_BRIDGE_MANIFEST',[44.95,1.6,-0.4],[46,1.25,0]);
   const bridgeMotion=[];
   for(let frame=0;frame<3;frame++){
     await page.waitForTimeout(180);
@@ -289,16 +290,17 @@ try{
   // M6: nonexistent 6F — stay near lift instead of chasing.
   await flag('PHANTOM6_RETURN_ZONE','second_campus_5f');await load('phantom_6f','phantom_6f_lift');
   await shot('m6-elevator-display-6',null,null,'Phantom6F_ElevatorDisplay',[0,2.48,.6],[0,2.48,1.78]);
+  await shot('m6-annie-cpr-long',null,null,'Annie_FLOOR6_CPR',[0,2.8,1.2],[.6,.9,-7.3]);
   mannequinCheck=await q(()=>{const a=window.__storyQA.worldRouter.activeZoneInstance.annie;return {state:a.userData.state,compression:a.userData.rig.compression,inscription:a.userData.inscription}});
   assert.equal(mannequinCheck.state,'FLOOR6_CPR');assert.equal(mannequinCheck.inscription,'祝 守恆 醫師 1997 執業誌慶');
   await page.waitForTimeout(120);
   const cprAfterFrame=await q(()=>window.__storyQA.worldRouter.activeZoneInstance.annie.userData.rig.compression);
   assert.notEqual(cprAfterFrame,mannequinCheck.compression,'6F CPR pose must move during the live animation loop');
   await shot('m6-annie-cpr',null,null,'Annie_FLOOR6_CPR',[0.5,1.85,-10.6],[.82,.85,-7.3]);
-  await shot('m6-annie-cpr-close',null,null,'Annie_Stethoscope',[.05,1.25,-8.0],[.60,.82,-7.3]);
-  const pressOne=await motionShot('m6-cpr-press-1','Annie_FLOOR6_CPR',[.05,1.25,-8.0],[.60,.82,-7.3],{capture:'cpr',phase:'press'});
-  const release=await motionShot('m6-cpr-release','Annie_FLOOR6_CPR',[.05,1.25,-8.0],[.60,.82,-7.3],{capture:'cpr',phase:'release'});
-  const pressTwo=await motionShot('m6-cpr-press-2','Annie_FLOOR6_CPR',[.05,1.25,-8.0],[.60,.82,-7.3],{capture:'cpr',phase:'press'});
+  await shot('m6-annie-cpr-close',null,null,'Annie_Stethoscope',[.3,2.15,-8.0],[.6,.96,-7.3]);
+  const pressOne=await motionShot('m6-cpr-press-1','Annie_FLOOR6_CPR',[.3,2.15,-8.0],[.6,.96,-7.3],{capture:'cpr',phase:'press'});
+  const release=await motionShot('m6-cpr-release','Annie_FLOOR6_CPR',[.3,2.15,-8.0],[.6,.96,-7.3],{capture:'cpr',phase:'release'});
+  const pressTwo=await motionShot('m6-cpr-press-2','Annie_FLOOR6_CPR',[.3,2.15,-8.0],[.6,.96,-7.3],{capture:'cpr',phase:'press'});
   assert(pressOne>0.85&&release<0.05&&pressTwo>0.85,'CPR browser frames must show press, release, and press');
 
   await interact({id:'FLOOR6_SAFE_RETURN'});
@@ -344,11 +346,11 @@ try{
   await mark('M9 TRUE NAME handoff accepted');
 
   assert.equal(report.errors.length,0,JSON.stringify(report.errors,null,2));
-  assert.deepEqual(report.screenshots.map(shot=>shot.file),requiredShots,'Story QA must produce the exact ordered 24-image manifest');
+  assert.deepEqual(report.screenshots.map(shot=>shot.file),requiredShots,'Story QA must produce the exact ordered 26-image manifest');
   assert.equal(report.screenshotWarnings.length,0,'Screenshot warnings are not accepted');
   assert.equal(report.motionScreenshots.length,6,'Three bridge idle and three CPR animation frames are required');
   const pngFiles=(await readdir(out)).filter(file=>file.endsWith('.png')).sort();
-  assert.deepEqual(pngFiles,[...requiredShots].sort(),'Output must contain exactly the 24 required screenshots');
+  assert.deepEqual(pngFiles,[...requiredShots].sort(),'Output must contain exactly the 26 required screenshots');
   report.verdict='PASS';
 }catch(e){
   report.verdict='FAIL';report.failure=e.stack;report.last=await snap().catch(()=>null);
