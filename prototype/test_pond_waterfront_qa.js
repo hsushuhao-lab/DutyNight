@@ -1,10 +1,11 @@
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
-import {WorldRouter} from './src/world/WorldRouter.js';
+import {GeometryFactory} from './src/world/shared/GeometryFactory.js';
+import {EcologyPond} from './src/world/zones/EcologyPond.js';
 import {FPSController} from './src/player/FPSController.js';
 global.document={querySelector:()=>null,addEventListener(){},createElement:()=>({getContext:()=>new Proxy({measureText:t=>({width:t.length*20})},{get:(o,k)=>o[k]||(()=>({addColorStop(){}}))})})};
-const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(),c=new FPSController(camera,{addEventListener(){}},[],[],[]),r=new WorldRouter(scene,camera,c);
-const zone=r.loadZone('ecology_pond','pond_from_hill');
+const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(),c=new FPSController(camera,{addEventListener(){}},[],[],[]);
+const zone=new EcologyPond(scene,new GeometryFactory()).build();c.colliders=zone.colliders;c.walkables=zone.walkables;c.teleport(53,1.12,-36.8);
 function walk(x,z){for(let i=0;i<2000;i++){
  const dx=x-c.position.x,dz=z-c.position.z,d=Math.hypot(dx,dz);if(d<.02)return;
  const before=c.position.clone();c.moveWithCollision(dx/d*Math.min(.04,d),dz/d*Math.min(.04,d));

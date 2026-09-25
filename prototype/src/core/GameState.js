@@ -79,14 +79,13 @@ export class GameState {
     this.flags.set('LEGEND_ER0033_RESOLVED', false);
     this.flags.set('SECOND_CAMPUS_ACCESS', false);
     this.flags.set('BRIDGE_ACCESS', false);
-    this.flags.set('OUTDOOR_ROUTE_ACCESS', false);
     this.flags.set('M4_CHEST_RESOLVED', false);
     this.flags.set('M5_BRIDGE_RESOLVED', false);
-    this.flags.set('M5_POND_RESOLVED', false);
     this.flags.set('M5_ROUTE_RESOLVED', false);
     this.flags.set('M5_ROUTE_CHOICE_RESOLVED', false);
     this.flags.set('M5_NAME_CLUE_FOUND', false);
     this.flags.set('M5_BRIDGE_COMMITTED', false);
+    this.flags.set('BRIDGE_OVERRIDE_PENDING', false);
     this.flags.set('SECOND_CAMPUS_PHONE_PENDING', false);
     this.flags.set('FLOOR6_AVAILABLE', false);
     this.flags.set('M6_FLOOR6_RESOLVED', false);

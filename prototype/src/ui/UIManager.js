@@ -847,7 +847,7 @@ export class UIManager {
         ]);
       }else if(this.gameState.getFlag('M4_CHEST_RESOLVED')&&!this.gameState.getFlag('M5_ROUTE_RESOLVED')){
         this.renderTaskBoard('翌日 01:45｜離開第二院區',[
-          {id:'task-m5-route',text:this.gameState.getFlag('M5_ROUTE_CHOICE_RESOLVED')?'找回安妮留下的舊聽診器，讀取銘牌':'返回第一院區；可走天橋，或從第二院區 1F 山側步道經生態池繞回',state:'ready'}
+          {id:'task-m5-route',text:this.gameState.getFlag('M5_ROUTE_CHOICE_RESOLVED')?'找回安妮留下的舊聽診器，讀取銘牌':'穿越封閉天橋，返回第一院區',state:'ready'}
         ]);
       }else if(this.gameState.getFlag('M5_ROUTE_RESOLVED')&&!this.gameState.getFlag('M6_FLOOR6_RESOLVED')){
         this.renderTaskBoard('翌日 02:00｜返回第一院區',[
@@ -913,7 +913,7 @@ export class UIManager {
     this.renderTaskBoard('4F 病房值班｜17:15–20:00', sequential([
       {id:'task-4f-report',task:'P1_4F_REPORT',text:'17:15 向護理站報到並確認交班重點'},
       {id:'task-duty-room',task:'P1_DUTY_ROOM_READY',text:'17:30 開啟值班室、放置物品並確認值班電話'},
-      {id:'task-round',task:'P1_ROUND_COMPLETE',text:'18:00 完成 401–409 晚間巡房'},
+      {id:'task-round',task:'P1_ROUND_COMPLETE',text:'18:00 完成 401–408 晚間巡房'},
       {id:'task-403',task:'P1_INSOMNIA_DONE',text:'18:30 評估 403 睡眠問題'},
       {id:'task-normal-event',task:'P1_NORMAL_EVENT_DONE',text:'19:30 處理一般病房事件'},
       {id:'task-rest',task:'P1_REST_DONE',text:'20:00 回值班室短暫休息並等待急診通知'}

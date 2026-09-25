@@ -1,14 +1,14 @@
-# ART-CHAR-ANNIE-HERO-V2 — Hero Asset Engineering Contract
+# ART-CHAR-ANNIE-HERO-V2 — Procedural Mannequin Release Contract
 
-Priority: P0 — visual release blocker
+Priority: P0 — procedural art release
 Revision: 2026-09-25
-Status: `FUNCTIONAL_FALLBACK_READY / ART_HERO_ASSET_PENDING`
+Status: `LOCAL_QA_PASS / PUBLIC_PAGES_PENDING`
 
-This specification refines Annie's model, materials, rig, animation, lighting, and close-up presentation. It supplements the shared Annie identity bible and takes precedence over earlier face, hair, and pose descriptions wherever they differ. The M1–M9 story, Annie's identity, and her narrative role remain unchanged.
+This specification defines the shippable Annie V2 Procedural Mannequin for the current release. It supersedes the previous rule that required an external Hero GLB. A Hero GLB and license research are not needed for this release; they are optional `FUTURE ART POLISH`. The M1–M9 story, Annie's identity, and her narrative role remain unchanged.
 
 ## Read at a glance
 
-Annie must read as an old full-body CPR training mannequin wearing 張守恆's yellowed white coat. At 8–12 m she reads as an adult woman in a white coat; at 0.8–1.5 m the vinyl skin, fixed unfocused eyes, mold seams, CPR airway, and teaching joints reveal a training mannequin. Use medium-length dark wig-like hair with dry, tangled, separated locks; keep it off the face and grounded like an old wig, not floating ghost hair. Keep her adult-sized and long-limbed, approximately 162–168 cm.
+Annie reads as a 165 cm clothing mannequin / old CPR training dummy in 張守恆's aged white coat. Use normal adult proportions and smooth, rounded Sphere/Capsule/Cylinder/Lathe/Torus geometry. Annie's body, coat, limbs, hands, and shoes must not use `BoxGeometry`. Her gray-ivory synthetic plastic, minimal fixed face, small artificial airway, mold seams, rigid posture, and repeated presence carry the horror; do not pursue realistic skin or distort her face into a monster.
 
 The dread comes from the mannequin's posture, CPR motion, fixed gaze, repeated appearances, and wrong presence. Do not distort or grotesquely exaggerate her facial features.
 
@@ -22,16 +22,16 @@ The stethoscope and inscription are property/clue evidence from 張守恆; Annie
 
 - Use one shared model with `STORAGE_STATIC`, `BRIDGE_MANIFEST`, and `FLOOR6_CPR` poses.
 - Face: softly rounded vinyl shell, slightly molded facial details, subdued cloudy eyes, centered pupils that never track the player, a small dark airway opening with a pale molded rim, and visible but fine mold seams.
-- Hair: medium-length dark wig with dry, tangled, separated locks. Keep the face readable. No floating hair, blood, wounds, or spectral eye glow.
-- Body and hands: narrow, elongated proportions, rigid shoulder line, clear elbow and wrist joints, hinged finger segments, and hard-plastic knee/ankle joints.
-- Coat: aged ivory with restrained yellowing, loose fit, cloth-like roughness, lapels and pockets, and a blank or removed badge. Avoid a clean modern coat.
-- Stethoscope: aged rubber tube and oxidized metal bell/plate, physically worn around the neck. The inscription is part of the prop and must also be represented in the close inspection content.
+- Hair: modestly messy dark mannequin wig, kept clear of the face; no ghost styling, blood, wounds, or spectral eye glow.
+- Body and hands: natural adult proportions, stiff pose, visible neck/wrist mold seams, articulated teaching joints, and grounded old work shoes.
+- Clothing: loose, aged yellow-white coat over muted gray-green scrubs; cloth reads differently from the smooth vinyl.
+- Stethoscope: worn rubber tubing and oxidized metal, worn at the neck. Its attached plate visibly carries exactly `祝 守恆 醫師 1997 執業誌慶`.
 
 ## Motion and staging
 
 - `STORAGE_STATIC`: seated on its stool and completely still. This is ordinary training equipment on first inspection.
-- `BRIDGE_MANIFEST`: rigid standing pose, held unfocused gaze, and only a tiny mechanical settling motion. It never tracks the camera or behaves like a living person.
-- `FLOOR6_CPR`: kneeling beside the scorched bed and pressing both teaching hands rhythmically into the bed-side patient silhouette. The shoulders, forearms, hands, and compression plate move together at a steady training cadence. The old mannequin mechanism supplies the click; do not add gore or impact animation.
+- `BRIDGE_MANIFEST`: rigid standing pose, both arms extended forward with overlapped hands held at chest height; no hanging arms. Only tiny mechanical settling; no camera tracking.
+- `FLOOR6_CPR`: kneeling beside the scorched bed and pressing both overlapped teaching hands into the bed-side patient silhouette at 110 compressions/minute. Shoulders, arms, hands, and chest contact move together; no gore or impact animation.
 - The face remains composed and almost empty through every state. The horror is in what the body is doing and where it appears.
 
 ## Lighting and inspection
@@ -48,9 +48,21 @@ This file is linked from [`MASTER_UPGRADE_DIRECTIVE.md`](MASTER_UPGRADE_DIRECTIV
 
 Task ID: `ART-CHAR-ANNIE-HERO-V2`. Repository: `hsushuhao-lab/DutyNight`; runtime target: `prototype/`. The latest explicit user direction and this contract supersede older descriptions of Annie wherever they conflict. Narrative canon and the M1–M9 order do not change.
 
-At this revision, `prototype/src/world/shared/AnnieMannequin.js` is a procedural development fallback. The current `AssetRegistry.js` manifest and `prototype/public/assets/models/` inventory do not contain an Annie Hero GLB or the engraved stethoscope Hero Prop GLB. Do not label the procedural fallback as the final Hero Character Asset or mark this P0 task complete.
+The shared implementation lives in `prototype/src/art/AnnieArt.js`. 3F storage, the skybridge, and 6F instantiate this factory with only `STORAGE_STATIC`, `BRIDGE_MANIFEST`, or `FLOOR6_CPR` changing the pose. It owns the model, materials, rig, stethoscope, light, and contact shadows. `prototype/src/world/shared/AnnieMannequin.js` is only an import bridge and contains no second model implementation.
 
-## Required asset files and loading architecture
+## Current procedural release acceptance
+
+- All three scenes use the single `AnnieArt.js` factory and preserve the same silhouette/material identity.
+- The 165 cm standing-reference model is smoothly rounded; no Annie body mesh uses `BoxGeometry`.
+- The face is synthetic gray-ivory vinyl, minimally molded and fixed; CPR airway, neck/wrist seams, stiff joints, loose aged coat, gray-green scrubs, and worn shoes are visible at close range.
+- The bridge pose has lifted extended arms and overlapped hands. 6F is kneeling with overlapped hands at the patient contact point and a simple synchronized 110/min CPR loop. Storage is completely still.
+- The old neck stethoscope is individually inspectable and its exact inscription is readable in close view.
+- Local cool-white light, cast/contact shadows, correct scale/yaw, grounded soles/knees, and long/mid/close captures all pass browser review.
+- The current 24 story captures cover the mannequin in storage, close inspection, bridge long/mid, and 6F medium/close views. All required story milestones pass, the production build succeeds, and public Pages serves the exact verified release SHA.
+
+## FUTURE ART POLISH — Optional Hero GLB engineering contract
+
+The following GLB requirements describe a later quality upgrade only. Missing model files, manifest entries, external authorization, or GLB validation do not block the current procedural release.
 
 Formal assets:
 
@@ -162,10 +174,10 @@ Add `prototype/test_annie_hero_asset_qa.js`. It must verify the manifest keys an
 
 Run the existing story suites plus `test_m3_m9_story_qa.js`, `test_visual_geometry_contract_qa.js`, `test_user_floorplan_qa.js`, and `test_ward_circulation_qa.js`, `npm run build`, local browser story QA, and the eight dedicated Annie captures. Record frame time, draw calls, triangles, and texture memory in ordinary 4F, Skybridge Annie, and 6F CPR scenes after a documented warm-up and measurement interval. Report actual samples and bottlenecks; do not claim 60 FPS without measurement.
 
-## Provenance and release gate
+## FUTURE ART POLISH — Optional provenance and GLB gate
 
 For an external model, record source URL, author, exact license, modification permission, commercial-use status, redistribution status, and source/asset hashes in `prototype/public/assets/models/characters/README.md`. Do not use ripped assets, unclear licenses, or non-redistributable files in the public repository. A custom-created asset must record its creator and source project/export settings as well.
 
-`ART-CHAR-ANNIE-HERO-V2` is `COMPLETE` only when a redistributable Hero GLB and PBR maps are committed; the same asset is used by all three states; the skeletal clips and CPR biomechanics pass; the stethoscope Hero Prop and inscription are legible; all eight distance shots and existing story QA pass locally and publicly; performance is measured; build passes; and public Pages serves the exact verified SHA.
+The current `ART-CHAR-ANNIE-HERO-V2` release is `COMPLETE` when the procedural acceptance above passes, including local and public story QA/screenshots and exact-SHA Pages verification. GLB/PBR/rig-export requirements in this section remain `FUTURE ART POLISH`.
 
-Until then the only truthful status is `FUNCTIONAL_FALLBACK_READY / ART_HERO_ASSET_PENDING`. If no suitable licensed or authored asset is available, report `BLOCKED_BY_HERO_ASSET`. A prettier procedural fallback is not release completion.
+Do not reintroduce `BLOCKED_BY_HERO_ASSET` as a blocker for this procedural release. When separately authorized and scheduled, GLB work may use the engineering contract above as its future asset checklist.

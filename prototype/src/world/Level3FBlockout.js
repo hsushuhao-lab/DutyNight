@@ -1,5 +1,6 @@
 // Level3FBlockout.js - 3F Administration Blockout with Sunset Warmth
 import * as THREE from 'three';
+import {createAnnieArt} from '../art/AnnieArt.js';
 import { getMaterials, materialForSurface } from '../art/MaterialRegistry.js';
 
 export class Level3FBlockout {
@@ -344,52 +345,26 @@ export class Level3FBlockout {
     const cart=new THREE.Group();cart.position.set(13.5,0,5.15);this.scene.add(cart);
     const bed=new THREE.Mesh(new THREE.BoxGeometry(1.70,.12,.72),this.materials.wall);bed.position.y=.76;cart.add(bed);
     for(const x of [-.72,.72])for(const z of [-.25,.25]){const leg=new THREE.Mesh(new THREE.CylinderGeometry(.025,.025,.62,8),cartMat);leg.position.set(x,.42,z);cart.add(leg);}
-    const anne=new THREE.Group();anne.name='CPR_Anne';
-    const plastic=new THREE.MeshStandardMaterial({color:0xe2c6ad,roughness:.74});
-    const shirt=new THREE.MeshStandardMaterial({color:0xd6e0df,roughness:.82});
-    const torso=new THREE.Mesh(new THREE.BoxGeometry(.42,.74,.22),shirt);torso.position.y=.35;anne.add(torso);
-    const head=new THREE.Mesh(new THREE.SphereGeometry(.17,18,14),plastic);head.position.y=.88;anne.add(head);
-    const neck=new THREE.Mesh(new THREE.CylinderGeometry(.06,.07,.12,12),plastic);neck.position.y=.72;anne.add(neck);
-    for(const sx of [-1,1]){const arm=new THREE.Mesh(new THREE.CylinderGeometry(.045,.055,.62,10),plastic);arm.position.set(sx*.29,.38,0);arm.rotation.z=sx*.10;anne.add(arm);}
-    for(const sx of [-1,1]){const leg=new THREE.Mesh(new THREE.CylinderGeometry(.055,.065,.72,10),plastic);leg.position.set(sx*.12,-.34,0);anne.add(leg);}
-    anne.position.set(13.5,1.02,5.15);anne.rotation.x=Math.PI/2;anne.rotation.z=Math.PI;this.scene.add(anne);
-    this.anneGroup=anne;this.anneHead=head;this.anneStage=0;
-    const anneHit=new THREE.Mesh(new THREE.BoxGeometry(1.75,.65,.90),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
-    anneHit.position.set(13.5,1.00,5.15);anneHit.userData={interactable:true,id:'CPR_ANNE',type:'cpr_anne',label:'查看 CPR 訓練假人「安妮」'};
+    const anne=createAnnieArt(this.scene,{materials:this.materials,state:'STORAGE_STATIC',position:[13.48,0,3.18],rotationY:0});
+    this.anneGroup=anne;this.anneHead=anne.getObjectByName('Annie_Head');this.anneStage=0;
+    const anneHit=new THREE.Mesh(new THREE.BoxGeometry(.95,1.9,.95),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
+    anneHit.position.set(13.48,1.0,3.18);anneHit.userData={interactable:true,id:'CPR_ANNE',type:'cpr_anne',label:'查看 CPR 訓練假人「安妮」'};
     this.scene.add(anneHit);this.interactables.push(anneHit);this.anneHit=anneHit;
-    const stool=new THREE.Group();stool.position.set(13.48,0,3.18);stool.visible=false;this.scene.add(stool);
-    const stoolSeat=new THREE.Mesh(new THREE.CylinderGeometry(.24,.24,.08,18),this.materials.wallDark);stoolSeat.position.y=.48;stool.add(stoolSeat);
-    for(let i=0;i<3;i++){const a=i*Math.PI*2/3;const leg=new THREE.Mesh(new THREE.CylinderGeometry(.018,.022,.46,8),this.materials.fixture);leg.position.set(Math.cos(a)*.15,.23,Math.sin(a)*.15);stool.add(leg);}
-    this.anneStool=stool;
+    this.anneStool=anne.getObjectByName('Annie_Stool');
     this.storageRoom={id:'3F_STORAGE',label:'器材儲藏室',anne:true,bounds:[11,2.5,16,6.5]};
   }
 
   setAnneStage(stage) {
-    if(!this.anneGroup || stage===this.anneStage)return;
+    if(!this.anneGroup||stage===this.anneStage)return;
     this.anneStage=stage;
-    this.anneGroup.visible=true;this.anneHit.visible=true;
-    if(stage===0){
-      this.anneGroup.position.set(13.5,1.02,5.15);this.anneGroup.rotation.set(Math.PI/2,0,Math.PI);this.anneHead.rotation.set(0,0,0);
-      this.anneHit.position.set(13.5,1.0,5.15);
-      if(this.storageDoor){this.storageDoor.position.set(13.05,1.15,2.72);this.storageDoor.rotation.y=-.52;}
-      if(this.anneStool)this.anneStool.visible=false;
-    }else if(stage===1){
-      this.anneGroup.position.set(13.5,1.02,5.15);this.anneGroup.rotation.set(Math.PI/2,0,Math.PI);
-      this.anneHead.rotation.z=.78;
-      this.anneHit.position.set(13.5,1.0,5.15);
-      if(this.storageDoor){this.storageDoor.position.set(13.05,1.15,2.72);this.storageDoor.rotation.y=-.52;}
-      if(this.anneStool)this.anneStool.visible=false;
-    }else if(stage===2){
-      this.anneGroup.position.set(13.48,.62,3.18);this.anneGroup.rotation.set(0,Math.PI,0);this.anneHead.rotation.set(0,0,0);
+    this.anneGroup.visible=stage<3;this.anneHit.visible=stage<3;
+    this.anneHit.userData.interactable=stage<3;
+    if(stage<3){
+      this.anneGroup.position.set(13.48,0,3.18);this.anneGroup.rotation.set(0,0,0);
+      this.anneHead.rotation.set(0,0,0);this.anneStool.visible=true;
       this.anneHit.position.set(13.48,1.0,3.18);
-      if(this.storageDoor){this.storageDoor.position.set(12.95,1.15,3.03);this.storageDoor.rotation.y=-Math.PI/2;}
-      if(this.anneStool)this.anneStool.visible=true;
-    }else{
-      this.anneGroup.visible=false;this.anneHit.visible=false;
-      this.anneHit.userData.interactable=false;
-      if(this.storageDoor){this.storageDoor.position.set(12.95,1.15,3.03);this.storageDoor.rotation.y=-Math.PI/2;}
-      if(this.anneStool)this.anneStool.visible=false;
     }
+    if(stage>=3&&this.storageDoor){this.storageDoor.position.set(12.95,1.15,3.03);this.storageDoor.rotation.y=-Math.PI/2;}
   }
 
   buildDutyOffice() {
@@ -492,8 +467,8 @@ export class Level3FBlockout {
     this.scene.add(lampShade);
 
     // 316 desk phone: ordinary before handoff, uncanny afterwards.
-    const phoneBase=new THREE.Mesh(new THREE.BoxGeometry(.34,.09,.22),this.materials.fixture);phoneBase.position.set(5.45,.86,5.72);this.scene.add(phoneBase);
-    const handset=new THREE.Mesh(new THREE.BoxGeometry(.38,.07,.10),this.materials.wallDark);handset.position.set(5.45,.95,5.72);this.scene.add(handset);
+    const phoneBase=new THREE.Mesh(new THREE.BoxGeometry(.34,.09,.22),this.materials.fixture);phoneBase.name='DutyPhone_316_Base';phoneBase.position.set(5.45,.86,5.72);this.scene.add(phoneBase);
+    const handset=new THREE.Mesh(new THREE.BoxGeometry(.38,.07,.10),this.materials.wallDark);handset.name='DutyPhone_316_Handset';handset.position.set(5.45,.95,5.72);this.scene.add(handset);
     const phoneHit=new THREE.Mesh(new THREE.BoxGeometry(.55,.35,.42),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
     phoneHit.position.set(5.45,.95,5.72);phoneHit.userData={interactable:true,id:'316_PHONE',type:'office_phone_316',label:'查看 316 辦公室電話'};
     this.scene.add(phoneHit);this.interactables.push(phoneHit);this.phoneMesh=phoneHit;
@@ -669,7 +644,8 @@ export class Level3FBlockout {
       const screenTex = new THREE.CanvasTexture(screenCanvas);
       screenTex.colorSpace = THREE.SRGBColorSpace;
       const displayGeo = new THREE.PlaneGeometry(0.58, 0.38);
-      const display = new THREE.Mesh(displayGeo, new THREE.MeshBasicMaterial({ map: screenTex }));
+        const display = new THREE.Mesh(displayGeo, new THREE.MeshBasicMaterial({ map: screenTex }));
+        display.name='DutyTerminal_316_LegacyScreen';
       // Screen normal points -X toward the operator chair (latest user instruction).
       display.rotation.y = -Math.PI / 2;
       display.position.set(9.61, 1.25, 5.5 + offsetZ);
@@ -707,6 +683,7 @@ export class Level3FBlockout {
           new THREE.MeshBasicMaterial({ visible: false })
         );
         legacyHitbox.position.set(9.8, 1.2, 5.5 + offsetZ);
+        legacyHitbox.name='DutyTerminal_316_LegacyHitbox';
         legacyHitbox.userData = {
           interactable: true,
           id: '316_LEGACY_TERMINAL',

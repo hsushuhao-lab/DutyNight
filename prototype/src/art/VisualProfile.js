@@ -2,8 +2,9 @@ import * as THREE from 'three';
 
 export const VisualProfile = Object.freeze({
   ACT1_DUSK_NORMAL: { fill: 0.42, sky: 0xe6e5de, ground: 0xd0c7b6, background: 0xabb4b4 },
-  NIGHT_NORMAL: { fill: 0.34, sky: 0x718187, ground: 0x3c4540, background: 0x10171b },
-  NIGHT_HORROR: { fill: 0.22, sky: 0x3f555b, ground: 0x202a26, background: 0x080d10 }
+  NIGHT_NORMAL: { fill: 0.22, sky: 0x718187, ground: 0x3c4540, background: 0x10171b },
+  NIGHT_LATE: { fill: 0.08, sky: 0x465c5b, ground: 0x1d2824, background: 0x080e10 },
+  NIGHT_HORROR: { fill: 0.04, sky: 0x263d3b, ground: 0x111a17, background: 0x040708 }
 });
 
 const zones = {
@@ -18,18 +19,18 @@ const zones = {
   second_campus_1f: { lamps: [[72, -4], [72, -11]], intensity: 3.5 },
   hillside_route: { lamps: [], intensity: 0 },
   ecology_pond: { lamps: [], intensity: 0 },
-  phantom_6f: { lamps: [[0,-1],[0,-6],[0,-11]], intensity: 1.35, width: 2.4, color: 0x8a5b4b, night: true },
-  b2_archive: { lamps: [[0,-1],[0,-6],[0,-11]], intensity: 1.15, width: 2.2, color: 0x6b5146, night: true }
+  phantom_6f: { lamps: [[0,-1],[0,-6],[0,-11]], intensity: 4.5, width: 2.4, color: 0x8a5b4b, night: true },
+  b2_archive: { lamps: [[0,-1],[0,-6],[0,-11]], intensity: 4.0, width: 2.2, color: 0x6b5146, night: true }
 };
 
-export function applyZoneLighting(group, scene, zoneId, storyTime='17:00') {
+export function applyZoneLighting({group,scene,zoneId,storyTime='17:00',roomLamps=[]}) {
   group.traverse(object => { if (object.isLight) object.shadow?.dispose(); });
   group.clear();
   const zone = zones[zoneId] || { lamps: [], intensity: 0, night: true };
   const timeOrder={'21:17':1,'23:55':1,'00:30':1,'00:33':2,'01:15':2,'01:45':2,'02:00':3,'02:17':3,'03:30':3,'04:05':3};
   const stage=timeOrder[storyTime]??0;
-  const profile = stage>=3?VisualProfile.NIGHT_HORROR:stage>=1||zone.night?VisualProfile.NIGHT_NORMAL:VisualProfile.ACT1_DUSK_NORMAL;
-  const practicalScale=stage===0?1:stage===1?.78:stage===2?.62:.48;
+  const profile = stage>=3?VisualProfile.NIGHT_HORROR:stage>=2?VisualProfile.NIGHT_LATE:stage>=1||zone.night?VisualProfile.NIGHT_NORMAL:VisualProfile.ACT1_DUSK_NORMAL;
+  const practicalScale=stage===0?1:stage===1?.82:stage===2?.42:.32;
   scene.background = new THREE.Color(profile.background);
   scene.fog = null;
   group.userData.profile = zone.night ? 'NIGHT_NORMAL' : 'ACT1_DUSK_NORMAL';
@@ -64,8 +65,14 @@ export function applyZoneLighting(group, scene, zoneId, storyTime='17:00') {
     panel.lookAt(x, 0, z);
     group.add(panel);
   }
+  for (const [x,z] of roomLamps) {
+    const panel=new THREE.RectAreaLight(0xfff0d9,3.5*practicalScale,2,1.2);
+    panel.position.set(x,3,z);
+    panel.lookAt(x,0,z);
+    group.add(panel);
+  }
   if(stage>=2&&['first_campus_3f','first_campus_4f','first_campus_2f','first_campus_1f'].includes(zoneId)){
-    const emergency=new THREE.PointLight(0x63b982,stage===2?.48:.72,5.5,2);
+    const emergency=new THREE.PointLight(0x63b982,stage===2?.40:.82,5.5,2);
     emergency.position.set(zoneId==='first_campus_4f'?6:0,2.45,zoneId==='first_campus_4f'?-3:0);
     emergency.name='LocalizedGreenEmergencySpill';group.add(emergency);
   }

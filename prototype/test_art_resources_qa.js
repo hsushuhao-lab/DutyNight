@@ -15,14 +15,14 @@ const countDisposals = resource => {
 const lighting = new THREE.Group();
 const scene = new THREE.Scene();
 for (let visit = 0; visit < 3; visit++) {
-  applyZoneLighting(lighting, scene, 'first_campus_3f');
+  applyZoneLighting({group:lighting,scene,zoneId:'first_campus_3f'});
   const sun = lighting.children.find(object => object.isSpotLight);
   assert.ok(sun, '3F shadow light exists');
   sun.shadow.map = new THREE.WebGLRenderTarget(16, 16);
   sun.shadow.mapPass = new THREE.WebGLRenderTarget(16, 16);
   const shadow = countDisposals(sun.shadow.map);
   const shadowPass = countDisposals(sun.shadow.mapPass);
-  applyZoneLighting(lighting, scene, 'first_campus_4f');
+  applyZoneLighting({group:lighting,scene,zoneId:'first_campus_4f'});
   assert.equal(shadow.value, 1, 'zone transition releases shadow map exactly once');
   assert.equal(shadowPass.value, 1, 'zone transition releases auxiliary shadow map');
 }

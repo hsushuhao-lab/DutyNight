@@ -41,7 +41,7 @@ assert.equal(state.getFlag('MEMORY_NEVER_SIGN_BED33'),true);
 
 const legend=new LegendStateManager();
 assert.equal(legend.getState('LEGEND_BED33'),NodeState.UNSEEN);
-legend.registerClue('LEGEND_BED33','KNOCK_403_49');
+legend.registerClue('LEGEND_BED33','KNOCK_408C_49');
 assert.equal(legend.getState('LEGEND_BED33'),NodeState.NOTICED);
 legend.registerClue('LEGEND_BED33','HIS_409_CLOSED');
 assert.equal(legend.getState('LEGEND_BED33'),NodeState.UNDERSTOOD);

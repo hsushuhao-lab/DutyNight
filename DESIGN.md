@@ -1,28 +1,42 @@
-# DutyNight visual contract
+# DutyNight visual and interaction contract
 
-## 1. Authority and audience
-The supplied DutyNight_CODEX_VISUAL_MASTER_20260917 package is canonical. Its images define material, mood and furniture detail, never literal floorplans, labels or patient identifiers. The player is an on-call physician in an ordinary Taiwanese hospital. Model topology, interaction anchors, routes and tests remain locked at 31f9e1b039a42317989291a1657b9901a673e748.
+## Authority
 
-## 2. Material tokens
-Warm ivory painted walls; sage accents; subdued resilient vinyl; terrazzo public floors; oak protection rails; brushed stainless hardware; aluminum window frames; mineral acoustic ceilings. Use local 2K albedo/normal/roughness maps with documented source, real-world UV scale, restrained wear. Preserve diffuse surface detail in highlights. No flat hero furniture, mirror floors or theatrical orange/blue wash.
+The current authority is [`docs/20260925_v2_upgrade/README.md`](docs/20260925_v2_upgrade/README.md), including its fixed M1–M9 walkthrough, enclosed-world rules, V2 art direction, Annie identity, and screenshot/release gates. This file summarizes the presentation rules for implementation. Historical Act 1 and M1–M9 documents do not define current scope. In particular, old statements that Bed 33 or 6F were not implemented must never be used to remove current story content.
 
-## 3. Typography and signage
-Traditional Chinese system sans-serif with English secondary text. Physical signs have backing thickness and supports, wood/aluminum mounts, restrained ivory/sage palette. No emoji. Repository room identities govern. No 402, 422, 4A33 or Bed 33 in Act 1. Duty rules are inside 316.
+The player is an on-call physician in a fictional Taiwanese psychiatric hospital. The fixed story moves from an ordinary shift through 409A/Bed 33, 21:17, 00:33, 316 identity evidence, the second campus, Annie and its two routes, elevator-only 6F, 02:17/B2, identity takeover, and the real 316 handoff. Preserve the established story; improve the production quality and horror progression around it.
 
-## 4. Spatial rhythm
-Keep exact collision and walkable coordinates except the user-authorized, reproduced ER eight boundary returns, Lobby/8F four returns, and eight hillside segment rotations. The executable baseline differential records these bounded repairs. Render art is separately owned per zone. Prioritize realistic frames, joints, baseboards, rails, ceiling grids, cabinet handles and furniture silhouettes before tiny props. Never hide gaps with props, darkness or fog.
+## Material and signage
 
-## 5. Reusable primitives and states
-AssetRegistry caches GLTF furniture; MaterialRegistry owns reusable PBR materials; per-zone ArtRoot owns visible additions; VisualProfile owns bounded lighting. Shared resources survive zone cleanup. Private duty room uses bed, desk, locker, lamp, bathroom and closable door. All baseline states are ordinary; later horror remains unimplemented until baseline lock.
+Use aged warm ivory paint, institutional sage wall protection, subdued clinical vinyl, terrazzo public corridors, dark stained wood doors, brushed stainless steel, aluminum frames, acoustic ceiling grids, and textured privacy glass. Use local PBR color, normal, and roughness maps through `MaterialRegistry` with consistent real-world UV scale. Avoid mirror floors, flat hero furniture, global teal/green grading, and theatrical orange/blue light.
 
-## 6. Lighting and motion
-ACT1_DUSK_NORMAL: 3500–4200K visual feeling, localized window daylight, restrained fill, emissive fixtures and a small bounded set of actual lights. NIGHT_NORMAL: maintained neutral interiors and practical exterior lamps. ACES, stable exposure, no global sunset wash. No decorative HUD motion. Existing gameplay controls remain intact.
+Use Traditional Chinese system sans-serif with restrained English secondary text. Mount signs and notices physically with backing, supports, and plausible placement. Generated text and labels inside concept images are not story canon. Remove only the duty-room bathroom's external washroom plaque; retain the actual bathroom and its internal fixtures. No decorative wall clocks in key story spaces.
 
-## 7. Accessibility and UI
-Small legible interaction prompts; HIS retains readable dense administrative information. Debug selector available only in DEV or explicit debug=1. Production location labels contain no milestone/debug metadata. Responsive UI must not obstruct first-person view.
+## Spatial composition and set dressing
 
-## 8. Acceptance and debt
-Engineering: 25 spawns, 18 routes, 8 doors, 13 walls, 5 interactions, cleanup/state, build all PASS after each zone. Visual: entrance/mid/detail/oblique comparisons for each zone; every hard-fail in package is blocking. Screenshots from the real production browser are evidence, test counts alone cannot confer VISUAL_LOCK. No accepted placeholder debt. Current VISUAL_LOCK is NOT PASS.
+The production world is indoor-only. The enclosed skybridge is the only inter-campus route in either direction. Hillside and ecology source modules can remain for historical geometry tests, but production routes, choices, tasks, and selectors must not lead outdoors. 6F is reachable only through the story elevator hijack and never appears as an ordinary floor or pre-event task.
 
-### UI implementation tokens
-HUD: background rgba(24,31,28,.65), text #f3f1e9, sage #b4c7b8, border #658b76; 12px body/14px location, 8px/12px padding, 16px screen margin. Task width 288px. HIS: #355342 title bar, #e1e8e3 header, #cfdbd3 table heading, 13px operational type, squared 2px corners. Small-screen HIS scrolls its content with footer accessible; no new fictional medical content.
+Build believable room shells, door frames, baseboards, wall rails, ceiling grids, notices, and furniture silhouettes before small props. Dress work areas with plausible whiteboards, acrylic notices, logbooks, binders, pens, tissues, lamps, phones, printers, carts, and clinical supplies. Every prop must rest on a surface or a mount. Keep door swings, desk/chair pullout, and patient circulation clear. Put the 4F duty desk, chair, and extension phone beside the bed; maintain at least 0.8m of clear circulation. Fix geometry and camera defects directly; never hide them with fog, darkness, or props.
+
+4F has exactly 32 official beds, 401A–408D. Room 409 is sealed and has no census bed; 409A exists as the anomalous Bed 33 story clue, not an ordinary physical or census bed. M4 remains a calm, ordinary occupied consult; the pre-filled internal transfer is its horror clue. Keep the hospital visually ordinary early, then use localized lighting and composition to increase unease.
+
+## Annie
+
+Annie is the same late-1990s CPR training mannequin in static storage, the bridge manifestation, and the 6F CPR scene. Build it through one shared model with explicit states. It is not a living woman, doctor, physician ghost, deceased clinician, or aggressor. Zhang owns the white coat and stethoscope; the mannequin is a vessel for memory. At 6F, show the CPR training action rather than a chase.
+
+## Lighting progression
+
+- 17:00–20:40: warm-neutral practicals, readable ivory and sage, modest window contribution, normal hospital ambience.
+- 21:17: reduce ambient fill to about 0.22, keep fluorescent pools localized, leave corridor ends deep, and use small emergency-green spill.
+- 00:33–02:00: reduce ambient fill to about 0.08, with stronger contrast, legible clinical objects, reflections, and warm phone/desk islands.
+- 6F/B2: practicals, near-black periphery, localized dirty green/cyan emergency light and archival tungsten; preserve navigable geometry.
+
+The horror profile uses about 0.04 ambient fill. These values are hemisphere-light intensity tokens, not exposure settings; practical lights must keep interaction targets readable while peripheral geometry falls into shadow.
+
+Use bounded local lights and stable exposure. Keep material detail visible in highlights. Do not apply a global haunted-house wash or use lighting to conceal collisions and clipping.
+
+## UI and QA
+
+Keep the existing HUD and HIS implementation tokens unless a concrete V2 readability issue requires a targeted change: HUD background `rgba(24,31,28,.65)`, text `#f3f1e9`, sage `#b4c7b8`, border `#658b76`; 12px body/14px location, 8px/12px padding, 16px screen margin, 288px task width. HIS title `#355342`, header `#e1e8e3`, table heading `#cfdbd3`, 13px operational type, 2px corners. Small-screen HIS scrolls while keeping its footer accessible.
+
+Production labels contain no debug/milestone metadata. Screenshot timeouts, missing files, browser errors, and off-frame QA anchors are hard failures. Follow `docs/20260925_v2_upgrade/QA_V2.md` for the exact local/public screenshot and release contract; state-machine tests alone cannot establish visual acceptance.

@@ -17,6 +17,8 @@ const routes=readFileSync('./src/world/shared/WorldRoutes.js','utf8');
 const html=readFileSync('./index.html','utf8');
 
 assert(!main.includes('工號'),'player-facing story copy must use 員編 terminology');
+assert(!routes.includes('hill_from_')&&!routes.includes('pond_from_'),'production routes must not expose outdoor spawns');
+assert(!router.includes('HillsideRoute')&&!router.includes('EcologyPond'),'production router must not load outdoor zones');
 assert(main.includes("setTrueNameFragment('frag_employeePrefix','MED-87')"),'M3 MED-87 clue missing');
 assert(main.includes("setTrueNameFragment('frag_employeeFull','MED-870409')"),'M7 full 員編 clue missing');
 assert(main.includes('第二院區 5F 有一位胸痛病人需要精神科評估'),'M3 lookup must hand off by phone');
@@ -28,17 +30,14 @@ assert(!readFileSync('./src/world/WorldRouter.js','utf8').includes("label:'6F'")
 
 assert(er.includes("type:'er_ghost_registration'"),'M3 ghost registration terminal missing');
 assert(er.includes("type:'er_exit_notice'")&&er.includes('此門只進不出'),'M3 ER entry-only exit warning missing');
-assert(!routes.includes("id:'er_to_hill'"),'2F ER exterior must never allow outbound travel');
-assert(routes.includes("id:'hill_to_er'"),'Hillside return into the ER side must remain available');
 assert(main.includes("LEGEND 02 — 00:33 急診掛號")&&main.includes("ER0033_SLIP_COLLECTED")&&main.includes("legacy_terminal_316")&&level3.includes("316_LEGACY_TERMINAL")&&main.includes("SECOND_CAMPUS_ACCESS"),'M3 two-stage ER-to-316 resolve or campus call missing');
 
 assert(ward.includes("type:'second_chest_patient'")&&ward.includes("type:'second_chest_transfer'"),'M4 chest-pain patient/form missing');
 assert(main.includes("LEGEND 03 — 事先填妥的轉院單")&&main.includes("M4_CHEST_RESOLVED")&&main.includes("second_chest_roster_clue"),'M4 clinical/admin-horror decision flow or physical clue missing');
 
 assert(bridge.includes("type:'bridge_loop_event'")&&main.includes("LEGEND 04 — 不能回頭的天橋"),'M5 bridge legend missing');
-assert(pond.includes("type:'pond_reflection_event'")&&main.includes("LEGEND 05 — 生態池裡的人影"),'M5 pond legend missing');
 assert(main.includes("frag_givenName_2','恆'"),'M5 true-name fragment missing');
-assert(bridge.includes("type:'true_name_clue_2'")&&pond.includes("type:'true_name_clue_2'"),'both M5 routes must expose an equivalent physical name clue');
+assert(bridge.includes("type:'true_name_clue_2'"),'M5 bridge must expose the physical name clue');
 
 assert(floor6.includes("type:'floor6_safe_return'")&&floor6.includes("type:'floor6_chase'"),'M6 phantom floor interactions missing');
 assert(router.includes("'phantom_6f': Phantom6F")&&routes.includes("phantom_6f_lift"),'M6 route registration missing');

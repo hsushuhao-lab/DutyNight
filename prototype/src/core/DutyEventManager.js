@@ -27,7 +27,7 @@ export class DutyEventManager {
   onZoneEntered(zoneId){
     if(zoneId==='first_campus_4f' && this.gameState.isTaskComplete('E_HANDOFF') && !this.gameState.isTaskComplete('P1_4F_REPORT')){
       this.gameState.setGameTime('17:15');
-      return {speaker:'晚班護理師',text:'「李醫師，你來啦。今晚 4F 滿床，總共 36 床。403 床老先生一直說隔壁在敲牆壁，待會巡房麻煩你幫忙看一下。」'};
+      return {speaker:'晚班護理師',text:'「李醫師，你來啦。今晚 4F 共 32 床。403 說最近睡不好；408C 的老先生提到隔壁有敲擊聲，晚點巡房時再確認。」'};
     }
     if(zoneId==='first_campus_2f' && this.gameState.isTaskComplete('P1_REST_DONE') && !this.gameState.isTaskComplete('P1_ER_ASSESSMENT_DONE')){
       this.gameState.setGameTime('20:05');

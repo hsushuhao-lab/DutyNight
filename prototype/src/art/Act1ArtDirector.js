@@ -211,10 +211,6 @@ export function applyAct1ArtDirection({ scene, renderer }) {
     }
   });
 
-  const hemisphere = new THREE.HemisphereLight(0xffead2, 0x6e7477, 0.34);
-  hemisphere.position.set(0, 18, 0);
-  scene.add(hemisphere);
-
   add4FVisualCorrections(scene);
   sanitizeAct1UI();
 }

@@ -8,7 +8,7 @@ export const NodeState=Object.freeze({
 
 export const LEGEND_BED33={
   id:'LEGEND_BED33',
-  semanticAny:['KNOCK_403_49','ARCHIVE_0409'],
+  semanticAny:['KNOCK_408C_49','ARCHIVE_0409'],
   contradictionAny:['BEDBOARD_33_409A','HIS_409_CLOSED','DOOR_409_SEALED']
 };
 

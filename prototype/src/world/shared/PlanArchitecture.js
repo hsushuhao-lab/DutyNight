@@ -76,7 +76,7 @@ export function ordinaryRoom(zone,walls,{id,label=id+' 病房',rect,side,door,ki
     zone.bedAreas??=[];
     spots.forEach(([bx,bz],index)=>{
       const bedIndex=index+1,bedInRoom=letters[index],bedId=`${id}${bedInRoom}`,wardBedNumber=(roomOrdinal-1)*4+bedIndex;
-      if(wardBedNumber>bedLimit&&!(id==='409'&&bedIndex===1&&bedLimit===32))return;
+      if(wardBedNumber>bedLimit)return;
       const anomalous=wardBedNumber>bedLimit;
       const model=asset(zone.zoneGroup,'hospitalBed',[bx,0,bz],[1,1,1]);
       if(model){model.name=`Bed_${bedId}`;model.userData={...model.userData,roomId:id,bedInRoom,bedIndex,bedId,wardBedNumber,anomalous};}

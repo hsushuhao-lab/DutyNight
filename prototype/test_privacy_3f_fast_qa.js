@@ -59,7 +59,8 @@ assert(!floor.includes("asset(this.zoneGroup,'printer',[-20.28,.82,5.30]"),'Floa
 assert(level.includes("RailNorthEast_WestOfStorage")&&level.includes("RailNorthEast_EastOfStorage"),'CPR doorway handrail must remain split');
 assert(art.includes("clearStorageDoor=x>=12.75&&x<=14.25"),'Rail mounting brackets must skip the CPR doorway');
 assert(verticalCore.includes("zoneId==='first_campus_4f'||zoneId==='first_campus_3f'"),'3F shared elevator core must cut the west office doorway');
-assert(level.includes("CPR_Anne")&&level.includes("type:'cpr_anne'"),'CPR Anne environmental-horror prop missing');
+assert(level.includes("id:'CPR_ANNE'")&&level.includes("type:'cpr_anne'"),'CPR mannequin inspection interaction missing');
+assert(level.includes("state:'STORAGE_STATIC'")&&level.includes("this.anneStool"),'Static Annie mannequin or stool missing');
 assert(main.includes("office_phone_316")&&main.includes("PHONE_ANSWERED"),'316 phone anomaly interaction missing');
 assert(ui.includes('setTimeout(()=>{')&&ui.includes("PHONE_RING_ACTIVE")&&ui.includes('2000'),'Phone must start itself after the anomaly is closed');
 assert(ui.includes("no-guidance")&&ui.includes("HIS_ANOMALY_SEEN"),'3F checklist must disappear after the HIS anomaly');

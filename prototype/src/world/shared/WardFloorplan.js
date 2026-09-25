@@ -6,6 +6,7 @@ import { AccessDoor } from './AccessDoor.js';
 import { KeyedKnobDoor } from './KeyedKnobDoor.js';
 import { CollisionFactory } from './CollisionFactory.js';
 import { SignAnchor } from './SignAnchor.js';
+import {createAnnieMannequin} from './AnnieMannequin.js';
 
 /** September 22 V5 user floorplan. Units are gameplay metres, not a real hospital survey. */
 export class WardFloorplan {
@@ -26,7 +27,7 @@ export class WardFloorplan {
     walls.line('x',0,o-7,o-4.6);
     walls.line('x',0,o+4.6,o+7);walls.cut('x',0,o+6.0,1.4);
 
-    const room=(n,r,side,d,kind='ward',label)=>ordinaryRoom(this,walls,{id:String(this.floor*100+n),label,rect:[r[0]+o,r[1],r[2]+o,r[3]],side,door:d+(side==='north'||side==='south'?o:0),kind,bedLimit:!second&&this.floor===4?32:Infinity});
+    const room=(n,r,side,d,kind='ward',label)=>ordinaryRoom(this,walls,{id:String(this.floor*100+n),label:label||`${this.floor*100+n} 病房`,rect:[r[0]+o,r[1],r[2]+o,r[3]],side,door:d+(side==='north'||side==='south'?o:0),kind,bedLimit:!second&&this.floor===4?32:Infinity});
     const roomIds=Array.from({length:9},(_,i)=>String(this.floor*100+i+1));
 
     // V5 perimeter geometry: 401/501 bottom-left -> 403/503 upper-left,
@@ -39,16 +40,12 @@ export class WardFloorplan {
     room(6,[2,-22,7,-16],'south',4.5);
     room(7,[7,-22,12,-12],'west',-13);
     room(8,[7,-12,12,-6],'west',-9);
-    room(9,[7,-6,12,0],'west',-3);
+    room(9,[7,-6,12,0],'west',-3,'ward','409 整修封閉');
 
     // Entrance vestibule storage room on the left, plant bay on the right.
     ordinaryRoom(this,walls,{id:'STORE_ENTRY',label:'儲藏室',rect:[o-12,0,o-7,2],side:'east',door:1,kind:'storage',protectedArea:false,storageLock:second?'card':'knob'});
     if(!second&&this.floor===4){
-      const annie=new THREE.Group();annie.name='Annie_4F_Storage';annie.position.set(-9.2,0,.7);this.zoneGroup.add(annie);
-      const coat=new THREE.Mesh(new THREE.BoxGeometry(.34,1.0,.52),new THREE.MeshStandardMaterial({color:0xd9e0d9,roughness:.92}));coat.position.y=.9;annie.add(coat);
-      const head=new THREE.Mesh(new THREE.SphereGeometry(.17,12,10),new THREE.MeshStandardMaterial({color:0xbabdb3,roughness:1}));head.position.set(0,1.53,0);annie.add(head);
-      const hair=new THREE.Mesh(new THREE.SphereGeometry(.19,12,8),new THREE.MeshStandardMaterial({color:0x242729,roughness:1}));hair.scale.set(1.05,.62,1);hair.position.set(0,1.62,-.025);annie.add(hair);
-      const light=new THREE.PointLight(0xc6d9d5,.12,1.3,2);light.position.set(0,1.2,.35);annie.add(light);
+      createAnnieMannequin(this.zoneGroup,{materials:this.gf.materials,state:'STORAGE_STATIC',position:[-9.2,0,.7],rotationY:0});
     }
     const plant=asset(this.zoneGroup,'plant',[o+9.4,0,1],[1.15,1.15,1.15]);
     if(plant){plant.name=`${second?'Second':'First'}WardEntrancePlant`;plant.userData={...plant.userData,fixture:'WARD_ENTRY_PLANT'};}
@@ -83,7 +80,6 @@ export class WardFloorplan {
       entrancePlant:true,
       bedCapacity:!second&&this.floor===4?32:36,
       bedLabels:['A','B','C','D'],
-      bed33Room:roomIds[8],
       bed33Id:roomIds[8]+'A',
       allControlledDoorsDefaultClosed:true,
       dutyRoomOutsideWard:true,
@@ -117,7 +113,12 @@ export class WardFloorplan {
     asset(this.zoneGroup,'hospitalBed',[-12.5,0,7.8],[1.2,.95,.97]);CollisionFactory.addBox(this.colliders,-12.5,.45,7.8,1.4,.9,2.2);
     solid(this.zoneGroup,this.gf.materials.doorWood,[-11.25,.28,8.1],[.5,.56,.5]);
     solid(this.zoneGroup,this.gf.materials.lightWarm,[-11.25,.76,8.1],[.19,.24,.19]);
-    workstation(this,{x:-10.0,z:3.1,id:'duty_desk'});
+    workstation(this,{x:-10.0,z:7.1,id:'duty_desk'});
+    const phone=new THREE.Group();phone.name='DutyRoom_ExtensionPhone';phone.position.set(-9.62,0,7.1);phone.userData={fixture:'EXTENSION_PHONE',extension:'316'};this.zoneGroup.add(phone);
+    solid(phone,this.gf.materials.wallDark,[0,.84,0],[.28,.07,.20]);
+    solid(phone,this.gf.materials.metal,[0,.89,-.01],[.19,.018,.09]);
+    solid(phone,this.gf.materials.bedSheet,[0,.92,-.055],[.25,.035,.055]);
+    for(let row=0;row<3;row++)for(let col=0;col<3;col++)solid(phone,this.gf.materials.stainless,[-.065+col*.065,.885,.025+row*.035],[.025,.008,.016]);
     const coffeeCup=new THREE.Group();coffeeCup.name='DutyRoom_HotCoffee';coffeeCup.position.set(-9.45,.82,3.05);this.zoneGroup.add(coffeeCup);
     const cupBody=new THREE.Mesh(new THREE.CylinderGeometry(.07,.06,.13,18),this.gf.materials.bedSheet);cupBody.position.y=.065;coffeeCup.add(cupBody);
     const coffee=new THREE.Mesh(new THREE.CircleGeometry(.055,18),new THREE.MeshBasicMaterial({color:0x3b2417,side:THREE.DoubleSide}));coffee.rotation.x=-Math.PI/2;coffee.position.y=.132;coffeeCup.add(coffee);
@@ -133,8 +134,6 @@ export class WardFloorplan {
     this.gf.buildCeiling(this.zoneGroup,-12.75,3.2,3.6,2.5,3.2);
     this.dutyBathroomDoor=new KeyedKnobDoor(this,{id:'duty_bathroom',x:-11.5,z:4.0,yaw:Math.PI/2,width:1.1,title:'值班室洗手間',openDirection:1});
     this.dutyBathroomDoor.setClosed(true);
-    SignAnchor.buildWallPlaque({scene:this.zoneGroup,x:-11.385,y:1.72,z:4.85,rotationY:Math.PI/2,width:.95,height:.30,code:'',title:'洗手間',subtitle:'',header:''});
-
     // Toilet with cistern and seat.
     solid(this.zoneGroup,this.gf.materials.bedSheet,[-13.25,.34,4.05],[.58,.68,.78]);
     solid(this.zoneGroup,this.gf.materials.bedSheet,[-13.25,.73,4.36],[.50,.52,.20]);
@@ -190,9 +189,9 @@ export class WardFloorplan {
       {type:'p1_action',action:'DUTY_ROOM_PREP',label:'整理值班室',position:new THREE.Vector3(-10.0,1.2,6.0),radius:1.8},
       {type:'p1_action',action:'WARD_ROUND',label:'完成晚間巡房',position:new THREE.Vector3(0,1.4,-12.0),radius:2.0},
       {type:'p1_action',action:'INSOMNIA_403',label:'評估 403 睡眠問題',position:new THREE.Vector3(p403[0],1.35,p403[2]),radius:1.65,anchorRoom:'403'},
-      {type:'p1_action',action:'NORMAL_EVENT',label:'處理一般病房事件',position:new THREE.Vector3(p408[0],1.35,p408[2]),radius:1.65,anchorRoom:'408'},
+      {type:'p1_action',action:'NORMAL_EVENT',label:'處理一般病房事件',position:new THREE.Vector3(p408[0],1.35,p408[2]),radius:1.65,anchorRoom:'408',anchorBedId:'408C'},
       {type:'p1_action',action:'REST',label:'短暫休息',position:new THREE.Vector3(-12.5,1.0,7.8),radius:1.8},
-      {type:'p1_action',action:'END_SHIFT',label:'回值班室／接聽值班電話',position:new THREE.Vector3(-10.0,1.1,3.1),radius:1.8}
+      {type:'p1_action',action:'END_SHIFT',label:'回值班室／接聽值班電話',position:new THREE.Vector3(-10.0,1.1,7.1),radius:1.8}
     );
   }
   buildBed33Legend(){
@@ -290,6 +289,21 @@ export class WardFloorplan {
     const bed=asset(this.zoneGroup,'hospitalBed',[bx,0,bz],[1,1,1],Math.PI/2);
     if(bed)bed.name='SecondCampus_ExtraChestPainBed';
     CollisionFactory.addBox(this.colliders,bx,.45,bz,2.15,.9,1.15);
+
+    const patient=new THREE.Group();patient.name='SecondCampus_ChestPainPatient';patient.position.set(bx,.78,bz);this.zoneGroup.add(patient);
+    const gown=new THREE.MeshStandardMaterial({color:0xd3ddd5,roughness:.96});
+    const skin=new THREE.MeshStandardMaterial({color:0xc7b5a4,roughness:.94});
+    const hair=new THREE.MeshStandardMaterial({color:0x383635,roughness:1});
+    const patientTorso=new THREE.Mesh(new THREE.BoxGeometry(.72,.28,.46),gown);patientTorso.name='SecondCampus_ChestPainPatient_Gown';patientTorso.position.set(-.10,.09,0);patient.add(patientTorso);
+    const blanket=new THREE.Mesh(new THREE.BoxGeometry(.96,.19,.56),this.gf.materials.bedSheet);blanket.name='SecondCampus_ChestPainPatient_Blanket';blanket.position.set(.47,.13,0);patient.add(blanket);
+    const pillow=new THREE.Mesh(new THREE.BoxGeometry(.48,.10,.54),this.gf.materials.bedSheet);pillow.position.set(-.78,.06,0);patient.add(pillow);
+    const face=new THREE.Mesh(new THREE.SphereGeometry(.135,16,12),skin);face.name='SecondCampus_ChestPainPatient_Face';face.scale.set(1,.78,1);face.position.set(-.78,.18,0);patient.add(face);
+    const hairCap=new THREE.Mesh(new THREE.SphereGeometry(.145,16,10),hair);hairCap.scale.set(1,.5,1);hairCap.position.set(-.80,.25,0);patient.add(hairCap);
+    const armMat=new THREE.MeshStandardMaterial({color:0xc7b5a4,roughness:.94});
+    for(const side of [-1,1]){
+      const arm=new THREE.Mesh(new THREE.CylinderGeometry(.055,.07,.50,10),armMat);arm.rotation.z=Math.PI/2;arm.rotation.x=side*.10;arm.position.set(-.05,.02,side*.31);patient.add(arm);
+    }
+    const wristband=new THREE.Mesh(new THREE.BoxGeometry(.12,.045,.09),this.gf.materials.lightWarm);wristband.name='SecondCampus_ChestPainPatient_Wristband';wristband.position.set(-.48,.08,.34);patient.add(wristband);
 
     const cardCanvas=document.createElement('canvas');cardCanvas.width=620;cardCanvas.height=360;
     const ctx=cardCanvas.getContext('2d');ctx.fillStyle='#f2eee3';ctx.fillRect(0,0,620,360);

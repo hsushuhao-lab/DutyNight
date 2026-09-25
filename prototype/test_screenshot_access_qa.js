@@ -25,7 +25,7 @@ for(const id of ['first_campus_4f','second_campus_5f']){
  check(id+' nursing station has four oriented workstations',()=>{const work=zone.workstations.filter(w=>w.id.startsWith(prefix+'_station_'));assert.equal(work.length,4);for(const ws of work)assert.equal(ws.deskYaw,ws.yaw);});
  check(id+' nursing station has clinical props',()=>{const ids=new Set(zone.clinicalProps.map(p=>p.id));for(const suffix of ['medication_cart','treatment_cart','iv_pole','iv_bag','medication_cabinet','syringe_tray','sharps_container','stethoscope','white_coat','bp_device','pulse_oximeter','supply_boxes'])assert(ids.has(prefix+'_station_'+suffix),suffix);});
  check(id+' all nine ward-room knob doors default closed',()=>{for(const room of zone.roomAreas.filter(r=>r.kind==='ward')){assert.equal(room.doorType,'knob');assert(zone.keyedDoors[room.accessDoorId]?.closed,room.id);}});
- check(id+' entrance vestibule has storage and plant',()=>{const store=zone.roomAreas.find(r=>r.id==='STORE_ENTRY');assert(store);assert(zone.accessDoors[store.accessDoorId]?.closed);assert(zone.entrancePlant);});
+ check(id+' entrance vestibule has storage and plant',()=>{const store=zone.roomAreas.find(r=>r.id==='STORE_ENTRY');assert(store);assert(zone.accessDoors[store.accessDoorId]?.closed||zone.keyedDoors[store.accessDoorId]?.closed);assert(zone.entrancePlant);});
 }
 zone=router.loadZone('second_campus_5f');
 check('Second-campus V5.2 uses duty room, not physician office',()=>{assert(zone.roomAreas.some(r=>r.id==='SECOND_DUTY'&&r.label==='值班室'));assert(zone.accessDoors.second_duty_room?.closed);assert(!zone.roomAreas.some(r=>r.id==='DOCTOR'));});

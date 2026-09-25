@@ -215,6 +215,29 @@ if(new URLSearchParams(location.search).get('qa')==='story'){
     setFlag:(k,v=true)=>gameState.setFlag(k,v),
     task:id=>gameState.markTaskComplete(id),
     phase:p=>{floorStateManager.setPhase(p);worldRouter.activeZoneInstance?.applyGamePhase?.(p,gameState);},
+    captureView:({position,target,anchorName})=>{
+      const dx=target[0]-position[0],dy=target[1]-position[1],dz=target[2]-position[2];
+      const yaw=Math.atan2(-dx,-dz),pitch=Math.atan2(dy,Math.hypot(dx,dz));
+      controller.teleport(position[0],position[1],position[2],yaw);
+      controller.pitch=pitch;controller.updateCameraRotation();
+      scene.updateMatrixWorld(true);camera.updateProjectionMatrix();camera.updateMatrixWorld(true);
+      const anchor=scene.getObjectByName(anchorName);
+      if(!anchor||!anchor.visible)throw new Error('Story QA anchor missing or hidden: '+anchorName);
+      const bounds=new THREE.Box3().setFromObject(anchor);
+      if(bounds.isEmpty())throw new Error('Story QA anchor has no visible geometry: '+anchorName);
+      const frustum=new THREE.Frustum().setFromProjectionMatrix(new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse));
+      if(!frustum.intersectsBox(bounds))throw new Error('Story QA anchor is outside the camera frustum: '+anchorName);
+      const points=[];
+      for(const x of [bounds.min.x,bounds.max.x])for(const y of [bounds.min.y,bounds.max.y])for(const z of [bounds.min.z,bounds.max.z]){
+        points.push(new THREE.Vector3(x,y,z).project(camera));
+      }
+      const width=renderer.domElement.clientWidth,height=renderer.domElement.clientHeight;
+      const minX=Math.min(...points.map(p=>(p.x+1)*.5*width)),maxX=Math.max(...points.map(p=>(p.x+1)*.5*width));
+      const minY=Math.min(...points.map(p=>(1-p.y)*.5*height)),maxY=Math.max(...points.map(p=>(1-p.y)*.5*height));
+      const rect={left:Math.max(0,minX),top:Math.max(0,minY),width:Math.min(width,maxX)-Math.max(0,minX),height:Math.min(height,maxY)-Math.max(0,minY)};
+      if(rect.width<=2||rect.height<=2)throw new Error('Story QA anchor has no visible projected rectangle: '+anchorName);
+      return {anchorName,rect,viewport:{width,height}};
+    },
     interact:(query)=>{
       const obj=findInteractable(query);
       if(!obj)throw new Error('QA interactable missing '+JSON.stringify(query));
@@ -260,7 +283,7 @@ controller.onInteract = (interactable) => {
       controller.enabled=false;controller.cancelAutoMove();
       uiManager.runDoorTransition(()=>worldRouter.teleportToSpawn(door.portal));
     }else{
-      if(interactable.doorId==='ER_HILLSIDE'&&!gameState.getFlag('OUTDOOR_ROUTE_ACCESS')){
+      if(interactable.doorId==='ER_HILLSIDE'){
         soundManager.playDoorLockClack();
         uiManager.showSubtitle('門禁','「此門只進不出。」',2600);
         return;
@@ -447,7 +470,7 @@ controller.onInteract = (interactable) => {
         uiManager.showSubtitle('電話',`（三秒雜音）\\n${lines[Math.min(loopCount,lines.length-1)]}`,4300);
         return;
       }
-      if(interactable.doorId==='SECOND_1F_HILLSIDE'&&!gameState.getFlag('OUTDOOR_ROUTE_ACCESS')){
+      if(interactable.doorId==='SECOND_1F_HILLSIDE'){
         soundManager.playDoorLockClack();
         uiManager.showSubtitle('門禁','「夜間山側通行權限尚未開啟。」',2800);
         return;
@@ -494,7 +517,7 @@ controller.onInteract = (interactable) => {
     }
     gameState.setFlag('SECOND_CAMPUS_PHONE_PENDING',true);
     soundManager.playPhoneRingPattern();
-    uiManager.showSubtitle('316 舊資料終端','「1998-ER-0217｜責任醫師：張○○｜員編前綴：MED-87。」\\n\\n終端機停止後，桌上的院內電話立刻響起。',5200);
+    uiManager.showSubtitle('316 舊資料終端','「1998-ER-0217｜責任醫師：張○○｜員編前綴：MED-87。」\n\n終端機停止後，桌上的院內電話立刻響起。',5200);
   } else if (interactable.type === 'workstation') {
     if(gameState.getFlag('M8_IDENTITY_BATTLE_ACTIVE')&&worldRouter.activeZoneId==='first_campus_3f'){
       gameState.setGameTime('04:05');
@@ -682,7 +705,10 @@ controller.onInteract = (interactable) => {
       worldRouter.loadZone(destination.zoneId, destination.spawn);
       const dutyLine=dutyEvents.onZoneEntered(destination.zoneId);
       worldRouter.activeZoneInstance?.syncStoryState?.();
-      if(dutyLine)uiManager.showSubtitle(dutyLine.speaker,dutyLine.text);
+      if(dutyLine){
+        if(destination.zoneId==='first_campus_2f'&&gameState.gameTime==='20:05')soundManager.playPhoneRingPattern();
+        uiManager.showSubtitle(dutyLine.speaker,dutyLine.text);
+      }
       controller.enabled = true;
     }, interactable.kind);
   } else if (interactable.type === 'second_chest_patient') {
@@ -734,7 +760,6 @@ controller.onInteract = (interactable) => {
         gameState.setGameTime('01:45');
         gameState.setFlag('M4_CHEST_RESOLVED',true);
         gameState.setFlag('CHEST_RECORD_MATCH',true);
-        gameState.setFlag('OUTDOOR_ROUTE_ACCESS',true);
         persistentMemory.resolveLegend('chestPain');
         persistentMemory.addJournalNote('CHEST_RESOLVED','焦慮引起的胸悶已改善；轉院單卻事先填妥第一院區 409A，並留有「李○○」簽名。');
         persistentMemory.raiseErosion(1);
@@ -759,27 +784,6 @@ controller.onInteract = (interactable) => {
         gameState.setFlag('M5_ROUTE_CHOICE_RESOLVED',true);
         persistentMemory.resolveLegend('bridge');
         persistentMemory.addJournalNote('BRIDGE_SAFE','越過天橋中線後不要回頭。橋邊留下了一件刻有姓名的舊聽診器。');
-        completeM5IfReady();
-        controller.enabled=true;
-      }
-    });
-  } else if (interactable.type === 'pond_reflection_event') {
-    if(gameState.getFlag('M5_POND_RESOLVED')){
-      uiManager.showSubtitle('李醫師','「水裡那個人不是我的倒影。」',2200);return;
-    }
-    controller.enabled=false;
-    uiManager.openStoryChoice({
-      title:'生態池｜不同步的倒影',
-      body:'你停下腳步後，水中的白袍仍往前走了半步才停。\n它抬起頭，像是在等你靠近。',
-      primaryText:'走近水邊看清楚',
-      secondaryText:'離開水邊，不再看它',
-      onPrimary:()=>loopManager.triggerLegendOverride('POND',{legend:'LEGEND 05 — 生態池裡的人影',reason:'你留在水裡了。'}),
-      onSecondary:()=>{
-        gameState.setGameTime('02:00');
-        gameState.setFlag('M5_POND_RESOLVED',true);
-        gameState.setFlag('M5_ROUTE_CHOICE_RESOLVED',true);
-        persistentMemory.resolveLegend('pond');
-        persistentMemory.addJournalNote('POND_SAFE','倒影沒有跟著我停下。岸邊留著一件舊聽診器。');
         completeM5IfReady();
         controller.enabled=true;
       }
@@ -871,20 +875,17 @@ controller.onInteract = (interactable) => {
     } else if(action==='WARD_ROUND'){
       if(!gameState.isTaskComplete('P1_DUTY_ROOM_READY')) return uiManager.showSubtitle('李醫師','「先把值班室整理好再巡房。」',2500);
       dutyEvents.complete('P1_ROUND_COMPLETE','18:00');
-      uiManager.showSubtitle('值班電話','☎ 護理站：「李醫師，403 老先生又說隔壁在敲牆，麻煩你過來看一下。」',4200);
+      uiManager.showSubtitle('值班電話','☎ 護理站：「李醫師，408C 的老先生說隔壁又有敲擊聲，麻煩巡房時確認一下。」',4200);
     } else if(action==='INSOMNIA_403'){
       if(!gameState.isTaskComplete('P1_ROUND_COMPLETE')) return uiManager.showSubtitle('李醫師','「先完成晚間巡房。」',2500);
       dutyEvents.complete('P1_INSOMNIA_DONE','18:30');
-      if(gameState.getFlag('HOOK_409_ZERO_ROOM')){
-        gameState.setFlag('CLUE_403_0409',true);
-        registerBed33Clue('KNOCK_403_49');
-      }
       uiManager.showSubtitle('403 病人','「醫師，我一直睡不著。」');
     } else if(action==='NORMAL_EVENT'){
       if(!gameState.isTaskComplete('P1_INSOMNIA_DONE')) return uiManager.showSubtitle('李醫師','「先處理 403 的睡眠問題。」',2500);
       if(!gameState.getFlag('BED33_RESOLVED')) return uiManager.showSubtitle('李醫師','「護理站那張 409A 臨時床位單還沒釐清，不能就這樣簽掉。」',3200);
       dutyEvents.complete('P1_NORMAL_EVENT_DONE','19:30');
       soundManager.playBed33KnockPattern();
+      registerBed33Clue('KNOCK_408C_49');
       uiManager.showSubtitle('408C 老先生','「李醫師！隔壁又在敲了！每次都敲四下，停一下，又敲九下……」',5600);
     } else if(action==='REST'){
       if(!gameState.isTaskComplete('P1_NORMAL_EVENT_DONE')) return uiManager.showSubtitle('李醫師','「先把剛才的病房事件處理完。」',2500);
@@ -958,6 +959,10 @@ function animate() {
 
   controller.update(delta);
   worldRouter.update(delta);
+  if(gameState.getFlag('BRIDGE_OVERRIDE_PENDING')){
+    gameState.setFlag('BRIDGE_OVERRIDE_PENDING',false);
+    loopManager.triggerLegendOverride('BRIDGE',{legend:'LEGEND 04 — 不能回頭的天橋',reason:'你已經回頭三次。'});
+  }
 
   // After the 21:17 bootstrap the player is explicitly sent back to the 4F duty room.
   // Crossing into the room automatically advances the story; no hidden E target is required.

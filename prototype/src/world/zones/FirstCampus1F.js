@@ -216,7 +216,7 @@ export class FirstCampus1F {
 
     // Legacy service door concealed by later wall finish; only becomes meaningful after 3F archive evidence.
     const hiddenDoorMat=new THREE.MeshStandardMaterial({color:0xd8d6cf,roughness:.96});
-    const hiddenPanel=new THREE.Mesh(new THREE.PlaneGeometry(1.15,2.15),hiddenDoorMat);
+    const hiddenPanel=new THREE.Mesh(new THREE.PlaneGeometry(1.15,2.15),hiddenDoorMat);hiddenPanel.name='FirstFloor_BPanel_ConcealedDoor';
     hiddenPanel.position.set(-13.785,1.18,4.55);hiddenPanel.rotation.y=Math.PI/2;this.zoneGroup.add(hiddenPanel);
     const seamMat=new THREE.MeshStandardMaterial({color:0x8f918d,roughness:.95});
     for(const zOff of [-.57,.57]){

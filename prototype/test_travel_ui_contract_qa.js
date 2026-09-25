@@ -6,7 +6,9 @@ for(const cls of ['floor-arrow','floor-digit']){
  assert(new RegExp('class="[^"]*\\b'+cls+'\\b[^"]*"').test(html),`Travel UI missing .${cls}`);
  assert(ui.includes(`querySelector('.${cls}')`));
 }
-assert(html.includes('401–409'));
+assert(html.includes('總床數：32｜病房：401–408｜408A–D 各一床'));
+assert(ui.includes('18:00 完成 401–408 晚間巡房'));
+assert(!ui.includes('18:00 完成 401–409 晚間巡房'));
 assert(html.includes('位於電梯旁、病房大門外側'));
 assert(!html.includes('位於護理站右側走廊'));
 console.log('TRAVEL UI CONTRACT PASS: direction and floor elements exist; HIS location follows approved plan');

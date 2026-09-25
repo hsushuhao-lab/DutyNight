@@ -34,7 +34,7 @@ jobs:
       - name: Local production M2-M9 browser playthrough
         timeout-minutes: 30
         working-directory: prototype
-        run: node scripts/test-story-playthrough.mjs qa-results/story-local
+        run: node scripts/test-story-playthrough.mjs qa-results/story-v2-local
       - name: Wait for matching public Pages build
         timeout-minutes: 8
         working-directory: prototype
@@ -44,7 +44,7 @@ jobs:
       - name: Public Pages M2-M9 browser playthrough
         timeout-minutes: 30
         working-directory: prototype
-        run: node scripts/test-story-playthrough.mjs qa-results/story-live 'https://hsushuhao-lab.github.io/DutyNight/'
+        run: node scripts/test-story-playthrough.mjs qa-results/story-v2-public 'https://hsushuhao-lab.github.io/DutyNight/'
       - name: Preserve browser evidence
         if: always()
         uses: actions/upload-artifact@v4

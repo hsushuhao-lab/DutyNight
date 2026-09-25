@@ -11,6 +11,7 @@ assert.equal(state.getGamePhase(),GamePhase.AFTER_ARCHIVE);
 
 const router=readFileSync('./src/world/WorldRouter.js','utf8');
 const main=readFileSync('./src/main.js','utf8');
+const stateSource=readFileSync('./src/core/GameState.js','utf8');
 const floor3=readFileSync('./src/world/zones/FirstCampus3F.js','utf8');
 const floor2=readFileSync('./src/world/zones/FirstCampus2FER.js','utf8');
 const floor1=readFileSync('./src/world/zones/FirstCampus1F.js','utf8');
@@ -21,7 +22,7 @@ assert(router.includes('floorStateManager.apply(zoneId,this.activeZoneInstance)'
 assert(floor3.includes("Phase2_2040_ElevatorGlitch")&&floor3.includes("Phase3_2117_NightPatrol"),'3F must define phase-specific return states');
 assert(floor3.includes('Phase3_2117_WetFootprints'),'21:17 3F return must have wet-footprint layer');
 assert(floor3.includes('409／舊隔離零號房')&&floor3.includes('316／夜間封鎖決策點')&&floor3.includes('1F／舊警衛台後配電')&&floor3.includes('2F／舊式手圈索引'),'Archive must seed 409/316/1F/2F hard hooks');
-assert(main.includes("HOOK_409_ZERO_ROOM")&&main.includes("HOOK_0316_COMMAND_POINT")&&main.includes("CLUE_403_0409"),'403-to-409 and 316 command-point hooks missing');
+assert(stateSource.includes("HOOK_409_ZERO_ROOM")&&main.includes("registerBed33Clue('ARCHIVE_0409')")&&main.includes("SECOND_CAMPUS_PHONE_PENDING"),'409A clue and 316-to-second-campus call hooks missing');
 assert(main.includes("ER_JANE_DOE_WRISTBAND")&&main.includes("FIRST_FLOOR_GUARD_KEY"),'2F Jane Doe to 1F key hook missing');
 assert(floor2.includes("legacy_unreadable"),'2F old wristband visual hook missing');
 assert(floor1.includes("1F_HIDDEN_SERVICE_DOOR")&&floor1.includes("requires:'FIRST_FLOOR_GUARD_KEY'"),'1F concealed service-door hook missing');

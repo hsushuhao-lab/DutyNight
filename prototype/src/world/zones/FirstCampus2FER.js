@@ -121,6 +121,7 @@ export class FirstCampus2FER {
 
     // Triage Counter (at z = 3.5)
     const triageCounter = new THREE.Mesh(new THREE.BoxGeometry(4.8, 1.1, 0.7), this.gf.materials.wallDark);
+    triageCounter.name='ER_TriageCounter';
     triageCounter.position.set(3.5, 0.55, 3.5);
     this.zoneGroup.add(triageCounter);
     CollisionFactory.addBox(this.colliders, 3.5, 0.55, 3.5, 4.8, 1.1, 0.7);
@@ -345,6 +346,7 @@ export class FirstCampus2FER {
     }
 
     const ghostTerminal=new THREE.Mesh(new THREE.BoxGeometry(.75,.55,.35),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
+    ghostTerminal.name='ER_GhostRegistrationTerminal';
     ghostTerminal.position.set(13,1.18,-6.35);
     ghostTerminal.userData={interactable:gameState.getFlag('GHOST_REGISTRATION_AVAILABLE')===true,id:'ER_GHOST_REGISTRATION',type:'er_ghost_registration',label:'查看急診掛號系統'};
     this.zoneGroup.add(ghostTerminal);this.interactables.push(ghostTerminal);this.ghostRegistrationTerminal=ghostTerminal;

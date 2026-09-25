@@ -7,6 +7,8 @@ import { disposeZoneArt } from '../../art/ArtResources.js';
 import { CollisionFactory } from '../shared/CollisionFactory.js';
 import { SignAnchor } from '../shared/SignAnchor.js';
 import { gameState } from '../../core/GameState.js';
+import {createAnnieArt,updateAnnieArt} from '../../art/AnnieArt.js';
+import { soundManager } from '../../audio/SoundManager.js';
 
 export class Skybridge {
   constructor(scene, geometryFactory) {
@@ -17,6 +19,10 @@ export class Skybridge {
     this.interactables = [];
     this.zoneGroup = new THREE.Group();
     this.zoneGroup.name = 'Skybridge_Zone';
+    this.returnBridgeActive=false;
+    this.lookbackArmed=true;
+    this.lookbackTimer=0;
+    this.lookbackCount=0;
   }
 
   build() {
@@ -241,27 +247,48 @@ export class Skybridge {
     wallTrim(this.zoneGroup,this.gf.materials);
 
     // Doppelgänger appears only after the second-campus chest-pain discrepancy is resolved.
-    const doubleGroup=new THREE.Group();doubleGroup.name='Skybridge_Doppelganger';
-    const coat=new THREE.Mesh(new THREE.BoxGeometry(.46,1.05,.20),new THREE.MeshStandardMaterial({color:0xe6e8e3,roughness:.9}));
-    coat.position.y=.78;doubleGroup.add(coat);
-    const head=new THREE.Mesh(new THREE.SphereGeometry(.16,16,12),new THREE.MeshStandardMaterial({color:0xc9b49d,roughness:.92}));
-    head.position.y=1.45;doubleGroup.add(head);
-    doubleGroup.position.set(46,0,0);doubleGroup.visible=gameState.getFlag('M4_CHEST_RESOLVED');this.zoneGroup.add(doubleGroup);
+    const doubleGroup=createAnnieArt(this.zoneGroup,{materials:this.gf.materials,state:'BRIDGE_MANIFEST',position:[46,0,0],rotationY:-Math.PI/2});
+    doubleGroup.visible=gameState.getFlag('M4_CHEST_RESOLVED');
     const bridgeEvent=new THREE.Mesh(new THREE.BoxGeometry(2.2,2.5,3.2),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
     bridgeEvent.position.set(31,1.2,0);
     bridgeEvent.userData={interactable:gameState.getFlag('M4_CHEST_RESOLVED'),id:'BRIDGE_LOOP_EVENT',type:'bridge_loop_event',label:'停下來確認遠處白袍'};
-    this.zoneGroup.add(bridgeEvent);this.interactables.push(bridgeEvent);this.bridgeDoppelganger=doubleGroup;
+    this.zoneGroup.add(bridgeEvent);this.interactables.push(bridgeEvent);this.bridgeDoppelganger=doubleGroup;this.annie=doubleGroup;
+    this.bridgeAnomalyLight=new THREE.PointLight(0x6da28e,0,8,2);this.bridgeAnomalyLight.position.set(30,2.1,0);this.bridgeAnomalyLight.name='Bridge_LocalizedEmergencySpill';this.zoneGroup.add(this.bridgeAnomalyLight);
 
-    const bridgeRelic=new THREE.Group();bridgeRelic.name='Annie_EngravedStethoscope_Bridge';bridgeRelic.position.set(30,.12,.35);this.zoneGroup.add(bridgeRelic);
-    const stethoscope=new THREE.Mesh(new THREE.TorusGeometry(.16,.025,8,24),this.gf.materials.stainless);stethoscope.rotation.y=Math.PI/2;stethoscope.position.y=.34;bridgeRelic.add(stethoscope);
-    const engraving=solid(bridgeRelic,this.gf.materials.lightWarm,[0,.20,.03],[.32,.025,.10]);engraving.name='Annie_Bridge_Engraving';
-    SignAnchor.buildWallPlaque({scene:bridgeRelic,x:0,y:.48,z:-.04,width:.58,height:.22,rotationY:0,code:'1997',title:'祝 守恆 醫師',subtitle:'執業誌慶',header:''});
-    const relicHit=new THREE.Mesh(new THREE.BoxGeometry(.8,.65,.7),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));relicHit.position.y=.32;
+    const bridgeRelic=new THREE.Group();bridgeRelic.name='Annie_EngravedStethoscope_Bridge';bridgeRelic.position.set(5,0,.35);this.zoneGroup.add(bridgeRelic);
+    solid(bridgeRelic,this.gf.materials.wallDark,[0,.45,0],[.78,.9,.48]);
+    solid(bridgeRelic,this.gf.materials.stainless,[0,.93,0],[.90,.06,.56]);
+    const stethoscope=new THREE.Mesh(new THREE.TorusGeometry(.16,.025,8,24),this.gf.materials.stainless);stethoscope.rotation.y=Math.PI/2;stethoscope.position.set(0,1.04,.04);bridgeRelic.add(stethoscope);
+    const engraving=solid(bridgeRelic,this.gf.materials.lightWarm,[0,1.22,.248],[.32,.025,.01]);engraving.name='Annie_Bridge_Engraving';
+    SignAnchor.buildWallPlaque({scene:bridgeRelic,x:0,y:1.42,z:.249,width:.58,height:.22,rotationY:0,code:'1997',title:'祝 守恆 醫師',subtitle:'執業誌慶',header:''});
+    const relicHit=new THREE.Mesh(new THREE.BoxGeometry(.95,1.5,.9),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));relicHit.position.y=.95;
     relicHit.userData={interactable:true,id:'ANNIE_TRUE_NAME_CLUE',type:'true_name_clue_2',label:'查看安妮留下的舊聽診器'};bridgeRelic.add(relicHit);this.interactables.push(relicHit);
 
     new AccessDoor(this,{id:'BRIDGE_FIRST',x:0,z:0,yaw:Math.PI/2,width:2.4,title:'第一院區感應門',portal:'first_bridge_return'});
     new AccessDoor(this,{id:'BRIDGE_SECOND',x:60,z:0,yaw:Math.PI/2,width:2.4,title:'第二院區感應門',portal:'second_bridge_return'});
     return this;
+  }
+
+  update(camera,delta=0){
+    if(this.bridgeDoppelganger?.visible)updateAnnieArt(this.bridgeDoppelganger,delta);
+    if(!gameState.getFlag('M4_CHEST_RESOLVED'))return;
+    if(camera.position.x>=55)this.returnBridgeActive=true;
+    if(!this.returnBridgeActive)return;
+    if(camera.position.x<=30)gameState.setFlag('M5_BRIDGE_COMMITTED',true);
+
+    const deviation=Math.abs(Math.atan2(Math.sin(camera.rotation.y-Math.PI/2),Math.cos(camera.rotation.y-Math.PI/2)));
+    if(!this.lookbackArmed){
+      if(deviation<70*Math.PI/180){this.lookbackArmed=true;this.lookbackTimer=0;}
+      return;
+    }
+    this.lookbackTimer=deviation>110*Math.PI/180?this.lookbackTimer+delta:0;
+    if(this.lookbackTimer<.45)return;
+
+    this.lookbackTimer=0;this.lookbackArmed=false;this.lookbackCount++;
+    soundManager.playDoorLockClack();
+    this.bridgeAnomalyLight.intensity=Math.min(.35*this.lookbackCount,1.05);
+    this.bridgeDoppelganger.position.x=Math.max(31,46-5*this.lookbackCount);
+    if(this.lookbackCount>=3)gameState.setFlag('BRIDGE_OVERRIDE_PENDING',true);
   }
 
   cleanup() {

@@ -35,7 +35,11 @@ for(const id of Object.keys(CORE_ORIGINS).filter(s=>s!=='second_campus_std')){
   for(const d of Object.values(z.keyedDoors||{})) d.setClosed(false);
   const roomIds=z.roomAreas.filter(x=>x.kind==='ward').map(x=>x.id);
   check(id+' exact nine V5 perimeter rooms',()=>assert.deepEqual(roomIds,Array.from({length:9},(_,i)=>String((second?500:400)+i+1))));
-  check(id+' exactly 36 ward beds',()=>{assert.equal(z.bedAreas.length,36);assert.equal(z.bedAreas.find(b=>b.wardBedNumber===33)?.roomId,String((second?500:400)+9));});
+  check(id+(second?' exactly 36 ward beds':' exactly 32 first-campus ward beds'),()=>{
+   assert.equal(z.bedAreas.length,second?36:32);
+   if(second)assert.equal(z.bedAreas.find(b=>b.wardBedNumber===33)?.roomId,'509');
+   else{assert.equal(z.bedAreas.find(b=>b.wardBedNumber===33),undefined);assert(!z.bedAreas.some(b=>b.roomId==='409'));}
+  });
   for(const room of z.roomAreas)check(id+' room '+room.id+' in and out',()=>{walk(room.corridor,room.point);walk(room.point,room.corridor);});
   check(id+' V5.1 custom protected station',()=>assert.equal(z.station.module,'NursingStation_V5_2_GLASS_BOX'));
   check(id+' glass bypass is transparent',()=>{const d=z.accessDoors[second?'second_ward_glass':'first_ward_glass'];assert(d);assert(d.leaves.every(l=>l.material.transparent));});
@@ -64,4 +68,4 @@ for(const id of ['first_campus_8f','skybridge','second_campus_2f']){
  const z=r.loadZone(id);for(const d of Object.values(z.accessDoors).filter(d=>d.portal))check(id+' portal door stays closed '+d.id,()=>{assert(d.closed);const p=d.closedBox.getCenter(new THREE.Vector3());c.teleport(p.x,1.7,p.z);assert(c.checkCollision(p.x,p.z));const before=r.activeZoneId;r.update();assert.equal(r.activeZoneId,before);});
 }
 check('20 alternating zone cleanup cycles stable',()=>{let initial;for(let i=0;i<20;i++){r.loadZone('first_campus_4f');r.loadZone('second_campus_5f');r.loadZone('first_campus_3f');let n=0;scene.traverse(()=>n++);initial??=n;assert.equal(n,initial);}assert.equal(scene.children.length,2);});
-console.log(JSON.stringify({passed,failed},null,2));fs.mkdirSync('qa-results',{recursive:true});fs.writeFileSync('qa-results/floorplan.json',JSON.stringify({passed,failed,results},null,2));if(failed)process.exitCode=1;
+console.log(JSON.stringify({passed,failed},null,2));fs.mkdirSync('qa-results',{recursive:true});fs.writeFileSync('qa-results/floorplan-v2.json',JSON.stringify({passed,failed,results},null,2));if(failed)process.exitCode=1;

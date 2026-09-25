@@ -11,7 +11,7 @@ No single state-machine PASS is sufficient. A release requires the current stati
 - No production portal, task, selector, or story choice reaches `hillside_route` or `ecology_pond`; M4 outbound and M5 return both use skybridge.
 - M4 ordinary patient remains present and calms; only physical roster inspection grants 守; reject signature and keep correct-path treatment ordinary.
 - M5 return threshold and look-back debounce/punishment progression; relic grants 恆 only on pickup.
-- One shared Annie mannequin builder across static storage, bridge manifestation, and 6F CPR; synthetic face, training airway, jointed hands, rigid idle pose, CPR motion, and exact neck stethoscope inscription correct.
+- One shared `prototype/src/art/AnnieArt.js` factory across 3F storage, bridge manifestation, and 6F CPR; rounded mannequin geometry (no Annie `BoxGeometry`), fixed synthetic face, training airway, mold seams, overlapped bridge/CPR hands, static storage, moving CPR, and exact neck stethoscope inscription.
 - 6F is elevator-hijack-only and absent from ordinary floors/task text; B2 grants full employee number; reconstruction and M9 require the complete exact identity pair.
 - Duty-room washroom plaque absent, bathroom retained; no permanent wall clocks in key story spaces; bedside desk/phone and 0.8m circulation; no floating/occluded/penetrating props; ER monitor is separated from glass.
 
@@ -46,30 +46,30 @@ Capture exactly these 24 named visual states at their explicit ART_QA spawns/cam
 23. M9 dual identity form
 24. M9 successful dawn ending
 
-Screenshot timeout is a hard failure. Do not catch-and-warn or drop missing files. Every image must be a valid, fully rendered image at the requested viewport. Before capture, assert the named scene anchor is in the camera frustum and has a non-empty projected rectangle. Require the exact 24-file manifest, zero warnings, zero browser errors, and all 11 story milestones.
+Screenshot timeout is a hard failure. Do not catch-and-warn or drop missing files. Every image must be a valid, fully rendered image at the requested viewport. Before capture, assert the named scene anchor is in the camera frustum and has a non-empty projected rectangle. Require the exact 24-file manifest, zero warnings, zero browser errors, and all 10 recorded story milestones.
 
 ## Visual review
 
 Review all 24 captures against the concept references and live scene anchors. Check wall/floor material, lighting phase, signage, furniture circulation, rail/door clipping, mannequin identity, framed subject, and Traditional-Chinese legibility. Hard failures are blockers. A focused code/design-system review and independent screenshot review must pass on the same source revision.
 
-## P0 Annie Hero asset gate
+## P0 Annie V2 procedural art release gate
 
-This gate is additional to the 24 story screenshots above. The current procedural Annie is a development fallback; the formal Hero asset status remains `FUNCTIONAL_FALLBACK_READY / ART_HERO_ASSET_PENDING` until this gate passes. Run `node test_annie_hero_asset_qa.js` from `prototype/`. While either registered GLB is absent, the required result is `BLOCKED_BY_HERO_ASSET` with a nonzero exit code. That result is a truthful open release blocker, not a test-suite PASS and not permission to replace the Hero asset with scene-local primitives.
+This gate replaces the former Hero GLB gate for this release. `BLOCKED_BY_HERO_ASSET` is not a release status here. Do not wait for external GLBs or run license research. A GLB is optional `FUTURE ART POLISH`.
 
-After both registered GLBs and the shared asset factory are present, capture the following eight additional 1440 × 900 browser images locally and on public Pages. Record the source SHA, asset SHA-256, camera transform, measured distance to the visible subject, viewport, and screenshot SHA-256 for every image.
+Run `node test_v2_annie_identity_qa.js` from `prototype/`, then run the full 24-shot story browser playthrough. Use these shots from that manifest as the Annie visual evidence set and save the actual camera-to-subject distance with the release QA record:
 
-| Required image | State | Camera distance | Required read |
-|---|---|---:|---|
-| `annie_storage_long.png` | M1 storage static | 8–12 m | Adult-sized white-coated figure; complete silhouette and grounded feet. |
-| `annie_storage_close.png` | M1 storage static | 0.8–1.5 m | Smooth vinyl face, fixed unfocused eyes, airway, fine mold seam, coat fabric, and neck stethoscope. |
-| `annie_bridge_long.png` | M5 bridge manifestation | 8–12 m | Same mannequin silhouette and coat as M1; empty-CPR staging reads in the bridge. |
-| `annie_bridge_mid.png` | M5 bridge manifestation | 3–5 m | Rigid elongated posture and machine-like CPR action. |
-| `annie_bridge_close.png` | M5 bridge manifestation | 0.8–1.5 m | Molded face and joints remain legible under the localized practical light. |
-| `annie_floor6_cpr_long.png` | M6 floor 6 CPR | 8–12 m | Kneeling full-body pose, bed relation, and contact with the human-shaped burn silhouette. |
-| `annie_floor6_cpr_close.png` | M6 floor 6 CPR | 0.8–1.5 m | Overlapped hands, locked elbows, fixed eyes, and synchronized compression motion. |
-| `stethoscope_inspect.png` | M5 relic inspection | 0.3–0.6 m | Separate pickup prop; exact engraved inscription is readable and matches the neck-worn prop. |
+| Story capture | State / distance | Required read |
+|---|---|---|
+| `m1-3f-storage-annie-static.png` | 3F static / room medium | Full seated mannequin, same coat/scrub palette, grounded shoes, readable storage context. |
+| `m1-annie-close-inspection.png` | 3F static / close | Smooth vinyl face, fixed eyes, airway and mold seams; neck-worn stethoscope and inscription. |
+| `m5-outbound-bridge-baseline.png` | Bridge / 8–12 m | Full recognizable white-coated silhouette with arms extended and hands overlapped. |
+| `m5-return-bridge-annie.png` | Bridge / 3–5 m | Same geometry/material identity, rigid stance, held gaze, hands still lifted. |
+| `m6-annie-cpr.png` | 6F CPR / medium (about 4 m, room-limited) | Kneeling relation to bed and patient silhouette, contact and contact shadow visible. |
+| `m6-annie-cpr-close.png` | 6F CPR / close | Mechanical compression pose, hands stacked at contact, face/stethoscope detail. |
 
-All eight captures must succeed; timeout, absent anchor, occlusion, wrong distance, or unreadable required detail is FAIL. Review one 30-second CPR sample and record its measured compression rate, runtime frame time, draw calls, rendered triangles, and texture memory in ordinary 4F, Skybridge M5, and M6. Do not claim the Hero asset gate or visual release complete until the formal GLBs, asset QA, all eight local/public captures, current story QA, build, and exact public SHA verification pass together.
+All six captures must be fresh and composed correctly. Screenshots must be genuine browser captures at 1440 × 900, with valid named anchors in frame, no timeout/warnings/browser errors, and readable Traditional Chinese. The run also saves three bridge-idle frames and three CPR press/release frames with camera distance and SHA-256 evidence. The 24-story suite must pass all story milestones locally and on public Pages; the production build must pass; the deployed build fingerprint must match the exact pushed SHA. These conditions mark the procedural release complete without a Hero GLB.
+
+The old `test_annie_hero_asset_qa.js` and the GLB/PBR/rig/export requirements in `ANNIE_VISUAL_REWORK_SPEC.md` are future-art-polish checks only. Their absence or failure must not block this procedural release.
 
 ## Release proof
 

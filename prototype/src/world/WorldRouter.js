@@ -17,8 +17,6 @@ import { Skybridge } from './zones/Skybridge.js';
 import { SecondCampus2F } from './zones/SecondCampus2F.js';
 import { SecondCampusStandardFloor } from './zones/SecondCampusStandardFloor.js';
 import { SecondCampus1F } from './zones/SecondCampus1F.js';
-import { HillsideRoute } from './zones/HillsideRoute.js';
-import { EcologyPond } from './zones/EcologyPond.js';
 import { Phantom6F } from './zones/Phantom6F.js';
 import { B2Archive } from './zones/B2Archive.js';
 
@@ -36,9 +34,10 @@ export class WorldRouter {
     this.activeZoneId = null;
     this.activeZoneInstance = null;
     this.lightingZoneId=null;
+    this.roomLamps=[];
     gameState.addListener((event)=>{
       if((event==='phase_changed'||event==='time_changed')&&this.lightingZoneId){
-        applyZoneLighting(this.lightingGroup,this.scene,this.lightingZoneId,gameState.gameTime);
+        this.refreshLighting();
       }
     });
 
@@ -54,26 +53,22 @@ export class WorldRouter {
       'second_campus_5f': SecondCampusStandardFloor,
       'second_campus_std': SecondCampusStandardFloor,
       'second_campus_1f': SecondCampus1F,
-      'hillside_route': HillsideRoute,
-      'ecology_pond': EcologyPond,
       'phantom_6f': Phantom6F,
       'b2_archive': B2Archive
     };
 
     this.zoneLabels = {
-      'first_campus_3f': '1. 第一院區 3F 行政與總醫師室 (M0)',
-      'first_campus_4f': '2. 第一院區 4F 病房 (M1-M3)',
-      'first_campus_2f': '3. 第一院區 2F 急診 (M4)',
-      'first_campus_1f': '4. 第一院區 1F 公共服務大廳 (M5)',
-      'first_campus_8f': '5. 第一院區 8F 院史展天橋前廳 (M6)',
-      'skybridge': '6. 跨院區空中連通道 (M7)',
-      'second_campus_2f': '7. 第二院區 2F 連通道管制台 (M9)',
+      'first_campus_3f': '第一院區 3F 行政與總醫師室',
+      'first_campus_4f': '第一院區 4F 病房',
+      'first_campus_2f': '第一院區 2F 急診',
+      'first_campus_1f': '第一院區 1F 公共服務大廳',
+      'first_campus_8f': '第一院區 8F 院史展與天橋前廳',
+      'skybridge': '跨院區封閉連通道',
+      'second_campus_2f': '第二院區 2F 連通道管制台',
       'second_campus_4f_story': '第二院區 4F 劇情專用場景（一般電梯不顯示）',
-      'second_campus_5f': '8. 第二院區 5F 病房護理站 (M8)',
-      'second_campus_std': '8. 第二院區 5F 病房護理站 (M8)',
-      'second_campus_1f': '9. 第二院區 1F 警衛台與山側後門 (M10)',
-      'hillside_route': '10. 山側景觀步道與叉路 (M11)',
-      'ecology_pond': '11. 生態池觀景木棧台 (M12)',
+      'second_campus_5f': '第二院區 5F 病房護理站',
+      'second_campus_std': '第二院區 5F 病房護理站',
+      'second_campus_1f': '第二院區 1F 警衛台',
       'phantom_6f': '不存在的 6F',
       'b2_archive': 'B2 封存隔離層'
     };
@@ -88,6 +83,16 @@ export class WorldRouter {
     this.wardGateClosed=true;
     this.acuteGateClosed=true;
     this.doorStates={};
+  }
+
+  refreshLighting(){
+    applyZoneLighting({
+      group:this.lightingGroup,
+      scene:this.scene,
+      zoneId:this.lightingZoneId,
+      storyTime:gameState.gameTime,
+      roomLamps:this.roomLamps
+    });
   }
 
   /**
@@ -116,7 +121,6 @@ export class WorldRouter {
     console.info(`[WorldRouter] Loading Zone: ${zoneId}`);
     const lightingZone = (zoneId === 'second_campus_4f_story' || zoneId === 'second_campus_5f') ? 'second_campus_std' : zoneId;
     this.lightingZoneId=lightingZone;
-    applyZoneLighting(this.lightingGroup, this.scene, lightingZone,gameState.gameTime);
     const ZoneClass = this.zones[zoneId];
     const floorMatch = zoneId.match(/_([0-9])f(?:_|$)/);
     this.activeZoneInstance = new ZoneClass(this.scene, this.gf, { floor: Number(floorMatch?.[1] || 5) });
@@ -125,21 +129,20 @@ export class WorldRouter {
     floorStateManager.apply(zoneId,this.activeZoneInstance);
     this.activeZoneInstance.zoneGroup.updateMatrixWorld(true);
 
-    const corridorLights = new Set();
     // The new wards have an authored light plan. Do not multiply shader lights
     // by both room and corridor count when expanding from four to nine rooms.
     const authoredWard = ['first_campus_4f','second_campus_5f','second_campus_4f_story','second_campus_std'].includes(zoneId);
+    const corridorLights = new Set();
+    this.roomLamps=[];
     for (const room of (authoredWard ? [] : this.activeZoneInstance.roomAreas || [])) {
       for (const point of [room.point, room.corridor].filter(Boolean)) {
         const key = point[0] + ':' + point[2];
         if (corridorLights.has(key)) continue;
         corridorLights.add(key);
-        const light = new THREE.RectAreaLight(0xfff0d9, 3.5, 2, 1.2);
-        light.position.set(point[0], 3, point[2]);
-        light.lookAt(point[0], 0, point[2]);
-        this.lightingGroup.add(light);
+        this.roomLamps.push([point[0],point[2]]);
       }
     }
+    this.refreshLighting();
 
     if (zoneId === 'first_campus_4f') {
       this.activeZoneInstance.setDutyDoorClosed(this.dutyDoorClosed);

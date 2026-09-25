@@ -78,10 +78,13 @@ for(const [zoneId,prefix] of [['first_campus_4f','40'],['second_campus_5f','50']
     }
   }
   assert.equal(zone.bedAreas.filter(b=>!b.anomalous).length,firstCampus4F?32:36);
-  assert.equal(zone.bedAreas.length,firstCampus4F?33:36);
-  const bed33=zone.bedAreas.find(b=>b.wardBedNumber===33);
-  assert.equal(bed33.id,prefix+'9A');
-  assert.equal(bed33.bedInRoom,'A');
+  assert.equal(zone.bedAreas.length,firstCampus4F?32:36);
+  if(firstCampus4F)assert(!zone.bedAreas.some(b=>b.wardBedNumber===33),'4F Bed 33 is narrative-only');
+  else{
+    const bed33=zone.bedAreas.find(b=>b.wardBedNumber===33);
+    assert.equal(bed33.id,prefix+'9A');
+    assert.equal(bed33.bedInRoom,'A');
+  }
 
   const storage=zone.roomAreas.find(r=>r.id==='STORE_ENTRY');
   assert(storage?.accessDoorId);
@@ -92,6 +95,10 @@ for(const [zoneId,prefix] of [['first_campus_4f','40'],['second_campus_5f','50']
     assert(zone.roomAreas.some(r=>r.id==='SECOND_DUTY'&&r.label==='值班室'));
     assert(zone.accessDoors.second_duty_room?.closed);
     assert(!zone.roomAreas.some(r=>r.id==='DOCTOR'));
+    const patient=zone.zoneGroup.getObjectByName('SecondCampus_ChestPainPatient');
+    assert(patient?.isGroup,'M4 ordinary patient must have a visible scene model');
+    assert(patient.getObjectByName('SecondCampus_ChestPainPatient_Face')?.isMesh,'M4 patient must include a face');
+    assert(patient.getObjectByName('SecondCampus_ChestPainPatient_Wristband')?.isMesh,'M4 patient must include a wristband');
   }
 }
 assert.match(main,/STAFF_ACCESS_CARD/);

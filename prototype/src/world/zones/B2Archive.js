@@ -29,6 +29,11 @@ export class B2Archive {
     // Burnt mirror-316 office at the end of the corridor.
     const frame=solid(this.zoneGroup,m.wallDark,[0,1.25,-14.65],[3.4,2.5,.15]);
     frame.name='B2_Mirror316_Frame';
+    const mirror=new THREE.Mesh(
+      new THREE.PlaneGeometry(2.62,1.82),
+      new THREE.MeshPhysicalMaterial({color:0x56665f,metalness:.82,roughness:.24,envMapIntensity:.7})
+    );
+    mirror.name='B2_Mirror316_Surface';mirror.position.set(0,1.23,-14.56);this.zoneGroup.add(mirror);
     SignAnchor.buildWallPlaque({
       scene:this.zoneGroup,x:0,y:2.36,z:-14.52,rotationY:0,width:1.45,height:.42,
       code:'316',title:'總醫師辦公室',subtitle:'ARCHIVE MIRROR',header:''
