@@ -34,6 +34,13 @@ export class UIManager {
     this.storyChoiceModal = document.getElementById('story-choice-modal');
     this.finalHandoffModal = document.getElementById('final-handoff-modal');
     this.finalSuccessModal = document.getElementById('final-success-modal');
+    this.memoryModal = document.getElementById('memory-modal');
+    this.memoryFrameCanvas = document.getElementById('memory-frame-canvas');
+    this.identityMatrixModal = document.getElementById('identity-matrix-modal');
+    this.memorySequence = null;
+    this.memoryFrameIndex = 0;
+    this.memoryCloseHandler = null;
+    this.identityMatrixHandler = null;
     this.storyChoiceHandlers = null;
     this.finalHandoffHandler = null;
     this.bed33Handlers = null;
@@ -128,6 +135,10 @@ export class UIManager {
 
     document.getElementById('btn-close-archive')?.addEventListener('click',()=>this.closeArchiveDocument());
     document.getElementById('btn-close-poster')?.addEventListener('click',()=>this.closePoster());
+    document.getElementById('btn-close-memory')?.addEventListener('click',()=>this.closeMemorySequence());
+    document.getElementById('btn-memory-prev')?.addEventListener('click',()=>this.stepMemory(-1));
+    document.getElementById('btn-memory-next')?.addEventListener('click',()=>this.stepMemory(1));
+    document.getElementById('btn-close-identity-matrix')?.addEventListener('click',()=>this.closeIdentityMatrix());
     document.getElementById('btn-archive-prev')?.addEventListener('click',()=>{
       if(this.archivePageIndex>0){this.archivePageIndex--;this.renderArchivePage();soundManager.playClick();}
     });
@@ -198,6 +209,9 @@ export class UIManager {
 
     // Debug toggle with Backquote (~)
     document.addEventListener('keydown', (e) => {
+      if(this.memoryModal?.classList.contains('active')&&(e.code==='KeyA'||e.code==='ArrowLeft'||e.code==='KeyD'||e.code==='ArrowRight')){
+        e.preventDefault();this.stepMemory((e.code==='KeyA'||e.code==='ArrowLeft')?-1:1);return;
+      }
       if(e.code==='Tab'){
         e.preventDefault();
         if(this.journalModal?.classList.contains('active'))this.closeJournal();
@@ -220,6 +234,8 @@ export class UIManager {
         }
         if (this.archiveModal?.classList.contains('active')) this.closeArchiveDocument();
         if (this.posterModal?.classList.contains('active')) this.closePoster();
+        if (this.memoryModal?.classList.contains('active')) this.closeMemorySequence();
+        if (this.identityMatrixModal?.classList.contains('active')) this.closeIdentityMatrix();
         if (this.lockerModal?.classList.contains('active')) this.closeLocker();
         if (this.office302Modal?.classList.contains('active')) this.close302Keypad();
         if (this.inspect302Modal?.classList.contains('active')) this.close302Inspect();
@@ -257,11 +273,11 @@ export class UIManager {
   showInitialDialogue() {
     setTimeout(() => {
       if(persistentMemory.data.loopCount>0){
-        this.showSubtitle('李醫師','「……又是這裡。316、1700、3082。我記得。」',3600);
+        this.showSubtitle('值班醫師','「……又是這裡。316、1700、3082。我記得。」',3600);
         return;
       }
       this.showSubtitle(
-        '學長 (資深住院醫師)',
+        '學長',
         '「我先走了，先把 316 鎖了，自己想辦法進去把今晚的交班做完吧，值班交給你了。」\n「有問題就去警衛查哨點看看。」',
         7800
       );
@@ -380,7 +396,7 @@ export class UIManager {
     this.inspect302FocusTimer=setTimeout(()=>{
       this.gameState.setFlag('FOUND_302_CODE',true);
       this.inspect302Clue?.classList.add('found');
-      this.showSubtitle('李醫師','「……3082 嗎？」',2300);
+      this.showSubtitle('值班醫師','「……3082 嗎？」',2300);
     },1000);
   }
 
@@ -499,7 +515,7 @@ export class UIManager {
     if(resume)this.onTerminalClose?.();
   }
 
-  playLegendOverride({legend='LEGEND OVERRIDE',reason='你已被重新分類。'}={},onComplete){
+  playLegendOverride({legend='409 PATIENTIZATION',reason='你重演了當年的錯誤。'}={},onComplete){
     document.exitPointerLock();
     this.loopOverrideComplete=onComplete;
     for(const t of this.loopCutsceneTimers)clearTimeout(t);
@@ -508,23 +524,21 @@ export class UIManager {
     const body=document.getElementById('loop-stage-body');
     const band=document.getElementById('loop-wristband');
     const card=document.getElementById('loop-gameover-card');
-    title.textContent='IDENTITY OVERRIDE';
-    body.textContent='系統正在重新分類你的身分。';
+    title.textContent='409 PATIENTIZATION';
+    body.textContent='水平同步失鎖。視野像被猛然往下扯。';
     band?.classList.remove('visible');card?.classList.remove('visible');
-    if(card){
-      card.querySelector('strong').textContent=legend;
-      card.querySelector('span').textContent=reason;
-    }
+    if(card){card.querySelector('strong').textContent=legend;card.querySelector('span').textContent=reason;}
     this.loopCutscene?.classList.add('active');
-
     const later=(ms,fn)=>this.loopCutsceneTimers.push(setTimeout(fn,ms));
-    later(900,()=>{title.textContent='';body.textContent='日光燈一格一格從視野上方滑過。\n推車輪子壓過地磚，發出規律的咕嚕聲。';});
-    later(2500,()=>{band?.classList.add('visible');body.textContent='你的 Staff Card 被拿走，病人手圈套上手腕。\n「33床新收案，自稱是今晚的值班醫師。」';});
-    later(4400,()=>{body.textContent='「身分認知混亂，先執行保護性處置。」\n皮帶扣環一個接一個拉緊。';});
-    later(6100,()=>{body.textContent='門口站著另一個穿白袍的「李醫師」。\n護理師說：「33床一直說自己才是值班醫師。」\n他只回答：「我知道。」';});
-    later(7900,()=>{title.textContent='';body.textContent='視線開始模糊。白噪音蓋過所有聲音。';});
-    later(9300,()=>{body.textContent='';card?.classList.add('visible');});
-    later(11300,()=>this.finishLoopCutscene());
+    later(850,()=>{title.textContent='';body.textContent='畫面恢復時，你正仰躺在綠色斑駁的 409-A 鐵床。\n四條粗糙的皮革約束帶已扣住手腕與腳踝。';});
+    later(2300,()=>{band?.classList.add('visible');body.textContent='一條泛黃塑膠手圈被套上手腕：\n【無名病人】／床號 409-A。';});
+    later(3850,()=>{body.textContent='床頭舊終端吐出點陣紙：\nSTAFF ID: NOT FOUND\nOVERWRITE CONFIRMED: TEMPORARY PATIENT RECORD CREATED\nLOCATION: WARD 409-A';});
+    later(5650,()=>{body.textContent='面孔被雜訊抹去的護理師低頭準備針劑：\n「病人急性精神混亂，自稱是醫師……先執行四點約束，通報總值班。」\n\n「放開我！我是今晚的值班醫師！名冊在 316……！」';});
+    later(7700,()=>{body.textContent='一名沒有名牌的白袍人影從門外經過，抽走床尾的值班日誌。\n金屬厚門「匡啷」反鎖。';});
+    later(9300,()=>{body.textContent='舊式機械火警鈴開始尖叫。\n焦臭濃煙從門底縫隙湧入，視野逐漸全黑。';});
+    later(10800,()=>{title.textContent='17:00';body.textContent='黑暗中傳來電梯到站的「叮——」。\n秒針倒轉。日期欄短暫閃過：1998-10-12。';});
+    later(12400,()=>{body.textContent='';card?.classList.add('visible');});
+    later(14200,()=>this.finishLoopCutscene());
   }
 
   finishLoopCutscene(){
@@ -552,6 +566,63 @@ export class UIManager {
     if(resume)this.onTerminalClose?.();
   }
 
+  openMemorySequence(sequence,onClose=null){
+    if(!sequence)return;
+    document.exitPointerLock();
+    this.memorySequence=sequence;this.memoryFrameIndex=0;this.memoryCloseHandler=onClose;
+    document.getElementById('memory-title').textContent=sequence.title||'記憶影像';
+    document.getElementById('memory-mode').textContent=sequence.mode==='CCTV'?'FRAME PLAYBACK / CCTV':'FRAME ALBUM';
+    document.getElementById('memory-source').textContent=sequence.source||'';
+    this.memoryModal?.classList.add('active');this.renderMemoryFrame();
+  }
+
+  stepMemory(delta){
+    if(!this.memorySequence)return;
+    const next=Math.max(0,Math.min(this.memorySequence.frames.length-1,this.memoryFrameIndex+delta));
+    if(next===this.memoryFrameIndex)return;
+    this.memoryFrameIndex=next;soundManager.playClick();this.renderMemoryFrame();
+  }
+
+  renderMemoryFrame(){
+    const sequence=this.memorySequence,frame=sequence?.frames?.[this.memoryFrameIndex];
+    if(!frame||!this.memoryFrameCanvas)return;
+    const canvas=this.memoryFrameCanvas,ctx=canvas.getContext('2d'),cctv=sequence.mode==='CCTV',w=canvas.width,h=canvas.height;
+    ctx.fillStyle=cctv?'#111612':'#c5b58f';ctx.fillRect(0,0,w,h);
+    const grad=ctx.createLinearGradient(0,0,w,h);grad.addColorStop(0,cctv?'#29332b':'#d8caa8');grad.addColorStop(1,cctv?'#080b09':'#8f7a58');ctx.fillStyle=grad;ctx.fillRect(30,30,w-60,h-60);
+    ctx.strokeStyle=cctv?'#708c76':'#5d4b35';ctx.lineWidth=8;ctx.strokeRect(42,42,w-84,h-84);
+    ctx.fillStyle=cctv?'#b6cfb9':'#3d3427';ctx.font='bold 30px ui-monospace, monospace';ctx.fillText(frame.stamp||'',70,92);
+    ctx.font='bold 44px sans-serif';ctx.fillText(frame.title||'',70,150);
+    const people=frame.people||[],count=Math.max(1,people.length),gap=(w-260)/count;
+    for(let i=0;i<people.length;i++){const x=130+gap*(i+.5);ctx.fillStyle=cctv?'#54685a':'#6a5942';ctx.beginPath();ctx.arc(x,270,46,0,Math.PI*2);ctx.fill();ctx.fillRect(x-55,318,110,162);if(people[i]==='Annie'){ctx.strokeStyle=cctv?'#9db5a1':'#4a4031';ctx.lineWidth=8;ctx.strokeRect(x-52,315,104,166);}ctx.fillStyle=cctv?'#d4ded5':'#30291f';ctx.font='22px sans-serif';ctx.textAlign='center';ctx.fillText(people[i],x,535);}
+    ctx.textAlign='left';if(people.length===0){ctx.fillStyle=cctv?'#405044':'#7a684c';ctx.fillRect(210,240,w-420,260);}
+    if(cctv){ctx.globalAlpha=.18;ctx.fillStyle='#d9f1df';for(let y=54;y<h-54;y+=8)ctx.fillRect(50,y,w-100,2);ctx.globalAlpha=1;ctx.fillStyle='#c6d9c8';ctx.font='23px ui-monospace,monospace';ctx.fillText('REC ●',w-170,92);}
+    else{ctx.globalAlpha=.12;ctx.fillStyle='#3b2d1f';for(let i=0;i<55;i++){const x=(i*97)%w,y=(i*53)%h;ctx.fillRect(x,y,2+(i%3),2+(i%4));}ctx.globalAlpha=1;}
+    document.getElementById('memory-stamp').textContent=frame.stamp||'';document.getElementById('memory-frame-title').textContent=frame.title||'';document.getElementById('memory-caption').textContent=frame.caption||'';document.getElementById('memory-narration').textContent=frame.narration||'';
+    document.getElementById('memory-indicator').textContent=(this.memoryFrameIndex+1)+' / '+sequence.frames.length;
+    const prev=document.getElementById('btn-memory-prev'),next=document.getElementById('btn-memory-next');if(prev)prev.disabled=this.memoryFrameIndex===0;if(next)next.disabled=this.memoryFrameIndex===sequence.frames.length-1;
+  }
+
+  closeMemorySequence(resume=true){
+    this.memoryModal?.classList.remove('active');const cb=this.memoryCloseHandler;this.memoryCloseHandler=null;this.memorySequence=null;cb?.();if(resume)this.onTerminalClose?.();
+  }
+
+  openIdentityMatrix({candidates=[],onSelect}={}){
+    document.exitPointerLock();this.identityMatrixHandler=onSelect;
+    const grid=document.getElementById('identity-candidate-grid');grid.replaceChildren();
+    for(const candidate of candidates){
+      const button=document.createElement('button');button.className='identity-candidate';button.id='identity-candidate-'+candidate.id;
+      const strong=document.createElement('strong');strong.textContent=candidate.name;
+      const meta=document.createElement('span');meta.textContent=candidate.employeeId+' ｜ '+candidate.role;
+      button.append(strong,meta);
+      button.addEventListener('click',()=>{soundManager.playComputerBeep();const result=this.identityMatrixHandler?.(candidate)||{};this.setIdentityMatrixStatus(result.message||'',result.resolved?'match':'error');if(result.resolved)setTimeout(()=>this.closeIdentityMatrix(),1500);});
+      grid.appendChild(button);
+    }
+    this.setIdentityMatrixStatus('等待候選身分比對。','');this.identityMatrixModal?.classList.add('active');
+  }
+
+  setIdentityMatrixStatus(text,tone=''){const el=document.getElementById('identity-matrix-status');if(!el)return;el.textContent=text;el.classList.remove('match','error');if(tone)el.classList.add(tone);}
+  closeIdentityMatrix(resume=true){this.identityMatrixModal?.classList.remove('active');this.identityMatrixHandler=null;if(resume)this.onTerminalClose?.();}
+
   openFinalHandoff(handler){
     document.exitPointerLock();
     this.finalHandoffHandler=handler;
@@ -569,7 +640,7 @@ export class UIManager {
 
   showFinalSuccess(name){
     this.finalHandoffModal?.classList.remove('active');
-    const last=this.finalSuccessModal?.querySelector('.anomaly-last');if(last)last.textContent=`你第一次記得自己的名字：${name}。`;
+    const last=this.finalSuccessModal?.querySelector('.anomaly-last');if(last)last.textContent='409-A 無名病人紀錄已失效；值班醫師姓名已恢復：'+name+'。';
     this.finalSuccessModal?.classList.add('active');
   }
 
@@ -590,8 +661,8 @@ export class UIManager {
   showLoopWakeup(loopCount){
     const el=document.getElementById('loop-wake-flash');
     el?.classList.remove('active');void el?.offsetWidth;el?.classList.add('active');
-    setTimeout(()=>this.showSubtitle('學長 (資深住院醫師)','「李醫師？發什麼呆，我先走了……」',3600),850);
-    setTimeout(()=>this.showSubtitle('李醫師',`「手腕……這不是夢。這已經是第 ${loopCount+1} 次了。」`,4200),4200);
+    setTimeout(()=>this.showSubtitle('學長','「醫師？發什麼呆，我先走了……」',3600),850);
+    setTimeout(()=>this.showSubtitle('值班醫師',`「手腕……這不是夢。這已經是第 ${loopCount+1} 次了。」`,4200),4200);
   }
 
   openTravelSelector(destinations, currentZone, onSelect, kind = 'elevator') {
