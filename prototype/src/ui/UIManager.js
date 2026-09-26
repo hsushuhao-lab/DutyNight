@@ -710,7 +710,10 @@ export class UIManager {
   }
 
   closeAllTransientOverlays(){
-    document.querySelectorAll('.modal-overlay.active,.cutscene-overlay.active').forEach(el=>el.classList.remove('active'));
+    document.querySelectorAll('.modal-overlay.active,.cutscene-overlay.active').forEach(el=>{
+      if(el===this.loopCutscene)return;
+      el.classList.remove('active');
+    });
   }
 
   resetAfterLoop(){
