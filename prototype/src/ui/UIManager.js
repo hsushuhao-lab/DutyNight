@@ -839,6 +839,7 @@ export class UIManager {
     const preloadPromise=Promise.resolve(onPrefetch?.(destination)).catch(error=>{
       console.warn('[perf] destination prefetch failed',destination.zoneId,error);
     });
+    const preloadDeadline=new Promise(resolve=>setTimeout(resolve,4000));
     const glitch=kind!=='stairs'&&fromFloor===3&&destination.floorNum===4&&this.gameState.isTaskComplete('ARCHIVE_CLUE_FOUND');
     if(glitch){
       const digit=this.elevatorCutscene.querySelector('.floor-digit');
@@ -848,7 +849,7 @@ export class UIManager {
     }
     this.travelTimer=setTimeout(async()=>{
       try {
-        await preloadPromise;
+        await Promise.race([preloadPromise,preloadDeadline]);
         onSelect(destination);
         soundManager.playElevatorChime();
       } finally {

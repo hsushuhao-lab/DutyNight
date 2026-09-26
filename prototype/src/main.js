@@ -18,12 +18,19 @@ await preloadCriticalAssets();
 // critical path while preserving full-quality assets once they are cached.
 const deferredHospitalAssets = () => Promise.all([preloadAssets(), preloadMaterials()])
   .catch(error => console.warn('[perf] deferred hospital asset preload failed', error));
-const campusBackdropZones = new Set(['first_campus_1f','first_campus_2f','first_campus_8f']);
-const prefetchDestinationAssets = destination => Promise.all([
-  preloadAssets(),
-  preloadMaterials(),
-  campusBackdropZones.has(destination?.zoneId) ? preloadCampusBackdropAssets() : Promise.resolve()
-]);
+const blockingCampusBackdropZones = new Set(['first_campus_1f','first_campus_8f']);
+const nonBlockingCampusBackdropZones = new Set(['first_campus_2f']);
+const prefetchDestinationAssets = destination => {
+  const zoneId=destination?.zoneId;
+  if(nonBlockingCampusBackdropZones.has(zoneId)){
+    void preloadCampusBackdropAssets().catch(error=>console.warn('[perf] deferred 2F backdrop preload failed',error));
+  }
+  return Promise.all([
+    preloadAssets(),
+    preloadMaterials(),
+    blockingCampusBackdropZones.has(zoneId) ? preloadCampusBackdropAssets() : Promise.resolve()
+  ]);
+};
 let fastPathWorldPreload=Promise.resolve();
 import { gameState } from './core/GameState.js';
 import { DutyEventManager } from './core/DutyEventManager.js';
