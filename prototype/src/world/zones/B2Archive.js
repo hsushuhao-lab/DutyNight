@@ -52,15 +52,14 @@ export class B2Archive {
     solid(phone,m.metal,[0,.12,0],[.42,.08,.09],.025);
     const terminal=workstation.hitbox;this.interactables.push(terminal);
 
-    const stairwell=new THREE.Group();stairwell.name='B2_EscapeStairwell';stairwell.position.set(0,0,.72);this.zoneGroup.add(stairwell);
-    for(let step=0;step<6;step++)solid(stairwell,m.metal,[0,.10+step*.17,.30-step*.30],[2.2,.20,.42]);
-    solid(stairwell,m.wallDark,[-1.18,1.25,-.45],[.10,2.5,2.8]);solid(stairwell,m.wallDark,[1.18,1.25,-.45],[.10,2.5,2.8]);
-    solid(stairwell,m.doorWood,[0,1.15,.46],[1.72,2.30,.10]);
-    solid(stairwell,m.metal,[.68,1.12,.38],[.08,.08,.08]);
-    SignAnchor.buildWallPlaque({scene:stairwell,x:0,y:2.25,z:.66,rotationY:Math.PI,width:1.55,height:.38,code:'EXIT',title:'逃生梯｜返回 1F',subtitle:'STAIRWAY',header:''});
+    const exitDoor=new THREE.Group();exitDoor.name='B2_OneWayExitDoor';exitDoor.position.set(0,0,.72);this.zoneGroup.add(exitDoor);
+    solid(exitDoor,m.wallDark,[-1.18,1.25,0],[.10,2.5,2.8]);solid(exitDoor,m.wallDark,[1.18,1.25,0],[.10,2.5,2.8]);
+    solid(exitDoor,m.doorWood,[0,1.15,.46],[1.72,2.30,.10]);
+    solid(exitDoor,m.metal,[.68,1.12,.38],[.08,.08,.08]);
+    SignAnchor.buildWallPlaque({scene:exitDoor,x:0,y:2.25,z:.66,rotationY:Math.PI,width:1.55,height:.38,code:'EXIT',title:'單向出口｜返回 1F 警衛台後方',subtitle:'ONE-WAY EXIT',header:'離開後無法返回 B2'});
     const returnHit=new THREE.Mesh(new THREE.BoxGeometry(1.78,2.30,.62),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
     returnHit.position.set(0,1.15,1.18);
-    returnHit.userData={interactable:true,id:'B2_ESCAPE_STAIRS',type:'b2_escape_stairs',label:'沿逃生梯返回 1F'};
+    returnHit.userData={interactable:true,id:'B2_ONE_WAY_EXIT',type:'b2_exit_door',label:'由單向門返回 1F 警衛台後方'};
     this.zoneGroup.add(returnHit);this.interactables.push(returnHit);
 
     // Charred archive boxes: visual evidence only.
@@ -72,7 +71,7 @@ export class B2Archive {
     asset(this.zoneGroup,'storageCabinet',[-3.7,0,-1.5],[.75,.9,.75],Math.PI/2);
     asset(this.zoneGroup,'storageCabinet',[3.7,0,-1.5],[.75,.9,.75],-Math.PI/2);
 
-    this.b2={id:'B2_ARCHIVE',archiveMirror:true,terminal:'B2_ARCHIVE_TERMINAL',exit:'B2_ESCAPE_STAIRS'};
+    this.b2={id:'B2_ARCHIVE',archiveMirror:true,terminal:'B2_ARCHIVE_TERMINAL',exit:'B2_ONE_WAY_EXIT'};
     return this;
   }
 
