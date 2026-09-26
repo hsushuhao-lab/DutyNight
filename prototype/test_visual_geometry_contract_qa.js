@@ -26,7 +26,12 @@ for(const [name,desk] of [['Bed33_HIS409Sheet',wsB?.desk],['Bed33_AssignmentForm
 }
 assert.equal(zone.dutyDoor?.openDirection,1,'4F duty-room door must swing inward');
 assert.equal(zone.dutyBathroomDoor?.openDirection,1,'4F bathroom door must swing inward');
-assert.equal(zone.keyedDoors['room_409']?.openDirection,-1,'409 west-wall patient door must swing into the room');
+for(const id of ['room_401','room_402','room_403','room_404','room_405','room_406'])assert.equal(zone.keyedDoors[id]?.openDirection,-1,id+' must swing toward the corridor');
+for(const id of ['room_407','room_408'])assert.equal(zone.keyedDoors[id]?.openDirection,1,id+' must swing toward the corridor');
+assert.equal(zone.keyedDoors['room_409']?.openDirection,-1,'sealed 409 keeps its inward swing');
+const handoverBoard=zone.zoneGroup.getObjectByName('FourF_NursingHandoverBoard');
+assert(handoverBoard,'4F handover board missing');
+assert(handoverBoard.position.z>0,'4F handover board must be mounted on the corridor-facing station wall');
 for(const room of zone.roomAreas.filter(r=>r.kind==='ward')){
   const door=zone.keyedDoors[room.accessDoorId];
   assert(door?.hitPanel,`${room.id} interaction sensor missing`);
