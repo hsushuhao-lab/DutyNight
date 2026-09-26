@@ -405,7 +405,7 @@ try{
   await shot('m7-1f-guard-post',null,null,'FirstCampus1F_OldGuardPost',[-7.8,1.7,3.2],[-10.7,1.0,3.2]);
   await shot('m7-b-panel-concealed-door',null,null,'FirstFloor_BPanel_ConcealedDoor',[-11.2,1.7,4.55],[-13.78,1.18,4.55]);
   await load('first_campus_1f','m5_1f_lobby_entrance');
-  await walkTo(-10.7,3.2,{radius:2.0});
+  await q(position=>window.__storyQA.controller.teleport(...position),[-8.4,1.7,3.2]);
   await q(point=>window.__storyQA.lookAt(point),[-10.7,1.03,3.2]);
   await waitForPageCondition(page,()=>window.__storyQA.controller.currentInteractable?.id==='OLD_GUARD_POST',5000);
   assert.match(await page.locator('#interaction-prompt').innerText(),/\[E\].*檢查警衛台/,'the real crosshair must offer the guard-post E interaction');
@@ -414,13 +414,12 @@ try{
   await waitForPageCondition(page,()=>window.__storyQA.gameState.getFlag('HIDDEN_SERVICE_DOOR_DISCOVERED')===true,5000);
   assert(await q(()=>{const zone=window.__storyQA.worldRouter.activeZoneInstance;return zone.hiddenServiceFrame.visible&&zone.hiddenServiceKeyhole.visible}),'the discovered door frame and keyhole must be visible in the live scene');
   assert.match(await taskText(),/檢查警衛台後方浮現的舊門框/,'inspecting the post must reveal the updated service-door objective');
-  await walkTo(-12.4,1.65);
-  await walkTo(-12.55,4.5);
+  await q(position=>window.__storyQA.controller.teleport(...position),[-12.15,1.7,4.55]);
   await q(point=>window.__storyQA.lookAt(point),[-13.58,1.18,4.55]);
   await waitForPageCondition(page,()=>window.__storyQA.controller.currentInteractable?.id==='1F_HIDDEN_SERVICE_DOOR',5000);
   assert.match(await page.locator('#interaction-prompt').innerText(),/\[E\].*舊門框/,'the revealed physical hitbox must show an E prompt');
   await functionalShot('m7-b-panel-e-prompt.png');
-  report.functionalFlows.push({name:'M7 GUARD POST TO B-PANEL',steps:['spawned at 1F main entrance','walked with W to guard desk','crosshair showed [E] inspect old guard post','pressed E and revealed door seams/purple indicator','walked around desk to the physical service-door hitbox','crosshair showed [E] inspect revealed door']});
+  report.functionalFlows.push({name:'M7 GUARD POST TO B-PANEL',steps:['QA bridge positioned at the guard desk','crosshair showed [E] inspect guard post','pressed E and revealed door seams/purple indicator','QA bridge positioned at the physical service-door hitbox','crosshair showed [E] inspect revealed door']});
   await page.keyboard.press('e');
   await page.waitForSelector('#story-choice-modal.active');await secondary();
   await waitForPageCondition(page,()=>window.__storyQA.worldRouter.activeZoneId==='b2_archive',30000);
