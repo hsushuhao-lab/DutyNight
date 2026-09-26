@@ -885,11 +885,12 @@ export class UIManager {
           {id:'task-second-call',text:'留意第二院區來電',state:'ready'}
         ]);
       }else if(this.gameState.getFlag('SECOND_CAMPUS_ACCESS')&&!this.gameState.getFlag('M4_CHEST_RESOLVED')){
+        const reported=this.gameState.getFlag('SECOND_CAMPUS_5F_REPORTED');
         const seen=this.gameState.getFlag('SECOND_CHEST_PATIENT_SEEN');
         this.renderTaskBoard('翌日 01:15｜第二院區 5F',[
           {
             id:'task-m4-chest',
-            text:seen?'到護理站核對胸痛病人的轉院單':'前往第二院區 5F 病房，找到護理站通知的胸痛病人',
+            text:!reported?'先到第二院區 5F 護理站報到':seen?'回護理站查看桌上的「病人處置醫囑」':'前往 504B 評估陳怡君',
             state:'ready'
           }
         ]);
@@ -899,7 +900,7 @@ export class UIManager {
         ]);
       }else if(this.gameState.getFlag('M5_ROUTE_RESOLVED')&&!this.gameState.getFlag('M6_FLOOR6_RESOLVED')){
         this.renderTaskBoard('翌日 02:00｜返回第一院區',[
-          {id:'task-m6-elevator',text:currentZone==='phantom_6f'?(this.gameState.getFlag('FLOOR6_STETHOSCOPE_FOUND')?'檢視老舊聽診器，翻面或擦去刻字上的灰塵':'翻找焦黑器材，尋找被埋住的金屬物件'):'搭乘一般電梯返回第一院區',state:'ready'}
+          {id:'task-m6-elevator',text:currentZone==='phantom_6f'?(this.gameState.getFlag('FLOOR6_STETHOSCOPE_FOUND')?'檢視反光的老舊聽診器，翻面或擦去刻字上的灰塵':'查看焦黑器材旁反光的物件'):'搭乘一般電梯返回第一院區',state:'ready'}
         ]);
       }else if(this.gameState.getFlag('M6_FLOOR6_RESOLVED')&&!this.gameState.getFlag('M7_B2_OPEN')){
         this.renderTaskBoard('翌日 02:17 前｜B-Panel',[
@@ -963,12 +964,8 @@ export class UIManager {
       {id:'task-409-seal',complete:this.gameState.getFlag('FOURF_409_SEAL_CHECKED_AFTER_408C'),text:'確認 409 房門封條與整修狀態'},
       {id:'task-bed33-form',complete:this.gameState.getFlag('BED33_RESOLVED'),text:'回護理站核對 409A 臨時床位分配單'}
     ];
-    let nextDutyStep=true;
-    const dutyItems=dutySteps.map(step=>{
-      const state=step.complete?'completed':nextDutyStep?'ready':'locked';
-      if(!step.complete)nextDutyStep=false;
-      return {id:step.id,text:step.text,state};
-    });
+    const currentDutyStep=dutySteps.find(step=>!step.complete);
+    const dutyItems=currentDutyStep?[{id:currentDutyStep.id,text:currentDutyStep.text,state:'ready'}]:[];
     if(!this.gameState.getFlag('BED33_RESOLVED')){
       this.renderTaskBoard('4F 病房值班｜17:15–20:00',dutyItems);
       return;

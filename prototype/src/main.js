@@ -174,7 +174,7 @@ function unlockSecondCampusAccess(){
   gameState.setFlag('SECOND_CAMPUS_ACCESS',true);
   gameState.setFlag('BRIDGE_ACCESS',true);
   persistentMemory.addJournalNote('SECOND_CAMPUS_CALL','第二院區護理站主動開了天橋權限；在這之前我根本沒有跨院區資格。');
-  uiManager.showSubtitle('第二院區護理師','「第二院區 5F 有一位胸痛病人需要精神科評估，天橋門禁已經幫你開了。」',5600);
+  uiManager.showSubtitle('第二院區護理師','「請到第二院區 5F 護理站報到，有一位病人需要精神科評估。天橋門禁已經幫你開了。」',5600);
 }
 
 function completeM5IfReady(){
@@ -811,14 +811,30 @@ controller.onInteract = (interactable) => {
       }
       controller.enabled = true;
     }, interactable.kind);
+  } else if (interactable.type === 'second_campus_nursing_report') {
+    if(!gameState.getFlag('SECOND_CAMPUS_ACCESS')){
+      uiManager.showSubtitle('李醫師','「我現在沒有第二院區權限。」',2200);
+      return;
+    }
+    if(!gameState.getFlag('SECOND_CAMPUS_5F_REPORTED')){
+      gameState.setFlag('SECOND_CAMPUS_5F_REPORTED',true);
+      persistentMemory.addJournalNote('SECOND_5F_REPORT','第二院區 5F 護理站交班：陳怡君，504B，因胸悶與心悸需要精神科評估。');
+      worldRouter.activeZoneInstance?.syncStoryState?.();
+      uiManager.showSubtitle('第二院區護理師','「病人是陳怡君，在 504B。她因胸悶、心悸留置觀察，麻煩你先去評估。」',4800);
+    }
   } else if (interactable.type === 'second_chest_patient') {
     if(!gameState.getFlag('SECOND_CAMPUS_ACCESS')){
       uiManager.showSubtitle('李醫師','「我現在沒有第二院區權限。」',2200);
       return;
     }
+    if(!gameState.getFlag('SECOND_CAMPUS_5F_REPORTED')){
+      uiManager.showSubtitle('李醫師','「先到護理站報到，確認病人身分與床位。」',2600);
+      return;
+    }
     if(!gameState.getFlag('SECOND_CHEST_PATIENT_SEEN')){
       gameState.setFlag('SECOND_CHEST_PATIENT_SEEN',true);
       persistentMemory.addJournalNote('CHEST_PATIENT','陳怡君因胸悶、心悸與焦慮前來；生命徵象穩定，表現符合焦慮伴隨換氣過度。');
+      worldRouter.activeZoneInstance?.syncStoryState?.();
       uiManager.showSubtitle('李醫師','「生命徵象穩定，心電圖也沒有急性變化。先陪她放慢呼吸，這比較像焦慮引起的換氣過度。」',5200);
     }else uiManager.showSubtitle('陳怡君','「胸口好多了，謝謝醫師。」',2800);
   } else if (interactable.type === 'second_chest_roster_clue') {
@@ -864,7 +880,7 @@ controller.onInteract = (interactable) => {
     }
   } else if (interactable.type === 'second_chest_transfer') {
     if(!gameState.getFlag('SECOND_CHEST_PATIENT_SEEN')){
-      uiManager.showSubtitle('李醫師','「先評估病人，不能直接簽轉院單。」',2400);
+      uiManager.showSubtitle('李醫師','「標題是『病人處置醫囑』。先去 504B 看過陳怡君，再回來核對內容。」',3000);
       return;
     }
     if(gameState.getFlag('M4_CHEST_RESOLVED')){
@@ -873,10 +889,10 @@ controller.onInteract = (interactable) => {
     }
     controller.enabled=false;
     uiManager.openStoryChoice({
-      title:'第二院區｜胸痛病人轉院單',
+      title:'第二院區｜病人處置醫囑',
       body:`陳怡君，主訴胸悶與心悸。生命徵象穩定，心電圖沒有急性變化；評估符合焦慮伴隨換氣過度。
 
-轉院單卻已經填妥：目的地「第一院區 409A」，開立醫師「李○○」。
+重新核對病人後才發現，這份「病人處置醫囑」的第二頁其實是已填妥的轉院單：目的地「第一院區 409A」，開立醫師「李○○」。
 
 護理師：「李醫師，單子不是你早就填好的嗎？快補簽名吧。」`,
       primaryText:'補上簽名',
@@ -917,8 +933,12 @@ controller.onInteract = (interactable) => {
   } else if (interactable.type === 'floor6_chase') {
     loopManager.triggerLegendOverride('FLOOR6',{legend:'LEGEND 06 — 不存在的六樓',reason:'查無此樓層。'});
   } else if (interactable.type === 'floor6_safe_return') {
-    if(!gameState.getFlag('M5_NAME_CLUE_FOUND')){
-      uiManager.showSubtitle('李醫師','「先翻找焦黑器材。這件舊聽診器上的刻字還沒看清楚。」',3200);
+    if(!gameState.getFlag('FLOOR6_STETHOSCOPE_FOUND')){
+      uiManager.showSubtitle('李醫師','「等等……焦黑器材旁好像有東西在反光，應該先看一下。」',3400);
+      return;
+    }
+    if(!gameState.getFlag('FLOOR6_STETHOSCOPE_INSPECTED')){
+      uiManager.showSubtitle('李醫師','「那個反光的是老舊聽診器，胸件背面像有刻字，應該看清楚。」',3400);
       return;
     }
     if(!gameState.getFlag('M6_FLOOR6_RESOLVED')){

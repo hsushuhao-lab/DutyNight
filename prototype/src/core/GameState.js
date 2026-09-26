@@ -89,6 +89,7 @@ export class GameState {
     this.flags.set('M3_316_DECODED', false);
     this.flags.set('LEGEND_ER0033_RESOLVED', false);
     this.flags.set('SECOND_CAMPUS_ACCESS', false);
+    this.flags.set('SECOND_CAMPUS_5F_REPORTED', false);
     this.flags.set('BRIDGE_ACCESS', false);
     this.flags.set('M4_CHEST_RESOLVED', false);
     this.flags.set('M5_BRIDGE_RESOLVED', false);

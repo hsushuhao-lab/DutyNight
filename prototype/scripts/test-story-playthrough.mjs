@@ -326,9 +326,13 @@ try{
 
   // M4: second-campus chest-pain duplicate patient.
   await load('second_campus_5f');
+  assert.match(await taskText(),/護理站報到/,'M4 must begin at the second-campus nursing station');
+  await interact({id:'SECOND_5F_NURSING_REPORT'});
+  s=await snap();assert.equal(s.flags.SECOND_CAMPUS_5F_REPORTED,true);
+  assert.match(await taskText(),/504B[\s\S]*陳怡君/,'nursing report must reveal the patient identity and bed');
   await shot('m4-ordinary-patient',null,null,'SecondCampus_ChestPainPatient',[65.8,1.7,-18.5],[67.9,.95,-20.68]);
   await interact({id:'SECOND_CHEST_PATIENT'});
-  assert.match(await taskText(),/轉院單/,'seeing the M4 patient must advance the objective to the transfer form');
+  assert.match(await taskText(),/病人處置醫囑/,'seeing the M4 patient must advance the objective without spoiling the transfer form');
   await interact({id:'SECOND_CHEST_TRANSFER'});
   await page.waitForSelector('#story-choice-modal.active');
   const transferBody=await page.locator('#story-choice-body').textContent();

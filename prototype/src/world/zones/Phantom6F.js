@@ -32,6 +32,16 @@ export class Phantom6F {
     const displayTexture=new THREE.CanvasTexture(displayCanvas);displayTexture.colorSpace=THREE.SRGBColorSpace;
     const displayFace=new THREE.Mesh(new THREE.PlaneGeometry(.40,.25),new THREE.MeshBasicMaterial({map:displayTexture}));displayFace.position.z=-.051;displayFace.rotation.y=Math.PI;elevatorDisplay.add(displayFace);
 
+    const elevator=new THREE.Group();elevator.name='Phantom6F_ElevatorDoors';elevator.position.set(0,0,1.79);this.zoneGroup.add(elevator);
+    const doorMaterial=new THREE.MeshStandardMaterial({color:0x7f8781,metalness:.32,roughness:.62});
+    const frameMaterial=new THREE.MeshStandardMaterial({color:0x3f4944,metalness:.38,roughness:.7});
+    solid(elevator,doorMaterial,[-.61,1.12,0],[1.18,2.24,.08]);
+    solid(elevator,doorMaterial,[.61,1.12,0],[1.18,2.24,.08]);
+    solid(elevator,frameMaterial,[0,2.27,-.01],[2.64,.14,.14]);
+    solid(elevator,frameMaterial,[-1.25,1.12,-.01],[.14,2.38,.14]);
+    solid(elevator,frameMaterial,[1.25,1.12,-.01],[.14,2.38,.14]);
+    solid(elevator,frameMaterial,[0,1.12,-.055],[.035,2.18,.025]);
+
     SignAnchor.buildWallPlaque({
       scene:this.zoneGroup,x:-2.9,y:2.1,z:-1.8,rotationY:0,width:1.15,height:.42,
       code:'6F',title:'樓層資料不存在',subtitle:'FLOOR RECORD NOT FOUND',header:'青嶺醫療中心'
@@ -116,6 +126,10 @@ export class Phantom6F {
     const inspected=gameState.getFlag('FLOOR6_STETHOSCOPE_INSPECTED')===true;
     this.stethoscopeSearch.userData.interactable=!found;
     this.stethoscopeInspect.userData.interactable=found&&!inspected;
+    this.stethoscopeSearch.visible=!found;
+    this.stethoscopeInspect.visible=found&&!inspected;
+    if(found)this.stethoscopeSearch.layers.disableAll();else this.stethoscopeSearch.layers.set(0);
+    if(found&&!inspected)this.stethoscopeInspect.layers.set(0);else this.stethoscopeInspect.layers.disableAll();
     this.stethoscopeProp.visible=found;
   }
 

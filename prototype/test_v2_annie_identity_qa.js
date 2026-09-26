@@ -62,6 +62,7 @@ for(const side of [-1,1]){
 gameState.setFlag('FLOOR6_STETHOSCOPE_FOUND',false);
 gameState.setFlag('FLOOR6_STETHOSCOPE_INSPECTED',false);
 const phantom6F=router.loadZone('phantom_6f');
+assert(phantom6F.zoneGroup.getObjectByName('Phantom6F_ElevatorDoors'),'6F elevator landing must retain visible elevator doors');
 const stethoscope=phantom6F.stethoscopeProp;
 assert.equal(stethoscope.visible,false,'the 6F stethoscope stays buried until searched');
 assert.equal(phantom6F.stethoscopeSearch.userData.interactable,true);
@@ -72,10 +73,15 @@ gameState.setFlag('FLOOR6_STETHOSCOPE_FOUND',true);
 phantom6F.syncStoryState();
 assert.equal(stethoscope.visible,true,'searching reveals the stethoscope');
 assert.equal(phantom6F.stethoscopeSearch.userData.interactable,false);
+assert.equal(phantom6F.stethoscopeSearch.visible,false,'inactive search hitbox must stop blocking the inspection ray');
+assert.equal(phantom6F.stethoscopeSearch.layers.mask,0,'inactive search hitbox must leave the raycast layer');
 assert.equal(phantom6F.stethoscopeInspect.userData.interactable,true);
+assert.equal(phantom6F.stethoscopeInspect.visible,true,'inspection hitbox must accept the next raycast');
+assert.notEqual(phantom6F.stethoscopeInspect.layers.mask,0,'inspection hitbox must be on the raycast layer');
 gameState.setFlag('FLOOR6_STETHOSCOPE_INSPECTED',true);
 phantom6F.syncStoryState();
 assert.equal(phantom6F.stethoscopeInspect.userData.interactable,false,'inspection cannot be repeated after reading the engraving');
+assert.equal(phantom6F.stethoscopeInspect.visible,false,'completed inspection hitbox must stop receiving rays');
 
 const cpr=phantom6F.zoneGroup.getObjectByName('Annie_FLOOR6_CPR');
 assertAnnie(cpr,ANNIE_STATES.FLOOR6_CPR);

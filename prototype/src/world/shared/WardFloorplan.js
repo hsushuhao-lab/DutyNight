@@ -288,6 +288,11 @@ export class WardFloorplan {
     const m=this.gf.materials;
     const chestBed=this.bedAreas.find(item=>item.id==='504B');
     const [bx,,bz]=chestBed.position;
+    const report={
+      position:new THREE.Vector3(o-3.35,0,-2.35),radius:2.1,
+      interactable:true,id:'SECOND_5F_NURSING_REPORT',type:'second_campus_nursing_report',label:'向第二院區 5F 護理站報到'
+    };
+    this.interactables.push(report);this.secondCampusNursingReport=report;
     const patient=new THREE.Group();patient.name='SecondCampus_ChestPainPatient';patient.position.set(bx,.80,bz);this.zoneGroup.add(patient);
     const gown=new THREE.MeshStandardMaterial({color:0xd3ddd5,roughness:.96});
     const skin=new THREE.MeshStandardMaterial({color:0xc7b5a4,roughness:.94});
@@ -321,7 +326,8 @@ export class WardFloorplan {
     // The transfer form sits on the second-campus nursing-station workstation, not in mid-air.
     const form=solid(this.zoneGroup,m.lightWarm,[o-1.28,.829,-2.18],[.42,.018,.30]);
     form.name='SecondCampus_ChestTransferForm';
-    form.userData={interactable:true,id:'SECOND_CHEST_TRANSFER',type:'second_chest_transfer',label:'查看已填妥的胸痛病人轉院單'};
+    form.userData={interactable:true,id:'SECOND_CHEST_TRANSFER',type:'second_chest_transfer',label:'查看病人處置醫囑'};
+    this.secondCampusTreatmentOrder=form;
     this.interactables.push(form);
 
     const roster=solid(this.zoneGroup,m.lightWarm,[bx+.36,.91,bz+.64],[.25,.012,.12]);
@@ -337,6 +343,14 @@ export class WardFloorplan {
       const ringing=gameState.getFlag('PHONE_RING_ACTIVE')===true;
       this.dutyPhone.userData.interactable=ringing;
       this.dutyPhone.userData.label=ringing?'接聽值班電話':'查看值班電話';
+    }
+    if(this.secondCampusNursingReport){
+      const reported=gameState.getFlag('SECOND_CAMPUS_5F_REPORTED')===true;
+      this.secondCampusNursingReport.interactable=!reported;
+    }
+    if(this.secondCampusTreatmentOrder){
+      const seen=gameState.getFlag('SECOND_CHEST_PATIENT_SEEN')===true;
+      this.secondCampusTreatmentOrder.userData.label=seen?'重新查看病人處置醫囑':'查看病人處置醫囑';
     }
   }
 
