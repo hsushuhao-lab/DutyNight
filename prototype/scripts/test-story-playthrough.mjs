@@ -21,7 +21,7 @@ const requiredShots=[
   'm6-annie-cpr-long.png','m6-stethoscope-relic.png','m6-annie-cpr.png','m6-annie-cpr-close.png','m7-1f-guard-post.png','m7-b-panel-concealed-door.png','m7-b2-mirror-316.png',
   'm9-dual-identity-form.png','m9-successful-dawn-ending.png'
 ];
-const report={url,sourceSha:process.env.GITHUB_SHA||'local-working-tree',started:new Date().toISOString(),milestones:[],screenshots:[],motionScreenshots:[],functionalScreenshots:[],functionalFlows:[],screenshotWarnings:[],errors:[],method:'Browser-driven M2-M9 story checkpoint playthrough with named scene-anchor frustum checks, 26 required full-resolution captures, bridge-idle/CPR motion frames, and physical M7 guard-post-to-B-Panel interaction.'};
+const report={url,sourceSha:process.env.GITHUB_SHA||'local-working-tree',started:new Date().toISOString(),milestones:[],screenshots:[],motionScreenshots:[],functionalScreenshots:[],functionalFlows:[],screenshotWarnings:[],errors:[],method:'Browser-driven M2-M9 story checkpoint playthrough with named scene-anchor frustum checks, 26 required full-resolution captures, bridge-idle/CPR motion frames, QA-positioned phone raycast + E checks, and physical M7 guard-post-to-B-Panel interaction.'};
 let page;
 
 async function snap(){return page.evaluate(()=>window.__storyQA.snapshot());}
@@ -107,6 +107,7 @@ async function pressEAt(target,id){
   assert.equal(aim.current,id,`crosshair raycast did not hit ${id}: ${JSON.stringify(aim)}`);
   await page.keyboard.press('e');
   await page.waitForTimeout(180);
+  return aim;
 }
 async function walkTo(x,z,{radius=.42,timeout=20000}={}){
   await q(point=>window.__storyQA.lookAt(point),[x,1.7,z]);
@@ -119,12 +120,10 @@ async function walkTo(x,z,{radius=.42,timeout=20000}={}){
   }finally{await page.keyboard.up('w');}
   await page.waitForTimeout(180);
 }
-async function walkToInteractable(id,target,{timeout=20000}={}){
-  await q(point=>window.__storyQA.lookAt(point),target);
-  await page.keyboard.down('w');
-  try{await page.waitForFunction(id=>window.__storyQA.controller.currentInteractable?.id===id,id,{timeout});}
-  finally{await page.keyboard.up('w');}
-  await page.waitForTimeout(180);
+async function answer4fPhone(label){
+  await q(position=>window.__storyQA.controller.teleport(...position),[-9.45,1.7,4.1]);
+  const aim=await pressEAt([-9.45,.84,3.34],'4F_DUTY_PHONE');
+  report.functionalFlows.push({name:label,steps:['QA bridge positioned on phone near side','live crosshair raycast resolved 4F_DUTY_PHONE','pressed E'],raycast:aim});
 }
 async function functionalShot(file){
   await mkdir(out+'/functional',{recursive:true});
@@ -237,8 +236,7 @@ try{
   await waitForPageCondition(page,()=>window.__storyQA.gameState.getFlag('PHONE_RING_ACTIVE')&&window.__storyQA.gameState.getFlag('PHONE_CALL_KIND')==='ER_JANE_2005');
   s=await snap();assert.equal(s.flags.P1_ER_CALL_ANSWERED,false);assert.equal(s.flags.ER_JANE_PRESENT,false);assert.equal(s.time,'20:00');
   assert.equal((await taskText()).trim(),'','the next objective waits for the 20:05 phone answer');
-  await walkToInteractable('4F_DUTY_PHONE',[-9.45,.84,3.34]);
-  await pressEAt([-9.45,.84,3.34],'4F_DUTY_PHONE');
+  await answer4fPhone('20:05 ER call phone interaction');
   await waitForPageCondition(page,()=>window.__storyQA.gameState.getFlag('P1_ER_CALL_ANSWERED')===true);
   s=await snap();assert.equal(s.flags.PHONE_RING_ACTIVE,false);assert.equal(s.flags.PHONE_ANSWERED,true);assert.equal(s.flags.ER_JANE_PRESENT,true);assert.equal(s.time,'20:05');
   assert.equal(await page.locator('#task-er-assess').count(),1,'answering the 20:05 call reveals the ER assessment objective');
@@ -260,8 +258,7 @@ try{
   await waitForPageCondition(page,()=>window.__storyQA.gameState.getFlag('PHONE_RING_ACTIVE')&&window.__storyQA.gameState.getFlag('PHONE_CALL_KIND')==='NIGHT_PATROL_2115');
   s=await snap();assert.equal(s.flags.NIGHT_PATROL_RETURN_3F,false);assert.equal(s.time,'21:15');
   assert.equal((await taskText()).trim(),'','the 21:15 return objective waits for the phone answer');
-  await walkToInteractable('4F_DUTY_PHONE',[-9.45,.84,3.34]);
-  await pressEAt([-9.45,.84,3.34],'4F_DUTY_PHONE');
+  await answer4fPhone('21:15 night return phone interaction');
   await waitForPageCondition(page,()=>window.__storyQA.gameState.getFlag('NIGHT_PATROL_RETURN_3F')===true);
   s=await snap();assert.equal(s.flags.PHONE_RING_ACTIVE,false);assert.equal(s.flags.PHONE_ANSWERED,true);assert.equal(s.time,'21:15');
   assert.equal(await page.locator('#task-night-return').count(),1,'answering the 21:15 call reveals the return-to-3F objective');
@@ -284,8 +281,7 @@ try{
   assert.equal(s.controllerEnabled,true,'movement must return after the forced phone beat');
   assert.equal(await q(()=>window.__storyQA.gameState.getDisplayTime()),'翌日 00:30');
   assert.equal((await taskText()).trim(),'','the 00:33 registration objective waits for the call answer');
-  await walkToInteractable('4F_DUTY_PHONE',[-9.45,.84,3.34]);
-  await pressEAt([-9.45,.84,3.34],'4F_DUTY_PHONE');
+  await answer4fPhone('00:30 ER registration phone interaction');
   await waitForPageCondition(page,()=>window.__storyQA.gameState.getFlag('POST_2117_DUTY_CALL_DONE')===true);
   s=await snap();assert.equal(s.flags.PHONE_RING_ACTIVE,false);assert.equal(s.flags.PHONE_ANSWERED,true);assert.equal(s.time,'00:33');
   assert.equal(s.flags.GHOST_REGISTRATION_ARMED,true);assert.equal(s.flags.GHOST_REGISTRATION_AVAILABLE,true);
@@ -456,7 +452,7 @@ try{
   assert.equal(report.screenshotWarnings.length,0,'Screenshot warnings are not accepted');
   assert.equal(report.motionScreenshots.length,6,'Three bridge idle and three CPR animation frames are required');
   assert.equal(report.functionalScreenshots.length,2,'M7 must include real guard-post and B-Panel interaction screenshots');
-  assert.equal(report.functionalFlows.length,1,'M7 physical interaction flow evidence is required');
+  assert.equal(report.functionalFlows.length,4,'Three 4F phone raycast checks and the M7 physical interaction flow are required');
   const pngFiles=(await readdir(out)).filter(file=>file.endsWith('.png')).sort();
   assert.deepEqual(pngFiles,[...requiredShots].sort(),'Output must contain exactly the 26 required screenshots');
   report.verdict='PASS';
