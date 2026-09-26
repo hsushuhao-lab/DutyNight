@@ -23,8 +23,8 @@ assert(floor3.includes("Phase2_2040_ElevatorGlitch")&&floor3.includes("Phase3_21
 assert(floor3.includes('Phase3_2117_WetFootprints'),'21:17 3F return must have wet-footprint layer');
 assert(floor3.includes('409／舊隔離零號房')&&floor3.includes('316／夜間封鎖決策點')&&floor3.includes('1F／警衛台後配電')&&floor3.includes('2F／舊式手圈索引'),'Archive must seed 409/316/1F/2F hard hooks');
 assert(stateSource.includes("HOOK_409_ZERO_ROOM")&&main.includes("registerBed33Clue('ARCHIVE_0409')")&&main.includes("SECOND_CAMPUS_PHONE_PENDING"),'409A clue and 316-to-second-campus call hooks missing');
-assert(main.includes("ER_JANE_DOE_WRISTBAND")&&main.includes("FIRST_FLOOR_GUARD_KEY"),'2F Jane Doe to 1F key hook missing');
-assert(floor2.includes("ER_JaneDoe_ObservationPatient")&&floor2.includes("identity_unconfirmed"),'20:05 physical patient must have an identity-unconfirmed wristband');
+assert(main.includes("ER_UNKNOWN_MALE_TAG")&&main.includes("B_PANEL_CLUE_KNOWN")&&main.includes("WANG_B_PANEL_KEY"),'2F unknown-male clue to 1F security-key chain missing');
+assert(floor2.includes("ER_UnknownMale_ObservationPatient")&&floor2.includes("ENG-860214 / 6F SKILL LAB / B-PANEL"),'20:05 physical patient must carry the burned facilities-maintenance identity clue');
 assert(floor1.includes("1F_HIDDEN_SERVICE_DOOR")&&floor1.includes("requires:'FIRST_FLOOR_GUARD_KEY'"),'1F concealed service-door hook missing');
 assert(main.includes("FORCE_3F_ELEVATOR_STOP")&&main.includes("GamePhase.ELEVATOR_GLITCH"),'20:40 forced 3F elevator return missing');
 assert(core.includes("StairLatch_3F_Locked")&&core.includes("StairBolt_4F_UnlockSide"),'3F/4F asymmetric stair shortcut visual states missing');
