@@ -230,7 +230,7 @@ try{
   await waitForPageCondition(page,()=>window.__storyQA.gameState.getFlag('PHONE_RING_ACTIVE')&&window.__storyQA.gameState.getFlag('PHONE_CALL_KIND')==='ER_JANE_2005');
   s=await snap();assert.equal(s.flags.P1_ER_CALL_ANSWERED,false);assert.equal(s.flags.ER_JANE_PRESENT,false);assert.equal(s.time,'20:00');
   assert.equal((await taskText()).trim(),'','the next objective waits for the 20:05 phone answer');
-  await walkTo(-9.62,4.7);
+  await walkTo(-9.45,4.1);
   await pressEAt([-9.45,.84,3.34],'4F_DUTY_PHONE');
   await waitForPageCondition(page,()=>window.__storyQA.gameState.getFlag('P1_ER_CALL_ANSWERED')===true);
   s=await snap();assert.equal(s.flags.PHONE_RING_ACTIVE,false);assert.equal(s.flags.PHONE_ANSWERED,true);assert.equal(s.flags.ER_JANE_PRESENT,true);assert.equal(s.time,'20:05');
@@ -253,7 +253,7 @@ try{
   await waitForPageCondition(page,()=>window.__storyQA.gameState.getFlag('PHONE_RING_ACTIVE')&&window.__storyQA.gameState.getFlag('PHONE_CALL_KIND')==='NIGHT_PATROL_2115');
   s=await snap();assert.equal(s.flags.NIGHT_PATROL_RETURN_3F,false);assert.equal(s.time,'21:15');
   assert.equal((await taskText()).trim(),'','the 21:15 return objective waits for the phone answer');
-  await walkTo(-9.62,4.7);
+  await walkTo(-9.45,4.1);
   await pressEAt([-9.45,.84,3.34],'4F_DUTY_PHONE');
   await waitForPageCondition(page,()=>window.__storyQA.gameState.getFlag('NIGHT_PATROL_RETURN_3F')===true);
   s=await snap();assert.equal(s.flags.PHONE_RING_ACTIVE,false);assert.equal(s.flags.PHONE_ANSWERED,true);assert.equal(s.time,'21:15');
@@ -277,7 +277,7 @@ try{
   assert.equal(s.controllerEnabled,true,'movement must return after the forced phone beat');
   assert.equal(await q(()=>window.__storyQA.gameState.getDisplayTime()),'翌日 00:30');
   assert.equal((await taskText()).trim(),'','the 00:33 registration objective waits for the call answer');
-  await walkTo(-9.62,4.7);
+  await walkTo(-9.45,4.1);
   await pressEAt([-9.45,.84,3.34],'4F_DUTY_PHONE');
   await waitForPageCondition(page,()=>window.__storyQA.gameState.getFlag('POST_2117_DUTY_CALL_DONE')===true);
   s=await snap();assert.equal(s.flags.PHONE_RING_ACTIVE,false);assert.equal(s.flags.PHONE_ANSWERED,true);assert.equal(s.time,'00:33');
