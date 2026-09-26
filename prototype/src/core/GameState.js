@@ -35,6 +35,7 @@ export class GameState {
     this.flags.set('OPENED_316', false);
     this.flags.set('LOCKER_OPENED', false);
     this.flags.set('HIS_CREDENTIALS', false);
+    this.flags.set('M1_HANDOFF_CHOICE_RESOLVED', false);
     this.flags.set('ARCHIVE_OBJECTIVE', false);
     this.flags.set('ARCHIVE_LOCKED_SEEN', false);
     this.flags.set('ARCHIVE_ACCESS_KEY', false);
@@ -96,6 +97,8 @@ export class GameState {
     this.flags.set('BRIDGE_ACCESS', false);
     this.flags.set('M4_CHEST_RESOLVED', false);
     this.flags.set('M5_BRIDGE_RESOLVED', false);
+    this.flags.set('M5_CCTV_RESOLVED', false);
+    this.flags.set('SIX_FLOOR_HISTORY_CONFIRMED', false);
     this.flags.set('M5_ROUTE_RESOLVED', false);
     this.flags.set('M5_ROUTE_CHOICE_RESOLVED', false);
     this.flags.set('M5_NAME_CLUE_FOUND', false);
@@ -115,6 +118,7 @@ export class GameState {
     this.flags.set('M7_B2_OPEN', false);
     this.flags.set('M7_B2_RESOLVED', false);
     this.flags.set('M8_IDENTITY_BATTLE_ACTIVE', false);
+    this.flags.set('M8_CODE_BLACK_ANNOUNCED', false);
     this.flags.set('LAST_CALL_SEEN', false);
     this.flags.set('GAME_COMPLETE', false);
     this.flags.set('POST_2117_RETURN_TO_DUTY_ROOM', false);
