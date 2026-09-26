@@ -23,12 +23,15 @@ assert(campus.includes('preloadCampusBackdropAssets'),'campus backdrop preload h
 // Transition prefetch: destination resources begin loading while elevator/stair transition is visible.
 assert(ui.includes("openTravelSelector(destinations, currentZone, onSelect, kind = 'elevator', onPrefetch = null)"),'travel prefetch callback missing');
 assert(ui.includes('const preloadPromise=Promise.resolve(onPrefetch?.(destination))'),'destination preload must start at transition start');
-assert(ui.includes('await preloadPromise'),'arrival must wait for required destination assets');
+assert(ui.includes('await Promise.race([preloadPromise,preloadDeadline])'),'arrival must wait only up to the bounded preload deadline');
+assert(ui.includes('const preloadDeadline=new Promise(resolve=>setTimeout(resolve,4000))'),'travel preload must have a hard 4-second ceiling');
 for(const zone of ['first_campus_1f','first_campus_2f','first_campus_8f']) {
   assert(main.includes(zone),zone+' must be included in campus backdrop prefetch destinations');
 }
 assert(main.includes('prefetchDestinationAssets'),'main travel flow must provide destination prefetch');
-assert(main.includes('prefetchDestinationAssets = destination => Promise.all(['),'destination prefetch must await all staged asset groups');
+assert(main.includes("blockingCampusBackdropZones = new Set(['first_campus_1f','first_campus_8f'])"),'1F/8F may await full campus backdrop');
+assert(main.includes("nonBlockingCampusBackdropZones = new Set(['first_campus_2f'])"),'2F ER backdrop must be non-blocking');
+assert(main.includes("void preloadCampusBackdropAssets().catch"),'2F ER should start outdoor backdrop loading without awaiting it');
 assert(main.includes('preloadAssets()')&&main.includes('preloadMaterials()'),'travel transition must finish pending indoor assets before arrival');
 
 // B2: terminal + one-way door, no staircase, exit lands behind 1F guard post and cannot be re-entered.
