@@ -2,7 +2,7 @@ export const TRUE_NAME_CANON='張守恆';
 const STORAGE_KEY='DutyNight_PersistentData';
 
 const defaults=()=>({
-  version:2,
+  version:3,
   loopCount:0,
   hasSeenHandoffAcknowledgement:false,
   seenOnce:{hotCoffee:false,unregisteredMessage3F:false},
@@ -38,7 +38,8 @@ const defaults=()=>({
     frag_title:null,
     frag_employeeFull:null
   },
-  journalNotes:[]
+  journalNotes:[],
+  memoryEvidence:{}
 });
 
 const memoryStore={value:null};
@@ -62,7 +63,8 @@ function merge(base,loaded){
     proofs:{...base.proofs,...loaded?.proofs},
     legends:{...base.legends,...loaded?.legends},
     trueNameFragments:{...base.trueNameFragments,...loaded?.trueNameFragments},
-    journalNotes:Array.isArray(loaded?.journalNotes)?[...loaded.journalNotes]:[]
+    journalNotes:Array.isArray(loaded?.journalNotes)?[...loaded.journalNotes]:[],
+    memoryEvidence:{...base.memoryEvidence,...loaded?.memoryEvidence}
   };
 }
 
@@ -92,6 +94,7 @@ export class PersistentMemory {
         };
         data.journalNotes=data.journalNotes.filter(n=>!['TRUE_NAME','B2_316'].includes(n.id));
       }
+      if((parsed.version||1)<3)data.version=3;
       return data;
     }catch(e){
       return defaults();
@@ -130,6 +133,16 @@ export class PersistentMemory {
     this.data.journalNotes.push({id,text,loop:this.data.loopCount});
     this.save();return true;
   }
+
+  rememberEvidence(id){
+    if(!id||this.data.memoryEvidence[id])return false;
+    this.data.memoryEvidence[id]=true;
+    this.save();
+    return true;
+  }
+
+  hasEvidence(id){return this.data.memoryEvidence[id]===true;}
+  evidenceCount(){return Object.values(this.data.memoryEvidence).filter(Boolean).length;}
 
   raiseErosion(delta=1){
     this.data.identityErosionLevel=Math.max(0,Math.min(5,this.data.identityErosionLevel+delta));
@@ -176,7 +189,7 @@ export class PersistentMemory {
     if(name!==TRUE_NAME_CANON || !this.canReconstructTrueName())return false;
     this.data.trueName=name;
     this.data.trueNameResolved=true;
-    this.addJournalNote('TRUE_NAME',`我的名字是「${name}」。不是李醫師。`);
+    this.addJournalNote('TRUE_NAME','B2 的時間、空間、病歷與物證一致指向「'+name+'」。');
     this.save();
     return true;
   }
@@ -194,7 +207,7 @@ export class PersistentMemory {
       BED33:{legend:'bed33',rule:'neverSignBed33',notes:[
         ['RULE_BED33','不要簽 409A 的床位。'],
         ['CODE_0409','04:09 不是時間，是 409。'],
-        ['IDENTITY_DOCTOR','如果我被登記成病人，另一個「李醫師」就會接手我的工作。']
+        ['IDENTITY_DOCTOR','如果我被登記成病人，系統就會讓另一個值班身分接手我的工作。']
       ]},
       ER0033:{legend:'er0033',rule:'neverCreateGhostRecord',notes:[['RULE_ER0033','00:33 的無名掛號只能查閱，不能建立新病歷。']]},
       CHEST:{legend:'chestPain',rule:'neverSignChestTransfer',notes:[['RULE_CHEST','第二院區多出的胸痛病人，不能替他簽轉院單。']]},
