@@ -42,8 +42,11 @@ assert(er.includes("type:'er_exit_notice'")&&er.includes('此門只進不出'),'
 assert(main.includes("LEGEND 02 — 00:33 急診掛號")&&main.includes("ER0033_SLIP_COLLECTED")&&main.includes("legacy_terminal_316")&&level3.includes("316_LEGACY_TERMINAL")&&main.includes("SECOND_CAMPUS_ACCESS"),'M3 two-stage ER-to-316 resolve or campus call missing');
 
 assert(ward.includes("type:'second_campus_nursing_report'")&&ward.includes("type:'second_chest_patient'")&&ward.includes("type:'second_chest_transfer'"),'M4 nursing report/patient/form sequence missing');
+assert(ward.includes('Second5F_DutyPhoto_')&&ward.includes('1998 夜班合照')&&ward.includes('臨床教學留影'),'M4 second-campus 5F duty room must contain visible framed photos');
+const second2f=readFileSync('./src/world/zones/SecondCampus2F.js','utf8');
+assert(!second2f.includes("Doorway.build({scene:this.zoneGroup,colliders:this.colliders,x:72,z:4.5"),'second-campus 2F elevator-front doorway must remain removed');
 assert(ward.includes("label:'查看病人處置醫囑'"),'M4 desk paper must retain its initial treatment-order name');
-assert(main.includes("SECOND_CAMPUS_5F_REPORTED")&&main.includes('醫師你剛剛開好了，現在簽名就好')&&main.includes('李承禮總醫師已經預開醫囑、預蓋章'),'M4 report must use Li doctor pre-open/prestamp identity misdirection');
+assert(main.includes("SECOND_CAMPUS_5F_REPORTED")&&main.includes('醫師你剛剛開好了，現在簽名就好')&&main.includes('李承禮醫師？我剛剛也有這張醫囑單嗎？'),'M4 must use concise nurse wording plus protagonist Li-identity misdirection');
 assert(main.includes("LEGEND 03 — 事先填妥的轉院單")&&main.includes("M4_CHEST_RESOLVED")&&main.includes("second_chest_roster_clue"),'M4 clinical/admin-horror decision flow or physical clue missing');
 
 assert(bridge.includes("type:'bridge_loop_event'")&&main.includes("LEGEND 04 — 不能回頭的天橋"),'M5 bridge legend missing');
@@ -52,6 +55,8 @@ assert(!bridge.includes("type:'true_name_clue_2'")&&floor6.includes("type:'floor
 
 assert(floor6.includes("type:'floor6_safe_return'")&&!floor6.includes("type:'floor6_chase'"),'M6 must retain safe return and remove the obsolete white-coat chase');
 assert(router.includes("'phantom_6f': Phantom6F")&&routes.includes("phantom_6f_lift"),'M6 route registration missing');
+assert(floor6.includes("title:'臨床技能中心'")&&floor6.includes('Floor6_MedicationCart')&&floor6.includes('Floor6_CrashCart')&&floor6.includes('Floor6_IV_Stand')&&floor6.includes('Floor6_VitalMonitor'),'M6 scene must read as a clinical skills center with medical teaching equipment');
+assert(!floor6.includes("title:'異常檔案區'"),'M6 obsolete rear green board must be removed');
 assert(main.includes("M6_FLOOR6_RESOLVED")&&!main.includes("interactable.type === 'floor6_chase'")&&!memorySource.includes('neverChaseFloor6'),'M6 safe resolution must remain without the obsolete chase override');
 
 assert(b2.includes("type:'b2_archive_terminal'")&&b2.includes("type:'b2_exit_door'")&&!b2.includes('B2_EscapeStairwell'),'M7 B2 must use terminal plus one-way exit door, with no stairwell');
@@ -59,10 +64,15 @@ assert(html.includes('identity-matrix-modal')&&main.includes('IDENTITY_CANDIDATE
 assert(main.includes("B_PANEL_CLUE_KNOWN")&&main.includes("WANG_B_PANEL_KEY")&&!main.includes('她掉下來的舊十字鑰匙'),'B-Panel key provenance must resolve through the 1F guard post');
 assert(main.includes("interactable.type === 'er_nurse_computer'")&&main.includes('這個電腦是護理師專用'),'ER nurse computers must redirect the physician');
 assert(main.includes("gameState.setFlag('B2_IDENTITY_INCOMPLETE',true)")&&main.includes("interactable.type === 'b2_exit_door'")&&main.includes("B2_EXITED_PERMANENTLY"),'B2 insufficient identity route must fail forward through a permanent one-way exit');
+assert(main.includes("尚未完成身分驗證。離開後 B2 將永久鎖閉，確定離開？"),'B2 unresolved exit must require confirmation');
+assert(main.includes("資料不完整：")&&main.includes("可先嘗試比對"),'B2 evidence gaps must warn without hard-blocking identity comparison');
+assert(main.includes("completeFinalIdentityAt316")&&main.includes("getDeferred316IdentityHints"),'316 must allow a last-chance direct identity declaration with advisory hints only');
 assert(router.includes("'b2_archive': B2Archive")&&routes.includes("b2_archive_entry")&&routes.includes("first_1f_guard_back")&&!routes.includes("b2_archive_lift"),'M7 B2 entry and 1F guard-back exit route registration missing');
 assert(main.includes("M7_B2_RESOLVED")&&main.includes("02:17｜警衛台後方 B-Panel"),'M7 02:17/B2 logic missing');
 
 assert(main.includes("M8_IDENTITY_BATTLE_ACTIVE")&&main.includes("LAST_CALL_SEEN"),'M8 identity battle/last call missing');
+assert(main.includes("有人嘗試覆寫模板已在 316 登入｜請宣告真正姓名與員編｜最後一次機會"),'M9 overwrite warning must not reveal Li Chengli');
+assert(!main.includes("李承禮 MED-820316 覆寫模板已在 316 登入"),'M9 must not explicitly identify the overwrite actor before the final declaration');
 assert(html.includes('final-handoff-modal')&&main.includes("TRUE_NAME_CANON")&&main.includes("GAME_COMPLETE"),'M9 true-name final handoff missing');
 
 const backing=new Map();
