@@ -26,6 +26,8 @@ for(const zone of ['first_campus_1f','first_campus_2f','first_campus_8f']) {
   assert(main.includes(zone),zone+' must be included in campus backdrop prefetch destinations');
 }
 assert(main.includes('prefetchDestinationAssets'),'main travel flow must provide destination prefetch');
+assert(main.includes('prefetchDestinationAssets = destination => Promise.all(['),'destination prefetch must await all staged asset groups');
+assert(main.includes('preloadAssets()')&&main.includes('preloadMaterials()'),'travel transition must finish pending indoor assets before arrival');
 
 // B2: terminal + one-way door, no staircase, exit lands behind 1F guard post and cannot be re-entered.
 assert(b2.includes("type:'b2_exit_door'")&&!b2.includes('B2_EscapeStairwell'),'B2 must have a door exit and no stairwell');
