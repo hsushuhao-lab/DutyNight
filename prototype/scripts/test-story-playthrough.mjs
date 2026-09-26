@@ -142,7 +142,7 @@ async function secondary(){await domClick('#story-choice-modal.active #btn-story
 async function primary(){await domClick('#story-choice-modal.active #btn-story-primary');}
 async function setM2Checkpoint(){
   await flag('STAFF_ACCESS_CARD',true);await flag('HOOK_409_ZERO_ROOM',true);
-  for(const id of ['KEY_PICKUP','WARD_ENTRY','P1_4F_REPORT','P1_DUTY_ROOM_READY','P1_ROUND_COMPLETE'])await task(id);
+  for(const id of ['KEY_PICKUP','WARD_ENTRY','P1_4F_REPORT'])await task(id);
   await load('first_campus_4f');
 }
 
@@ -175,7 +175,6 @@ try{
   // M2: deliberately fail first, verify identity override + soft reset + persistent cognition.
   await setM2Checkpoint();
   await load('first_campus_4f','m3_4f_nursing_station');
-  await interact({action:'INSOMNIA_403'});
   await interact({id:'BED33_BOARD'});await closeArchive();
   await interact({id:'BED33_HIS_409'});await closeArchive();
   let s=await snap();assert.equal(s.legend,'NOTICED');
@@ -202,7 +201,7 @@ try{
   await mark('M2 override loops to 17:00 with memory');
 
   // M2 second loop: use remembered rule and reject without re-learning every clue.
-  await flag('STAFF_ACCESS_CARD',true);await flag('HOOK_409_ZERO_ROOM',true);await task('KEY_PICKUP');await task('WARD_ENTRY');await task('P1_INSOMNIA_DONE');await load('first_campus_4f');
+  await flag('STAFF_ACCESS_CARD',true);await flag('HOOK_409_ZERO_ROOM',true);await task('KEY_PICKUP');await task('WARD_ENTRY');await task('P1_4F_REPORT');await load('first_campus_4f');
   await interact({id:'BED33_ASSIGNMENT'});
   await page.waitForSelector('#bed33-modal.active');
   assert.equal(await page.locator('#btn-bed33-reject').isVisible(),true);
