@@ -12,23 +12,16 @@ import { floorStateManager } from '../core/FloorStateManager.js';
 import { gameState } from '../core/GameState.js';
 
 import { FirstCampus3F } from './zones/FirstCampus3F.js';
-
-// Only the opening 3F zone is part of the startup bundle. Other floors are
-// loaded on demand when the player actually travels there.
-const zoneLoaders = {
-  first_campus_4f: () => import('./zones/FirstCampus4F.js').then(m => m.FirstCampus4F),
-  first_campus_2f: () => import('./zones/FirstCampus2FER.js').then(m => m.FirstCampus2FER),
-  first_campus_1f: () => import('./zones/FirstCampus1F.js').then(m => m.FirstCampus1F),
-  first_campus_8f: () => import('./zones/FirstCampus8FBridgeEntry.js').then(m => m.FirstCampus8FBridgeEntry),
-  skybridge: () => import('./zones/Skybridge.js').then(m => m.Skybridge),
-  second_campus_2f: () => import('./zones/SecondCampus2F.js').then(m => m.SecondCampus2F),
-  second_campus_4f_story: () => import('./zones/SecondCampusStandardFloor.js').then(m => m.SecondCampusStandardFloor),
-  second_campus_5f: () => import('./zones/SecondCampusStandardFloor.js').then(m => m.SecondCampusStandardFloor),
-  second_campus_std: () => import('./zones/SecondCampusStandardFloor.js').then(m => m.SecondCampusStandardFloor),
-  second_campus_1f: () => import('./zones/SecondCampus1F.js').then(m => m.SecondCampus1F),
-  phantom_6f: () => import('./zones/Phantom6F.js').then(m => m.Phantom6F),
-  b2_archive: () => import('./zones/B2Archive.js').then(m => m.B2Archive),
-};
+import { FirstCampus4F } from './zones/FirstCampus4F.js';
+import { FirstCampus2FER } from './zones/FirstCampus2FER.js';
+import { FirstCampus1F } from './zones/FirstCampus1F.js';
+import { FirstCampus8FBridgeEntry } from './zones/FirstCampus8FBridgeEntry.js';
+import { Skybridge } from './zones/Skybridge.js';
+import { SecondCampus2F } from './zones/SecondCampus2F.js';
+import { SecondCampusStandardFloor } from './zones/SecondCampusStandardFloor.js';
+import { SecondCampus1F } from './zones/SecondCampus1F.js';
+import { Phantom6F } from './zones/Phantom6F.js';
+import { B2Archive } from './zones/B2Archive.js';
 
 export class WorldRouter {
   constructor(scene, camera, controller) {
@@ -52,7 +45,19 @@ export class WorldRouter {
     });
 
     this.zones = {
-      'first_campus_3f': FirstCampus3F
+      'first_campus_3f': FirstCampus3F,
+      'first_campus_4f': FirstCampus4F,
+      'first_campus_2f': FirstCampus2FER,
+      'first_campus_1f': FirstCampus1F,
+      'first_campus_8f': FirstCampus8FBridgeEntry,
+      'skybridge': Skybridge,
+      'second_campus_2f': SecondCampus2F,
+      'second_campus_4f_story': SecondCampusStandardFloor,
+      'second_campus_5f': SecondCampusStandardFloor,
+      'second_campus_std': SecondCampusStandardFloor,
+      'second_campus_1f': SecondCampus1F,
+      'phantom_6f': Phantom6F,
+      'b2_archive': B2Archive
     };
 
     this.zoneLabels = {
@@ -110,8 +115,7 @@ export class WorldRouter {
   /**
    * Loads a specific zone by ID and teleports player to a designated spawn point.
    */
-  async loadZone(zoneId, spawnId = null) {
-    if (!this.zones[zoneId] && zoneLoaders[zoneId]) this.zones[zoneId] = await zoneLoaders[zoneId]();
+  loadZone(zoneId, spawnId = null) {
     if (!this.zones[zoneId]) {
       console.warn(`[WorldRouter] Unknown zone: ${zoneId}, defaulting to first_campus_3f`);
       zoneId = 'first_campus_3f';
@@ -186,7 +190,7 @@ export class WorldRouter {
   /**
    * Teleports player to named spawn point.
    */
-  async teleportToSpawn(spawnKey) {
+  teleportToSpawn(spawnKey) {
     const sp = DEBUG_SPAWN_POINTS[spawnKey];
     if (!sp) {
       console.warn(`[WorldRouter] Spawn point not found: ${spawnKey}`);
@@ -195,7 +199,7 @@ export class WorldRouter {
 
     // Ensure zone is active
     if (this.activeZoneId !== sp.zoneId) {
-      await this.loadZone(sp.zoneId, spawnKey);
+      this.loadZone(sp.zoneId, spawnKey);
       return;
     }
 
@@ -221,7 +225,7 @@ export class WorldRouter {
       const allowed=!p.gated||(p.requiresFlag&&gameState.getFlag(p.requiresFlag));
       return allowed&&p.from===this.activeZoneId&&new THREE.Box3(new THREE.Vector3(...p.bounds[0]),new THREE.Vector3(...p.bounds[1])).containsPoint(this.controller.position);
     });
-    if (portal) void this.teleportToSpawn(portal.spawn);
+    if (portal) this.teleportToSpawn(portal.spawn);
   }
 
   floorDestinations(kind = 'elevator') {
