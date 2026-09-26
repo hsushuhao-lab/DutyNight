@@ -246,7 +246,7 @@ try{
   assert.equal(preGhost,false,'00:33 terminal must stay dormant during the first ER consult');
   assert.equal(await q(()=>window.__storyQA.worldRouter.activeZoneInstance.janeDoePatient.visible),true,'the 20:05 phone answer materializes a physical patient');
   await interact({action:'ER_ASSESS'});await interact({action:'ER_NOTE'});
-  s=await snap();assert.equal(s.flags.B_PANEL_KEY,true);assert.equal(s.memory.trueNameFragments.frag_surname,null);
+  s=await snap();assert.equal(s.flags.B_PANEL_KEY,false);assert.equal(s.flags.B_PANEL_CLUE_KNOWN,true);assert.equal(s.memory.trueNameFragments.frag_surname,null);
   await interact({id:'ER_EXIT_NOTICE'});
   assert((await page.locator('#subtitle-text').innerText()).includes('只進不出'));
 
@@ -412,6 +412,7 @@ try{
   await functionalShot('m7-guard-post-approach.png');
   await page.keyboard.press('e');
   await waitForPageCondition(page,()=>window.__storyQA.gameState.getFlag('HIDDEN_SERVICE_DOOR_DISCOVERED')===true,5000);
+  assert.equal((await snap()).flags.B_PANEL_KEY,true,'B-Panel key must come from the 1F guard-post key cabinet, not the ER patient');
   assert(await q(()=>{const zone=window.__storyQA.worldRouter.activeZoneInstance;return zone.hiddenServiceFrame.visible&&zone.hiddenServiceKeyhole.visible}),'the discovered door frame and keyhole must be visible in the live scene');
   assert.match(await taskText(),/檢查警衛台後方浮現的舊門框/,'inspecting the post must reveal the updated service-door objective');
   await q(position=>window.__storyQA.controller.teleport(...position),[-12.15,1.7,4.55]);
@@ -426,7 +427,13 @@ try{
   await shot('m7-b2-mirror-316',null,null,'B2_ArchiveMirror_Frame',[0,1.7,-11.0],[0,1.7,-14.65]);
 
   await flag('B2_ADMIN_SOURCE',true);await flag('B2_HISTORY_SOURCE',true);await flag('B2_LEGACY_SOURCE',true);await flag('B2_SECURITY_SOURCE',true);
+  await interact({id:'MEMORY_B2_VICTIM_MAP'});
+  await waitForPageCondition(page,()=>document.getElementById('memory-modal')?.classList.contains('active'),30000);
+  await domClick('#btn-close-memory');
   await interact({id:'B2_ARCHIVE_TERMINAL'});
+  await waitForPageCondition(page,()=>document.getElementById('identity-matrix-modal')?.classList.contains('active'),30000);
+  await domClick('#identity-candidate-ZHANG_SHOUHENG');
+  await waitForPageCondition(page,()=>window.__storyQA.gameState.getFlag('M7_B2_RESOLVED')===true,30000);
   s=await snap();assert.equal(s.flags.M7_B2_RESOLVED,true);assert.equal(s.flags.M8_IDENTITY_BATTLE_ACTIVE,true);assert.equal(s.memory.trueNameResolved,true);assert.equal(s.memory.trueName,'張守恆');assert.equal(s.memory.trueNameFragments.frag_employeeFull,'MED-870409');
   assert.match(await taskText(),/逃生梯[\s\S]*離開封存層/,'B2 verification must explicitly tell the player how to leave');
   await interact({id:'B2_ESCAPE_STAIRS'});
