@@ -830,3 +830,17 @@ body.his-flicker #canvas-container{animation:his-power-flicker .42s linear}
 .poster-reader-body{padding:18px;overflow:auto;display:flex;flex-direction:column;align-items:center;gap:14px;background:radial-gradient(circle at 50% 36%,#252926 0,#131614 70%)}
 #poster-image{display:block;max-width:min(720px,86vw);max-height:72vh;width:auto;height:auto;object-fit:contain;box-shadow:0 12px 36px rgba(0,0,0,.72);border:1px solid rgba(223,211,180,.25);background:#d6cfbd}
 .poster-commentary{width:min(720px,86vw);margin:0;padding:11px 14px;border-left:3px solid #7b8f7e;background:rgba(233,227,209,.07);font:16px/1.7 "Noto Serif TC","PMingLiU",serif;color:#ddd5c3}
+
+
+/* v2.2 stepped memory archive */
+.memory-viewer{width:min(1080px,95vw);max-height:94vh;background:#161916;color:#eee;border:1px solid #5d675e;box-shadow:0 30px 100px rgba(0,0,0,.88);display:flex;flex-direction:column}
+.memory-header{display:flex;justify-content:space-between;align-items:flex-start;padding:14px 18px;background:#242b27;border-bottom:1px solid #515c54}.memory-header small{font:11px ui-monospace,monospace;letter-spacing:.15em;color:#9db29f}.memory-header h2{margin:4px 0 2px}.memory-header #memory-source{font-size:12px;color:#9d9a8e}
+.memory-body{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(260px,.75fr);gap:18px;padding:18px;overflow:auto;background:radial-gradient(circle at 42% 35%,#262a25,#111310 72%)}
+#memory-frame-canvas{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:contain;background:#141713;border:1px solid #6f766c;box-shadow:0 12px 40px rgba(0,0,0,.75)}
+.memory-copy{padding:8px 6px}.memory-stamp{font:12px ui-monospace,monospace;color:#90aa94;letter-spacing:.08em}.memory-copy h3{font-size:22px;margin:10px 0}.memory-copy p{font:16px/1.75 "Noto Serif TC","PMingLiU",serif;color:#d8d3c7}.memory-narration{padding-top:12px;border-top:1px dashed #536058;color:#bfcfbe!important}
+.memory-footer{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-top:1px solid #485249;background:#202520}#memory-indicator{font:13px ui-monospace,monospace;color:#b6c2b6}
+.identity-matrix{width:min(880px,94vw);background:#101611;color:#dce8de;border:1px solid #4f6a58;box-shadow:0 30px 100px rgba(0,0,0,.9);padding:0 0 22px}
+.identity-matrix-header{display:flex;justify-content:space-between;align-items:flex-start;padding:18px 20px;background:#1e3025;border-bottom:1px solid #4f6a58}.identity-matrix-header small{font:11px ui-monospace,monospace;letter-spacing:.16em;color:#84b397}.identity-matrix-header h2{margin:4px 0 0;font:700 27px ui-monospace,monospace;color:#c7f0d3}
+.identity-intro{margin:18px 22px;line-height:1.7;color:#c7cec7}.identity-candidate-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 22px}.identity-candidate{padding:15px;text-align:left;background:#172019;color:#e8eee9;border:1px solid #48604f;cursor:pointer}.identity-candidate:hover,.identity-candidate:focus-visible{background:#243329;border-color:#87b394}.identity-candidate strong{display:block;font-size:19px}.identity-candidate span{display:block;margin-top:6px;font:12px ui-monospace,monospace;color:#93aa99}
+.identity-matrix-status{white-space:pre-wrap;margin:18px 22px 0;padding:16px;background:#07100a;border:1px solid #304437;color:#d6b87a;min-height:72px;line-height:1.65}.identity-matrix-status.match{color:#95e1a9}.identity-matrix-status.error{color:#e29382}
+@media(max-width:760px){.memory-body{grid-template-columns:1fr}.identity-candidate-grid{grid-template-columns:1fr}}
