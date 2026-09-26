@@ -19,7 +19,7 @@
   <div id="hospital-hud-bar">
     <div class="hud-tag">青嶺醫療中心</div>
     <div class="hud-location">3F 醫師辦公行政區</div>
-    <div class="hud-time">17:00 ｜ 第一線值班：李住院醫師</div>
+    <div class="hud-time">17:00 ｜ 第一線值班：值班醫師｜姓名待核</div>
   </div>
 
   <!-- Top Right Task Checklist -->
@@ -59,7 +59,7 @@
 
   <!-- Bottom Subtitle Box -->
   <div id="subtitle-box">
-    <div id="subtitle-speaker">學長 (資深住院醫師)</div>
+    <div id="subtitle-speaker">學長</div>
     <div id="subtitle-text">「今天你值班喔？鑰匙在老地方，值班本記得簽一下。」</div>
   </div>
 
@@ -82,7 +82,7 @@
       </div>
       <div id="his-handoff-content" class="his-locked-content">
       <div class="his-header-info">
-        <div class="info-col"><strong>登入人員：</strong>李住院醫師 (第一線值班)</div>
+        <div class="info-col"><strong>登入人員：</strong>值班醫師（姓名待核）</div>
         <div class="info-col"><strong>交班時段：</strong>今日 17:00 ～ 明日 08:30</div>
         <div class="info-col"><strong>院區狀態：</strong>精神專科病房 / 夜間常規值班</div>
       </div>
@@ -149,7 +149,7 @@
 
       </div>
       <div class="his-footer">
-        <div class="his-system-msg">系統連線正常 ｜ 資料庫版本 2026.09.21-1700</div>
+        <div class="his-system-msg">系統連線正常 ｜ 夜班資料節點：時間欄位待同步</div>
         <button id="btn-sign-handoff" class="btn-action">確認電子交班</button>
       </div>
     </div>
@@ -179,15 +179,15 @@
           <tbody>
             <tr>
               <td>一線值班醫師</td>
-              <td>李○○ 住院醫師</td>
+              <td>值班醫師（姓名待核）</td>
               <td>17:00</td>
-              <td><span class="signature-font">李○○ (待簽)</span></td>
+              <td><span class="signature-font">值班醫師（待簽）</span></td>
               <td>4F 值班室 (已領取)</td>
               <td><span class="status-tag ready">簽章就緒</span></td>
             </tr>
             <tr>
               <td>二線值勤醫師</td>
-              <td>張○○ 主治醫師</td>
+              <td>院外待命醫師（未同步）</td>
               <td>院外待命</td>
               <td>--</td>
               <td>--</td>
@@ -289,7 +289,7 @@
   <div id="journal-modal" class="modal-overlay">
     <div class="journal-book">
       <div class="journal-header">
-        <div><small>李醫師隨身手冊</small><h2>夜班筆記</h2></div>
+        <div><small>值班醫師隨身手冊</small><h2>夜班筆記</h2></div>
         <button id="btn-close-journal" class="btn-win-close" aria-label="關閉醫師手冊">✕</button>
       </div>
       <div id="journal-loop-count" class="journal-loop-count">這是第一次值班。</div>
@@ -304,7 +304,7 @@
       <div class="bed33-form-body">
         <div class="bed33-form-row"><span>床號</span><strong>33</strong></div>
         <div class="bed33-form-row"><span>位置</span><strong>409A</strong></div>
-        <div class="bed33-form-row"><span>收治姓名</span><strong>李○○</strong></div>
+        <div class="bed33-form-row"><span>收治姓名</span><strong>身分待確認</strong></div>
         <div class="bed33-form-row"><span>狀態</span><strong>待醫師確認</strong></div>
         <p id="bed33-warning-text">急診留置床系統卡住，請值班醫師確認過床。</p>
       </div>
@@ -324,7 +324,7 @@
       <div id="loop-wristband" class="loop-wristband">
         <div>青嶺醫療中心｜急性精神科</div>
         <strong>409-A　　第33床</strong>
-        <div>姓名：李○○　身分：收治病人</div>
+        <div>姓名：無名病人　身分：收治病人</div>
       </div>
       <div id="loop-gameover-card" class="loop-gameover-card">
         <div>夜班紀錄已被覆寫</div>
@@ -377,8 +377,8 @@
       <div class="anomaly-code">HANDOFF ACCEPTED</div>
       <h2>CURRENT DUTY PHYSICIAN VERIFIED</h2>
       <p>夜班紀錄已完成。</p>
-      <p>另一個「李醫師」的登入狀態正在從系統中消失。</p>
-      <p class="anomaly-last">你第一次記得自己的名字。</p>
+      <p>李承禮的歷史覆寫模板正在從當夜交班紀錄中撤銷。</p>
+      <p class="anomaly-last">409-A 無名病人紀錄已失效；真正的值班醫師姓名已恢復。</p>
     </div>
   </div>
 
@@ -415,6 +415,43 @@
         <img id="poster-image" alt="院內年代海報" />
         <p id="poster-commentary" class="poster-commentary"></p>
       </div>
+    </div>
+  </div>
+
+
+  <!-- v2.2 stepped memory / photo / CCTV viewer -->
+  <div id="memory-modal" class="modal-overlay">
+    <div class="memory-viewer">
+      <div class="memory-header">
+        <div><small id="memory-mode">FRAME ARCHIVE</small><h2 id="memory-title">記憶影像</h2><div id="memory-source"></div></div>
+        <button id="btn-close-memory" class="btn-win-close" aria-label="關閉記憶影像">✕</button>
+      </div>
+      <div class="memory-body">
+        <canvas id="memory-frame-canvas" width="1280" height="720" aria-label="逐幀記憶畫面"></canvas>
+        <div class="memory-copy">
+          <div id="memory-stamp" class="memory-stamp"></div>
+          <h3 id="memory-frame-title"></h3>
+          <p id="memory-caption"></p>
+          <p id="memory-narration" class="memory-narration"></p>
+        </div>
+      </div>
+      <div class="memory-footer">
+        <button id="btn-memory-prev" class="btn-secondary">A / 上一幀</button>
+        <span id="memory-indicator">1 / 1</span>
+        <button id="btn-memory-next" class="btn-primary">下一幀 / D</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="identity-matrix-modal" class="modal-overlay">
+    <div class="identity-matrix">
+      <div class="identity-matrix-header">
+        <div><small>ARCHIVE IDENTITY RECONSTRUCTION</small><h2>WHO ARE YOU?</h2></div>
+        <button id="btn-close-identity-matrix" class="btn-win-close" aria-label="關閉身分重建">✕</button>
+      </div>
+      <p class="identity-intro">目前職別確認：醫師。請利用整晚取得的時間、空間、病歷與個人物證，排除不可能的歷史身分。</p>
+      <div id="identity-candidate-grid" class="identity-candidate-grid"></div>
+      <pre id="identity-matrix-status" class="identity-matrix-status">等待候選身分比對。</pre>
     </div>
   </div>
 
