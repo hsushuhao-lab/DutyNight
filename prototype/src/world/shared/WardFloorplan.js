@@ -287,8 +287,30 @@ export class WardFloorplan {
     asset(decor,'plant',[o+13.15,0,8.85],[.62,.62,.62]);
     solid(decor,this.gf.materials.metal,[o+9.2,.64,8.9],[.05,1.28,.05]);
     solid(decor,this.gf.materials.wallBumper,[o+9.2,1.10,8.9],[.82,.52,.06]);
-    solid(decor,this.gf.materials.doorWood,[o+13.84,1.55,6.65],[.05,1.05,1.35]);
-    solid(decor,this.gf.materials.lightWarm,[o+13.80,1.55,6.65],[.018,.90,1.20]);
+
+    const dutyPhoto=(x,y,z,title,subtitle,people=4)=>{
+      const canvas=document.createElement('canvas');canvas.width=960;canvas.height=620;
+      const ctx=canvas.getContext('2d');
+      ctx.fillStyle='#c9b998';ctx.fillRect(0,0,960,620);
+      const grad=ctx.createLinearGradient(0,0,960,620);grad.addColorStop(0,'#dfd0ae');grad.addColorStop(1,'#75634d');ctx.fillStyle=grad;ctx.fillRect(28,28,904,564);
+      ctx.fillStyle='#2d332f';ctx.font='bold 36px sans-serif';ctx.fillText(title,52,78);
+      ctx.font='22px sans-serif';ctx.fillText(subtitle,52,116);
+      for(let i=0;i<people;i++){
+        const px=170+i*(620/Math.max(1,people-1));
+        ctx.fillStyle=i%2?'#59645e':'#4b514d';
+        ctx.beginPath();ctx.arc(px,260,44,0,Math.PI*2);ctx.fill();
+        ctx.fillRect(px-52,304,104,150);
+      }
+      ctx.fillStyle='rgba(245,238,215,.72)';ctx.fillRect(70,485,820,70);
+      ctx.fillStyle='#413a31';ctx.font='20px sans-serif';ctx.fillText('青嶺醫療中心｜第二院區留影',95,528);
+      const tex=new THREE.CanvasTexture(canvas);tex.colorSpace=THREE.SRGBColorSpace;
+      const frame=solid(decor,this.gf.materials.doorWood,[x,y,z],[1.52,1.02,.07]);
+      frame.name='Second5F_DutyPhoto_Frame_'+title;
+      const photo=new THREE.Mesh(new THREE.PlaneGeometry(1.38,.88),new THREE.MeshStandardMaterial({map:tex,roughness:.88}));
+      photo.position.set(x,y,z-.041);photo.name='Second5F_DutyPhoto_'+title;decor.add(photo);
+    };
+    dutyPhoto(o+10.25,1.72,9.78,'1998 夜班合照','第二院區 5F 值班室',4);
+    dutyPhoto(o+12.15,1.72,9.78,'臨床教學留影','病房急救演練',3);
     asset(this.zoneGroup,'hospitalBed',[o+12.3,0,7.7],[1.1,.95,.97]);CollisionFactory.addBox(this.colliders,o+12.3,.45,7.7,1.3,.9,2.1);
     asset(this.zoneGroup,'storageCabinet',[o+9.4,0,8.7],[1,1,1],Math.PI);
     solid(this.zoneGroup,this.gf.materials.doorWood,[o+10.75,.28,8.1],[.5,.56,.5]);

@@ -44,8 +44,11 @@ assert(main.includes('preloadAssets()')&&main.includes('preloadMaterials()'),'tr
 assert(b2.includes("type:'b2_exit_door'")&&!b2.includes('B2_EscapeStairwell'),'B2 must have a door exit and no stairwell');
 assert(routes.includes("first_1f_guard_back"),'B2 return spawn must be behind the 1F guard post');
 assert(main.includes("B2_EXITED_PERMANENTLY"),'B2 one-way exit lockout missing');
-assert(main.includes("M7_IDENTITY_RESOLVED_AT_316"),'B2 fail-forward must allow deferred identity reconstruction at 316');
-assert(main.includes("getDeferred316IdentityMissing"),'deferred 316 evidence audit missing');
+assert(main.includes("M7_IDENTITY_RESOLVED_AT_316"),'B2 fail-forward must allow direct identity declaration at 316');
+assert(main.includes("getDeferred316IdentityHints"),'316 advisory evidence hints missing');
+assert(main.includes("尚未完成身分驗證。離開後 B2 將永久鎖閉，確定離開？"),'unresolved B2 exit must require irreversible confirmation');
+assert(main.includes("有人嘗試覆寫模板已在 316 登入｜請宣告真正姓名與員編｜最後一次機會"),'final 316 warning must stay anonymous and explicit');
+assert(!main.includes("trueNameResolved&&persistentMemory.hasAllProofs()"),'final 316 identity declaration must not hard-block on the full proof bundle');
 assert(!ui.includes('沿 B2 逃生梯返回'),'B2 task board must not tell the player to use a removed staircase');
 assert(!ui.includes('沿逃生梯離開封存層'),'B2 completion task must use the one-way door, not a staircase');
 const b2FailForward=ui.indexOf("this.gameState.getFlag('B2_EXITED_PERMANENTLY')&&!this.gameState.getFlag('M7_B2_RESOLVED')");
@@ -60,5 +63,13 @@ assert(main.includes("if(!gameState.getFlag('FOUND_316_SPARE_KEY'))"),'loop fast
 assert(main.includes("prefetchDestinationAssets({zoneId:'first_campus_4f'})"),'316 fast-path phone must preload 4F before card pickup');
 const fastPhone=main.slice(main.indexOf("gameState.getFlag('FAST_PATH_3F')&&gameState.getFlag('PHONE_RING_ACTIVE')"),main.indexOf("}else if(gameState.getFlag('SECOND_CAMPUS_PHONE_PENDING'))"));
 assert(!fastPhone.includes("markTaskComplete('KEY_PICKUP')")&&!fastPhone.includes("setFlag('STAFF_ACCESS_CARD',true)"),'fast phone must leave key and card in the locker');
+
+const second2f=readFileSync('./src/world/zones/SecondCampus2F.js','utf8');
+const ward=readFileSync('./src/world/shared/WardFloorplan.js','utf8');
+const floor6=readFileSync('./src/world/zones/Phantom6F.js','utf8');
+assert(!second2f.includes("Doorway.build({scene:this.zoneGroup,colliders:this.colliders,x:72,z:4.5"),'second-campus 2F elevator-front doorway must stay removed');
+assert(ward.includes('Second5F_DutyPhoto_')&&ward.includes('1998 夜班合照')&&ward.includes('臨床教學留影'),'second-campus 5F duty room must contain actual framed photos');
+assert(floor6.includes("title:'臨床技能中心'")&&floor6.includes('Floor6_MedicationCart')&&floor6.includes('Floor6_CrashCart')&&floor6.includes('Floor6_IV_Stand')&&floor6.includes('Floor6_VitalMonitor'),'hidden 6F must present as a clinical skills center with teaching equipment');
+assert(!floor6.includes("title:'異常檔案區'"),'obsolete rear green archive board must stay removed');
 
 console.log('LOADING / B2 / LOOP2 REGRESSION QA PASS');

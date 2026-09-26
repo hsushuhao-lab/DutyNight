@@ -72,7 +72,7 @@ export class WorldRouter {
       'second_campus_5f': '第二院區 5F 病房護理站',
       'second_campus_std': '第二院區 5F 病房護理站',
       'second_campus_1f': '第二院區 1F 警衛台',
-      'phantom_6f': '不存在的 6F',
+      'phantom_6f': '6F 臨床技能中心',
       'b2_archive': 'B2 封存隔離層'
     };
 
