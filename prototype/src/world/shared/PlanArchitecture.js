@@ -53,7 +53,9 @@ export function ordinaryRoom(zone,walls,{id,label=id+' 病房',rect,side,door,ki
     accessDoorId='room_'+id;doorType='knob';
     new KeyedKnobDoor(zone,{
       id:accessDoorId,x,z,yaw:alongX?0:Math.PI/2,width:1.6,title:id+' 病房',
-      openDirection:(side==='south'||side==='east')?1:-1,
+      // Occupied patient rooms open toward the corridor so the leaf never sweeps through a bed.
+      // 409 is the sealed anomaly room and keeps its previous inward swing.
+      openDirection:(bedLimit===32&&Number(id)%100===9)?-1:((side==='south'||side==='east')?-1:1),
       interactionSide:(side==='south'||side==='east')?1:-1
     });
   }else if(kind==='storage'){
@@ -227,7 +229,9 @@ export function nursingStationV5(zone,{x,z=-4.3,id}){
 
   if(zone.campus==='first'&&zone.floor===4){
     const board=new THREE.Group();board.name='FourF_NursingHandoverBoard';
-    board.position.set(x-2.0,1.78,north+.105);zone.zoneGroup.add(board);
+    // Mount on the corridor-facing south wall segment instead of the deep north wall.
+    // This keeps all three handoff rows readable from the ward entrance and out from behind station furniture.
+    board.position.set(x-2.9,1.74,south+.115);zone.zoneGroup.add(board);
     solid(board,m.wallBumper,[0,0,0],[2.72,1.12,.055],.018);
     const canvas=document.createElement('canvas');canvas.width=1024;canvas.height=480;
     const ctx=canvas.getContext('2d');
