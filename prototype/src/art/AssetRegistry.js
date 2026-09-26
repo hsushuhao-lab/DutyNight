@@ -9,13 +9,14 @@ export const assetManifest = Object.freeze({
   shrub: 'shrub_02/shrub_02_2k.gltf', fern: 'fern_02/fern_02_2k.gltf', campusTree: 'campusTree.glb',
 });
 const vegetation = { shrub: 'shrub_02', fern: 'fern_02' };
+const outdoorAssets = new Set(['shrub', 'fern', 'campusTree']);
 const assets = new Map();
 let preload;
+let outdoorPreload;
 
-export function preloadAssets() {
-  if (preload) return preload;
+async function loadAssetEntries(entries) {
   const loader = new GLTFLoader();
-  preload = Promise.all(Object.entries(assetManifest).map(async ([name, file]) => {
+  return Promise.all(entries.map(async ([name, file]) => {
     const gltf = await loader.loadAsync(`${root}${file}`);
     const collection = vegetation[name];
     const alpha = collection ? await new TextureLoader().loadAsync(`${root}${collection}/textures/${collection}_alpha_2k.png`) : null;
@@ -63,11 +64,26 @@ export function preloadAssets() {
     } else {
       assets.set(name, gltf.scene);
     }
-  })).catch(error => { throw new Error(`Hospital GLTF asset preload failed: ${error.message}`, { cause: error }); });
+  }));
+}
+
+export function preloadAssets() {
+  if (preload) return preload;
+  preload = loadAssetEntries(Object.entries(assetManifest).filter(([name]) => !outdoorAssets.has(name)))
+    .catch(error => { throw new Error(`Hospital GLTF asset preload failed: ${error.message}`, { cause: error }); });
   return preload;
 }
 
+export function preloadOutdoorAssets() {
+  if (outdoorPreload) return outdoorPreload;
+  outdoorPreload = loadAssetEntries(Object.entries(assetManifest).filter(([name]) => outdoorAssets.has(name)))
+    .catch(error => { throw new Error(`Outdoor GLTF asset preload failed: ${error.message}`, { cause: error }); });
+  return outdoorPreload;
+}
+
 // Geometry/materials remain shared across clones; zone cleanup must skip sharedAsset resources.
+export function isAssetReady(name) { return assets.has(name); }
+
 export function instantiateAsset(name) {
   const source = assets.get(name);
   if (!source) return null;
