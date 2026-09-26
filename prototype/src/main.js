@@ -71,7 +71,7 @@ const worldRouter = new WorldRouter(scene, camera, controller);
 window.worldRouter = worldRouter;
 const dutyEvents = new DutyEventManager(gameState);
 persistentMemory.applyToGameState(gameState);
-gameState.setFlag('FAST_PATH_3F',persistentMemory.data.loopCount>=2);
+gameState.setFlag('FAST_PATH_3F',persistentMemory.data.loopCount>=1);
 
 // Instantiate UI Manager
 let uiManager;
