@@ -416,10 +416,9 @@ controller.onInteract = (interactable) => {
     controller.currentInteractable = null;
     uiManager.showPrompt(null);
   } else if (['admin_roster_3f','admin_printer_doc_3f','admin_drawer_manual_3f'].includes(interactable.type)) {
-    if(gameState.getFlag('FAST_PATH_3F')){
-      uiManager.showSubtitle('值班醫師','「這些行政流程我已經處理過了。」',2200);
-      return;
-    }
+    // FAST_PATH_3F may skip repeated handoff chores, but evidence documents must
+    // remain readable on every loop. A player can trigger HANDOFF_DEFAULT before
+    // ever inspecting the admin office, so loopCount alone is not evidence progress.
     const config={
       admin_roster_3f:['ADMIN_ROSTER_CHECKED','P1_ADMIN_ROSTER_CHECK'],
       admin_printer_doc_3f:['ADMIN_PRINTER_DOC_CHECKED','P1_ADMIN_PRINTER_DOC'],
