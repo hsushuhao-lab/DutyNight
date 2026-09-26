@@ -44,15 +44,67 @@ export class Phantom6F {
 
     SignAnchor.buildWallPlaque({
       scene:this.zoneGroup,x:-2.9,y:2.1,z:-1.8,rotationY:0,width:1.15,height:.42,
-      code:'6F',title:'樓層資料不存在',subtitle:'FLOOR RECORD NOT FOUND',header:'青嶺醫療中心'
+      code:'6F',title:'臨床技能中心',subtitle:'CLINICAL SKILLS CENTER',header:'青嶺醫療中心'
     });
 
-    // Burnt mirror of the 316 motif.
-    solid(this.zoneGroup,m.wallDark,[0,1.05,-12.9],[2.8,2.1,.12]);
-    const plaque=SignAnchor.buildWallPlaque({
-      scene:this.zoneGroup,x:0,y:2.15,z:-12.72,rotationY:0,width:1.2,height:.36,
-      code:'6F',title:'異常檔案區',subtitle:'ARCHIVE CORRIDOR',header:''
-    });
+    // Make the hidden floor read as a real clinical skills center, not an empty corridor.
+    const poster=(x,y,z,rotationY,title,lines)=>{
+      const canvas=document.createElement('canvas');canvas.width=900;canvas.height=1200;
+      const ctx=canvas.getContext('2d');ctx.fillStyle='#eef1ea';ctx.fillRect(0,0,900,1200);
+      ctx.fillStyle='#315844';ctx.fillRect(0,0,900,150);
+      ctx.fillStyle='#fff';ctx.font='bold 48px sans-serif';ctx.fillText(title,42,92);
+      ctx.fillStyle='#33433a';ctx.font='30px sans-serif';
+      lines.forEach((line,i)=>ctx.fillText('• '+line,52,250+i*88));
+      ctx.strokeStyle='#8ca195';ctx.lineWidth=8;ctx.strokeRect(30,180,840,900);
+      const tex=new THREE.CanvasTexture(canvas);tex.colorSpace=THREE.SRGBColorSpace;
+      const frame=new THREE.Mesh(new THREE.BoxGeometry(.92,1.25,.045),m.doorWood);frame.position.set(x,y,z);frame.rotation.y=rotationY;this.zoneGroup.add(frame);
+      const face=new THREE.Mesh(new THREE.PlaneGeometry(.84,1.15),new THREE.MeshStandardMaterial({map:tex,roughness:.9}));
+      face.position.set(x+(rotationY>0?.026:rotationY<0?-.026:0),y,z+(rotationY===0?.026:0));
+      face.rotation.y=rotationY;this.zoneGroup.add(face);
+    };
+    poster(-3.82,1.72,-4.0,Math.PI/2,'CPR / AED 教學',['確認反應與呼吸','立即胸外按壓','AED 到位後依指示操作','每兩分鐘重新評估']);
+    poster(3.82,1.72,-4.0,-Math.PI/2,'臨床技能訓練',['靜脈注射與點滴','急救藥物核對','生命徵象監測','團隊急救分工']);
+
+    // Medication cart.
+    const medCart=new THREE.Group();medCart.name='Floor6_MedicationCart';medCart.position.set(-2.75,0,-5.2);this.zoneGroup.add(medCart);
+    solid(medCart,m.wallDark,[0,.55,0],[.82,1.05,.55]);
+    solid(medCart,m.stainless,[0,1.10,0],[.88,.08,.60]);
+    for(const y of [.30,.53,.76])solid(medCart,m.wall,[0,y,-.285],[.70,.14,.025]);
+    for(const x of [-.30,.30])for(const z of [-.20,.20]){
+      const wheel=new THREE.Mesh(new THREE.CylinderGeometry(.07,.07,.04,16),m.metal);wheel.rotation.z=Math.PI/2;wheel.position.set(x,.06,z);medCart.add(wheel);
+    }
+
+    // Red crash cart with defibrillator shelf.
+    const crashMat=new THREE.MeshStandardMaterial({color:0x9b3d35,roughness:.66});
+    const crash=new THREE.Group();crash.name='Floor6_CrashCart';crash.position.set(2.75,0,-5.0);this.zoneGroup.add(crash);
+    solid(crash,crashMat,[0,.58,0],[.86,1.10,.58]);solid(crash,m.stainless,[0,1.17,0],[.94,.09,.65]);
+    for(const y of [.32,.58,.84])solid(crash,m.wall,[0,y,-.30],[.72,.16,.025]);
+    solid(crash,m.metal,[0,1.42,.08],[.52,.36,.12]);
+    const defibScreen=new THREE.Mesh(new THREE.PlaneGeometry(.42,.25),new THREE.MeshBasicMaterial({color:0x193529}));defibScreen.position.set(0,1.42,.145);crash.add(defibScreen);
+
+    // IV pole with hanging fluid bag.
+    const iv=new THREE.Group();iv.name='Floor6_IV_Stand';iv.position.set(2.45,0,-8.2);this.zoneGroup.add(iv);
+    const pole=new THREE.Mesh(new THREE.CylinderGeometry(.018,.018,2.1,12),m.stainless);pole.position.y=1.05;iv.add(pole);
+    const base=new THREE.Mesh(new THREE.CylinderGeometry(.22,.22,.035,18),m.metal);base.position.y=.025;iv.add(base);
+    const hook=new THREE.Mesh(new THREE.BoxGeometry(.46,.025,.025),m.stainless);hook.position.y=2.06;iv.add(hook);
+    const bagMat=new THREE.MeshStandardMaterial({color:0xdcefe7,transparent:true,opacity:.62,roughness:.3});
+    const bag=new THREE.Mesh(new THREE.BoxGeometry(.18,.32,.055),bagMat);bag.position.set(.14,1.83,0);iv.add(bag);
+    const line=new THREE.Mesh(new THREE.CylinderGeometry(.006,.006,.72,8),m.metal);line.position.set(.14,1.31,0);iv.add(line);
+
+    // Bedside vital-sign monitor.
+    const vital=new THREE.Group();vital.name='Floor6_VitalMonitor';vital.position.set(2.65,.78,-7.2);this.zoneGroup.add(vital);
+    solid(vital,m.metal,[0,.20,0],[.62,.48,.18]);
+    const vcanvas=document.createElement('canvas');vcanvas.width=640;vcanvas.height=360;const vctx=vcanvas.getContext('2d');
+    vctx.fillStyle='#0d1714';vctx.fillRect(0,0,640,360);vctx.strokeStyle='#62d48a';vctx.lineWidth=7;vctx.beginPath();vctx.moveTo(20,170);
+    for(let x=20;x<620;x+=35){vctx.lineTo(x,170+(x%140===0?-55:0));}vctx.stroke();
+    vctx.fillStyle='#8ff0ad';vctx.font='bold 42px monospace';vctx.fillText('HR 84',28,70);vctx.fillText('SpO2 98%',330,70);
+    const vtex=new THREE.CanvasTexture(vcanvas);vtex.colorSpace=THREE.SRGBColorSpace;
+    const vface=new THREE.Mesh(new THREE.PlaneGeometry(.52,.29),new THREE.MeshBasicMaterial({map:vtex}));vface.position.set(0,.20,.095);vital.add(vface);
+    solid(vital,m.stainless,[0,-.40,0],[.05,.76,.05]);
+
+    // Lower-wall protection and clinical-room trim make the finish less like a blank blockout.
+    for(const x of [-3.84,3.84])solid(this.zoneGroup,m.wallBumper,[x,.62,-6],[.025,.18,14.8]);
+    solid(this.zoneGroup,m.wallBumper,[0,.62,-13.82],[7.5,.18,.025]);
 
     const safe=new THREE.Mesh(new THREE.BoxGeometry(1.8,2.2,.8),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
     safe.position.set(0,1.1,1.25);
