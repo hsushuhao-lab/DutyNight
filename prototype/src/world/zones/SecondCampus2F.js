@@ -7,6 +7,7 @@ import { Doorway } from '../shared/Doorway.js';
 import { SignAnchor } from '../shared/SignAnchor.js';
 import { CollisionFactory } from '../shared/CollisionFactory.js';
 import {buildDeskCluster,buildMonitorWall,buildSupplyCabinet} from '../../art/ClinicalDressing.js';
+import { gameState } from '../../core/GameState.js';
 
 export class SecondCampus2F {
   constructor(scene, geometryFactory) {
@@ -153,6 +154,15 @@ export class SecondCampus2F {
     this.gf.buildCeilingLight(this.zoneGroup, 65, 3.15, 0, 0.8, 7.5);
     this.gf.buildCeilingLight(this.zoneGroup, 75, 3.15, 0, 0.8, 7.5);
 
+    // Narrative lure: while passing the monitoring-room doorway after M4, the light
+    // glitches hard enough to pull the player's attention into room 202.
+    this.cctvLureLight=new THREE.PointLight(0xddebe2,0,8,2);
+    this.cctvLureLight.name='Second2F_CCTV_LureLight';
+    this.cctvLureLight.position.set(74,2.35,-4.8);
+    this.zoneGroup.add(this.cctvLureLight);
+    this.cctvLureElapsed=0;
+    this.cctvLureActive=false;
+
     const art = this.art;
     counterFront(art, this.gf.materials, 67, 2.78, 4.2, 1.1);
     asset(art, 'bench', [70, 0, -3.85]);
@@ -171,6 +181,28 @@ export class SecondCampus2F {
     new AccessDoor(this,{id:'BRIDGE_ACCESS',x:60,z:0,yaw:Math.PI/2,width:2.8,title:'天橋感應門',portal:'bridge_from_second'});
     wallTrim(this.zoneGroup,this.gf.materials);
     return this;
+  }
+
+  update(camera,delta=0){
+    if(!camera||gameState.getFlag('CCTV_SELF_DUPLICATE_SEEN')){
+      if(this.cctvLureLight)this.cctvLureLight.intensity=0;
+      return;
+    }
+    const nearDoor=camera.position.x>71.0&&camera.position.x<77.0&&camera.position.z>-6.4&&camera.position.z<-2.1;
+    if(nearDoor&&!gameState.getFlag('SECOND_2F_CCTV_LURE_SEEN')){
+      gameState.setFlag('SECOND_2F_CCTV_LURE_SEEN',true);
+      this.cctvLureActive=true;
+      this.cctvLureElapsed=0;
+    }
+    if(this.cctvLureActive){
+      this.cctvLureElapsed+=delta;
+      const t=this.cctvLureElapsed;
+      const pulse=(Math.sin(t*29)>0?.95:.05)+(Math.sin(t*11)>.35?.45:0);
+      this.cctvLureLight.intensity=pulse;
+      if(t>2.8){this.cctvLureActive=false;this.cctvLureLight.intensity=.10;}
+    }else if(this.cctvLureLight){
+      this.cctvLureLight.intensity=.06;
+    }
   }
 
   cleanup() {
