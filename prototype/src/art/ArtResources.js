@@ -4,6 +4,7 @@ export function disposeZoneArt(root) {
   const materials = new Set();
   const textures = new Set();
   root.traverse(object => {
+    if (object.isLight) object.shadow?.dispose();
     if (object.isInstancedMesh) object.dispose();
     if (object.userData.disposeArt) object.userData.disposeArt();
     if (object.geometry && !object.geometry.userData.sharedAsset) geometries.add(object.geometry);

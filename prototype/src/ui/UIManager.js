@@ -963,6 +963,13 @@ export class UIManager {
     const opened316=this.gameState.getFlag('OPENED_316');
     const currentZone=window.worldRouter?.activeZoneId || '';
 
+    if(this.gameState.getFlag('GAME_COMPLETE')){
+      this.renderTaskBoard('翌日 04:05｜交班完成',[
+        {id:'task-game-complete',text:'張守恆已完成真正的晨間交班',state:'completed'}
+      ]);
+      return;
+    }
+
     if(this.gameState.getFlag('PHONE_RING_ACTIVE')&&['ER_JANE_2005','NIGHT_PATROL_2115','ER_GHOST_0033','FAST_PATH_316'].includes(this.gameState.getFlag('PHONE_CALL_KIND'))){
       this.renderTaskBoard('',[]);
       return;
@@ -1065,7 +1072,7 @@ export class UIManager {
             state:'ready'
           }
         ]);
-      }else if(this.gameState.getFlag('M6_FLOOR6_RESOLVED')&&!this.gameState.getFlag('M7_B2_OPEN')){
+      }else if(this.gameState.getFlag('M6_FLOOR6_RESOLVED')&&!this.gameState.getFlag('M7_B2_OPEN')&&!this.gameState.getFlag('M7_B2_RESOLVED')){
         this.renderTaskBoard('翌日 02:17 前｜門禁紀錄',[
           {id:'task-m7-service-door',text:this.gameState.getFlag('HIDDEN_SERVICE_DOOR_DISCOVERED')?'檢查警衛台後方浮現的舊門框':'02:17 前往第一院區 1F 警衛台，查找異常門禁與監視紀錄',state:'ready'}
         ]);
@@ -1080,10 +1087,6 @@ export class UIManager {
       }else if(this.gameState.getFlag('M8_IDENTITY_BATTLE_ACTIVE')&&!this.gameState.getFlag('GAME_COMPLETE')){
         this.renderTaskBoard('CODE BLACK｜04:09 前',[
           {id:'task-m9-final-handoff',text:'全院門禁正在收縮：立刻回第一院區 3F 316，在覆寫完成前宣告真正姓名與員編；這是最後一次機會',state:'ready'}
-        ]);
-      }else if(this.gameState.getFlag('GAME_COMPLETE')){
-        this.renderTaskBoard('翌日 04:05｜交班完成',[
-          {id:'task-game-complete',text:'張守恆已完成真正的晨間交班',state:'completed'}
         ]);
       }else{
         document.getElementById('task-panel')?.classList.add('no-guidance');

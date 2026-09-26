@@ -42,6 +42,7 @@ const surfaces = new Map();
 const outdoorSurfaces = new Set(['ground', 'asphalt']);
 let preload;
 let outdoorPreload;
+const pendingSurfaces = new Map();
 
 export function getMaterials() { return materials; }
 
@@ -74,14 +75,14 @@ function loadMaterialEntries(entries) {
 
 export function preloadMaterials() {
   if (preload) return preload;
-  preload = loadMaterialEntries(Object.entries(sources).filter(([surface]) => !outdoorSurfaces.has(surface)))
+  preload = preloadMaterialSurfaces(Object.keys(sources).filter(surface => !outdoorSurfaces.has(surface)))
     .catch(error => { throw new Error(`Hospital PBR texture preload failed: ${error.message}`, { cause: error }); });
   return preload;
 }
 
 export function preloadOutdoorMaterials() {
   if (outdoorPreload) return outdoorPreload;
-  outdoorPreload = loadMaterialEntries(Object.entries(sources).filter(([surface]) => outdoorSurfaces.has(surface)))
+  outdoorPreload = preloadMaterialSurfaces([...outdoorSurfaces])
     .catch(error => { throw new Error(`Outdoor PBR texture preload failed: ${error.message}`, { cause: error }); });
   return outdoorPreload;
 }
@@ -108,4 +109,48 @@ export function materialForSurface(name, width = 1, height = 1) {
   applySurfaceMaps(material, name);
   surfaces.set(key, material);
   return material;
+}
+
+export function preloadMaterialSurfaces(names) {
+  return Promise.all(names.map(name => {
+    if (!sources[name]) throw new Error(`Unknown PBR surface: ${name}`);
+    if (!pendingSurfaces.has(name)) pendingSurfaces.set(name, loadMaterialEntries([[name, sources[name]]]));
+    return pendingSurfaces.get(name);
+  }));
+}
+
+export function auditSceneMaterials(root) {
+  const byMaterial = new Map();
+  const totals = { texturedMeshCount: 0, flatMeshCount: 0, pbrMeshCount: 0 };
+  root?.traverseVisible(object => {
+    if (!object.isMesh) return;
+    const meshMaterials = Array.isArray(object.material) ? object.material : [object.material];
+    for (const material of meshMaterials) {
+      if (!material) continue;
+      const name = material.name || '(unnamed)';
+      let entry = byMaterial.get(name);
+      if (!entry) {
+        entry = { materialName: name, meshCount: 0, flatMeshCount: 0, pbrMeshCount: 0,
+          hasMap: false, hasNormalMap: false,
+          hasRoughnessMap: false, mapImageWidth: 0, mapImageHeight: 0,
+          repeatX: null, repeatY: null, colorSpace: null };
+        byMaterial.set(name, entry);
+      }
+      entry.meshCount++;
+      if (!material.map) entry.flatMeshCount++;
+      if (material.map && material.normalMap && material.roughnessMap) entry.pbrMeshCount++;
+      entry.hasMap ||= !!material.map;
+      entry.hasNormalMap ||= !!material.normalMap;
+      entry.hasRoughnessMap ||= !!material.roughnessMap;
+      entry.mapImageWidth = material.map?.image?.width ?? entry.mapImageWidth;
+      entry.mapImageHeight = material.map?.image?.height ?? entry.mapImageHeight;
+      entry.repeatX = material.map?.repeat?.x ?? entry.repeatX;
+      entry.repeatY = material.map?.repeat?.y ?? entry.repeatY;
+      entry.colorSpace = material.map?.colorSpace ?? entry.colorSpace;
+      if (material.map) totals.texturedMeshCount++;
+      else totals.flatMeshCount++;
+      if (material.map && material.normalMap && material.roughnessMap) totals.pbrMeshCount++;
+    }
+  });
+  return { ...totals, materials: [...byMaterial.values()].sort((a, b) => a.materialName.localeCompare(b.materialName)) };
 }

@@ -17,11 +17,11 @@ const requiredShots=[
   'm1-3f-admin-316.png','m1-3f-storage-annie-static.png','m1-annie-close-inspection.png','m2-4f-nursing-station.png','m2-4f-duty-room.png',
   'm2-408c-bed.png','m2-409-sealed.png','m3-er-nursing-station.png','m3-0033-registration.png',
   'm3-316-legacy-terminal-phone.png','m4-ordinary-patient.png','m4-transfer-form.png','m4-guard-roster-clue.png',
-  'm5-outbound-bridge-baseline.png','m5-return-bridge-annie.png','m5-bridge-close-annie.png','m6-elevator-display-6.png',
+  'm5-security-playback.png','m5-outbound-bridge-baseline.png','m5-return-bridge-annie.png','m5-bridge-close-annie.png','m6-elevator-display-6.png',
   'm6-annie-cpr-long.png','m6-stethoscope-relic.png','m6-annie-cpr.png','m6-annie-cpr-close.png','m7-1f-guard-post.png','m7-b-panel-concealed-door.png','m7-b2-mirror-316.png',
   'm9-dual-identity-form.png','m9-successful-dawn-ending.png'
 ];
-const report={url,sourceSha:process.env.GITHUB_SHA||'local-working-tree',started:new Date().toISOString(),milestones:[],screenshots:[],motionScreenshots:[],functionalScreenshots:[],functionalFlows:[],screenshotWarnings:[],errors:[],method:'Browser-driven M2-M9 story checkpoint playthrough with named scene-anchor frustum checks, 26 required full-resolution captures, bridge-idle/CPR motion frames, QA-positioned phone raycast + E checks, and physical M7 guard-post-to-B-Panel interaction.'};
+const report={url,sourceSha:process.env.GITHUB_SHA||'local-working-tree',started:new Date().toISOString(),milestones:[],screenshots:[],motionScreenshots:[],functionalScreenshots:[],functionalFlows:[],screenshotWarnings:[],errors:[],method:'Browser-driven M2-M9 story checkpoint playthrough with named scene-anchor frustum checks, 27 required full-resolution captures, bridge-idle/CPR motion frames, QA-positioned phone raycast + E checks, and physical M7 guard-post-to-B-Panel interaction.'};
 let page;
 
 async function snap(){return page.evaluate(()=>window.__storyQA.snapshot());}
@@ -97,7 +97,7 @@ async function waitForPageCondition(target,predicate,timeout=10000){
   throw new Error(`page condition timed out after ${timeout}ms`);
 }
 async function taskText(){return q(()=>document.getElementById('task-panel')?.innerText||'');}
-async function load(zone,spawn){await q(({zone,spawn})=>window.__storyQA.load(zone,spawn),{zone,spawn});await page.waitForTimeout(120);}
+async function load(zone,spawn){await q(zone=>window.__storyQA.prefetch({zoneId:zone}),zone);await q(({zone,spawn})=>window.__storyQA.load(zone,spawn),{zone,spawn});await page.waitForTimeout(120);}
 async function enter(zone,spawn){await q(({zone,spawn})=>window.__storyQA.enter(zone,spawn),{zone,spawn});await page.waitForTimeout(160);}
 async function flag(k,v=true){await q(({k,v})=>window.__storyQA.setFlag(k,v),{k,v});}
 async function task(id){await q(id=>window.__storyQA.task(id),id);}
@@ -486,13 +486,13 @@ try{
   await mark('M9 TRUE NAME handoff accepted');
 
   assert.equal(report.errors.length,0,JSON.stringify(report.errors,null,2));
-  assert.deepEqual(report.screenshots.map(shot=>shot.file),requiredShots,'Story QA must produce the exact ordered 26-image manifest');
+  assert.deepEqual(report.screenshots.map(shot=>shot.file),requiredShots,'Story QA must produce the exact ordered 27-image manifest');
   assert.equal(report.screenshotWarnings.length,0,'Screenshot warnings are not accepted');
   assert.equal(report.motionScreenshots.length,5,'Three bridge idle and two CPR animation frames are required');
-  assert.equal(report.functionalScreenshots.length,2,'M7 must include real guard-post and B-Panel interaction screenshots');
+  assert.deepEqual(report.functionalScreenshots.map(shot=>shot.file),['functional/m1-handoff-identity-choice.png','functional/m7-guard-post-approach.png','functional/m7-b-panel-e-prompt.png'],'M1 identity and M7 physical interaction screenshots are required');
   assert.equal(report.functionalFlows.length,4,'Three 4F phone raycast checks and the M7 physical interaction flow are required');
   const pngFiles=(await readdir(out)).filter(file=>file.endsWith('.png')).sort();
-  assert.deepEqual(pngFiles.filter(file=>file!=='failure.png'),[...requiredShots].sort(),'Output must contain the 26 required screenshots');
+  assert.deepEqual(pngFiles.filter(file=>file!=='failure.png'),[...requiredShots].sort(),'Output must contain the 27 required screenshots');
   report.verdict='PASS';
 }catch(e){
   report.verdict='FAIL';report.failure=e.stack;report.last=await snap().catch(()=>null);

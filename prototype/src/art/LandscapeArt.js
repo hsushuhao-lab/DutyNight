@@ -78,6 +78,7 @@ function vegetation(root,positions,mats,seed) {
     if(!plant)return;
     const targetHeight=type==='fern'?Math.min(height,.55):height;
     plant.scale.setScalar(targetHeight/plant.userData.dimensions[1]);
+    if(plant.userData.pendingAsset)plant.userData.targetHeight=targetHeight;
     if(tree){plant.scale.x*=1.22;plant.scale.z*=1.22;}
     plant.rotation.y=random()*Math.PI*2;
     plant.position.set(x,y,z);

@@ -23,6 +23,7 @@ export function applyExteriorTime(root,time=gameState.gameTime) {
     if(object.name==='Campus atmospheric sky'){
       object.material.uniforms.zenith.value.setHex(palette.zenith);
       object.material.uniforms.horizon.value.setHex(palette.horizon);
+      object.material.uniforms.starOpacity.value=phase==='DEEP_NIGHT'?.78:phase==='DAWN'?.10:0;
     }
     if(object.name==='Campus story sky'&&object.userData.paintStorySky)object.userData.paintStorySky(palette,phase);
     if(object.name==='Campus exterior dark glass')object.material.color.setHex(palette.glass);
@@ -53,9 +54,9 @@ export function buildCampusBackdrop(parent) {
 
   // Infinite-distance gradient: camera translation and the local ER height offset do not move the sky.
   const sky = new THREE.Mesh(new THREE.SphereGeometry(1,24,12),new THREE.ShaderMaterial({
-    uniforms:{zenith:{value:new THREE.Color(0x94adb7)},horizon:{value:new THREE.Color(0xd7dad1)}},
+    uniforms:{zenith:{value:new THREE.Color(0x94adb7)},horizon:{value:new THREE.Color(0xd7dad1)},starOpacity:{value:0}},
     vertexShader:'varying vec3 direction; void main(){ direction=position; vec4 clip=projectionMatrix*mat4(mat3(viewMatrix))*vec4(position,1.0); gl_Position=clip.xyww; }',
-    fragmentShader:"uniform vec3 zenith; uniform vec3 horizon; varying vec3 direction; void main(){ float h=smoothstep(-0.08,0.75,normalize(direction).y); gl_FragColor=vec4(mix(horizon,zenith,h),1.0);\n#include <tonemapping_fragment>\n#include <colorspace_fragment>\n}",
+    fragmentShader:"uniform vec3 zenith; uniform vec3 horizon; uniform float starOpacity; varying vec3 direction; void main(){ vec3 ray=normalize(direction); float h=smoothstep(-0.08,0.75,ray.y); vec3 sky=mix(horizon,zenith,h); vec2 grid=ray.xz*160.0; vec2 cell=floor(grid); float seed=fract(sin(dot(cell,vec2(127.1,311.7)))*43758.5453); float spot=pow(max(0.0,1.0-length(fract(grid)-0.5)*2.0),10.0); float star=step(0.998,seed)*spot*starOpacity*smoothstep(0.02,0.2,ray.y); gl_FragColor=vec4(sky+vec3(star),1.0);\n#include <tonemapping_fragment>\n#include <colorspace_fragment>\n}",
     side:THREE.BackSide,depthWrite:false,
   }));
   sky.name='Campus atmospheric sky';sky.frustumCulled=false;sky.renderOrder=-100;root.add(sky);

@@ -5,31 +5,17 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
-import { preloadAssets, preloadCriticalAssets } from './art/AssetRegistry.js';
-import { preloadMaterials } from './art/MaterialRegistry.js';
-import { preloadCampusBackdropAssets } from './art/CampusBackdrop.js';
+import { auditSceneMaterials } from './art/MaterialRegistry.js';
+import { zoneAssetManifest, preloadZoneEssential, preloadZoneOptional } from './art/ZoneAssetManifest.js';
 
 RectAreaLightUniformsLib.init();
-// Preserve the authored opening 3F furniture without putting the entire hospital
-// asset library back on the critical path.
-await preloadCriticalAssets();
-// Boot immediately with procedural/shared fallback materials and load heavyweight
-// GLTF/PBR assets after first paint. This removes 20+ asset requests from the
-// critical path while preserving full-quality assets once they are cached.
-const deferredHospitalAssets = () => Promise.all([preloadAssets(), preloadMaterials(), preloadCampusBackdropAssets()])
-  .catch(error => console.warn('[perf] deferred hospital asset preload failed', error));
-const blockingCampusBackdropZones = new Set(['first_campus_1f','first_campus_8f']);
-const nonBlockingCampusBackdropZones = new Set(['first_campus_2f']);
-const prefetchDestinationAssets = destination => {
+const requestedOpeningZone = new URLSearchParams(location.search).get('zone');
+const openingZoneId = zoneAssetManifest[requestedOpeningZone] ? requestedOpeningZone : 'first_campus_3f';
+await preloadZoneEssential(openingZoneId);
+const prefetchDestinationAssets = async destination => {
   const zoneId=destination?.zoneId;
-  if(nonBlockingCampusBackdropZones.has(zoneId)){
-    void preloadCampusBackdropAssets().catch(error=>console.warn('[perf] deferred 2F backdrop preload failed',error));
-  }
-  return Promise.all([
-    preloadAssets(),
-    preloadMaterials(),
-    blockingCampusBackdropZones.has(zoneId) ? preloadCampusBackdropAssets() : Promise.resolve()
-  ]);
+  await preloadZoneEssential(zoneId);
+  void preloadZoneOptional(zoneId).catch(error => console.warn('[art] optional zone asset preload failed', error));
 };
 let fastPathWorldPreload=Promise.resolve();
 import { gameState } from './core/GameState.js';
@@ -67,10 +53,6 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.0;
 container.appendChild(renderer.domElement);
-requestAnimationFrame(() => {
-  if ('requestIdleCallback' in window) requestIdleCallback(deferredHospitalAssets, { timeout: 2500 });
-  else setTimeout(deferredHospitalAssets, 500);
-});
 const reflectionRoom = new RoomEnvironment();
 const reflectionGenerator = new THREE.PMREMGenerator(renderer);
 scene.environment = reflectionGenerator.fromScene(reflectionRoom, .04).texture;
@@ -95,6 +77,10 @@ const controller = new FPSController(
 // Instantiate World Router
 const worldRouter = new WorldRouter(scene, camera, controller);
 window.worldRouter = worldRouter;
+window.__materialAudit = () => ({
+  zoneId: worldRouter.activeZoneId,
+  ...auditSceneMaterials(worldRouter.activeZoneInstance?.zoneGroup)
+});
 const dutyEvents = new DutyEventManager(gameState);
 persistentMemory.applyToGameState(gameState);
 gameState.setFlag('FAST_PATH_3F',persistentMemory.data.loopCount>=1);
@@ -129,7 +115,7 @@ uiManager = new UIManager(
 
 const loopManager=new LoopManager({
   gameState,worldRouter,controller,uiManager,
-  prepareLoopReset:()=>Promise.all([preloadAssets(),preloadMaterials(),preloadCampusBackdropAssets()])
+  prepareLoopReset:()=>preloadZoneEssential('first_campus_3f')
 });
 uiManager.setHandoffDecisionHandler(choice=>{
   if(choice==='default'){
@@ -262,6 +248,7 @@ function completeFinalIdentityAt316(name,employeeId,{deferred=false}={}) {
   gameState.setFlag('M8_IDENTITY_BATTLE_ACTIVE',false);
   persistentMemory.resolveLegend('lastCall');
   persistentMemory.completeGame();
+  uiManager.updateTasks();
   uiManager.showFinalSuccess(TRUE_NAME_CANON);
   controller.enabled=false;
   return true;
@@ -291,6 +278,7 @@ if(new URLSearchParams(location.search).get('qa')==='story'){
   };
   window.__storyQA={
     gameState,persistentMemory,legendState,worldRouter,uiManager,loopManager,dutyEvents,GamePhase,floorStateManager,controller,
+    prefetch:prefetchDestinationAssets,
     load:(zone,spawn)=>{worldRouter.loadZone(zone,spawn);worldRouter.activeZoneInstance?.syncStoryState?.();},
     enter:(zone,spawn)=>{
       worldRouter.loadZone(zone,spawn);
@@ -1377,4 +1365,8 @@ if (import.meta.env.DEV || urlParams.get('debug') === '1') {
 }
 
 animate();
+requestAnimationFrame(() => setTimeout(() => {
+  if (worldRouter.activeZoneId !== 'first_campus_3f')
+    void preloadZoneOptional(worldRouter.activeZoneId).catch(error => console.warn('[art] optional opening zone assets failed', error));
+}, 1000));
 console.log('Night Corridor - Full World Modeling System Initialized.');

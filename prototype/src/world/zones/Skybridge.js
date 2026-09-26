@@ -23,6 +23,9 @@ export class Skybridge {
     this.lookbackArmed=true;
     this.lookbackTimer=0;
     this.lookbackCount=0;
+    this.bridgeFixtures=[];
+    this.horrorClock=0;
+    this.visualStage=-1;
   }
 
   build() {
@@ -212,7 +215,7 @@ export class Skybridge {
       const offsetZ = index % 2 === 0 ? -0.25 : 0.25;
       const isTransverse = index % 3 === 0;
       const tubeColor = (index === 2 || index === 5) ? 0xffe4c0 : 0xfff6ea; // Aged warm tube
-      this.gf.buildCeilingLight(
+      const light=this.gf.buildCeilingLight(
         this.zoneGroup,
         x,
         bridgeHeight - 0.05,
@@ -222,6 +225,7 @@ export class Skybridge {
         tubeColor,
         isTransverse
       );
+      this.bridgeFixtures.push(light);
     });
 
     const art=artRoot(this.zoneGroup,'Bridge');
@@ -260,9 +264,35 @@ export class Skybridge {
   }
 
   update(camera,delta=0){
+    this.horrorClock+=delta;
+    if(camera.position.x>=55&&gameState.getFlag('M4_CHEST_RESOLVED'))this.returnBridgeActive=true;
+    const returnMode=this.returnBridgeActive||gameState.getFlag('M5_BRIDGE_COMMITTED')||gameState.getFlag('M5_BRIDGE_RESOLVED');
+    const stage=returnMode?Math.min(3,1+this.lookbackCount):0;
+    const tilts=[0,.13,-.19,.08,-.22,.16,-.11,.20];
+    this.bridgeFixtures.forEach(({fixture,emitter},index)=>{
+      const damaged=stage>0&&[1,3,5,6].includes(index);
+      fixture.rotation.z=damaged?tilts[index]*Math.min(1,stage*.55):0;
+      emitter.rotation.z=fixture.rotation.z;
+      fixture.rotation.y=damaged?tilts[index]*.3:0;
+      emitter.rotation.y=fixture.rotation.y;
+      const pulse=damaged&&this.horrorClock%((index+3)*1.7)<(stage===3?.95:.28);
+      emitter.material.color.setHex(stage>0?0xc9d9d2:emitter.userData.baseColor);
+      if(stage>0)emitter.material.color.multiplyScalar(pulse?.08:damaged?.68:1);
+    });
+    if(stage!==this.visualStage){
+      this.scene.fog=stage>0?new THREE.FogExp2(0x0b1516,stage===1?.008:stage===2?.010:.013):null;
+      const lighting=this.scene.getObjectByName('WorldRouter_BaselineLighting');
+      const fill=lighting?.children.find(light=>light.isHemisphereLight);
+      if(fill){fill.userData.bridgeBaseIntensity??=fill.intensity;fill.intensity=fill.userData.bridgeBaseIntensity*(stage===0?1:stage===1?.75:stage===2?.55:.35);}
+      const lights=lighting?.children.filter(light=>light.isRectAreaLight)||[];
+      lights.forEach((light,index)=>{
+        light.userData.bridgeBaseIntensity??=light.intensity;
+        light.intensity=light.userData.bridgeBaseIntensity*(stage===0?1:[1,3,4,6].includes(index)?stage===1?.55:stage===2?.3:.08:stage===3?.45:.7);
+      });
+      this.visualStage=stage;
+    }
     if(this.bridgeDoppelganger?.visible)updateAnnieArt(this.bridgeDoppelganger,delta);
     if(!gameState.getFlag('M4_CHEST_RESOLVED'))return;
-    if(camera.position.x>=55)this.returnBridgeActive=true;
     if(!this.returnBridgeActive)return;
     if(
       camera.position.x<=34 &&
@@ -294,6 +324,7 @@ export class Skybridge {
   cleanup() {
     if (this.zoneGroup) {
       this.scene.remove(this.zoneGroup);
+      this.scene.fog=null;
       disposeZoneArt(this.zoneGroup);
     }
     this.colliders = [];

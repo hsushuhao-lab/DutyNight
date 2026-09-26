@@ -6,16 +6,14 @@ const ui=readFileSync('./src/ui/UIManager.js','utf8');
 const assets=readFileSync('./src/art/AssetRegistry.js','utf8');
 const materials=readFileSync('./src/art/MaterialRegistry.js','utf8');
 const campus=readFileSync('./src/art/CampusBackdrop.js','utf8');
+const zoneAssets=readFileSync('./src/art/ZoneAssetManifest.js','utf8');
 const b2=readFileSync('./src/world/zones/B2Archive.js','utf8');
 const routes=readFileSync('./src/world/shared/WorldRoutes.js','utf8');
 
-// Startup: no heavyweight synchronous preload before the first frame.
-assert(!main.includes('await Promise.all([preloadAssets(), preloadMaterials()])'),'startup must not block on full GLTF/PBR preload');
-assert(main.includes('await preloadCriticalAssets()'),'opening scene must wait only for critical 3F furniture');
-for(const asset of ['officeChair','storageCabinet','workDesk','printer','bench','plant'])assert(assets.includes(`'${asset}'`),'opening critical asset missing: '+asset);
-assert(main.includes('requestIdleCallback(deferredHospitalAssets'),'indoor quality assets must preload after first paint');
-assert(main.includes('preloadCampusBackdropAssets()'),'3F backdrop assets must also begin deferred preload after first paint');
-assert(main.includes('prepareLoopReset:()=>Promise.all([preloadAssets(),preloadMaterials(),preloadCampusBackdropAssets()])'),'loop reset must prepare complete 3F art before rebuilding');
+assert(main.includes('await preloadZoneEssential(openingZoneId)'),'opening art and PBR must be ready before scene construction');
+for(const asset of ['officeChair','storageCabinet','workDesk','printer','bench','plant'])assert(zoneAssets.includes(`'${asset}'`),'opening critical asset missing: '+asset);
+assert(!main.includes('deferredHospitalAssets'),'first paint must not start a whole-world download storm');
+assert(main.includes("prepareLoopReset:()=>preloadZoneEssential('first_campus_3f')"),'loop reset must prepare 3F art and materials');
 const loopManager=readFileSync('./src/core/LoopManager.js','utf8');
 assert(loopManager.includes('await this.loopResetPreparation'),'loop reset must await art/material readiness before loadZone');
 assert(ui.includes('async finishLoopCutscene()')&&ui.includes("body.textContent='場景重建中……'")&&ui.includes('await result'),'patientization cutscene must remain active while loop art finishes loading');
@@ -31,20 +29,17 @@ const level3=readFileSync('./src/world/Level3FBlockout.js','utf8');
 assert(geometryFactory.includes('this.surface(material, width, height)'),'shared architectural walls must use dimension-aware repeated PBR materials');
 assert(level3.includes('materialForSurface(materialName,width,height)'),'3F walls must use dimension-aware repeated PBR materials');
 assert(campus.includes('preloadCampusBackdropAssets'),'campus backdrop preload hook missing');
+assert(zoneAssets.includes("'ground', 'asphalt'"),'visible exterior ground must have PBR maps before scene build');
 
-// Transition prefetch: destination resources begin loading while elevator/stair transition is visible.
 assert(ui.includes("openTravelSelector(destinations, currentZone, onSelect, kind = 'elevator', onPrefetch = null)"),'travel prefetch callback missing');
 assert(ui.includes('const preloadPromise=Promise.resolve(onPrefetch?.(destination))'),'destination preload must start at transition start');
-assert(ui.includes('await preloadPromise'),'arrival must wait for required indoor assets and PBR before zone construction');
+assert(ui.includes('await preloadPromise'),'arrival must wait for destination essentials before zone construction');
 assert(!ui.includes('preloadDeadline'),'required indoor art must never be bypassed by an arbitrary timeout');
-for(const zone of ['first_campus_1f','first_campus_2f','first_campus_8f']) {
-  assert(main.includes(zone),zone+' must be included in campus backdrop prefetch destinations');
-}
 assert(main.includes('prefetchDestinationAssets'),'main travel flow must provide destination prefetch');
-assert(main.includes("blockingCampusBackdropZones = new Set(['first_campus_1f','first_campus_8f'])"),'1F/8F may await full campus backdrop');
-assert(main.includes("nonBlockingCampusBackdropZones = new Set(['first_campus_2f'])"),'2F ER backdrop must be non-blocking');
-assert(main.includes("void preloadCampusBackdropAssets().catch"),'2F ER should start outdoor backdrop loading without awaiting it');
-assert(main.includes('preloadAssets()')&&main.includes('preloadMaterials()'),'travel transition must finish pending indoor assets before arrival');
+assert(main.includes('await preloadZoneEssential(zoneId)'),'travel transition must await only destination essentials');
+assert(main.includes('void preloadZoneOptional(zoneId)'),'decorative assets must not block arrival');
+assert(!main.includes('preloadAssets()')&&!main.includes('preloadCampusBackdropAssets()'),'travel must not block on full hospital or campus vegetation');
+for(const zone of ['first_campus_3f','first_campus_4f','first_campus_2f','first_campus_1f','first_campus_8f','skybridge','second_campus_2f','second_campus_5f','phantom_6f','b2_archive'])assert(zoneAssets.includes(`${zone}:`),'zone manifest missing '+zone);
 
 // B2: terminal + one-way door, no staircase, exit lands behind 1F guard post and cannot be re-entered.
 assert(b2.includes("type:'b2_exit_door'")&&!b2.includes('B2_EscapeStairwell'),'B2 must have a door exit and no stairwell');
