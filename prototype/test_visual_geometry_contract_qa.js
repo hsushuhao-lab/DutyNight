@@ -91,9 +91,12 @@ for(const id of ['ER_TriageMonitor_1','ER_TriageMonitor_2']){
   assert.equal(screen.position.z,3.55,`${id} must sit behind the glass on the counter`);
 }
 assert.equal(zone.ghostRegistrationTerminal?.userData?.interactable,false,'00:33 terminal leaked before bootstrap');
+assert(Math.abs(zone.ghostRegistrationTerminal.position.z+8.45)<.01,'00:33 terminal sensor must align with the doctor computer');
+assert(zone.ghostRegistrationTerminal.geometry.parameters.width>=1.3,'00:33 terminal sensor must be easy to target');
 gameState.setFlag('GHOST_REGISTRATION_AVAILABLE',true);
 zone.syncStoryState();
 assert.equal(zone.ghostRegistrationTerminal?.userData?.interactable,true,'00:33 terminal did not activate after the story gate');
+assert.equal(zone.erNoteInteraction?.interactable,false,'completed ER-note prompt must not cover the 00:33 terminal');
 
 // Second-campus transfer paperwork also belongs on a desk.
 zone=router.loadZone('second_campus_5f');

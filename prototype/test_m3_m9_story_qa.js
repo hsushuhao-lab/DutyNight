@@ -22,6 +22,7 @@ assert(!router.includes('HillsideRoute')&&!router.includes('EcologyPond'),'produ
 assert(main.includes("setTrueNameFragment('frag_employeePrefix','MED-87')"),'M3 MED-87 clue missing');
 assert(main.includes("setTrueNameFragment('frag_employeeFull','MED-870409')"),'M7 full 員編 clue missing');
 assert(main.includes('請到第二院區 5F 護理站報到'),'M3 lookup must hand off through the nursing station');
+assert(main.includes('八樓天橋的門禁權限已開放'),'second-campus call must identify the bridge floor');
 assert(main.includes('怎麼知道我在 316 辦公室'),'M3 phone must establish the 316 privacy violation');
 assert(html.includes('final-employee-id'),'M9 must collect the full 員編');
 assert(main.includes("employeeId==='MED-870409'")&&main.includes("name===TRUE_NAME_CANON"),'M9 must require both the exact name and employee ID');

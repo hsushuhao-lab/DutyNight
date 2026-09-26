@@ -173,8 +173,8 @@ function unlockSecondCampusAccess(){
   gameState.setGameTime('01:15');
   gameState.setFlag('SECOND_CAMPUS_ACCESS',true);
   gameState.setFlag('BRIDGE_ACCESS',true);
-  persistentMemory.addJournalNote('SECOND_CAMPUS_CALL','第二院區護理站主動開了天橋權限；在這之前我根本沒有跨院區資格。');
-  uiManager.showSubtitle('第二院區護理師','「請到第二院區 5F 護理站報到，有一位病人需要精神科評估。天橋門禁已經幫你開了。」',5600);
+  persistentMemory.addJournalNote('SECOND_CAMPUS_CALL','第二院區護理站主動開了八樓天橋權限；在這之前我根本沒有跨院區資格。');
+  uiManager.showSubtitle('第二院區護理師','「請到第二院區 5F 護理站報到，有一位病人需要精神科評估。八樓天橋的門禁權限已開放。」',5600);
 }
 
 function completeM5IfReady(){
@@ -1045,6 +1045,7 @@ controller.onInteract = (interactable) => {
     } else if(action==='ER_NOTE'){
       if(!gameState.isTaskComplete('P1_ER_ASSESSMENT_DONE')) return uiManager.showSubtitle('李醫師','「先完成病人評估。」',2500);
       dutyEvents.complete('P1_ER_NOTE_DONE','20:30');
+      worldRouter.activeZoneInstance?.syncStoryState?.();
       if(gameState.getFlag('ER_JANE_DOE_WRISTBAND')){
         gameState.setFlag('FIRST_FLOOR_GUARD_KEY',true);
         gameState.setFlag('B_PANEL_KEY',true);

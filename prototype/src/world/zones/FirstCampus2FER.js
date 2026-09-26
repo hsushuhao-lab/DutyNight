@@ -342,10 +342,10 @@ export class FirstCampus2FER {
       text: '急診夜間出入口 ｜ 此門只進不出'
     });
 
-    const ghostTerminal=new THREE.Mesh(new THREE.BoxGeometry(.75,.55,.35),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
+    const ghostTerminal=new THREE.Mesh(new THREE.BoxGeometry(1.35,.95,.75),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
     ghostTerminal.name='ER_GhostRegistrationTerminal';
-    ghostTerminal.position.set(13,1.18,-6.35);
-    ghostTerminal.userData={interactable:gameState.getFlag('GHOST_REGISTRATION_AVAILABLE')===true,id:'ER_GHOST_REGISTRATION',type:'er_ghost_registration',label:'查看急診掛號系統'};
+    ghostTerminal.position.set(13,1.18,-8.45);
+    ghostTerminal.userData={interactable:gameState.getFlag('GHOST_REGISTRATION_AVAILABLE')===true,id:'ER_GHOST_REGISTRATION',type:'er_ghost_registration',label:'查詢 00:33 異常掛號紀錄'};
     this.zoneGroup.add(ghostTerminal);this.interactables.push(ghostTerminal);this.ghostRegistrationTerminal=ghostTerminal;
 
     const exitNotice=new THREE.Mesh(new THREE.BoxGeometry(.9,.42,.10),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
@@ -353,9 +353,8 @@ export class FirstCampus2FER {
     exitNotice.userData={interactable:true,id:'ER_EXIT_NOTICE',type:'er_exit_notice',label:'查看急診夜間出入口告示'};
     this.zoneGroup.add(exitNotice);this.interactables.push(exitNotice);
 
-    this.interactables.push(
-      {type:'p1_action',action:'ER_NOTE',label:'完成急診評估紀錄',position:new THREE.Vector3(13,1.2,-6.5),radius:1.8}
-    );
+    this.erNoteInteraction={type:'p1_action',action:'ER_NOTE',label:'完成急診評估紀錄',position:new THREE.Vector3(13,1.2,-8.1),radius:2.5,interactable:!gameState.isTaskComplete('P1_ER_NOTE_DONE')};
+    this.interactables.push(this.erNoteInteraction);
     this.buildArtDetails();
     this.buildAcuteGate();
     const bedWalls=new PlanWalls(this);
@@ -377,8 +376,12 @@ export class FirstCampus2FER {
   }
 
   syncStoryState(){
+    const ghostAvailable=gameState.getFlag('GHOST_REGISTRATION_AVAILABLE')===true;
     if(this.ghostRegistrationTerminal){
-      this.ghostRegistrationTerminal.userData.interactable=gameState.getFlag('GHOST_REGISTRATION_AVAILABLE')===true;
+      this.ghostRegistrationTerminal.userData.interactable=ghostAvailable;
+    }
+    if(this.erNoteInteraction){
+      this.erNoteInteraction.interactable=!gameState.isTaskComplete('P1_ER_NOTE_DONE')&&!ghostAvailable;
     }
     if(this.janeDoePatient){
       this.janeDoePatient.visible=gameState.getFlag('ER_JANE_PRESENT')===true;
