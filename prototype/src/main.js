@@ -232,20 +232,39 @@ function completeM5IfReady(){
   return true;
 }
 
-function getDeferred316IdentityMissing() {
-  const missing=[];
-  if(!gameState.getFlag('B2_ADMIN_SOURCE'))missing.push('3F 行政原始紀錄');
-  if(!gameState.getFlag('B2_HISTORY_SOURCE'))missing.push('3F 文史封存索引');
-  if(!gameState.getFlag('B2_LEGACY_SOURCE'))missing.push('316 舊終端索引');
-  if(!gameState.getFlag('B2_SECURITY_SOURCE'))missing.push('1F 警衛門禁來源');
-  const fragments=persistentMemory.data.trueNameFragments;
-  if(fragments.frag_employeePrefix!=='MED-87')missing.push('員編前綴 MED-87');
-  if(!fragments.frag_surname||!fragments.frag_givenName_1||!fragments.frag_givenName_2)missing.push('完整姓名片段');
-  if(!gameState.getFlag('BED33_RESOLVED'))missing.push('409-A 拒簽證據');
-  if(!gameState.getFlag('M4_CHEST_RESOLVED'))missing.push('504B 轉院拒簽');
-  if(!gameState.getFlag('FLOOR6_STETHOSCOPE_INSPECTED'))missing.push('6F 刻字聽診器');
-  if(!persistentMemory.hasAllProofs())missing.push('時間／空間／身分三組證明');
-  return [...new Set(missing)];
+function getDeferred316IdentityHints() {
+  const hints=[];
+  if(!gameState.getFlag('B2_ADMIN_SOURCE'))hints.push('3F 行政辦公室');
+  if(!gameState.getFlag('B2_HISTORY_SOURCE'))hints.push('文史封存');
+  return hints;
+}
+
+function establishCanonicalIdentity({at316=false}={}) {
+  persistentMemory.setTrueNameFragment('frag_employeePrefix','MED-87');
+  persistentMemory.setTrueNameFragment('frag_surname','張');
+  persistentMemory.setTrueNameFragment('frag_givenName_1','守');
+  persistentMemory.setTrueNameFragment('frag_givenName_2','恆');
+  persistentMemory.setTrueNameFragment('frag_title','住院醫師');
+  persistentMemory.setTrueNameFragment('frag_employeeFull','MED-870409');
+  persistentMemory.resolveTrueName(TRUE_NAME_CANON);
+  gameState.setFlag('M7_B2_RESOLVED',true);
+  if(at316)gameState.setFlag('M7_IDENTITY_RESOLVED_AT_316',true);
+  while(persistentMemory.data.identityErosionLevel<4)persistentMemory.raiseErosion(1);
+  return persistentMemory.data.trueNameResolved===true;
+}
+
+function completeFinalIdentityAt316(name,employeeId,{deferred=false}={}) {
+  if(name!==TRUE_NAME_CANON||employeeId!=='MED-870409')return false;
+  establishCanonicalIdentity({at316:deferred});
+  gameState.setFlag('LAST_CALL_SEEN',true);
+  gameState.setFlag('M8_CODE_BLACK_ANNOUNCED',true);
+  gameState.setFlag('GAME_COMPLETE',true);
+  gameState.setFlag('M8_IDENTITY_BATTLE_ACTIVE',false);
+  persistentMemory.resolveLegend('lastCall');
+  persistentMemory.completeGame();
+  uiManager.showFinalSuccess(TRUE_NAME_CANON);
+  controller.enabled=false;
+  return true;
 }
 
 function resolveAdminIdentityPuzzleIfReady() {
@@ -651,59 +670,40 @@ controller.onInteract = async (interactable) => {
     uiManager.showSubtitle('316 舊資料終端','「1998-ER-0217｜責任醫師：張○○｜員編前綴：MED-87。」\n\n終端機停止後，桌上的院內電話立刻響起。',5200);
   } else if (interactable.type === 'workstation') {
     if(gameState.getFlag('B2_EXITED_PERMANENTLY')&&!gameState.getFlag('M7_B2_RESOLVED')&&worldRouter.activeZoneId==='first_campus_3f'){
-      const missing=getDeferred316IdentityMissing();
-      if(missing.length){
-        uiManager.showSubtitle('316｜延後身分重建','「B2 已永久封閉。現在仍缺：'+missing.join('、')+'。先在院內補齊，再回 316。」',5600);
-        uiManager.updateTasks();
-        return;
-      }
+      const hints=getDeferred316IdentityHints();
       controller.enabled=false;
-      uiManager.openIdentityMatrix({
-        candidates:IDENTITY_CANDIDATES,
-        onSelect:candidate=>{
-          if(candidate.id!=='ZHANG_SHOUHENG')return {resolved:false,message:candidate.contradiction};
-          persistentMemory.setTrueNameFragment('frag_title','住院醫師');
-          persistentMemory.setTrueNameFragment('frag_employeeFull','MED-870409');
-          if(!persistentMemory.resolveTrueName(TRUE_NAME_CANON))return {resolved:false,message:'院內來源仍未完成一致性收斂。請再核對行政、門禁與 6F 物證。'};
-          gameState.setFlag('M7_B2_RESOLVED',true);
-          gameState.setFlag('M7_IDENTITY_RESOLVED_AT_316',true);
-          gameState.setFlag('M8_IDENTITY_BATTLE_ACTIVE',true);
-          gameState.setFlag('LAST_CALL_SEEN',true);
-          gameState.setFlag('M8_CODE_BLACK_ANNOUNCED',true);
-          gameState.setGameTime('03:55');
-          while(persistentMemory.data.identityErosionLevel<4)persistentMemory.raiseErosion(1);
-          persistentMemory.resolveLegend('lastCall');
-          persistentMemory.addJournalNote('316_DEFERRED_IDENTITY_VERIFY','B2 已永久封閉後，改由 3F 316 整合行政、文史、門禁、409-A、第二院區與 6F 物證，重建張守恆 MED-870409。');
-          uiManager.updateTasks();
-          soundManager.playDoorLockClack();
-          setTimeout(()=>uiManager.showSubtitle('全院廣播','「CODE BLACK。偵測到已除籍死亡人員 MED-870409 重新登入。04:09 前，夜班紀錄將由李承禮覆寫模板封存。」',6800),1800);
-          return {resolved:true,message:'[DEFERRED VERIFICATION @ 316]\n行政／文史／門禁／臨床物證 ........ MATCH\nMED-87 + 409-A + 姓名片段 ........ MATCH\n\n>>> IDENTITY RECONSTRUCTED\n>>> 張守恆 / MED-870409'};
+      uiManager.openFinalHandoff(({name,employeeId})=>{
+        if(completeFinalIdentityAt316(name,employeeId,{deferred:true}))return;
+        const hasInput=name||employeeId;
+        uiManager.setFinalHandoffStatus(hasInput?'姓名或員編不符｜覆寫模板正在接管交班':'請輸入姓名與員編');
+        if(hasInput){
+          setTimeout(()=>{
+            uiManager.closeFinalHandoff(false);
+            loopManager.triggerLegendOverride('FINAL',{legend:'最終覆寫 — 晨間交班',reason:'今日值班醫師已確認；你已被收治。'});
+          },650);
         }
       });
+      uiManager.setFinalHandoffStatus(
+        (hints.length?'線索可能仍在'+hints.join('與')+'。':'')+
+        '有人嘗試覆寫模板已在 316 登入｜請宣告真正姓名與員編｜最後一次機會'
+      );
       return;
     }
     if(gameState.getFlag('M8_IDENTITY_BATTLE_ACTIVE')&&worldRouter.activeZoneId==='first_campus_3f'){
       gameState.setGameTime('04:05');
       controller.enabled=false;
       uiManager.openFinalHandoff(({name,employeeId})=>{
-        if(name===TRUE_NAME_CANON&&employeeId==='MED-870409'&&persistentMemory.data.trueNameResolved&&persistentMemory.hasAllProofs()){
-          gameState.setFlag('GAME_COMPLETE',true);
-          gameState.setFlag('M8_IDENTITY_BATTLE_ACTIVE',false);
-          persistentMemory.completeGame();
-          uiManager.showFinalSuccess(TRUE_NAME_CANON);
-          controller.enabled=false;
-        }else{
-          const hasInput=name||employeeId;
-          uiManager.setFinalHandoffStatus(hasInput?'姓名或員編不符｜李承禮覆寫模板正在接管交班':'請輸入姓名與員編');
-          if(hasInput){
-            setTimeout(()=>{
-              uiManager.closeFinalHandoff(false);
-              loopManager.triggerLegendOverride('FINAL',{legend:'最終覆寫 — 晨間交班',reason:'今日值班醫師已確認；你已被收治。'});
-            },650);
-          }
+        if(completeFinalIdentityAt316(name,employeeId))return;
+        const hasInput=name||employeeId;
+        uiManager.setFinalHandoffStatus(hasInput?'姓名或員編不符｜覆寫模板正在接管交班':'請輸入姓名與員編');
+        if(hasInput){
+          setTimeout(()=>{
+            uiManager.closeFinalHandoff(false);
+            loopManager.triggerLegendOverride('FINAL',{legend:'最終覆寫 — 晨間交班',reason:'今日值班醫師已確認；你已被收治。'});
+          },650);
         }
       });
-    uiManager.setFinalHandoffStatus('李承禮 MED-820316 覆寫模板已在 316 登入｜請宣告真正姓名與員編');
+      uiManager.setFinalHandoffStatus('有人嘗試覆寫模板已在 316 登入｜請宣告真正姓名與員編｜最後一次機會');
       return;
     }
     controller.enabled = false;
@@ -845,64 +845,87 @@ controller.onInteract = async (interactable) => {
       return;
     }
     const missing=[];
-    if(!gameState.getFlag('B2_ADMIN_SOURCE'))missing.push('行政端原始紀錄');
-    if(!gameState.getFlag('B2_HISTORY_SOURCE'))missing.push('歷史封存索引');
+    if(!gameState.getFlag('B2_ADMIN_SOURCE'))missing.push('3F 行政辦公室');
+    if(!gameState.getFlag('B2_HISTORY_SOURCE'))missing.push('文史封存');
     if(!gameState.getFlag('B2_LEGACY_SOURCE'))missing.push('316 舊終端');
     if(!gameState.getFlag('B2_SECURITY_SOURCE'))missing.push('夜間門禁來源');
     if(!persistentMemory.hasEvidence('B2_VICTIM_MAP'))missing.push('B2 火災罹難者位置圖');
     const fragments=persistentMemory.data.trueNameFragments;
     if(!fragments.frag_surname||!fragments.frag_givenName_1||!fragments.frag_givenName_2)missing.push('姓名片段');
-    if(missing.length){
-      gameState.setFlag('B2_IDENTITY_INCOMPLETE',true);
-      uiManager.updateTasks();
-      uiManager.showSubtitle('ARCHIVE CONSISTENCY CHECK','「驗證未完成。尚缺：'+missing.join('、')+'。可以繼續查看 B2 原始資料；若現在離開，B2 將永久鎖閉，只能在其他樓層繼續搜尋。」',5800);
-      return;
-    }
+    if(missing.length)gameState.setFlag('B2_IDENTITY_INCOMPLETE',true);
+
     controller.enabled=false;
     uiManager.openIdentityMatrix({
       candidates:IDENTITY_CANDIDATES,
       onSelect:candidate=>{
         if(candidate.id!=='ZHANG_SHOUHENG')return {resolved:false,message:candidate.contradiction};
-        const blockers=[];
-        if(!gameState.getFlag('BED33_RESOLVED'))blockers.push('409-A 拒簽');
-        if(!gameState.getFlag('M3_316_DECODED'))blockers.push('ER-0217 / MED-87');
-        if(!gameState.getFlag('M4_CHEST_RESOLVED'))blockers.push('504B 轉院拒簽');
-        if(!gameState.getFlag('FLOOR6_STETHOSCOPE_INSPECTED'))blockers.push('6F 刻字聽診器');
-        if(blockers.length)return {resolved:false,message:'候選人方向合理，但證據鏈仍缺：'+blockers.join('、')+'。不能靠名字猜答案。'};
-        persistentMemory.setTrueNameFragment('frag_title','住院醫師');
-        persistentMemory.setTrueNameFragment('frag_employeeFull','MED-870409');
-        if(!persistentMemory.resolveTrueName(TRUE_NAME_CANON))return {resolved:false,message:'姓名片段仍未完成一致性收斂。請回查行政、人事、第二院區與 6F 證物。'};
-        gameState.setFlag('M7_B2_RESOLVED',true);
+        establishCanonicalIdentity();
         gameState.setFlag('M8_IDENTITY_BATTLE_ACTIVE',true);
-        while(persistentMemory.data.identityErosionLevel<4)persistentMemory.raiseErosion(1);
-        persistentMemory.addJournalNote('B2_ARCHIVE_VERIFY','B2 身分矩陣排除李承禮、周啟文與陳柏勳；時間、空間、409-A 與聽診器物證一致指向張守恆 MED-870409。');
+        persistentMemory.addJournalNote(
+          'B2_ARCHIVE_VERIFY',
+          missing.length
+            ? 'B2 封存終端仍有資料缺口，但候選身分與現有時間、病歷、門禁線索一致，重建為張守恆 MED-870409。缺失資料可回查 3F 行政辦公室與文史封存。'
+            : 'B2 身分矩陣排除其他候選；時間、病歷與物證一致指向張守恆 MED-870409。'
+        );
         uiManager.updateTasks();
-        return {resolved:true,message:'[EVIDENCE] 409-A 拒簽 ........ MATCH\n[EVIDENCE] ER-0217 / MED-87 ... MATCH\n[EVIDENCE] 504B 轉院拒簽 ...... MATCH\n[EVIDENCE] 6F 聽診器刻字 ...... MATCH\n[EVIDENCE] 409-A 約束記憶 ...... MATCH\n\n>>> IDENTITY RECONSTRUCTED\n>>> 張守恆 / MED-870409'};
+        return {
+          resolved:true,
+          message:(missing.length
+            ? '[WARNING] 尚有未讀資料：'+missing.join('、')+'\n仍可完成候選身分比對。\n\n'
+            : ''
+          )+'>>> IDENTITY RECONSTRUCTED\n>>> 張守恆 / MED-870409'
+        };
       }
     });
+    if(missing.length){
+      uiManager.setIdentityMatrixStatus(
+        '資料不完整：'+missing.join('、')+'。可先嘗試比對；額外線索可能在 3F 行政辦公室與文史封存。',
+        'error'
+      );
+    }
   } else if (interactable.type === 'b2_exit_door') {
     const resolved=gameState.getFlag('M7_B2_RESOLVED')===true;
-    gameState.setFlag('B2_EXITED_PERMANENTLY',true);
-    gameState.setFlag('M7_B2_OPEN',false);
-    gameState.setFlag('HIDDEN_SERVICE_DOOR_DISCOVERED',false);
-    gameState.setFlag('SECURITY_RECORD_OBJECTIVE',false);
-    if(resolved)gameState.setGameTime('03:30');
-    worldRouter.loadZone('first_campus_1f','first_1f_guard_back');
-    if(resolved){
-      gameState.setFlag('LAST_CALL_SEEN',true);
-      gameState.setFlag('M8_CODE_BLACK_ANNOUNCED',true);
-      persistentMemory.resolveLegend('lastCall');
-      persistentMemory.addJournalNote('M8_CODE_BLACK','B2 身分重建後，全院系統將 MED-870409 判定為「已死亡／已除籍卻重新登入」的人員，開始自動封門並搶回 316 交班權限。');
-      soundManager.playDoorLockClack();
-      setTimeout(()=>uiManager.showSubtitle('全院廣播','「CODE BLACK。偵測到已除籍死亡人員 MED-870409 重新登入。門禁完整性程序啟動。04:09 前，夜班紀錄將由李承禮覆寫模板封存。」',7200),700);
-    }else{
-      gameState.setFlag('B2_IDENTITY_INCOMPLETE',true);
-      gameState.setGameTime('03:10');
-      persistentMemory.addJournalNote('B2_EXIT_INCOMPLETE','我在身分驗證尚未完成時離開 B2。單向門已永久鎖閉；後續只能從行政、文史、316 舊終端、門禁與臨床物證補齊，最後回 316 完成延後身分重建。');
-      setTimeout(()=>uiManager.showSubtitle('值班醫師','「門鎖死了……回不去 B2。先把院內缺的資料找齊，最後回 3F 316 重建身分。」',4600),700);
+    const leaveB2=()=>{
+      gameState.setFlag('B2_EXITED_PERMANENTLY',true);
+      gameState.setFlag('M7_B2_OPEN',false);
+      gameState.setFlag('HIDDEN_SERVICE_DOOR_DISCOVERED',false);
+      gameState.setFlag('SECURITY_RECORD_OBJECTIVE',false);
+      worldRouter.loadZone('first_campus_1f','first_1f_guard_back');
+      if(resolved){
+        gameState.setGameTime('03:30');
+        gameState.setFlag('LAST_CALL_SEEN',true);
+        gameState.setFlag('M8_CODE_BLACK_ANNOUNCED',true);
+        persistentMemory.resolveLegend('lastCall');
+        persistentMemory.addJournalNote('M8_CODE_BLACK','B2 身分重建完成後，系統偵測到已除籍人員重新登入，開始收縮門禁並搶回 316 交班權限。');
+        soundManager.playDoorLockClack();
+        setTimeout(()=>uiManager.showSubtitle('全院廣播','「CODE BLACK。偵測到已除籍死亡人員重新登入。門禁完整性程序啟動。04:09 前，夜班紀錄將被覆寫封存。」',7200),700);
+      }else{
+        gameState.setFlag('B2_IDENTITY_INCOMPLETE',true);
+        gameState.setFlag('M8_IDENTITY_BATTLE_ACTIVE',true);
+        gameState.setFlag('LAST_CALL_SEEN',true);
+        gameState.setFlag('M8_CODE_BLACK_ANNOUNCED',true);
+        gameState.setGameTime('03:10');
+        persistentMemory.addJournalNote('B2_EXIT_INCOMPLETE','身分驗證尚未完成就離開 B2；B2 永久鎖閉。缺失線索可能仍在 3F 行政辦公室與文史封存，但 316 仍可進行最後身分宣告。');
+        soundManager.playDoorLockClack();
+        setTimeout(()=>uiManager.showSubtitle('值班醫師','「回不去 B2 了。若還缺線索，也許在 3F 行政辦公室或文史封存；但我還可以直接回 316 宣告身分。」',5600),700);
+      }
+      uiManager.updateTasks();
+      controller.enabled=true;
+    };
+
+    if(!resolved){
+      controller.enabled=false;
+      uiManager.openStoryChoice({
+        title:'B2｜單向出口',
+        body:'尚未完成身分驗證。離開後 B2 將永久鎖閉，確定離開？',
+        primaryText:'確定離開',
+        secondaryText:'留在 B2',
+        onPrimary:leaveB2,
+        onSecondary:()=>{controller.enabled=true;}
+      });
+      return;
     }
-    uiManager.updateTasks();
-    controller.enabled=true;
+    leaveB2();
   } else if (interactable.type === 'security_monitor_anomaly') {
     gameState.setFlag('CCTV_SELF_DUPLICATE_SEEN',true);
     gameState.setFlag('M5_CCTV_RESOLVED',true);
@@ -982,7 +1005,7 @@ controller.onInteract = async (interactable) => {
       gameState.setFlag('SECOND_CAMPUS_5F_REPORTED',true);
       persistentMemory.addJournalNote('SECOND_5F_REPORT','第二院區 5F 護理站交班：陳怡君，504B。李承禮總醫師已預開醫囑並預蓋章，只等值班醫師簽名。');
       worldRouter.activeZoneInstance?.syncStoryState?.();
-      uiManager.showSubtitle('第二院區護理師','「醫師你剛剛開好了，現在簽名就好。病人是陳怡君，在 504B；李承禮總醫師已經預開醫囑、預蓋章。你先去看一下她。」',5600);
+      uiManager.showSubtitle('第二院區護理師','「醫師你剛剛開好了，現在簽名就好。」',3600);
     }
   } else if (interactable.type === 'second_chest_patient') {
     if(!gameState.getFlag('SECOND_CAMPUS_ACCESS')){
@@ -1056,7 +1079,9 @@ controller.onInteract = async (interactable) => {
 
 重新核對病人後才發現，這份「病人處置醫囑」的第二頁其實是已填妥的轉院單：目的地「第一院區 409A」，預審醫師「李承禮 MED-820316」。
 
-護理師：「醫師你剛剛開好了，現在簽名就好。李承禮總醫師已經預開醫囑、預蓋章，只差你的接治簽名。」`,
+護理師：「醫師你剛剛開好了，現在簽名就好。」
+
+值班醫師（低聲）：「李承禮醫師？我剛剛也有這張醫囑單嗎？」`,
       primaryText:'補上簽名',
       secondaryText:'拒絕簽署並重新查核',
       onPrimary:()=>loopManager.triggerLegendOverride('CHEST',{legend:'LEGEND 03 — 事先填妥的轉院單',reason:'轉院目的地是 409A。'}),
