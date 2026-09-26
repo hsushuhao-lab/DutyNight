@@ -748,12 +748,12 @@ controller.onInteract = (interactable) => {
       uiManager.showSubtitle('值班醫師','「牆面接縫不像一般裝修……B-Panel 的十字鑰匙應該還在警衛設備裡。」',3200);
       return;
     }
-    if(!persistentMemory.hasAllProofs()||!gameState.getFlag('M6_FLOOR6_RESOLVED')){
-      gameState.setFlag('HIDDEN_SERVICE_DOOR_DISCOVERED',true);
-      uiManager.showSubtitle('值班醫師','「鑰匙能插進去，但還少了什麼。409、21:17、另一個我……線索還沒有完全對上。」',4000);
+    if(gameState.getFlag('B2_EXITED_PERMANENTLY')){
+      soundManager.playDoorLockClack();
+      uiManager.showSubtitle('值班醫師','「門已經從 B2 那一側永久鎖死。沒有第二次機會。」',3400);
       return;
     }
-    if(gameState.getFlag('M7_B2_OPEN')){worldRouter.loadZone('b2_archive','b2_archive_stairs');return;}
+    if(gameState.getFlag('M7_B2_OPEN')){worldRouter.loadZone('b2_archive','b2_archive_entry');return;}
     gameState.setGameTime('02:17');
     controller.enabled=false;
     uiManager.openStoryChoice({
@@ -767,7 +767,7 @@ controller.onInteract = (interactable) => {
         gameState.setFlag('B2_DOOR_READY',true);
         persistentMemory.setProof('time',true);
         persistentMemory.addJournalNote('B2_OPEN','02:17 的 1→3→4 是歷史錯誤。我改用王世榮保管的十字鑰匙啟動紫色備援排煙；隱藏服務門因此鬆開。');
-        worldRouter.loadZone('b2_archive','b2_archive_stairs');
+        worldRouter.loadZone('b2_archive','b2_archive_entry');
         controller.enabled=true;
       }
     });
@@ -787,7 +787,7 @@ controller.onInteract = (interactable) => {
     if(missing.length){
       gameState.setFlag('B2_IDENTITY_INCOMPLETE',true);
       uiManager.updateTasks();
-      uiManager.showSubtitle('ARCHIVE CONSISTENCY CHECK','「驗證未完成。尚缺：'+missing.join('、')+'。先查看 B2 原始資料；必要時沿逃生梯返回補齊來源。」',5800);
+      uiManager.showSubtitle('ARCHIVE CONSISTENCY CHECK','「驗證未完成。尚缺：'+missing.join('、')+'。可以繼續查看 B2 原始資料；若現在離開，B2 將永久鎖閉，只能在其他樓層繼續搜尋。」',5800);
       return;
     }
     controller.enabled=false;
@@ -812,10 +812,12 @@ controller.onInteract = (interactable) => {
         return {resolved:true,message:'[EVIDENCE] 409-A 拒簽 ........ MATCH\n[EVIDENCE] ER-0217 / MED-87 ... MATCH\n[EVIDENCE] 504B 轉院拒簽 ...... MATCH\n[EVIDENCE] 6F 聽診器刻字 ...... MATCH\n[EVIDENCE] 409-A 約束記憶 ...... MATCH\n\n>>> IDENTITY RECONSTRUCTED\n>>> 張守恆 / MED-870409'};
       }
     });
-  } else if (interactable.type === 'b2_escape_stairs') {
+  } else if (interactable.type === 'b2_exit_door') {
     const resolved=gameState.getFlag('M7_B2_RESOLVED')===true;
+    gameState.setFlag('B2_EXITED_PERMANENTLY',true);
+    gameState.setFlag('M7_B2_OPEN',false);
     if(resolved)gameState.setGameTime('03:30');
-    worldRouter.loadZone('first_campus_1f');
+    worldRouter.loadZone('first_campus_1f','first_1f_guard_back');
     if(resolved){
       gameState.setFlag('LAST_CALL_SEEN',true);
       gameState.setFlag('M8_CODE_BLACK_ANNOUNCED',true);
@@ -825,7 +827,8 @@ controller.onInteract = (interactable) => {
       setTimeout(()=>uiManager.showSubtitle('全院廣播','「CODE BLACK。偵測到已除籍死亡人員 MED-870409 重新登入。門禁完整性程序啟動。04:09 前，夜班紀錄將由李承禮覆寫模板封存。」',7200),700);
     }else{
       gameState.setFlag('B2_IDENTITY_INCOMPLETE',true);
-      setTimeout(()=>uiManager.showSubtitle('值班醫師','「先離開封存層，補齊線索後再回來。」',3400),700);
+      persistentMemory.addJournalNote('B2_EXIT_INCOMPLETE','我在身分驗證尚未完成時離開 B2。單向門已永久鎖閉，只能在院內其他區域繼續補齊線索。');
+      setTimeout(()=>uiManager.showSubtitle('值班醫師','「門鎖死了……回不去 B2。只能在其他樓層把剩下的資料找齊。」',4200),700);
     }
     controller.enabled=true;
   } else if (interactable.type === 'security_monitor_anomaly') {
