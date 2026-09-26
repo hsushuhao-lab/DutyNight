@@ -34,8 +34,11 @@ export class WorldRouter {
     this.activeZoneInstance = null;
     this.lightingZoneId=null;
     this.roomLamps=[];
-    gameState.addListener((event)=>{
-      if((event==='phase_changed'||event==='time_changed')&&this.lightingZoneId){
+    this.identityAlarmLight=new THREE.AmbientLight(0x9b1d1d,0);
+    this.identityAlarmLight.name='M8_CodeBlack_Ambient';
+    gameState.addListener((event,data)=>{
+      const identityAlarmChanged=event==='flag_changed'&&['M8_IDENTITY_BATTLE_ACTIVE','GAME_COMPLETE'].includes(data?.flag);
+      if(((event==='phase_changed'||event==='time_changed')||identityAlarmChanged)&&this.lightingZoneId){
         this.refreshLighting();
         applyExteriorTime(this.activeZoneInstance?.zoneGroup,gameState.gameTime);
       }
@@ -76,6 +79,7 @@ export class WorldRouter {
     this.lightingGroup = new THREE.Group();
     this.lightingGroup.name = 'WorldRouter_BaselineLighting';
     this.scene.add(this.lightingGroup);
+    this.lightingGroup.add(this.identityAlarmLight);
   }
 
   resetTransientState(){
@@ -101,6 +105,8 @@ export class WorldRouter {
       storyTime:gameState.gameTime,
       roomLamps:this.roomLamps
     });
+    const codeBlack=gameState.getFlag('M8_IDENTITY_BATTLE_ACTIVE')&&!gameState.getFlag('GAME_COMPLETE');
+    if(this.identityAlarmLight)this.identityAlarmLight.intensity=codeBlack?.48:0;
   }
 
   /**
