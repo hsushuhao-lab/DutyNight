@@ -11,6 +11,8 @@ const routes=readFileSync('./src/world/shared/WorldRoutes.js','utf8');
 
 // Startup: no heavyweight synchronous preload before the first frame.
 assert(!main.includes('await Promise.all([preloadAssets(), preloadMaterials()])'),'startup must not block on full GLTF/PBR preload');
+assert(main.includes('await preloadCriticalAssets()'),'opening scene must wait only for critical 3F furniture');
+assert(assets.includes("openingCriticalAssets = new Set(['officeChair', 'storageCabinet'])"),'3F critical asset set must stay intentionally small');
 assert(main.includes('requestIdleCallback(deferredHospitalAssets'),'indoor quality assets must preload after first paint');
 
 // Batch split: outdoor assets and textures are not part of the indoor preload.
