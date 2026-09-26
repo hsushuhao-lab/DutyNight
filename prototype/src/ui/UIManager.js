@@ -908,11 +908,11 @@ export class UIManager {
         ]);
       }else if(this.gameState.getFlag('M7_B2_OPEN')&&!this.gameState.getFlag('M7_B2_RESOLVED')){
         this.renderTaskBoard('翌日 02:17｜B2',[
-          {id:'task-m7-b2-terminal',text:'查看 B2 的「316」舊終端，完成身分驗證',state:'ready'}
+          {id:'task-m7-b2-terminal',text:this.gameState.getFlag('B2_IDENTITY_INCOMPLETE')?'沿 B2 逃生梯返回，補齊線索後再來':'查看封存驗證終端，完成身分驗證',state:'ready'}
         ]);
       }else if(this.gameState.getFlag('M7_B2_RESOLVED')&&!this.gameState.getFlag('LAST_CALL_SEEN')){
         this.renderTaskBoard('B2｜身分驗證完成',[
-          {id:'task-m8-b2-exit',text:'搭舊貨梯離開 B2，回到第一院區',state:'ready'}
+          {id:'task-m8-b2-exit',text:'沿逃生梯離開封存層',state:'ready'}
         ]);
       }else if(this.gameState.getFlag('M8_IDENTITY_BATTLE_ACTIVE')&&!this.gameState.getFlag('GAME_COMPLETE')){
         this.renderTaskBoard('翌日 03:30｜真正的交班',[

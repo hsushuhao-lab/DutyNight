@@ -51,7 +51,7 @@ export class Phantom6F {
     solid(this.zoneGroup,m.wallDark,[0,1.05,-12.9],[2.8,2.1,.12]);
     const plaque=SignAnchor.buildWallPlaque({
       scene:this.zoneGroup,x:0,y:2.15,z:-12.72,rotationY:0,width:1.2,height:.36,
-      code:'316',title:'總醫師辦公室',subtitle:'',header:''
+      code:'6F',title:'異常檔案區',subtitle:'ARCHIVE CORRIDOR',header:''
     });
 
     const safe=new THREE.Mesh(new THREE.BoxGeometry(1.8,2.2,.8),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));

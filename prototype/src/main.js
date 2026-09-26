@@ -634,6 +634,8 @@ controller.onInteract = (interactable) => {
   } else if (interactable.type === 'era_poster') {
     controller.enabled=false;
     uiManager.openPoster(interactable.posterData);
+  } else if (interactable.type === 'er_nurse_computer') {
+    uiManager.showSubtitle('李醫師','「這個電腦是護理師專用，請醫師用醫師診療室專用電腦。」',3600);
   } else if (interactable.type === 'archive_document') {
     controller.enabled = false;
     uiManager.openArchiveDocument({title:interactable.documentTitle,pages:interactable.pages});
@@ -743,21 +745,29 @@ controller.onInteract = (interactable) => {
     persistentMemory.setTrueNameFragment('frag_employeeFull','MED-870409');
     const restored=persistentMemory.resolveTrueName(TRUE_NAME_CANON);
     if(!restored){
-      uiManager.showSubtitle('UNREGISTERED MESSAGE / ARCHIVE','「身分碎片不足。員編、姓氏與姓名記錄仍無法完成一致性驗證。」',4600);
+      gameState.setFlag('B2_IDENTITY_INCOMPLETE',true);
+      uiManager.updateTasks();
+      uiManager.showSubtitle('UNREGISTERED MESSAGE / ARCHIVE','「身分碎片不足。員編、姓名與姓名紀錄仍無法完成一致性驗證。」',4600);
       return;
     }
     gameState.setFlag('M7_B2_RESOLVED',true);
     gameState.setFlag('M8_IDENTITY_BATTLE_ACTIVE',true);
     while(persistentMemory.data.identityErosionLevel<4)persistentMemory.raiseErosion(1);
-    persistentMemory.addJournalNote('B2_316',`B2 的 316 舊終端完成驗證：MED-870409｜${TRUE_NAME_CANON}｜住院醫師。3F-316 同時有另一個「李醫師」登入中。`);
-    uiManager.showSubtitle('UNREGISTERED MESSAGE / ARCHIVE',`「IDENTITY VERIFIED：MED-870409｜${TRUE_NAME_CANON}。\n3F-316：另一個使用者已登入。」`,5800);
-  } else if (interactable.type === 'b2_return_lift') {
-    if(!gameState.getFlag('M7_B2_RESOLVED')) return uiManager.showSubtitle('李醫師','「先看那台舊終端機。」',2400);
-    gameState.setGameTime('03:30');
+    persistentMemory.addJournalNote('B2_ARCHIVE_VERIFY',`B2 封存驗證終端完成驗證：MED-870409｜${TRUE_NAME_CANON}｜住院醫師。3F-316 同時有另一個「李醫師」登入中。`);
+    uiManager.showSubtitle('UNREGISTERED MESSAGE / ARCHIVE',`「一致性驗證通過。
+MED-870409｜${TRUE_NAME_CANON}。\n3F-316：另一個使用者已登入。」`,5800);
+  } else if (interactable.type === 'b2_escape_stairs') {
+    const resolved=gameState.getFlag('M7_B2_RESOLVED')===true;
+    if(resolved)gameState.setGameTime('03:30');
     worldRouter.loadZone('first_campus_1f');
-    gameState.setFlag('LAST_CALL_SEEN',true);
-    persistentMemory.resolveLegend('lastCall');
-    setTimeout(()=>uiManager.showSubtitle('不明來電','☎「……快逃。」',3000),900);
+    if(resolved){
+      gameState.setFlag('LAST_CALL_SEEN',true);
+      persistentMemory.resolveLegend('lastCall');
+      setTimeout(()=>uiManager.showSubtitle('不明來電','☎「……快逃。」',3000),900);
+    }else{
+      gameState.setFlag('B2_IDENTITY_INCOMPLETE',true);
+      setTimeout(()=>uiManager.showSubtitle('李醫師','「先離開封存層，補齊線索後再回來。」',3400),700);
+    }
     controller.enabled=true;
   } else if (interactable.type === 'exit_door' || interactable.type === 'closed_door') {
     soundManager.playClick();
@@ -952,7 +962,7 @@ controller.onInteract = (interactable) => {
       gameState.setFlag('M6_FLOOR6_RESOLVED',true);
       gameState.setFlag('VERTICAL_PROOF_FRAGMENT',true);
       persistentMemory.resolveLegend('floor6');
-      persistentMemory.addJournalNote('FLOOR6_SAFE','6F 不存在。走廊盡頭卻有另一個「316」；它像是 B2 的倒影。');
+      persistentMemory.addJournalNote('FLOOR6_SAFE','6F 不存在。走廊盡頭卻有一個異常檔案區；它像是 B2 的倒影。');
       persistentMemory.raiseErosion(1);
     }
     const returnZone=gameState.getFlag('PHANTOM6_RETURN_ZONE')||'second_campus_5f';

@@ -443,6 +443,10 @@ export class FirstCampus2FER {
       const screen=monitor(this.art,m,x,triageDeskY,3.55);
       screen.name=`ER_TriageMonitor_${index+1}`;
     });
+    const nurseComputerHit=new THREE.Mesh(new THREE.BoxGeometry(4.5,1.25,.9),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
+    nurseComputerHit.position.set(3.5,1.48,3.48);
+    nurseComputerHit.userData={interactable:true,id:'ER_NURSE_COMPUTERS',type:'er_nurse_computer',label:'查看急診護理站電腦'};
+    this.zoneGroup.add(nurseComputerHit);this.interactables.push(nurseComputerHit);
     asset(this.art,'printer',[4.15,triageDeskY,3.55],[.8,.8,.8]);
     asset(this.art,'plant',[3.15,triageDeskY,3.55],[.25,.25,.25]);
     // Observation sign is held by a ceiling-fastened beam, above the open route.

@@ -46,7 +46,9 @@ assert(floor6.includes("type:'floor6_safe_return'")&&floor6.includes("type:'floo
 assert(router.includes("'phantom_6f': Phantom6F")&&routes.includes("phantom_6f_lift"),'M6 route registration missing');
 assert(main.includes("LEGEND 06 — 不存在的六樓")&&main.includes("M6_FLOOR6_RESOLVED"),'M6 safe/override logic missing');
 
-assert(b2.includes("type:'b2_archive_terminal'")&&b2.includes("type:'b2_return_lift'"),'M7 B2 convergence interactions missing');
+assert(b2.includes("type:'b2_archive_terminal'")&&b2.includes("type:'b2_escape_stairs'"),'M7 B2 convergence interactions missing');
+assert(main.includes("interactable.type === 'er_nurse_computer'")&&main.includes('這個電腦是護理師專用'),'ER nurse computers must redirect the physician');
+assert(main.includes("gameState.setFlag('B2_IDENTITY_INCOMPLETE',true)")&&main.includes("interactable.type === 'b2_escape_stairs'"),'B2 insufficient identity route must fail forward to stairs');
 assert(router.includes("'b2_archive': B2Archive")&&routes.includes("b2_archive_lift"),'M7 B2 route registration missing');
 assert(main.includes("M7_B2_RESOLVED")&&main.includes("02:17｜警衛台後方 B-Panel"),'M7 02:17/B2 logic missing');
 
