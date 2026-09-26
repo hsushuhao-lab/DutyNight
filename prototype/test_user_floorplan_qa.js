@@ -91,6 +91,13 @@ for(const [zoneId,prefix] of [['first_campus_4f','40'],['second_campus_5f','50']
   assert(zone.accessDoors[storage.accessDoorId]?.closed||zone.keyedDoors[storage.accessDoorId]?.closed);
   assert(zone.entrancePlant);
 
+  if(firstCampus4F){
+    const legacyActions=new Set(['DUTY_ROOM_PREP','WARD_ROUND','INSOMNIA_403','END_SHIFT']);
+    assert(!zone.interactables.some(o=>!o?.isObject3D&&legacyActions.has(o?.action)),'legacy 4F proximity actions must be removed');
+    assert(zone.interactables.some(o=>o?.userData?.id==='4F_NURSING_REPORT'),'4F report must be a physical nursing-station target');
+    assert(zone.interactables.some(o=>o?.userData?.id==='408C_BED_PLAQUE'&&o?.userData?.action==='NORMAL_EVENT'),'408C task must live on the bed plaque');
+  }
+
   if(zoneId==='second_campus_5f'){
     assert(zone.roomAreas.some(r=>r.id==='SECOND_DUTY'&&r.label==='值班室'));
     assert(zone.accessDoors.second_duty_room?.closed);
