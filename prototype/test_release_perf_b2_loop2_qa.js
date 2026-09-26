@@ -19,6 +19,7 @@ assert(main.includes('prepareLoopReset:()=>Promise.all([preloadAssets(),preloadM
 const loopManager=readFileSync('./src/core/LoopManager.js','utf8');
 assert(loopManager.includes('await this.loopResetPreparation'),'loop reset must await art/material readiness before loadZone');
 assert(ui.includes('async finishLoopCutscene()')&&ui.includes("body.textContent='場景重建中……'")&&ui.includes('await result'),'patientization cutscene must remain active while loop art finishes loading');
+assert(ui.includes("if(el===this.loopCutscene)return;"),'loop reset overlay cleanup must not expose the old scene before the rebuilt 3F is ready');
 
 // Batch split: outdoor assets and textures are not part of the indoor preload.
 assert(assets.includes("outdoorAssets = new Set(['shrub', 'fern', 'campusTree'])"),'outdoor GLTF split missing');
