@@ -7,6 +7,7 @@ import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { preloadAssets } from './art/AssetRegistry.js';
 import { preloadMaterials } from './art/MaterialRegistry.js';
+import { preloadCampusBackdropAssets } from './art/CampusBackdrop.js';
 
 RectAreaLightUniformsLib.init();
 // Boot immediately with procedural/shared fallback materials and load heavyweight
@@ -14,6 +15,10 @@ RectAreaLightUniformsLib.init();
 // critical path while preserving full-quality assets once they are cached.
 const deferredHospitalAssets = () => Promise.all([preloadAssets(), preloadMaterials()])
   .catch(error => console.warn('[perf] deferred hospital asset preload failed', error));
+const campusBackdropZones = new Set(['first_campus_1f','first_campus_2f','first_campus_8f']);
+const prefetchDestinationAssets = destination => campusBackdropZones.has(destination?.zoneId)
+  ? preloadCampusBackdropAssets()
+  : Promise.resolve();
 import { gameState } from './core/GameState.js';
 import { DutyEventManager } from './core/DutyEventManager.js';
 import { Level3FBlockout } from './world/Level3FBlockout.js';
@@ -899,7 +904,7 @@ controller.onInteract = (interactable) => {
         uiManager.showSubtitle(dutyLine.speaker,dutyLine.text);
       }
       controller.enabled = true;
-    }, interactable.kind);
+    }, interactable.kind, prefetchDestinationAssets);
   } else if (interactable.type === 'second_campus_nursing_report') {
     if(!gameState.getFlag('SECOND_CAMPUS_ACCESS')){
       uiManager.showSubtitle('值班醫師','「我現在沒有第二院區權限。」',2200);
