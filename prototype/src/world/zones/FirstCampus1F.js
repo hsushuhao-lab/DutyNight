@@ -352,6 +352,15 @@ export class FirstCampus1F {
     for (const z of [-3.5,0,3.5]) for(const x of [10.3,12.1,13.9]) asset(art,'bench',[x,0,z]);
     asset(art,'plant',[-10.5,0,6]);
     asset(art,'plant',[16.5,0,6]);
+    for(const [x,z,scale] of [[-5.8,-6.8,.65],[6.8,-6.8,.7],[10.2,-6.8,.65],[14.2,-6.8,.7],[-5.8,6.8,.7],[7.8,6.8,.7]])asset(art,'plant',[x,0,z],[scale,scale,scale]);
+    for(const [i,x] of [-5,-2,5,9,13].entries()){
+      const stand=new THREE.Group();stand.name=`Lobby_PublicInformationStand_${i+1}`;stand.position.set(x,0,-6.65);art.add(stand);
+      solid(stand,this.gf.materials.metal,[0,.60,0],[.045,1.20,.045]);
+      solid(stand,this.gf.materials.wallBumper,[0,1.02,0],[.80,.52,.055]);
+      solid(stand,this.gf.materials.lightWarm,[0,1.02,-.033],[.69,.42,.012]);
+      solid(stand,this.gf.materials.metal,[0,.03,0],[.72,.06,.42]);
+    }
+    for(const [x,title] of [[-4,'夜間門診公告'],[1,'院區平面圖'],[6,'病人安全宣導'],[11,'探病與門禁須知']])SignAnchor.buildWallPlaque({scene:art,x,y:2.35,z:7.76,rotationY:Math.PI,width:1.45,height:.48,code:'',title,subtitle:'青嶺醫療中心',header:''});
     // The shared elevator-core opening is clear; no legacy directory board across it.
     wallTrim(this.zoneGroup,this.gf.materials);
     const exterior=buildCampusBackdrop(this.zoneGroup);

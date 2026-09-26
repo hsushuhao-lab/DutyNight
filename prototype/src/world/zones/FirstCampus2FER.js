@@ -283,12 +283,17 @@ export class FirstCampus2FER {
     });
 
     // Charting desk & computer
-    asset(this.art, 'workDesk', [13, 0, -6.5], [2 / 1.405, 1, 1 / .725]);
+    asset(this.art, 'workDesk', [13, 0, -8.55], [2 / 1.405, 1, 1 / .725]);
     // Privacy: the doctor's screen faces the inner/back wall, never the doorway.
-    const doctorScreen=monitor(this.art,this.gf.materials,13,.76,-6.5,0);
-    this.workstations=[{id:'ER_DOCTOR',screen:doctorScreen,chair:[13,0,-5.45],yaw:0}];
-    asset(this.art,'officeChair',[13,0,-5.45],[1,1,1],Math.PI);
-    CollisionFactory.addBox(this.colliders, 13.0, 0.4, -6.5, 2.0, 0.8, 1.0);
+    const doctorScreen=monitor(this.art,this.gf.materials,13,.76,-8.55,0);
+    this.workstations=[{id:'ER_DOCTOR',screen:doctorScreen,chair:[13,0,-7.45],yaw:0}];
+    asset(this.art,'officeChair',[13,0,-7.45],[1,1,1],Math.PI);
+    asset(this.art,'storageCabinet',[10.2,0,-8.55],[.9,.9,.9],Math.PI);
+    asset(this.art,'hospitalBed',[17.4,0,-7.7],[1.05,.95,.95],Math.PI/2);
+    solid(this.art,this.gf.materials.doorWood,[15.7,.78,-9.05],[2.5,.06,.30]);
+    for(let i=0;i<9;i++)solid(this.art,i%2?this.gf.materials.wallBumper:this.gf.materials.bedSheet,[14.65+i*.25,1.08,-9.02],[.18,.48,.22]);
+    CollisionFactory.addBox(this.colliders, 13.0, 0.4, -8.55, 2.0, 0.8, 1.0);
+    CollisionFactory.addBox(this.colliders, 17.4, .45, -7.7, 1.3, .9, 2.1);
 
     // ==========================================
     // 7. HILLSIDE EXTERIOR AMBULANCE ENTRANCE (x = 22, z = 0)

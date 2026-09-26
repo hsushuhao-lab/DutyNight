@@ -558,6 +558,13 @@ controller.onInteract = (interactable) => {
   } else if (interactable.type === 'cpr_anne') {
     const stage=gameState.getFlag('ANNE_STAGE')||0;
     uiManager.showSubtitle('李醫師',stage===0?'「CPR 訓練用假人安妮。新的，看起來還沒怎麼用過。」':'「……剛才它是這個方向嗎？」',2600);
+  } else if (interactable.type === 'office_annie_stethoscope') {
+    gameState.setFlag('FLOOR6_STETHOSCOPE_FOUND',true);
+    gameState.setFlag('FLOOR6_STETHOSCOPE_INSPECTED',true);
+    gameState.setFlag('M5_NAME_CLUE_FOUND',true);
+    persistentMemory.setTrueNameFragment('frag_givenName_2','恆');
+    persistentMemory.addJournalNote('ANNIE_316_STETHOSCOPE','第二輪回到 316 時，安妮坐在辦公室裡；腿上的舊聽診器刻著「祝 守恆 醫師／1997／執業誌慶」。');
+    uiManager.showSubtitle('李醫師','「安妮怎麼會坐在 316 裡？……這支聽診器刻著：『祝 守恆 醫師，1997 執業誌慶』。」',4600);
   } else if (interactable.type === 'duty_log') {
     if(!gameState.getFlag('OPENED_316'))return;
     controller.enabled = false;
@@ -914,10 +921,10 @@ controller.onInteract = (interactable) => {
     }
     controller.enabled=false;
     uiManager.openStoryChoice({
-      title:'天橋中央｜遠處的白袍',
-      body:'前方有一個穿著和你相同白袍的人。玻璃反光讓你無法確認那張臉。\n\n你忽然很想回頭確認第二院區入口還在不在。',
-      primaryText:'回頭確認',
-      secondaryText:'不要回頭，繼續往前',
+      title:'8F 天橋｜窗戶倒影',
+      body:'走到一半，腳步忽然停住。窗戶倒影裡多出一個穿白袍的人影。她站在你身後，雙臂平舉，雙手交疊。\n\n要回頭看清楚，還是忍住不回頭？',
+      primaryText:'回頭看清楚',
+      secondaryText:'忍住，不要回頭',
       onPrimary:()=>loopManager.triggerLegendOverride('BRIDGE',{legend:'LEGEND 04 — 不能回頭的天橋',reason:'另一位值班醫師已通過。'}),
       onSecondary:()=>{
         gameState.setGameTime('02:00');
@@ -1094,6 +1101,12 @@ function animate() {
 
   controller.update(delta);
   worldRouter.update(delta);
+  if(gameState.getFlag('BRIDGE_REFLECTION_NOTICE_PENDING')){
+    gameState.setFlag('BRIDGE_REFLECTION_NOTICE_PENDING',false);
+    gameState.setFlag('BRIDGE_REFLECTION_NOTICE_SEEN',true);
+    controller.enabled=false;controller.cancelAutoMove();
+    controller.onInteract({type:'bridge_loop_event',forcedReflection:true});
+  }
   if(gameState.getFlag('FAST_PATH_3F')&&gameState.getFlag('OPENED_316')&&!gameState.getFlag('FAST_PATH_316_ENTERED')&&worldRouter.activeZoneId==='first_campus_3f'){
     const p=controller.position;
     if(p.x>3.2&&p.x<10.8&&p.z>2.8&&p.z<8.2){

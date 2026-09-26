@@ -194,6 +194,7 @@ export function nursingStation(zone,{x,z,yaw=0,id,rearEntry=false}) {
  */
 export function nursingStationV5(zone,{x,z=-4.3,id}){
   const m=zone.gf.materials,halfW=4.6,south=0,north=-8.6,west=x-halfW,east=x+halfW,wardExitX=x+4.0;
+  const referenceStation=(zone.campus==='first'&&zone.floor===4)||(zone.campus==='second'&&zone.floor===5);
   const lowerH=1.08,glassH=1.72,glassY=lowerH+glassH/2,thickness=.16;
   const glass=m.glass.clone();glass.side=THREE.DoubleSide;glass.transparent=true;glass.opacity=.24;glass.depthWrite=false;
 
@@ -224,12 +225,11 @@ export function nursingStationV5(zone,{x,z=-4.3,id}){
   workstation(zone,{x:x-1.35,z:z+1.95,yaw:0,id:id+'_B'});
   workstation(zone,{x:x-3.35,z:z-1.85,yaw:Math.PI,id:id+'_C'});
   workstation(zone,{x:x-1.35,z:z-1.85,yaw:Math.PI,id:id+'_D'});
-  if(zone.campus==='first'&&zone.floor===4){
+  if(referenceStation){
     const boardBlockingChair=zone.workstations.find(item=>item.id===id+'_C')?.chairObject;
     boardBlockingChair?.removeFromParent();
   }
-  if(zone.campus!=='first'||zone.floor!==4)asset(zone.zoneGroup,'storageCabinet',[x-3.6,0,z+3.1],[1,1,1],Math.PI/2);
-  const printerDesk=zone.campus==='first'&&zone.floor===4?zone.workstations.find(w=>w.id===id+'_D'):null;
+  const printerDesk=referenceStation?zone.workstations.find(w=>w.id===id+'_D'):null;
   const printer=printerDesk?.desk
     ?asset(zone.zoneGroup,'printer',[printerDesk.desk.position.x+.61,0,printerDesk.desk.position.z],[.7,.7,.7],Math.PI)
     :asset(zone.zoneGroup,'printer',[x-1.35,.8,z+1.95],[.7,.7,.7]);
@@ -240,8 +240,8 @@ export function nursingStationV5(zone,{x,z=-4.3,id}){
   }
   const clinicalPropIds=buildNursingStationClinicalProps(zone,{x,z,id});
 
-  if(zone.campus==='first'&&zone.floor===4){
-    const board=new THREE.Group();board.name='FourF_NursingHandoverBoard';
+  if(referenceStation){
+    const board=new THREE.Group();board.name=zone.campus==='first'?'FourF_NursingHandoverBoard':'SecondFiveF_NursingHandoverBoard';
     board.position.set(x-2.0,1.78,north+.105);zone.zoneGroup.add(board);
     solid(board,m.wallBumper,[0,0,0],[2.72,1.12,.055],.018);
     const canvas=document.createElement('canvas');canvas.width=1024;canvas.height=480;
@@ -249,12 +249,16 @@ export function nursingStationV5(zone,{x,z=-4.3,id}){
     ctx.fillStyle='#f1efe6';ctx.fillRect(0,0,canvas.width,canvas.height);
     ctx.fillStyle='#345343';ctx.fillRect(0,0,canvas.width,82);
     ctx.fillStyle='#f5f3eb';ctx.font='bold 42px sans-serif';ctx.textBaseline='middle';
-    ctx.fillText('4F 今日值班',42,42);
+    ctx.fillText(zone.campus==='first'?'4F 今日值班':'5F 今日值班',42,42);
     ctx.fillStyle='#233b30';ctx.font='bold 34px sans-serif';
-    const rows=[
+    const rows=zone.campus==='first'?[
       '第一線：李住院醫師　｜　總醫師：316 室',
       '病房現況：滿床 32 床　｜　408C：防跌倒、易躁動',
       '特別交班：409 封閉整修，禁止推床入內'
+    ]:[
+      '會診醫師：李住院醫師　｜　值班護理站：5F',
+      '病人：陳怡君　｜　床位：504B',
+      '主訴：胸悶、心悸　｜　先完成床邊評估'
     ];
     rows.forEach((text,index)=>{
       const y=160+index*96;

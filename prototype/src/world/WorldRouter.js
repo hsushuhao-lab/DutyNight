@@ -1,6 +1,7 @@
 // WorldRouter.js - Milestone M13: Central Scene/Zone Router, Traversal Verification & Debug Spawns
 import * as THREE from 'three';
 import { applyZoneLighting } from '../art/VisualProfile.js';
+import { applyExteriorTime } from '../art/CampusBackdrop.js';
 import { installEraPosters } from '../art/PosterFactory.js';
 import { GeometryFactory } from './shared/GeometryFactory.js';
 import { WORLD_SPAWNS as DEBUG_SPAWN_POINTS, ROUTE_PORTALS, FIRST_FLOORS, SECOND_FLOORS } from './shared/WorldRoutes.js';
@@ -39,6 +40,7 @@ export class WorldRouter {
     gameState.addListener((event)=>{
       if((event==='phase_changed'||event==='time_changed')&&this.lightingZoneId){
         this.refreshLighting();
+        applyExteriorTime(this.activeZoneInstance?.zoneGroup,gameState.gameTime);
       }
     });
 
@@ -127,6 +129,7 @@ export class WorldRouter {
     const floorMatch = zoneId.match(/_([0-9])f(?:_|$)/);
     this.activeZoneInstance = new ZoneClass(this.scene, this.gf, { floor: Number(floorMatch?.[1] || 5) });
     this.activeZoneInstance.build();
+    applyExteriorTime(this.activeZoneInstance.zoneGroup,gameState.gameTime);
     installEraPosters(this.activeZoneInstance, zoneId);
     addTravelFixtures(this.activeZoneInstance, zoneId);
     floorStateManager.apply(zoneId,this.activeZoneInstance);

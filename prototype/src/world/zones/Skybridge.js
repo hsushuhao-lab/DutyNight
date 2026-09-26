@@ -265,6 +265,16 @@ export class Skybridge {
     if(!gameState.getFlag('M4_CHEST_RESOLVED'))return;
     if(camera.position.x>=55)this.returnBridgeActive=true;
     if(!this.returnBridgeActive)return;
+    if(
+      camera.position.x<=34 &&
+      !gameState.getFlag('M5_BRIDGE_RESOLVED') &&
+      !gameState.getFlag('BRIDGE_REFLECTION_NOTICE_SEEN') &&
+      !gameState.getFlag('BRIDGE_REFLECTION_NOTICE_PENDING')
+    ){
+      gameState.setFlag('BRIDGE_REFLECTION_NOTICE_PENDING',true);
+      return;
+    }
+    if(gameState.getFlag('BRIDGE_REFLECTION_NOTICE_PENDING'))return;
     if(camera.position.x<=30)gameState.setFlag('M5_BRIDGE_COMMITTED',true);
 
     const deviation=Math.abs(Math.atan2(Math.sin(camera.rotation.y-Math.PI/2),Math.cos(camera.rotation.y-Math.PI/2)));

@@ -97,6 +97,8 @@ export class GameState {
     this.flags.set('M5_ROUTE_CHOICE_RESOLVED', false);
     this.flags.set('M5_NAME_CLUE_FOUND', false);
     this.flags.set('M5_BRIDGE_COMMITTED', false);
+    this.flags.set('BRIDGE_REFLECTION_NOTICE_PENDING', false);
+    this.flags.set('BRIDGE_REFLECTION_NOTICE_SEEN', false);
     this.flags.set('BRIDGE_OVERRIDE_PENDING', false);
     this.flags.set('SECOND_CAMPUS_PHONE_PENDING', false);
     this.flags.set('FLOOR6_AVAILABLE', false);

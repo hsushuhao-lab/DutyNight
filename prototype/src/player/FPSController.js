@@ -33,7 +33,7 @@ export class FPSController {
     // Raycast interaction
     this.groundRaycaster = new THREE.Raycaster();
     this.raycaster = new THREE.Raycaster();
-    this.raycaster.far = 2.6;
+    this.raycaster.far = 4.5;
     this.clickRaycaster = new THREE.Raycaster();
     this.clickRaycaster.far = 40;
     this.currentInteractable = null;
@@ -340,7 +340,7 @@ export class FPSController {
       for (const item of this.interactables) {
         if (
           item?.isObject3D ||
-          item?.type !== 'p1_action' ||
+          item?.interactable === false ||
           !item.position
         ) continue;
 

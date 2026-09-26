@@ -35,7 +35,7 @@ assert.deepEqual(handoverBoard.position.toArray(),[-2,1.78,-8.495],'4F handover 
 const stationCabinet=zone.zoneGroup.children.find(object=>object.name==='ArtAsset/storageCabinet'&&Math.abs(object.position.x+3.6)<.01&&Math.abs(object.position.z+1.2)<.01);
 assert.equal(stationCabinet,undefined,'green station cabinet must no longer intersect the workstation chair');
 const architectureSource=readFileSync('./src/world/shared/PlanArchitecture.js','utf8');
-assert(architectureSource.includes("const printerDesk=zone.campus==='first'&&zone.floor===4?zone.workstations.find(w=>w.id===id+'_D'):null;"),'4F printer must use the open D workstation');
+assert(architectureSource.includes("const printerDesk=referenceStation?zone.workstations.find(w=>w.id===id+'_D'):null;"),'both reference nursing stations must use the open D workstation for the printer');
 assert(architectureSource.includes('printer.position.y+=deskTop-new THREE.Box3().setFromObject(printer).min.y;'),'4F printer must be grounded against the loaded desk surface');
 const dutyDesk=zone.workstations.find(w=>w.id==='duty_desk');
 const dutyDeskTop=dutyDesk.desk?new THREE.Box3().setFromObject(dutyDesk.desk).max.y:.76;

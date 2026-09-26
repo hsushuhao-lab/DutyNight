@@ -2,6 +2,7 @@
 import * as THREE from 'three';
 import {createAnnieArt} from '../art/AnnieArt.js';
 import { getMaterials, materialForSurface } from '../art/MaterialRegistry.js';
+import { applyExteriorTime } from '../art/CampusBackdrop.js';
 
 export class Level3FBlockout {
   constructor(scene) {
@@ -75,28 +76,24 @@ export class Level3FBlockout {
     skyCanvas.width = 1024;
     skyCanvas.height = 512;
     const ctx = skyCanvas.getContext('2d');
-    const grad = ctx.createLinearGradient(0, 0, 0, 512);
-    grad.addColorStop(0, '#d8b39a');
-    grad.addColorStop(0.35, '#e6c9b3');
-    grad.addColorStop(0.7, '#c4ced3');
-    grad.addColorStop(1, '#99a6ae');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, 1024, 512);
-    ctx.fillStyle = 'rgba(255,255,255,0.12)';
-    ctx.beginPath();
-    ctx.arc(820, 150, 54, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = 'rgba(90,104,110,0.18)';
-    for (let i = 0; i < 7; i++) {
-      ctx.fillRect(40 + i * 150, 340 - (i % 3) * 18, 100, 180 + (i % 2) * 28);
-    }
     const skyTexture = new THREE.CanvasTexture(skyCanvas);
     skyTexture.colorSpace = THREE.SRGBColorSpace;
     const skyGeo = new THREE.PlaneGeometry(60, 20);
     const skyMat = new THREE.MeshBasicMaterial({ map: skyTexture, side: THREE.DoubleSide });
     const sky = new THREE.Mesh(skyGeo, skyMat);
+    sky.name='Campus story sky';
+    sky.userData.paintStorySky=(palette,phase)=>{
+      const top=`#${palette.zenith.toString(16).padStart(6,'0')}`,bottom=`#${palette.horizon.toString(16).padStart(6,'0')}`;
+      const grad=ctx.createLinearGradient(0,0,0,512);grad.addColorStop(0,top);grad.addColorStop(.7,bottom);grad.addColorStop(1,phase==='DEEP_NIGHT'?'#080d15':bottom);
+      ctx.fillStyle=grad;ctx.fillRect(0,0,1024,512);
+      if(phase!=='DEEP_NIGHT'){ctx.fillStyle=phase==='DAWN'?'rgba(255,226,194,.18)':'rgba(255,230,200,.14)';ctx.beginPath();ctx.arc(820,150,54,0,Math.PI*2);ctx.fill();}
+      ctx.fillStyle=phase==='DEEP_NIGHT'?'rgba(2,5,9,.82)':'rgba(48,59,66,.42)';
+      for(let i=0;i<7;i++)ctx.fillRect(40+i*150,340-(i%3)*18,100,180+(i%2)*28);
+      skyTexture.needsUpdate=true;
+    };
     sky.position.set(0, 5, -16);
     this.scene.add(sky);
+    applyExteriorTime(sky);
   }
 
   buildElevatorLobby() {
@@ -551,7 +548,7 @@ export class Level3FBlockout {
 
     // Hitbox for Duty Log
     const logHitbox = new THREE.Mesh(
-      new THREE.BoxGeometry(0.5, 0.3, 0.4),
+      new THREE.BoxGeometry(1.25, .85, 1.0),
       new THREE.MeshBasicMaterial({ visible: false })
     );
     logHitbox.position.set(6.4, 0.85, 6.0);

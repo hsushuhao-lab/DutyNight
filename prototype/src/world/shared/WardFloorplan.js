@@ -277,10 +277,15 @@ export class WardFloorplan {
     const w=new PlanWalls(this);w.rect(o+8,2,o+14,10);w.cut('z',o+8,6,1.4);
     this.gf.buildFloor(this.zoneGroup,this.walkables,o+11,0,6,6,8,this.gf.materials.floorWood);
     this.gf.buildCeiling(this.zoneGroup,o+11,3.2,6,6,8);
-    workstation(this,{x:o+11,z:3.5,id:'second_duty_desk'});
+    workstation(this,{x:o+12,z:3.1,id:'second_duty_desk'});
     const door=new AccessDoor(this,{id:'second_duty_room',x:o+8,z:6,yaw:Math.PI/2,width:1.4,title:'值班室'});door.setClosed(true);
     asset(this.zoneGroup,'hospitalBed',[o+12.3,0,7.7],[1.1,.95,.97]);CollisionFactory.addBox(this.colliders,o+12.3,.45,7.7,1.3,.9,2.1);
     asset(this.zoneGroup,'storageCabinet',[o+9.4,0,8.7],[1,1,1],Math.PI);
+    solid(this.zoneGroup,this.gf.materials.doorWood,[o+10.75,.28,8.1],[.5,.56,.5]);
+    solid(this.zoneGroup,this.gf.materials.lightWarm,[o+10.75,.76,8.1],[.19,.24,.19]);
+    const phone=new THREE.Group();phone.name='SecondDutyRoom_ExtensionPhone';phone.position.set(o+12.55,.84,3.34);this.zoneGroup.add(phone);
+    solid(phone,this.gf.materials.wallDark,[0,0,0],[.28,.07,.20]);
+    solid(phone,this.gf.materials.bedSheet,[0,.08,-.055],[.25,.035,.055]);
     w.build();this.gf.buildCeilingLight(this.zoneGroup,o+11,3.15,6,.75,7);
     this.roomAreas.push({id:'SECOND_DUTY',label:'值班室',point:[o+9.5,1.7,6],door:[o+8,1.7,6],corridor:[o+6.5,1.7,6],protectedArea:false,kind:'duty_room',accessDoorId:'second_duty_room'});
   }
@@ -289,7 +294,7 @@ export class WardFloorplan {
     const chestBed=this.bedAreas.find(item=>item.id==='504B');
     const [bx,,bz]=chestBed.position;
     const report={
-      position:new THREE.Vector3(o-3.35,0,-2.35),radius:2.1,
+      position:new THREE.Vector3(o-2.35,0,-2.35),radius:4.8,
       interactable:true,id:'SECOND_5F_NURSING_REPORT',type:'second_campus_nursing_report',label:'向第二院區 5F 護理站報到'
     };
     this.interactables.push(report);this.secondCampusNursingReport=report;

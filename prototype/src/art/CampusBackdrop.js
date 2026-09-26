@@ -2,6 +2,36 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { getMaterials, materialForSurface } from './MaterialRegistry.js';
 import { instantiateAsset } from './AssetRegistry.js';
+import { gameState } from '../core/GameState.js';
+
+export function getExteriorTimePhase(time=gameState.gameTime) {
+  const value=String(time||'17:00');
+  if(value>='03:30'&&value<'17:00')return 'DAWN';
+  if(value>='21:17'||value<'03:30')return 'DEEP_NIGHT';
+  return 'DUSK';
+}
+
+const EXTERIOR_PALETTE={
+  DUSK:{zenith:0x40566f,horizon:0xd09a72,glass:0x4b5e68,warm:0xb58b58,emissive:.24},
+  DEEP_NIGHT:{zenith:0x050914,horizon:0x111b2a,glass:0x182630,warm:0xc08b49,emissive:.42},
+  DAWN:{zenith:0x718ca4,horizon:0xe1b18c,glass:0x5c7180,warm:0xb29672,emissive:.13}
+};
+
+export function applyExteriorTime(root,time=gameState.gameTime) {
+  const phase=getExteriorTimePhase(time),palette=EXTERIOR_PALETTE[phase];
+  root?.traverse?.(object=>{
+    if(object.name==='Campus atmospheric sky'){
+      object.material.uniforms.zenith.value.setHex(palette.zenith);
+      object.material.uniforms.horizon.value.setHex(palette.horizon);
+    }
+    if(object.name==='Campus story sky'&&object.userData.paintStorySky)object.userData.paintStorySky(palette,phase);
+    if(object.name==='Campus exterior dark glass')object.material.color.setHex(palette.glass);
+    if(object.name==='Campus exterior warm glass'){
+      object.material.color.setHex(palette.warm);object.material.emissive.setHex(palette.warm);object.material.emissiveIntensity=palette.emissive;
+    }
+  });
+  return phase;
+}
 
 /** Decorative context is below/beyond each locked campus route, never a walkable surface. */
 export function buildCampusBackdrop(parent) {
@@ -67,7 +97,8 @@ export function buildCampusBackdrop(parent) {
         for(let col=0;col<count;col++) {
           const u=-span/2+1.6+col*(alongX?2.6:2.8);
           const wx=alongX?x+u:front,wz=alongX?front:z+u;
-          const window=box(wx,y,wz,1.42,1.38,.08,(row*7+col+site)%5===1?warmGlass:glass);
+          const lit=(row*7+col+site)%5===1;
+          const window=box(wx,y,wz,1.42,1.38,.08,lit?warmGlass:glass);window.name=lit?'Campus exterior warm glass':'Campus exterior dark glass';
           if(!alongX)window.rotation.y=Math.PI/2;
           for(const [offset,h,w] of [[-.72,1.55,.07],[.72,1.55,.07],[0,1.4,.045]]) {
             const f=box(wx+(alongX?offset:direction*.06),y,wz+(alongX?direction*.06:offset),w,h,.12,trim);if(!alongX)f.rotation.y=Math.PI/2;
@@ -97,9 +128,11 @@ export function buildCampusBackdrop(parent) {
   for(const [material,meshes] of groups) {
     if(meshes.length<2)continue;
     const geometries=meshes.map(mesh=>mesh.geometry.toNonIndexed().applyMatrix4(mesh.matrix));
-    const merged=new THREE.Mesh(mergeGeometries(geometries),material);merged.name='Campus architectural detail';merged.receiveShadow=true;
+    const merged=new THREE.Mesh(mergeGeometries(geometries),material);
+    merged.name=material===warmGlass?'Campus exterior warm glass':material===glass?'Campus exterior dark glass':'Campus architectural detail';merged.receiveShadow=true;
     for(const mesh of meshes){root.remove(mesh);mesh.geometry.dispose();}geometries.forEach(g=>g.dispose());root.add(merged);
   }
   parent.add(root);
+  applyExteriorTime(root);
   return root;
 }
