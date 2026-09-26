@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import { getMaterials, materialForSurface } from './MaterialRegistry.js';
-import { instantiateAsset } from './AssetRegistry.js';
+import { getMaterials, materialForSurface, preloadOutdoorMaterials } from './MaterialRegistry.js';
+import { instantiateAsset, preloadOutdoorAssets } from './AssetRegistry.js';
 import { gameState } from '../core/GameState.js';
 
 export function getExteriorTimePhase(time=gameState.gameTime) {
@@ -34,6 +34,10 @@ export function applyExteriorTime(root,time=gameState.gameTime) {
 }
 
 /** Decorative context is below/beyond each locked campus route, never a walkable surface. */
+export function preloadCampusBackdropAssets() {
+  return Promise.all([preloadOutdoorAssets(), preloadOutdoorMaterials()]);
+}
+
 export function buildCampusBackdrop(parent) {
   const root = new THREE.Group();
   root.name = 'ArtRoot_ExteriorCampus';
