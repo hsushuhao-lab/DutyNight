@@ -39,14 +39,15 @@ const materials = Object.fromEntries(Object.entries(definitions).map(([name, def
   return [name, material];
 }));
 const surfaces = new Map();
+const outdoorSurfaces = new Set(['ground', 'asphalt']);
 let preload;
+let outdoorPreload;
 
 export function getMaterials() { return materials; }
 
-export function preloadMaterials() {
-  if (preload) return preload;
+function loadMaterialEntries(entries) {
   const loader = new THREE.TextureLoader();
-  preload = Promise.all(Object.entries(sources).map(async ([surface, { id }]) => {
+  return Promise.all(entries.map(async ([surface, { id }]) => {
     const textures = await Promise.all(['Color', 'NormalGL', 'Roughness'].map(async channel => {
       const texture = await loader.loadAsync(`${textureRoot}${id}_2K-JPG_${channel}.jpg`);
       texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
@@ -64,11 +65,23 @@ export function preloadMaterials() {
       material.needsUpdate = true;
     }
   })).then(() => {
-    // Keep materials constructed by headless setup compatible with awaited browser preloading.
     for (const [key, material] of surfaces) applySurfaceMaps(material, key.split(':')[0]);
     return materials;
-  }).catch(error => { throw new Error(`Hospital PBR texture preload failed: ${error.message}`, { cause: error }); });
+  });
+}
+
+export function preloadMaterials() {
+  if (preload) return preload;
+  preload = loadMaterialEntries(Object.entries(sources).filter(([surface]) => !outdoorSurfaces.has(surface)))
+    .catch(error => { throw new Error(`Hospital PBR texture preload failed: ${error.message}`, { cause: error }); });
   return preload;
+}
+
+export function preloadOutdoorMaterials() {
+  if (outdoorPreload) return outdoorPreload;
+  outdoorPreload = loadMaterialEntries(Object.entries(sources).filter(([surface]) => outdoorSurfaces.has(surface)))
+    .catch(error => { throw new Error(`Outdoor PBR texture preload failed: ${error.message}`, { cause: error }); });
+  return outdoorPreload;
 }
 
 function applySurfaceMaps(material, name) {
