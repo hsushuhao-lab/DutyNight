@@ -37,9 +37,9 @@ assert(main.includes("M7_IDENTITY_RESOLVED_AT_316"),'B2 fail-forward must allow 
 assert(main.includes("getDeferred316IdentityMissing"),'deferred 316 evidence audit missing');
 assert(!ui.includes('沿 B2 逃生梯返回'),'B2 task board must not tell the player to use a removed staircase');
 assert(!ui.includes('沿逃生梯離開封存層'),'B2 completion task must use the one-way door, not a staircase');
-const b2FailForward=ui.indexOf("B2_EXITED_PERMANENTLY");
-const b2ReopenPrompt=ui.indexOf("M6_FLOOR6_RESOLVED");
-assert(b2FailForward>=0&&b2FailForward<b2ReopenPrompt,'permanent B2 exit must take precedence over the service-door objective');
+const b2FailForward=ui.indexOf("this.gameState.getFlag('B2_EXITED_PERMANENTLY')&&!this.gameState.getFlag('M7_B2_RESOLVED')");
+const b2ReopenPrompt=ui.indexOf("this.gameState.getFlag('M6_FLOOR6_RESOLVED')&&!this.gameState.getFlag('M7_B2_OPEN')");
+assert(b2FailForward>=0&&b2ReopenPrompt>=0&&b2FailForward<b2ReopenPrompt,'permanent B2 exit must take precedence over the service-door objective');
 
 // Loop 2: fast path can skip chores but cannot hide the admin evidence.
 const adminBranch=main.slice(main.indexOf("['admin_roster_3f','admin_printer_doc_3f','admin_drawer_manual_3f']"),main.indexOf("} else if (interactable.type === 'spare_key_316')"));
