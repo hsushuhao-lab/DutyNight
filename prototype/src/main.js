@@ -16,9 +16,11 @@ RectAreaLightUniformsLib.init();
 const deferredHospitalAssets = () => Promise.all([preloadAssets(), preloadMaterials()])
   .catch(error => console.warn('[perf] deferred hospital asset preload failed', error));
 const campusBackdropZones = new Set(['first_campus_1f','first_campus_2f','first_campus_8f']);
-const prefetchDestinationAssets = destination => campusBackdropZones.has(destination?.zoneId)
-  ? preloadCampusBackdropAssets()
-  : Promise.resolve();
+const prefetchDestinationAssets = destination => Promise.all([
+  preloadAssets(),
+  preloadMaterials(),
+  campusBackdropZones.has(destination?.zoneId) ? preloadCampusBackdropAssets() : Promise.resolve()
+]);
 import { gameState } from './core/GameState.js';
 import { DutyEventManager } from './core/DutyEventManager.js';
 import { Level3FBlockout } from './world/Level3FBlockout.js';
