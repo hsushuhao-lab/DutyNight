@@ -2,8 +2,9 @@ import { persistentMemory } from './PersistentMemory.js';
 import { legendState } from './LegendStateManager.js';
 
 export class LoopManager {
-  constructor({gameState,worldRouter,controller,uiManager}){
-    Object.assign(this,{gameState,worldRouter,controller,uiManager});
+  constructor({gameState,worldRouter,controller,uiManager,prepareLoopReset=null}){
+    Object.assign(this,{gameState,worldRouter,controller,uiManager,prepareLoopReset});
+    this.loopResetPreparation=Promise.resolve();
   }
 
   triggerBed33Override(){
@@ -14,10 +15,14 @@ export class LoopManager {
     persistentMemory.recordOverride(id);
     if(id==='BED33')legendState.override('LEGEND_BED33');
     this.controller.enabled=false;
+    this.loopResetPreparation=Promise.resolve(this.prepareLoopReset?.()).catch(error=>{
+      console.warn('[loop] scene asset preparation failed; rebuilding with available assets',error);
+    });
     this.uiManager.playLegendOverride({legend,reason},()=>this.softResetTo1700());
   }
 
-  softResetTo1700(){
+  async softResetTo1700(){
+    await this.loopResetPreparation;
     legendState.resetRound();
     this.worldRouter.resetTransientState?.();
     this.gameState.resetForLoop();

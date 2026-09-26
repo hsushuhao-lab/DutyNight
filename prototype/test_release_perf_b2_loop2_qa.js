@@ -14,6 +14,12 @@ assert(!main.includes('await Promise.all([preloadAssets(), preloadMaterials()])'
 assert(main.includes('await preloadCriticalAssets()'),'opening scene must wait only for critical 3F furniture');
 for(const asset of ['officeChair','storageCabinet','workDesk','printer','bench','plant'])assert(assets.includes(`'${asset}'`),'opening critical asset missing: '+asset);
 assert(main.includes('requestIdleCallback(deferredHospitalAssets'),'indoor quality assets must preload after first paint');
+assert(main.includes('preloadCampusBackdropAssets()'),'3F backdrop assets must also begin deferred preload after first paint');
+assert(main.includes('prepareLoopReset:()=>Promise.all([preloadAssets(),preloadMaterials(),preloadCampusBackdropAssets()])'),'loop reset must prepare complete 3F art before rebuilding');
+const loopManager=readFileSync('./src/core/LoopManager.js','utf8');
+assert(loopManager.includes('await this.loopResetPreparation'),'loop reset must await art/material readiness before loadZone');
+assert(ui.includes('async finishLoopCutscene()')&&ui.includes("body.textContent='場景重建中……'")&&ui.includes('await result'),'patientization cutscene must remain active while loop art finishes loading');
+assert(ui.includes("if(el===this.loopCutscene)return;"),'loop reset overlay cleanup must not expose the old scene before the rebuilt 3F is ready');
 
 // Batch split: outdoor assets and textures are not part of the indoor preload.
 assert(assets.includes("outdoorAssets = new Set(['shrub', 'fern', 'campusTree'])"),'outdoor GLTF split missing');
@@ -23,8 +29,8 @@ assert(campus.includes('preloadCampusBackdropAssets'),'campus backdrop preload h
 // Transition prefetch: destination resources begin loading while elevator/stair transition is visible.
 assert(ui.includes("openTravelSelector(destinations, currentZone, onSelect, kind = 'elevator', onPrefetch = null)"),'travel prefetch callback missing');
 assert(ui.includes('const preloadPromise=Promise.resolve(onPrefetch?.(destination))'),'destination preload must start at transition start');
-assert(ui.includes('await Promise.race([preloadPromise,preloadDeadline])'),'arrival must wait only up to the bounded preload deadline');
-assert(ui.includes('const preloadDeadline=new Promise(resolve=>setTimeout(resolve,4000))'),'travel preload must have a hard 4-second ceiling');
+assert(ui.includes('await preloadPromise'),'arrival must wait for required indoor assets and PBR before zone construction');
+assert(!ui.includes('preloadDeadline'),'required indoor art must never be bypassed by an arbitrary timeout');
 for(const zone of ['first_campus_1f','first_campus_2f','first_campus_8f']) {
   assert(main.includes(zone),zone+' must be included in campus backdrop prefetch destinations');
 }

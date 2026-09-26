@@ -547,13 +547,18 @@ export class UIManager {
     later(14200,()=>this.finishLoopCutscene());
   }
 
-  finishLoopCutscene(){
+  async finishLoopCutscene(){
     if(!this.loopCutscene?.classList.contains('active'))return;
     for(const t of this.loopCutsceneTimers)clearTimeout(t);
     this.loopCutsceneTimers=[];
-    this.loopCutscene.classList.remove('active');
     const cb=this.loopOverrideComplete;this.loopOverrideComplete=null;
-    cb?.();
+    const body=document.getElementById('loop-stage-body');
+    const result=cb?.();
+    if(result?.then){
+      if(body)body.textContent='場景重建中……';
+      await result;
+    }
+    this.loopCutscene.classList.remove('active');
   }
 
   openStoryChoice({title,body,primaryText='確認',secondaryText='暫緩',onPrimary,onSecondary}){
@@ -705,7 +710,10 @@ export class UIManager {
   }
 
   closeAllTransientOverlays(){
-    document.querySelectorAll('.modal-overlay.active,.cutscene-overlay.active').forEach(el=>el.classList.remove('active'));
+    document.querySelectorAll('.modal-overlay.active,.cutscene-overlay.active').forEach(el=>{
+      if(el===this.loopCutscene)return;
+      el.classList.remove('active');
+    });
   }
 
   resetAfterLoop(){
@@ -839,7 +847,6 @@ export class UIManager {
     const preloadPromise=Promise.resolve(onPrefetch?.(destination)).catch(error=>{
       console.warn('[perf] destination prefetch failed',destination.zoneId,error);
     });
-    const preloadDeadline=new Promise(resolve=>setTimeout(resolve,4000));
     const glitch=kind!=='stairs'&&fromFloor===3&&destination.floorNum===4&&this.gameState.isTaskComplete('ARCHIVE_CLUE_FOUND');
     if(glitch){
       const digit=this.elevatorCutscene.querySelector('.floor-digit');
@@ -849,7 +856,7 @@ export class UIManager {
     }
     this.travelTimer=setTimeout(async()=>{
       try {
-        await Promise.race([preloadPromise,preloadDeadline]);
+        await preloadPromise;
         onSelect(destination);
         soundManager.playElevatorChime();
       } finally {
