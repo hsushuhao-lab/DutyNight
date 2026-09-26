@@ -1043,17 +1043,25 @@ export class UIManager {
         this.renderTaskBoard('翌日 02:00｜返回第一院區',[
           {id:'task-m6-elevator',text:currentZone==='phantom_6f'?(this.gameState.getFlag('FLOOR6_STETHOSCOPE_FOUND')?'檢視反光的老舊聽診器，翻面或擦去刻字上的灰塵':'查看焦黑器材旁反光的物件'):'搭乘一般電梯返回第一院區',state:'ready'}
         ]);
+      }else if(this.gameState.getFlag('B2_EXITED_PERMANENTLY')&&!this.gameState.getFlag('M7_B2_RESOLVED')){
+        this.renderTaskBoard('B2 已永久封閉｜延後身分重建',[
+          {
+            id:'task-m7-deferred-316',
+            text:currentZone==='first_campus_3f'?'使用 316 電子交班工作站整合目前線索；若仍不足，系統會列出缺失來源':'繼續搜尋缺失的行政／文史／門禁／臨床資料；補齊後回第一院區 3F 316',
+            state:'ready'
+          }
+        ]);
       }else if(this.gameState.getFlag('M6_FLOOR6_RESOLVED')&&!this.gameState.getFlag('M7_B2_OPEN')){
         this.renderTaskBoard('翌日 02:17 前｜門禁紀錄',[
           {id:'task-m7-service-door',text:this.gameState.getFlag('HIDDEN_SERVICE_DOOR_DISCOVERED')?'檢查警衛台後方浮現的舊門框':'02:17 前往第一院區 1F 警衛台，查找異常門禁與監視紀錄',state:'ready'}
         ]);
       }else if(this.gameState.getFlag('M7_B2_OPEN')&&!this.gameState.getFlag('M7_B2_RESOLVED')){
         this.renderTaskBoard('翌日 02:17｜B2',[
-          {id:'task-m7-b2-terminal',text:this.gameState.getFlag('B2_IDENTITY_INCOMPLETE')?'沿 B2 逃生梯返回，補齊線索後再來':'查看封存驗證終端，完成身分驗證',state:'ready'}
+          {id:'task-m7-b2-terminal',text:this.gameState.getFlag('B2_IDENTITY_INCOMPLETE')?'可繼續在 B2 搜尋缺失原始資料；若由單向出口離開，B2 將永久封閉':'查看封存驗證終端，完成身分驗證',state:'ready'}
         ]);
       }else if(this.gameState.getFlag('M7_B2_RESOLVED')&&!this.gameState.getFlag('LAST_CALL_SEEN')){
         this.renderTaskBoard('B2｜身分驗證完成',[
-          {id:'task-m8-b2-exit',text:'沿逃生梯離開封存層',state:'ready'}
+          {id:'task-m8-b2-exit',text:'由單向出口門返回 1F 警衛台後方',state:'ready'}
         ]);
       }else if(this.gameState.getFlag('M8_IDENTITY_BATTLE_ACTIVE')&&!this.gameState.getFlag('GAME_COMPLETE')){
         this.renderTaskBoard('CODE BLACK｜04:09 前',[

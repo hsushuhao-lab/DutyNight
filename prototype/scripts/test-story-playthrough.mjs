@@ -462,8 +462,8 @@ try{
   await domClick('#identity-candidate-ZHANG_SHOUHENG');
   await waitForPageCondition(page,()=>window.__storyQA.gameState.getFlag('M7_B2_RESOLVED')===true,30000);
   s=await snap();assert.equal(s.flags.M7_B2_RESOLVED,true);assert.equal(s.flags.M8_IDENTITY_BATTLE_ACTIVE,true);assert.equal(s.memory.trueNameResolved,true);assert.equal(s.memory.trueName,'張守恆');assert.equal(s.memory.trueNameFragments.frag_employeeFull,'MED-870409');
-  assert.match(await taskText(),/逃生梯[\s\S]*離開封存層/,'B2 verification must explicitly tell the player how to leave');
-  await interact({id:'B2_ESCAPE_STAIRS'});
+  assert.match(await taskText(),/單向出口門[\s\S]*1F 警衛台後方/,'B2 verification must explicitly tell the player to use the one-way exit door');
+  await interact({id:'B2_ONE_WAY_EXIT'});
   await waitForPageCondition(page,()=>window.__storyQA.worldRouter.activeZoneId==='first_campus_1f',30000);
   s=await snap();assert.equal(s.flags.LAST_CALL_SEEN,true);assert.equal(s.time,'03:30');
   assert.match(await taskText(),/3F[\s\S]*316/,'last call must push the player back to 3F 316 for the final handoff');
