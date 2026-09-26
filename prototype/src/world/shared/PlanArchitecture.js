@@ -224,6 +224,10 @@ export function nursingStationV5(zone,{x,z=-4.3,id}){
   workstation(zone,{x:x-1.35,z:z+1.95,yaw:0,id:id+'_B'});
   workstation(zone,{x:x-3.35,z:z-1.85,yaw:Math.PI,id:id+'_C'});
   workstation(zone,{x:x-1.35,z:z-1.85,yaw:Math.PI,id:id+'_D'});
+  if(zone.campus==='first'&&zone.floor===4){
+    const boardBlockingChair=zone.workstations.find(item=>item.id===id+'_C')?.chairObject;
+    boardBlockingChair?.removeFromParent();
+  }
   if(zone.campus!=='first'||zone.floor!==4)asset(zone.zoneGroup,'storageCabinet',[x-3.6,0,z+3.1],[1,1,1],Math.PI/2);
   const printerDesk=zone.campus==='first'&&zone.floor===4?zone.workstations.find(w=>w.id===id+'_D'):null;
   const printer=printerDesk?.desk

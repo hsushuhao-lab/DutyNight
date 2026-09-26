@@ -190,10 +190,10 @@ export class WardFloorplan {
     this.dutyRoom={door:[-8,1.7,6],inside:[-9.5,1.7,6],outside:[-6.5,1.7,6],bounds:[-14,2,-8,10]};
     // V6 task flow: only the real nursing-station handoff remains as a free-standing target.
     // 408C starts the sealed-409 check; the duty-room computer owns the later 21:00 rest interaction.
-    const reportTarget=new THREE.Mesh(new THREE.BoxGeometry(.85,.24,.16),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
-    reportTarget.position.set(-3.35,1.22,-2.35);
-    reportTarget.userData={interactable:true,id:'4F_NURSING_REPORT',type:'p1_action',action:'NURSE_REPORT',label:'向護理站報到'};
-    this.zoneGroup.add(reportTarget);this.interactables.push(reportTarget);
+    this.interactables.push({
+      position:new THREE.Vector3(-3.35,0,-2.35),radius:2.1,
+      interactable:true,id:'4F_NURSING_REPORT',type:'p1_action',action:'NURSE_REPORT',label:'向護理站報到'
+    });
   }
   buildBed33Legend(){
     const m=this.gf.materials;

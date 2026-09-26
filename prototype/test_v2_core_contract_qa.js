@@ -25,6 +25,9 @@ assert(!ward.zoneGroup.getObjectByName('Bed_409A'),'409A must not be rendered as
 const actions=ward.interactables.map(item=>item.userData??item).filter(item=>item.type==='p1_action');
 for(const retired of ['DUTY_ROOM_PREP','WARD_ROUND','INSOMNIA_403'])assert(!actions.some(item=>item.action===retired),retired+' must not survive the simplified 4F flow');
 assert.equal(actions.find(item=>item.action==='NURSE_REPORT')?.id,'4F_NURSING_REPORT');
+const reportTarget=ward.interactables.find(item=>(item.userData??item).id==='4F_NURSING_REPORT');
+assert(reportTarget&&!reportTarget.isObject3D,'the 17:15 report target must not render a box over the handover board');
+assert.equal(reportTarget.radius,2.1,'the 17:15 report prompt must cover the accessible nursing-station counter');
 assert.equal(actions.find(item=>item.action==='NORMAL_EVENT')?.id,'408C_BED_PLAQUE');
 assert.equal(actions.find(item=>item.action==='END_SHIFT')?.id,'4F_DUTY_COMPUTER','21:00 rest must use the physical duty-room computer');
 assert.doesNotMatch(mainSource,/KNOCK_403_49/,'403 cannot own the knock clue');
@@ -34,6 +37,7 @@ assert.doesNotMatch(uiSource,/19:30 處理一般病房事件/,'the stale generic
 const handoverBoard=ward.zoneGroup.getObjectByName('FourF_NursingHandoverBoard');
 assert.deepEqual(handoverBoard.position.toArray(),[-2,1.78,-8.495],'handover board must return to its original north wall');
 assert(!ward.zoneGroup.children.some(object=>object.name==='ArtAsset/storageCabinet'&&Math.abs(object.position.x+3.6)<.01&&Math.abs(object.position.z+1.2)<.01),'the green station cabinet must be removed from the chair path');
+assert(!ward.zoneGroup.getObjectByName('WorkstationChair_first_station_C'),'the green chair back must not block the 4F handover board');
 assert.deepEqual(handoverBoard.userData.text,[
   '第一線：李住院醫師　｜　總醫師：316 室',
   '病房現況：滿床 32 床　｜　408C：防跌倒、易躁動',
