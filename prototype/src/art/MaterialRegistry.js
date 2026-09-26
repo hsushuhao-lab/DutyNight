@@ -52,16 +52,18 @@ function loadMaterialEntries(entries) {
       const texture = await loader.loadAsync(`${textureRoot}${id}_2K-JPG_${channel}.jpg`);
       texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
       texture.colorSpace = channel === 'Color' ? THREE.SRGBColorSpace : THREE.NoColorSpace;
-      texture.anisotropy = 4;
+      texture.anisotropy = 8;
       texture.userData.sharedAsset = true;
       return texture;
     }));
     for (const material of Object.values(materials)) {
       if (material.userData.surface !== surface) continue;
       [material.map, material.normalMap, material.roughnessMap] = textures;
-      // The clean paint coat is uniform pigment over the scanned polymer microstructure.
-      if (surface === 'plaster') material.map = null;
-      material.normalScale.set(surface === 'plaster' ? .035 : surface === 'vinyl' ? .045 : .24, surface === 'plaster' ? .035 : surface === 'vinyl' ? .045 : .24);
+      // Keep the scanned albedo on painted surfaces. The previous implementation
+      // explicitly nulled plaster.map, which made walls/ceilings render as flat color
+      // even though the texture files had been downloaded successfully.
+      const normalStrength = surface === 'plaster' ? .11 : surface === 'vinyl' ? .12 : surface === 'wood' ? .20 : .24;
+      material.normalScale.set(normalStrength, normalStrength);
       material.needsUpdate = true;
     }
   })).then(() => {
