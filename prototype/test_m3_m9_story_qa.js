@@ -15,6 +15,7 @@ const b2=readFileSync('./src/world/zones/B2Archive.js','utf8');
 const router=readFileSync('./src/world/WorldRouter.js','utf8');
 const routes=readFileSync('./src/world/shared/WorldRoutes.js','utf8');
 const html=readFileSync('./index.html','utf8');
+const ui=readFileSync('./src/ui/UIManager.js','utf8');
 
 assert(!main.includes('工號'),'player-facing story copy must use 員編 terminology');
 assert(ui.includes("17:00｜值班身分驗證異常")&&main.includes("HANDOFF_DEFAULT"),'M1 must make the default-template choice a real 409 Patientization decision');
