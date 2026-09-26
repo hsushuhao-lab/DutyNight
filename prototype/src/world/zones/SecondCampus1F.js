@@ -6,6 +6,7 @@ import { disposeZoneArt } from '../../art/ArtResources.js';
 import { SignAnchor } from '../shared/SignAnchor.js';
 import { CollisionFactory } from '../shared/CollisionFactory.js';
 import { AccessDoor } from '../shared/AccessDoor.js';
+import {buildDeskCluster,buildSupplyCabinet} from '../../art/ClinicalDressing.js';
 
 export class SecondCampus1F {
   constructor(scene, geometryFactory) {
@@ -103,6 +104,8 @@ export class SecondCampus1F {
     counterFront(art, this.gf.materials, 74, -4.04, 2.6, 1.1);
     // Security CCTV multi-view monitor facing inward
     monitor(art, this.gf.materials, 74, 1.18, -4.5, Math.PI);
+    buildDeskCluster(art,this.gf.materials,{x:74,z:-5.2,yaw:Math.PI,chairs:1,name:'Second1F_GuardWorkstation'});
+    buildSupplyCabinet(art,this.gf.materials,{x:76.6,z:-6.6,yaw:-Math.PI/2,name:'Second1F_GuardStorage'});
     // Guard logbook and security transceiver
     solid(art, this.gf.materials.doorWood, [75, 1.19, -4.5], [0.35, 0.04, 0.28]);
     solid(art, this.gf.materials.metal, [73.2, 1.25, -4.5], [0.08, 0.22, 0.08]);

@@ -6,6 +6,7 @@ import { disposeZoneArt } from '../../art/ArtResources.js';
 import { Doorway } from '../shared/Doorway.js';
 import { SignAnchor } from '../shared/SignAnchor.js';
 import { CollisionFactory } from '../shared/CollisionFactory.js';
+import {buildDeskCluster,buildMonitorWall,buildSupplyCabinet} from '../../art/ClinicalDressing.js';
 
 export class SecondCampus2F {
   constructor(scene, geometryFactory) {
@@ -45,11 +46,38 @@ export class SecondCampus2F {
       const code = index === 0 ? '201' : '202';
       const label = index === 0 ? '警衛休息室' : '安檢監控支援室';
       SignAnchor.buildWallPlaque({scene:this.zoneGroup,x:x-1.25,y:1.9,z:-4.28,rotationY:0,code,title:label,subtitle:'',header:'第二院區 2F'});
-      asset(this.art, 'workDesk', [x+2, 0, -9]);
-      CollisionFactory.addBox(this.colliders, x+2, .55, -9, 1.5, 1.1, .8);
+      if(index===0){
+        buildDeskCluster(this.art,this.gf.materials,{x:x-1,z:-8.7,chairs:2,name:'Second2F_GuardRestDesk'});
+        buildSupplyCabinet(this.art,this.gf.materials,{x:x+2.8,z:-9.65,name:'Second2F_GuardRestShelf'});
+        asset(this.art,'storageCabinet',[x-3,0,-9.6],[.72,.9,.72]);
+      }else{
+        buildDeskCluster(this.art,this.gf.materials,{x:x-1,z:-8.7,chairs:2,name:'Second2F_SecurityControlDesk'});
+        buildMonitorWall(this.art,this.gf.materials,{x,z:-10.25,name:'Second2F_CCTVWall'});
+        buildSupplyCabinet(this.art,this.gf.materials,{x:x+2.8,z:-9.65,name:'Second2F_SecurityArchiveShelf'});
+        const cctvHit=new THREE.Mesh(new THREE.BoxGeometry(3.2,2.0,1.2),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
+        cctvHit.position.set(x,1.55,-9.75);cctvHit.userData={interactable:true,id:'SECOND_2F_CCTV_SELF',type:'security_monitor_anomaly',label:'查看監視畫面'};
+        this.zoneGroup.add(cctvHit);this.interactables.push(cctvHit);
+      }
       this.gf.buildCeilingLight(this.zoneGroup,x,3.15,-7.5);
       this.roomAreas.push({id:code,label,point:[x,1.7,-7.5],door:[x,1.7,-4.5],corridor:[x,1.7,0]});
     }
+    this.gf.buildFloor(this.zoneGroup,this.walkables,72,0,8.85,8,8.7,this.gf.materials.floor);
+    this.gf.buildCeiling(this.zoneGroup,72,3.2,8.85,8,8.7);
+    this.gf.buildWall(this.zoneGroup,this.colliders,72,1.6,13.2,8,3.2,.4);
+    for(const x of [68,76])this.gf.buildWall(this.zoneGroup,this.colliders,x,1.6,8.85,.4,3.2,8.7);
+    for(const [x,width] of [[69.5,3],[74.5,3]])this.gf.buildWall(this.zoneGroup,this.colliders,x,1.6,4.5,width,3.2,.4);
+    Doorway.build({scene:this.zoneGroup,colliders:this.colliders,x:72,z:4.5,width:1.4,height:2.4,wallHeight:3.2,isAlongX:true,isOpen:true,doorMaterial:this.gf.materials.doorWood});
+    SignAnchor.buildWallPlaque({scene:this.zoneGroup,x:70.65,y:1.9,z:4.28,rotationY:0,code:'203',title:'醫師值班室',subtitle:'DUTY ROOM',header:'第二院區 2F'});
+    buildDeskCluster(this.art,this.gf.materials,{x:70,z:8.8,chairs:1,name:'Second2F_DoctorDutyDesk'});
+    buildSupplyCabinet(this.art,this.gf.materials,{x:69,z:10,name:'Second2F_DoctorShelf'});
+    asset(this.art,'hospitalBed',[73.5,0,8.7],[1,1,.9],Math.PI/2);
+    this.gf.buildWall(this.zoneGroup,this.colliders,74.4,1.3,6.7,3,2.6,.18);
+    this.gf.buildWall(this.zoneGroup,this.colliders,74.9,1.3,8.1,.18,2.6,3);
+    solid(this.art,this.gf.materials.bedSheet,[75.15,.28,7.5],[.42,.56,.48]);
+    solid(this.art,this.gf.materials.wall,[74.75,.65,6.86],[.55,.18,.36]);
+    solid(this.art,this.gf.materials.glass,[74.75,1.35,6.78],[.62,.55,.025]);
+    this.gf.buildCeilingLight(this.zoneGroup,72,3.15,7.5);
+    this.roomAreas.push({id:'203',label:'醫師值班室',point:[72,1.7,7.5],door:[72,1.7,4.5],corridor:[72,1.7,0]});
 
     // West wall with bridge entrance portal (at x = 60)
     // Left segment (z: -4.5 to -1.4)
@@ -128,7 +156,16 @@ export class SecondCampus2F {
     const art = this.art;
     counterFront(art, this.gf.materials, 67, 2.78, 4.2, 1.1);
     asset(art, 'bench', [70, 0, -3.85]);
+    asset(art,'bench',[63.0,0,3.75]);
+    asset(art,'bench',[63.0,0,-3.75]);
+    asset(art,'plant',[61.3,0,-3.4]);
     asset(art,'plant',[61.4,0,3.65]);
+    for(const [index,z] of [-2.2,2.2].entries()){
+      const stand=new THREE.Group();stand.name=`Second2F_BridgeLobbyStand_${index+1}`;stand.position.set(62.2,0,z);art.add(stand);
+      solid(stand,this.gf.materials.metal,[0,.62,0],[.05,1.24,.05]);
+      solid(stand,this.gf.materials.wallBumper,[0,1.02,0],[.78,.48,.06]);
+      solid(stand,this.gf.materials.metal,[0,.03,0],[.65,.06,.36]);
+    }
     const oldBridgeDoor=this.zoneGroup.getObjectByName('Doorway_60_0');
     for(const leaf of oldBridgeDoor.children)if(leaf.geometry?.parameters.height===2.35||leaf.geometry?.parameters.height===2.45)leaf.visible=false;
     new AccessDoor(this,{id:'BRIDGE_ACCESS',x:60,z:0,yaw:Math.PI/2,width:2.8,title:'天橋感應門',portal:'bridge_from_second'});

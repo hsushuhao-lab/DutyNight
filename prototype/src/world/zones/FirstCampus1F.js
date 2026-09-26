@@ -259,7 +259,7 @@ export class FirstCampus1F {
     this.hiddenServiceDoor={id:'1F_HIDDEN_SERVICE_DOOR',position:[-13.78,1.18,4.55],requires:'FIRST_FLOOR_GUARD_KEY',revealedBy:'HOOK_1F_HIDDEN_DOOR'};
 
     const guardPost=new THREE.Group();guardPost.name='FirstCampus1F_OldGuardPost';guardPost.position.set(-10.7,0,3.2);guardPost.rotation.y=2.30;
-    guardPost.userData={interactable:true,id:'OLD_GUARD_POST',type:'guard_post_inspection',label:'檢查舊警衛台'};
+    guardPost.userData={interactable:true,id:'OLD_GUARD_POST',type:'guard_post_inspection',label:'檢查警衛台'};
     this.zoneGroup.add(guardPost);this.guardPostObject=guardPost;this.interactables.push(guardPost);
     solid(guardPost,this.gf.materials.doorWood,[0,.53,0],[2.1,1.06,.78]);
     solid(guardPost,this.gf.materials.counterTop,[0,1.10,0],[2.18,.08,.84]);
@@ -286,7 +286,7 @@ export class FirstCampus1F {
     const lampLight=new THREE.PointLight(0xe9dfc0,.18,1.8,2);lampLight.name='OldGuardPost_WarmTaskLight';lampLight.position.set(0,.28,.08);taskLamp.add(lampLight);
     asset(guardPost,'storageCabinet',[-1.25,0,-.16],[.45,.9,.55]);
     CollisionFactory.addBox(this.colliders,-10.7,.55,3.2,2.3,1.1,1.9);
-    SignAnchor.buildWallPlaque({scene:guardPost,x:0,y:1.78,z:.43,rotationY:0,width:1.2,height:.34,code:'SECURITY',title:'警衛台',subtitle:'NIGHT SECURITY POST',header:''});
+    SignAnchor.buildWallPlaque({scene:guardPost,x:0,y:.72,z:.43,rotationY:0,width:1.2,height:.34,code:'SECURITY',title:'警衛台',subtitle:'NIGHT SECURITY POST',header:''});
     this.guardPost={id:'OLD_GUARD_POST',position:[-10.7,0,3.2],cctv:'OldGuardPost_CCTVMonitor',logbook:'OldGuardPost_NightLogbook',phone:'OldGuardPost_DeskPhone',keys:'OldGuardPost_KeyRing',lamp:'OldGuardPost_TaskLamp',serviceDoor:'1F_HIDDEN_SERVICE_DOOR'};
 
     // ==========================================

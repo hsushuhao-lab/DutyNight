@@ -89,6 +89,7 @@ export class GameState {
     this.flags.set('M3_316_DECODED', false);
     this.flags.set('LEGEND_ER0033_RESOLVED', false);
     this.flags.set('SECOND_CAMPUS_ACCESS', false);
+    this.flags.set('SECOND_CAMPUS_OBJECTIVE_ACTIVE', false);
     this.flags.set('SECOND_CAMPUS_5F_REPORTED', false);
     this.flags.set('BRIDGE_ACCESS', false);
     this.flags.set('M4_CHEST_RESOLVED', false);
@@ -103,6 +104,12 @@ export class GameState {
     this.flags.set('SECOND_CAMPUS_PHONE_PENDING', false);
     this.flags.set('FLOOR6_AVAILABLE', false);
     this.flags.set('M6_FLOOR6_RESOLVED', false);
+    this.flags.set('SECURITY_RECORD_OBJECTIVE', false);
+    this.flags.set('B2_ADMIN_SOURCE', false);
+    this.flags.set('B2_HISTORY_SOURCE', false);
+    this.flags.set('B2_LEGACY_SOURCE', false);
+    this.flags.set('B2_SECURITY_SOURCE', false);
+    this.flags.set('CCTV_SELF_DUPLICATE_SEEN', false);
     this.flags.set('M7_B2_OPEN', false);
     this.flags.set('M7_B2_RESOLVED', false);
     this.flags.set('M8_IDENTITY_BATTLE_ACTIVE', false);

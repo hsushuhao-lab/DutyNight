@@ -173,8 +173,10 @@ function unlockSecondCampusAccess(){
   gameState.setGameTime('01:15');
   gameState.setFlag('SECOND_CAMPUS_ACCESS',true);
   gameState.setFlag('BRIDGE_ACCESS',true);
+  gameState.setFlag('SECOND_CAMPUS_OBJECTIVE_ACTIVE',true);
   persistentMemory.addJournalNote('SECOND_CAMPUS_CALL','第二院區護理站主動開了八樓天橋權限；在這之前我根本沒有跨院區資格。');
-  uiManager.showSubtitle('第二院區護理師','「請到第二院區 5F 護理站報到，有一位病人需要精神科評估。八樓天橋的門禁權限已開放。」',5600);
+  uiManager.showSubtitle('第二院區護理師','「李醫師，第二院區 5F 有一位病人需要精神科評估。八樓天橋的門禁權限已開放，請到 5F 護理站報到。」',5600);
+  uiManager.updateTasks();
 }
 
 function completeM5IfReady(){
@@ -311,7 +313,7 @@ controller.onInteract = (interactable) => {
         uiManager.showSubtitle('門禁','「此門只進不出。」',2600);
         return;
       }
-      if(interactable.doorId==='3F_ARCHIVE_DOOR'&&!gameState.getFlag('ARCHIVE_OBJECTIVE')){
+      if(interactable.doorId==='3F_ARCHIVE_DOOR'&&!gameState.getFlag('ARCHIVE_ACCESS_KEY')){
         soundManager.playClick();
         uiManager.showSubtitle('李醫師','「文史館？今晚的正常交班流程沒有提到這裡。先把 316 的交班做完。」',3200);
         return;
@@ -360,11 +362,6 @@ controller.onInteract = (interactable) => {
       const zone=worldRouter.activeZoneInstance;
       const keyedDoor=zone.keyedDoors?.[interactable.doorId];
       if(!keyedDoor)return;
-      if(!gameState.getFlag('ARCHIVE_OBJECTIVE')){
-        soundManager.playDoorLockClack();
-        uiManager.showSubtitle('李醫師','「打不開。門上也沒有牌子……」',2400);
-        return;
-      }
       if(!gameState.getFlag('ARCHIVE_ACCESS_KEY')){
         gameState.setFlag('ARCHIVE_LOCKED_SEEN',true);
         soundManager.playDoorLockClack();
@@ -599,6 +596,7 @@ controller.onInteract = (interactable) => {
       persistentMemory.setProof('time',true);
     }
     gameState.setFlag('SECOND_CAMPUS_PHONE_PENDING',true);
+    gameState.setFlag('B2_LEGACY_SOURCE',true);
     soundManager.playPhoneRingPattern();
     uiManager.showSubtitle('316 舊資料終端','「1998-ER-0217｜責任醫師：張○○｜員編前綴：MED-87。」\n\n終端機停止後，桌上的院內電話立刻響起。',5200);
   } else if (interactable.type === 'workstation') {
@@ -640,6 +638,8 @@ controller.onInteract = (interactable) => {
     controller.enabled = false;
     uiManager.openArchiveDocument({title:interactable.documentTitle,pages:interactable.pages});
     gameState.addEvidence(1);
+    if(interactable.id?.startsWith('ADMIN_'))gameState.setFlag('B2_ADMIN_SOURCE',true);
+    if(interactable.id?.startsWith('ARCHIVE_'))gameState.setFlag('B2_HISTORY_SOURCE',true);
     if(interactable.id==='ARCHIVE_UNINDEXED_HANDOFF'&&gameState.getFlag('ARCHIVE_OBJECTIVE')){
       gameState.markTaskComplete('ARCHIVE_CLUE_FOUND');
       gameState.setFlag('ARCHIVE_CLUE_FOUND',true);
@@ -698,6 +698,8 @@ controller.onInteract = (interactable) => {
     controller.currentInteractable = null;
     uiManager.showPrompt(null);
   } else if (interactable.type === 'guard_post_inspection') {
+    gameState.setFlag('B2_SECURITY_SOURCE',true);
+    gameState.setFlag('SECURITY_RECORD_OBJECTIVE',false);
     if(!gameState.getFlag('HIDDEN_SERVICE_DOOR_DISCOVERED')){
       gameState.setFlag('HIDDEN_SERVICE_DOOR_DISCOVERED',true);
       worldRouter.activeZoneInstance?.syncStoryState?.();
@@ -718,7 +720,7 @@ controller.onInteract = (interactable) => {
       uiManager.showSubtitle('李醫師','「鑰匙能插進去，但還少了什麼。409、21:17、另一個我……線索還沒有完全對上。」',4000);
       return;
     }
-    if(gameState.getFlag('M7_B2_OPEN')){worldRouter.loadZone('b2_archive','b2_archive_lift');return;}
+    if(gameState.getFlag('M7_B2_OPEN')){worldRouter.loadZone('b2_archive','b2_archive_stairs');return;}
     gameState.setGameTime('02:17');
     controller.enabled=false;
     uiManager.openStoryChoice({
@@ -732,7 +734,7 @@ controller.onInteract = (interactable) => {
         gameState.setFlag('B2_DOOR_READY',true);
         persistentMemory.setProof('time',true);
         persistentMemory.addJournalNote('B2_OPEN','02:17 不是命令。我只隔離 B-Panel，沒有重演整個斷電流程。');
-        worldRouter.loadZone('b2_archive','b2_archive_lift');
+        worldRouter.loadZone('b2_archive','b2_archive_stairs');
         controller.enabled=true;
       }
     });
@@ -741,15 +743,22 @@ controller.onInteract = (interactable) => {
       uiManager.showSubtitle('舊終端機',`ARCHIVE ID：${TRUE_NAME_CANON}｜住院醫師｜1998 夜班事件關係人`,3600);
       return;
     }
-    persistentMemory.setTrueNameFragment('frag_title','住院醫師');
-    persistentMemory.setTrueNameFragment('frag_employeeFull','MED-870409');
-    const restored=persistentMemory.resolveTrueName(TRUE_NAME_CANON);
-    if(!restored){
+    const missing=[];
+    if(!gameState.getFlag('B2_ADMIN_SOURCE'))missing.push('行政端原始紀錄');
+    if(!gameState.getFlag('B2_HISTORY_SOURCE'))missing.push('歷史封存索引');
+    if(!gameState.getFlag('B2_LEGACY_SOURCE'))missing.push('316 舊終端');
+    if(!gameState.getFlag('B2_SECURITY_SOURCE'))missing.push('夜間門禁來源');
+    const fragments=persistentMemory.data.trueNameFragments;
+    if(!fragments.frag_surname||!fragments.frag_givenName_1||!fragments.frag_givenName_2)missing.push('姓名／員編');
+    if(missing.length){
       gameState.setFlag('B2_IDENTITY_INCOMPLETE',true);
       uiManager.updateTasks();
-      uiManager.showSubtitle('UNREGISTERED MESSAGE / ARCHIVE','「身分碎片不足。員編、姓名與姓名紀錄仍無法完成一致性驗證。」',4600);
+      uiManager.showSubtitle('ARCHIVE CONSISTENCY CHECK',`「驗證未完成。尚缺：${missing.join('、')}。沿逃生梯返回 1F，補齊對應來源。」`,5200);
       return;
     }
+    persistentMemory.setTrueNameFragment('frag_title','住院醫師');
+    persistentMemory.setTrueNameFragment('frag_employeeFull','MED-870409');
+    if(!persistentMemory.resolveTrueName(TRUE_NAME_CANON))return;
     gameState.setFlag('M7_B2_RESOLVED',true);
     gameState.setFlag('M8_IDENTITY_BATTLE_ACTIVE',true);
     while(persistentMemory.data.identityErosionLevel<4)persistentMemory.raiseErosion(1);
@@ -769,6 +778,12 @@ MED-870409｜${TRUE_NAME_CANON}。\n3F-316：另一個使用者已登入。」`,
       setTimeout(()=>uiManager.showSubtitle('李醫師','「先離開封存層，補齊線索後再回來。」',3400),700);
     }
     controller.enabled=true;
+  } else if (interactable.type === 'security_monitor_anomaly') {
+    if(!gameState.getFlag('CCTV_SELF_DUPLICATE_SEEN')){
+      gameState.setFlag('CCTV_SELF_DUPLICATE_SEEN',true);
+      persistentMemory.addJournalNote('CCTV_SELF_DUPLICATE','第二院區 2F 監控畫面裡，另一個「我」仍站在螢幕前。');
+      uiManager.showSubtitle('李醫師','「等等……我已經站在這裡了。\n那畫面裡正在被拍的人，是誰？」',4800);
+    }else uiManager.showSubtitle('監視畫面','畫面裡的人仍背對鏡頭，站在同一個位置。',2800);
   } else if (interactable.type === 'exit_door' || interactable.type === 'closed_door') {
     soundManager.playClick();
     if (interactable.id === '1F_MAIN_DOOR') {
@@ -965,10 +980,10 @@ MED-870409｜${TRUE_NAME_CANON}。\n3F-316：另一個使用者已登入。」`,
       persistentMemory.addJournalNote('FLOOR6_SAFE','6F 不存在。走廊盡頭卻有一個異常檔案區；它像是 B2 的倒影。');
       persistentMemory.raiseErosion(1);
     }
-    const returnZone=gameState.getFlag('PHANTOM6_RETURN_ZONE')||'second_campus_5f';
-    worldRouter.loadZone(returnZone);
+    gameState.setFlag('SECURITY_RECORD_OBJECTIVE',true);
+    worldRouter.loadZone('first_campus_1f');
     controller.enabled=true;
-    uiManager.showSubtitle('李醫師','「不要追。這層根本不在樓層圖上。」',2800);
+    uiManager.showSubtitle('李醫師','「如果這個樓層真的不存在，電梯系統不一定會留下正常紀錄……但夜間門禁和監視系統一定會記錄有人經過。去一樓警衛台。」',5400);
   } else if (interactable.type === 'guard_sign_2117') {
     if(!gameState.getFlag('NIGHT_PATROL_RETURN_3F'))return;
     if(!gameState.getFlag('GUARD_SIGN_EXAMINED')){

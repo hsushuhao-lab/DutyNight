@@ -21,7 +21,7 @@ assert(!routes.includes('hill_from_')&&!routes.includes('pond_from_'),'productio
 assert(!router.includes('HillsideRoute')&&!router.includes('EcologyPond'),'production router must not load outdoor zones');
 assert(main.includes("setTrueNameFragment('frag_employeePrefix','MED-87')"),'M3 MED-87 clue missing');
 assert(main.includes("setTrueNameFragment('frag_employeeFull','MED-870409')"),'M7 full 員編 clue missing');
-assert(main.includes('請到第二院區 5F 護理站報到'),'M3 lookup must hand off through the nursing station');
+assert(main.includes("setFlag('SECOND_CAMPUS_OBJECTIVE_ACTIVE',true)"),'M3 lookup must activate the second-campus objective');
 assert(main.includes('八樓天橋的門禁權限已開放'),'second-campus call must identify the bridge floor');
 assert(main.includes('怎麼知道我在 316 辦公室'),'M3 phone must establish the 316 privacy violation');
 assert(html.includes('final-employee-id'),'M9 must collect the full 員編');
@@ -49,7 +49,7 @@ assert(main.includes("LEGEND 06 — 不存在的六樓")&&main.includes("M6_FLOO
 assert(b2.includes("type:'b2_archive_terminal'")&&b2.includes("type:'b2_escape_stairs'"),'M7 B2 convergence interactions missing');
 assert(main.includes("interactable.type === 'er_nurse_computer'")&&main.includes('這個電腦是護理師專用'),'ER nurse computers must redirect the physician');
 assert(main.includes("gameState.setFlag('B2_IDENTITY_INCOMPLETE',true)")&&main.includes("interactable.type === 'b2_escape_stairs'"),'B2 insufficient identity route must fail forward to stairs');
-assert(router.includes("'b2_archive': B2Archive")&&routes.includes("b2_archive_lift"),'M7 B2 route registration missing');
+assert(router.includes("'b2_archive': B2Archive")&&routes.includes("b2_archive_stairs")&&!routes.includes("b2_archive_lift"),'M7 B2 stair route registration missing');
 assert(main.includes("M7_B2_RESOLVED")&&main.includes("02:17｜警衛台後方 B-Panel"),'M7 02:17/B2 logic missing');
 
 assert(main.includes("M8_IDENTITY_BATTLE_ACTIVE")&&main.includes("LAST_CALL_SEEN"),'M8 identity battle/last call missing');

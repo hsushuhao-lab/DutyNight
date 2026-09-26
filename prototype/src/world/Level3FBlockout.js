@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import {createAnnieArt} from '../art/AnnieArt.js';
 import { getMaterials, materialForSurface } from '../art/MaterialRegistry.js';
 import { applyExteriorTime } from '../art/CampusBackdrop.js';
+import {buildLegacyArchiveTerminal} from '../art/LegacyTerminalArt.js';
 
 export class Level3FBlockout {
   constructor(scene) {
@@ -606,6 +607,15 @@ export class Level3FBlockout {
 
     // Two PC monitors - oriented INWARD (facing East toward inner desk, backs facing doorway/corridor)
     [-0.6, 0.6].forEach((offsetZ, idx) => {
+      if(idx===1){
+        const legacy=buildLegacyArchiveTerminal({
+          parent:this.scene,materials:getMaterials(),position:[9.65,.78,5.5+offsetZ],rotationY:-Math.PI/2,
+          id:'316_LEGACY_TERMINAL',type:'legacy_terminal_316',label:'查看 316 舊資料終端',
+          screenTitle:'1998-ER-0217 SEARCH',name:'DutyTerminal_316_Legacy'
+        });
+        this.interactables.push(legacy.hitbox);this.legacyTerminalMesh=legacy.hitbox;
+        return;
+      }
       // Monitor stand on desk
       const stand = new THREE.Mesh(
         new THREE.CylinderGeometry(0.08, 0.1, 0.22),
@@ -677,24 +687,6 @@ export class Level3FBlockout {
         this.scene.add(wsHitbox);
         this.interactables.push(wsHitbox);
         this.workstationMesh = wsHitbox;
-      } else {
-        // The second 316 terminal is an older archive client. It looks like an
-        // ordinary ward-information screen until the 00:33 slip is brought back.
-        const legacyHitbox = new THREE.Mesh(
-          new THREE.BoxGeometry(0.8, 0.7, 0.9),
-          new THREE.MeshBasicMaterial({ visible: false })
-        );
-        legacyHitbox.position.set(9.8, 1.2, 5.5 + offsetZ);
-        legacyHitbox.name='DutyTerminal_316_LegacyHitbox';
-        legacyHitbox.userData = {
-          interactable: true,
-          id: '316_LEGACY_TERMINAL',
-          label: '查看 316 舊資料終端',
-          type: 'legacy_terminal_316'
-        };
-        this.scene.add(legacyHitbox);
-        this.interactables.push(legacyHitbox);
-        this.legacyTerminalMesh = legacyHitbox;
       }
     });
   }

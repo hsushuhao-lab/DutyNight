@@ -884,13 +884,13 @@ export class UIManager {
         this.renderTaskBoard('等待院內來電',[
           {id:'task-second-call',text:'留意第二院區來電',state:'ready'}
         ]);
-      }else if(this.gameState.getFlag('SECOND_CAMPUS_ACCESS')&&!this.gameState.getFlag('M4_CHEST_RESOLVED')){
+      }else if(this.gameState.getFlag('SECOND_CAMPUS_OBJECTIVE_ACTIVE')&&!this.gameState.getFlag('M4_CHEST_RESOLVED')){
         const reported=this.gameState.getFlag('SECOND_CAMPUS_5F_REPORTED');
         const seen=this.gameState.getFlag('SECOND_CHEST_PATIENT_SEEN');
         this.renderTaskBoard('翌日 01:15｜第二院區 5F',[
           {
             id:'task-m4-chest',
-            text:!reported?'先到第二院區 5F 護理站報到':seen?'回護理站查看桌上的「病人處置醫囑」':'前往 504B 評估陳怡君',
+            text:!reported?'01:15 前往第二院區 5F 護理站報到':seen?'回護理站查看桌上的「病人處置醫囑」':'前往 504B 評估陳怡君',
             state:'ready'
           }
         ]);
@@ -903,8 +903,8 @@ export class UIManager {
           {id:'task-m6-elevator',text:currentZone==='phantom_6f'?(this.gameState.getFlag('FLOOR6_STETHOSCOPE_FOUND')?'檢視反光的老舊聽診器，翻面或擦去刻字上的灰塵':'查看焦黑器材旁反光的物件'):'搭乘一般電梯返回第一院區',state:'ready'}
         ]);
       }else if(this.gameState.getFlag('M6_FLOOR6_RESOLVED')&&!this.gameState.getFlag('M7_B2_OPEN')){
-        this.renderTaskBoard('翌日 02:17 前｜B-Panel',[
-          {id:'task-m7-service-door',text:this.gameState.getFlag('HIDDEN_SERVICE_DOOR_DISCOVERED')?'檢查警衛台後方浮現的舊門框':'前往第一院區 1F，檢查警衛台',state:'ready'}
+        this.renderTaskBoard('翌日 02:17 前｜門禁紀錄',[
+          {id:'task-m7-service-door',text:this.gameState.getFlag('HIDDEN_SERVICE_DOOR_DISCOVERED')?'檢查警衛台後方浮現的舊門框':'02:17 前往第一院區 1F 警衛台，查找異常門禁與監視紀錄',state:'ready'}
         ]);
       }else if(this.gameState.getFlag('M7_B2_OPEN')&&!this.gameState.getFlag('M7_B2_RESOLVED')){
         this.renderTaskBoard('翌日 02:17｜B2',[

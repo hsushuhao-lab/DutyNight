@@ -41,9 +41,9 @@ export const ERA_POSTER_PLACEMENTS=Object.freeze({
   ]),
   skybridge:Object.freeze([
     P('poster_05_derealization_dissociation',8,1.55,-1.78,0,.64,'stained',true,-.016),
-    P('poster_05_derealization_dissociation',20,1.55,1.78,Math.PI,.62,'stained',false,.018),
+    P('poster_05_derealization_dissociation',18,1.55,-1.78,0,.62,'stained',false,.018),
     P('poster_03_doppelganger_delusion',30,1.55,-1.78,0,.58,'redacted',true,-.012),
-    P('poster_05_derealization_dissociation',40,1.55,1.78,Math.PI,.62,'torn',false,.014),
+    P('poster_05_derealization_dissociation',40,1.55,-1.78,0,.62,'torn',false,.014),
     P('poster_04_hospital_history_1998',50,1.55,-1.78,0,.60,'torn',false,-.02)
   ]),
   phantom_6f:Object.freeze([
@@ -52,10 +52,14 @@ export const ERA_POSTER_PLACEMENTS=Object.freeze({
     P('poster_03_doppelganger_delusion',-3.82,1.55,-11.2,Math.PI/2,.62,'redacted',false,.022)
   ]),
   b2_archive:Object.freeze([
-    P('poster_04_hospital_history_1998',-4.82,1.55,-4.5,Math.PI/2,.76,'burnt',true,-.016),
-    P('poster_06_night_shift_attendance',4.82,1.55,-7.2,-Math.PI/2,.68,'burnt',true,.016),
-    P('poster_07_ect_identity_memory',-4.82,1.55,-10.2,Math.PI/2,.68,'torn',false,-.012),
-    P('poster_03_doppelganger_delusion',4.82,1.55,-12.8,-Math.PI/2,.62,'redacted',false,.018)
+    P('poster_01_restraint_sop',-4.82,1.55,-2.4,Math.PI/2,.64,'burnt',true,-.016),
+    P('poster_02_auditory_hallucination_knocking',4.82,1.55,-3.8,-Math.PI/2,.64,'torn',true,.012),
+    P('poster_03_doppelganger_delusion',-4.82,1.55,-5.4,Math.PI/2,.64,'redacted',true,-.012),
+    P('poster_04_hospital_history_1998',4.82,1.55,-6.8,-Math.PI/2,.70,'burnt',true,.016),
+    P('poster_05_derealization_dissociation',-4.82,1.55,-8.2,Math.PI/2,.64,'stained',true,-.016),
+    P('poster_06_night_shift_attendance',4.82,1.55,-9.6,-Math.PI/2,.64,'burnt',true,.016),
+    P('poster_07_ect_identity_memory',-4.82,1.55,-11.0,Math.PI/2,.64,'torn',true,-.012),
+    P('poster_08_er_jane_doe_triage',4.82,1.55,-12.4,-Math.PI/2,.64,'redacted',true,.018)
   ])
 });
 

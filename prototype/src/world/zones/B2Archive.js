@@ -1,5 +1,7 @@
 import * as THREE from 'three';
-import { monitor, solid } from '../../art/ArtDetails.js';
+import { asset, solid } from '../../art/ArtDetails.js';
+import {buildLegacyArchiveTerminal} from '../../art/LegacyTerminalArt.js';
+import {buildDeskCluster,buildSupplyCabinet} from '../../art/ClinicalDressing.js';
 import { disposeZoneArt } from '../../art/ArtResources.js';
 import { SignAnchor } from '../shared/SignAnchor.js';
 
@@ -41,27 +43,34 @@ export class B2Archive {
     const desk=solid(this.zoneGroup,m.doorWood,[0,.78,-12.8],[2.2,.08,.88]);desk.name='B2_ArchiveDesk';
     solid(this.zoneGroup,m.metal,[-.8,.38,-12.8],[.07,.72,.07]);
     solid(this.zoneGroup,m.metal,[.8,.38,-12.8],[.07,.72,.07]);
-    const workstation=monitor(this.zoneGroup,m,0,.82,-12.92,0);workstation.name='B2_ArchiveWorkstation';
+    const workstation=buildLegacyArchiveTerminal({
+      parent:this.zoneGroup,materials:m,position:[0,.82,-12.92],id:'B2_ARCHIVE_TERMINAL',type:'b2_archive_terminal',
+      label:'啟動封存驗證終端',screenTitle:'IDENTITY ARCHIVE VERIFICATION',name:'B2_ArchiveLegacyTerminal'
+    });
     const phone=new THREE.Group();phone.name='B2_ArchiveDeskPhone';phone.position.set(.72,.84,-12.66);this.zoneGroup.add(phone);
     solid(phone,m.wallDark,[0,.04,0],[.34,.08,.22]);
     solid(phone,m.metal,[0,.12,0],[.42,.08,.09],.025);
-    const terminal=new THREE.Mesh(new THREE.BoxGeometry(1.25,1.05,.9),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
-    terminal.position.set(0,1.18,-12.75);
-    terminal.name='B2_ArchiveTerminal';
-    terminal.userData={interactable:true,id:'B2_ARCHIVE_TERMINAL',type:'b2_archive_terminal',label:'啟動 B2 舊終端機'};
-    this.interactables.push(terminal);
+    const terminal=workstation.hitbox;this.interactables.push(terminal);
 
     const stairwell=new THREE.Group();stairwell.name='B2_EscapeStairwell';stairwell.position.set(0,0,.72);this.zoneGroup.add(stairwell);
     for(let step=0;step<6;step++)solid(stairwell,m.metal,[0,.10+step*.17,.30-step*.30],[2.2,.20,.42]);
     solid(stairwell,m.wallDark,[-1.18,1.25,-.45],[.10,2.5,2.8]);solid(stairwell,m.wallDark,[1.18,1.25,-.45],[.10,2.5,2.8]);
+    solid(stairwell,m.doorWood,[0,1.15,.46],[1.72,2.30,.10]);
+    solid(stairwell,m.metal,[.68,1.12,.38],[.08,.08,.08]);
     SignAnchor.buildWallPlaque({scene:stairwell,x:0,y:2.25,z:.66,rotationY:Math.PI,width:1.55,height:.38,code:'EXIT',title:'逃生梯｜返回 1F',subtitle:'STAIRWAY',header:''});
-    const returnHit=new THREE.Mesh(new THREE.BoxGeometry(2.4,2.4,1.5),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
-    returnHit.position.set(0,1.2,1.1);
+    const returnHit=new THREE.Mesh(new THREE.BoxGeometry(1.78,2.30,.62),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
+    returnHit.position.set(0,1.15,1.18);
     returnHit.userData={interactable:true,id:'B2_ESCAPE_STAIRS',type:'b2_escape_stairs',label:'沿逃生梯返回 1F'};
     this.zoneGroup.add(returnHit);this.interactables.push(returnHit);
 
     // Charred archive boxes: visual evidence only.
     for(let i=0;i<8;i++)solid(this.zoneGroup,i%2?m.wallDark:m.metal,[-3.6+(i%2)*7.2,.28+(i%3)*.38,-3.5-Math.floor(i/2)*2.2],[.72,.52,.92]);
+    buildDeskCluster(this.zoneGroup,m,{x:-2.5,z:-5.6,yaw:Math.PI/2,chairs:2,name:'B2_ArchiveDesk_A'});
+    buildDeskCluster(this.zoneGroup,m,{x:2.5,z:-8.8,yaw:-Math.PI/2,chairs:2,name:'B2_ArchiveDesk_B'});
+    buildSupplyCabinet(this.zoneGroup,m,{x:-3.9,z:-13.5,yaw:Math.PI/2,name:'B2_ArchiveShelf_A'});
+    buildSupplyCabinet(this.zoneGroup,m,{x:3.9,z:-13.5,yaw:-Math.PI/2,name:'B2_ArchiveShelf_B'});
+    asset(this.zoneGroup,'storageCabinet',[-3.7,0,-1.5],[.75,.9,.75],Math.PI/2);
+    asset(this.zoneGroup,'storageCabinet',[3.7,0,-1.5],[.75,.9,.75],-Math.PI/2);
 
     this.b2={id:'B2_ARCHIVE',archiveMirror:true,terminal:'B2_ARCHIVE_TERMINAL',exit:'B2_ESCAPE_STAIRS'};
     return this;

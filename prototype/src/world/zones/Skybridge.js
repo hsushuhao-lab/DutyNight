@@ -197,12 +197,11 @@ export class Skybridge {
     buildBridgePortrait(40, 1.75, 1.78, Math.PI, '第四任院長 郭○○ 醫師', '兩院區空中天橋開通主事', '2002 - 2011');
     buildBridgePortrait(50, 1.75, 1.78, Math.PI, '第五任院長 鄭○○ 醫師', '現代精神醫療體系革新', '2011 - 2019');
 
-    // South wall exhibition sequence (z = -1.78, facing North)
-    buildBridgePortrait(15, 1.75, -1.78, 0, '1981 首屆精神醫學年會', '創院初期醫療團隊全體留影', '1981.10');
-    buildBridgePortrait(25, 1.75, -1.78, 0, '首任精神部主任 葉○○', '急診重症專科奠基者', '1979 - 1990');
-    buildBridgePortrait(35, 1.75, -1.78, 0, '1992 天橋貫通落成紀錄', '兩院區高空結構合攏竣工', '1992.05');
-    buildBridgePortrait(45, 1.75, -1.78, 0, '首任總護理長 許○○', '推動全台首創開放式日間護理', '1980 - 1996');
-    buildBridgePortrait(55, 1.75, -1.78, 0, '終身奉獻獎 蔡護理督導', '長期深耕慢性病房照護體系', '1982 - 2015');
+    buildBridgePortrait(5, 1.75, 1.78, Math.PI, '1981 首屆精神醫學年會', '創院初期醫療團隊全體留影', '1981.10');
+    buildBridgePortrait(15, 1.75, 1.78, Math.PI, '首任精神部主任 葉○○', '急診重症專科奠基者', '1979 - 1990');
+    buildBridgePortrait(25, 1.75, 1.78, Math.PI, '1992 天橋貫通落成紀錄', '兩院區高空結構合攏竣工', '1992.05');
+    buildBridgePortrait(35, 1.75, 1.78, Math.PI, '首任總護理長 許○○', '推動全台首創開放式日間護理', '1980 - 1996');
+    buildBridgePortrait(45, 1.75, 1.78, Math.PI, '終身奉獻獎 蔡護理督導', '長期深耕慢性病房照護體系', '1982 - 2015');
 
     // ==========================================
     // 5. CEILING LIGHT FIXTURES (Alternating / realistic spacing)

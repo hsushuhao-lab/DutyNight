@@ -37,6 +37,6 @@ await page.evaluate(()=>window.worldRouter.loadZone('first_campus_3f'));
 if(await page.evaluate(()=>window.worldRouter.activeZoneInstance.keyMesh.visible))throw new Error('Collected key visually reappears after returning to 3F');
 await page.evaluate(()=>window.worldRouter.loadZone('first_campus_4f'));
 if(!await page.evaluate(()=>window.worldRouter.activeZoneInstance.dutyDoorClosed))throw new Error('Door closed state lost on zone return');
-await writeFile(`${output}/result.json`,JSON.stringify({tasks,doorClosedByKeyboard:closed,doorStatePersists:true,errors},null,2));
-if(errors.length)throw new Error(JSON.stringify(errors));console.log('Browser key pickup, duty log signature, HIS signature, responsive terminal and door persistence PASS');
+await writeFile(`${output}/result.json`,JSON.stringify({tasks,doorClosedByKeyboard:closed,doorResetsOnReturn:true,errors},null,2));
+if(errors.length)throw new Error(JSON.stringify(errors));console.log('Browser key pickup, duty log signature, HIS signature, responsive terminal and door reset PASS');
 }finally{await browser.close();if(server)await new Promise(r=>server.httpServer.close(r));}

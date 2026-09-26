@@ -29,10 +29,6 @@ export class WorldRouter {
     this.controller = controller;
     this.gf = new GeometryFactory();
 
-    this.dutyDoorClosed = true;
-    this.wardGateClosed = true;
-    this.acuteGateClosed = true;
-    this.doorStates = {};
     this.activeZoneId = null;
     this.activeZoneInstance = null;
     this.lightingZoneId=null;
@@ -82,10 +78,17 @@ export class WorldRouter {
   }
 
   resetTransientState(){
-    this.dutyDoorClosed=true;
-    this.wardGateClosed=true;
-    this.acuteGateClosed=true;
-    this.doorStates={};
+    this.closeZoneDoors(this.activeZoneInstance);
+  }
+
+  closeZoneDoors(zone){
+    if(!zone)return;
+    for(const door of Object.values(zone.accessDoors||{}))door.setClosed?.(true);
+    for(const door of Object.values(zone.keyedDoors||{}))door.setClosed?.(true);
+    zone.setDutyDoorClosed?.(true);
+    zone.setWardGateClosed?.(true);
+    zone.setInnerWardGateClosed?.(true);
+    zone.setAcuteGateClosed?.(true);
   }
 
   refreshLighting(){
@@ -110,14 +113,7 @@ export class WorldRouter {
 
     // Clean up current zone
     if (this.activeZoneInstance && typeof this.activeZoneInstance.cleanup === 'function') {
-      if (this.activeZoneId === 'first_campus_4f') {
-        this.dutyDoorClosed = this.activeZoneInstance.dutyDoorClosed;
-        this.wardGateClosed = this.activeZoneInstance.wardGateClosed;
-      }
-      if (this.activeZoneId === 'first_campus_2f' && typeof this.activeZoneInstance.acuteGateClosed === 'boolean') {
-        this.acuteGateClosed = this.activeZoneInstance.acuteGateClosed;
-      }
-      this.doorStates[this.activeZoneId]=Object.fromEntries(Object.entries(this.activeZoneInstance.accessDoors||{}).map(([id,d])=>[id,d.closed]));
+      this.closeZoneDoors(this.activeZoneInstance);
       this.activeZoneInstance.cleanup();
       this.activeZoneInstance = null;
     }
@@ -150,18 +146,9 @@ export class WorldRouter {
     }
     this.refreshLighting();
 
-    if (zoneId === 'first_campus_4f') {
-      this.activeZoneInstance.setDutyDoorClosed(this.dutyDoorClosed);
-      this.activeZoneInstance.setWardGateClosed(this.wardGateClosed);
-    }
-    if (zoneId === 'first_campus_2f' && this.activeZoneInstance.setAcuteGateClosed) {
-      this.activeZoneInstance.setAcuteGateClosed(this.acuteGateClosed);
-    }
+    this.closeZoneDoors(this.activeZoneInstance);
     if (zoneId === 'first_campus_1f') {
       this.activeZoneInstance.setEntranceClosed(true);
-    }
-    for(const [id,closed] of Object.entries(this.doorStates[zoneId]||{})){
-      this.activeZoneInstance.accessDoors?.[id]?.setClosed(closed);
     }
     this.activeZoneId = zoneId;
 

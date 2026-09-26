@@ -10,6 +10,7 @@ import { Doorway } from '../shared/Doorway.js';
 import { SignAnchor } from '../shared/SignAnchor.js';
 import { CollisionFactory } from '../shared/CollisionFactory.js';
 import { gameState } from '../../core/GameState.js';
+import {buildClinicalCart,buildDeskCluster,buildIvStand,buildSupplyCabinet} from '../../art/ClinicalDressing.js';
 
 export class FirstCampus2FER {
   constructor(scene, geometryFactory) {
@@ -155,6 +156,14 @@ export class FirstCampus2FER {
     });
 
     this.gf.buildCeilingLight(this.zoneGroup, 3.5, 3.15, 6.0, 0.8, 6.0);
+    buildDeskCluster(this.art,this.gf.materials,{x:2.0,z:6.15,yaw:Math.PI,chairs:1,name:'ER_NurseDesk_A'});
+    buildDeskCluster(this.art,this.gf.materials,{x:5.1,z:6.15,yaw:Math.PI,chairs:1,name:'ER_NurseDesk_B'});
+    buildSupplyCabinet(this.art,this.gf.materials,{x:1.0,z:8.1,name:'ER_MedicationCabinet_A'});
+    buildSupplyCabinet(this.art,this.gf.materials,{x:5.9,z:8.1,name:'ER_RecordCabinet_B'});
+    buildClinicalCart(this.art,this.gf.materials,{x:6.15,z:7.2,yaw:Math.PI/2,name:'ER_MedicationCart'});
+    asset(this.art,'officeChair',[3.55,0,7.75],[.92,.92,.92],0);
+    const printer=solid(this.art,this.gf.materials.metal,[3.55,.86,6.72],[.52,.20,.38]);printer.name='ER_NursePrinter';
+    asset(this.art,'plant',[.55,0,4.25],[.7,.7,.7]);
 
     // ==========================================
     // 4. ER ACUTE OBSERVATION BED BAYS (x: 9 to 20, z: 3.5 to 9.5)
@@ -195,6 +204,13 @@ export class FirstCampus2FER {
       subtitle: 'OBSERVATION BAYS',
       header: '青嶺醫療中心 ｜ 急診醫學部'
     });
+    asset(this.art,'bench',[10.2,0,2.55]);
+    asset(this.art,'bench',[18.2,0,2.55]);
+    asset(this.art,'plant',[19.25,0,2.75],[.75,.75,.75]);
+    const guideStand=new THREE.Group();guideStand.name='ER_ObservationGuideStand';guideStand.position.set(16.8,0,2.65);this.art.add(guideStand);
+    solid(guideStand,this.gf.materials.metal,[0,.62,0],[.05,1.24,.05]);
+    solid(guideStand,this.gf.materials.wallBumper,[0,1.03,0],[.78,.48,.06]);
+    solid(guideStand,this.gf.materials.metal,[0,.03,0],[.65,.06,.36]);
 
     // ==========================================
     // 5. ACUTE TREATMENT ROOM / ECT PREP FOOTPRINT (x: 0 to 7, z: -9.5 to -3.5)
@@ -242,6 +258,12 @@ export class FirstCampus2FER {
     CollisionFactory.addBox(this.colliders, 3.5, 0.4, -6.5, 1.1, 0.8, 2.2);
 
     this.gf.buildCeilingLight(this.zoneGroup, 3.5, 3.15, -6.5, 0.9, 6.5, 0xffffff);
+    buildSupplyCabinet(this.art,this.gf.materials,{x:.75,z:-8.8,name:'ER_TreatmentSupply_A'});
+    buildSupplyCabinet(this.art,this.gf.materials,{x:6.25,z:-8.8,name:'ER_TreatmentSupply_B'});
+    buildClinicalCart(this.art,this.gf.materials,{x:1.15,z:-5.2,name:'ER_TreatmentCart_A'});
+    buildClinicalCart(this.art,this.gf.materials,{x:5.85,z:-5.2,yaw:Math.PI,name:'ER_TreatmentCart_B'});
+    buildIvStand(this.art,this.gf.materials,{x:2.55,z:-7.15,name:'ER_IVStand_A'});
+    buildIvStand(this.art,this.gf.materials,{x:4.45,z:-7.15,name:'ER_IVStand_B'});
 
     // ==========================================
     // 6. DOCTOR ON-DUTY CHARTING ROOM (x: 9 to 16, z: -9.5 to -3.5)
