@@ -821,3 +821,12 @@ body.his-flicker #canvas-container{animation:his-power-flicker .42s linear}
   #subtitle-box { bottom: 102px; }
   #control-hint { bottom: 12px; left: 12px; right: 12px; justify-content: center; }
 }
+
+
+/* Era poster inspection */
+.poster-reader{width:min(920px,94vw);max-height:92vh;background:#151817;color:#e8e3d8;border:1px solid #56645c;box-shadow:0 28px 90px rgba(0,0,0,.86);display:flex;flex-direction:column}
+.poster-reader-header{display:flex;align-items:flex-start;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #4a544f;background:#28352f}
+.poster-reader-header h2{margin:4px 0 0;font-size:21px;color:#eef4ef}
+.poster-reader-body{padding:18px;overflow:auto;display:flex;flex-direction:column;align-items:center;gap:14px;background:radial-gradient(circle at 50% 36%,#252926 0,#131614 70%)}
+#poster-image{display:block;max-width:min(720px,86vw);max-height:72vh;width:auto;height:auto;object-fit:contain;box-shadow:0 12px 36px rgba(0,0,0,.72);border:1px solid rgba(223,211,180,.25);background:#d6cfbd}
+.poster-commentary{width:min(720px,86vw);margin:0;padding:11px 14px;border-left:3px solid #7b8f7e;background:rgba(233,227,209,.07);font:16px/1.7 "Noto Serif TC","PMingLiU",serif;color:#ddd5c3}
