@@ -182,18 +182,12 @@ export class WardFloorplan {
     };
     w.build();this.gf.buildCeilingLight(this.zoneGroup,-11,3.15,6,.7,7,0xffebce);
     this.dutyRoom={door:[-8,1.7,6],inside:[-9.5,1.7,6],outside:[-6.5,1.7,6],bounds:[-14,2,-8,10]};
-    const room403=this.roomAreas.find(r=>r.id==='403');
-    const p403=room403?.corridor||[-6.9,1.4,-13];
+    // V6 task flow: only the real nursing-station handoff remains as a free-standing target.
+    // 408C is interacted with through its wall-mounted bed plaque; 20:00 advances by opening the duty-room door.
     const reportTarget=new THREE.Mesh(new THREE.BoxGeometry(.85,.24,.16),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
     reportTarget.position.set(-3.35,1.22,-2.35);
     reportTarget.userData={interactable:true,id:'4F_NURSING_REPORT',type:'p1_action',action:'NURSE_REPORT',label:'向護理站報到'};
     this.zoneGroup.add(reportTarget);this.interactables.push(reportTarget);
-    this.interactables.push(
-      {type:'p1_action',action:'DUTY_ROOM_PREP',label:'整理值班室',position:new THREE.Vector3(-10.0,1.2,6.0),radius:1.8},
-      {type:'p1_action',action:'WARD_ROUND',label:'完成晚間巡房',position:new THREE.Vector3(0,1.4,-12.0),radius:2.0},
-      {type:'p1_action',action:'INSOMNIA_403',label:'評估 403 睡眠問題',position:new THREE.Vector3(p403[0],1.35,p403[2]),radius:1.65,anchorRoom:'403'},
-      {type:'p1_action',action:'END_SHIFT',label:'回值班室／接聽值班電話',position:new THREE.Vector3(-10.0,1.1,3.1),radius:1.8}
-    );
   }
   buildBed33Legend(){
     const m=this.gf.materials;
@@ -269,7 +263,7 @@ export class WardFloorplan {
       hisStatusId:'BED33_HIS_409',
       sealedDoorId:'BED33_409_SEALED',
       assignmentId:'BED33_ASSIGNMENT',
-      checkpoint:'CP_EXIT_403'
+      checkpoint:'CP_408C_KNOCK'
     };
   }
 
