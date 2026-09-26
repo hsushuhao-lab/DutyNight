@@ -53,6 +53,7 @@ jobs:
           node test_persistent_loop_qa.js
           node test_bed33_gold_slice_qa.js
           node test_m3_m9_story_qa.js
+          node test_release_perf_b2_loop2_qa.js
           node test_playable_world_qa.js
           node test_v2_core_contract_qa.js
           node test_v2_annie_identity_qa.js

@@ -725,7 +725,7 @@ export class UIManager {
     setTimeout(()=>this.showSubtitle('值班醫師',`「手腕……這不是夢。這已經是第 ${loopCount+1} 次了。」`,4200),4200);
   }
 
-  openTravelSelector(destinations, currentZone, onSelect, kind = 'elevator') {
+  openTravelSelector(destinations, currentZone, onSelect, kind = 'elevator', onPrefetch = null) {
     document.exitPointerLock();
     this.elevatorCutscene.dataset.selecting = 'true';
     this.elevatorCutscene.dataset.travelling = 'false';
@@ -809,7 +809,7 @@ export class UIManager {
           button.style.cursor = 'default';
         } else {
           button.addEventListener('click', () => {
-            this.runTravelTransition(destination,curFloor,onSelect,kind);
+            this.runTravelTransition(destination,curFloor,onSelect,kind,onPrefetch);
           });
         }
       }
@@ -826,7 +826,7 @@ export class UIManager {
     info.appendChild(cancel);
   }
 
-  runTravelTransition(destination,fromFloor,onSelect,kind) {
+  runTravelTransition(destination,fromFloor,onSelect,kind,onPrefetch=null) {
     if(this.elevatorCutscene.dataset.travelling==='true')return;
     this.elevatorCutscene.dataset.selecting='false';
     this.elevatorCutscene.dataset.travelling='true';
@@ -836,6 +836,9 @@ export class UIManager {
     const statusEl=document.getElementById('elevator-status-text');
     statusEl.textContent=`${kind==='stairs'?'安全梯':'電梯'} ${fromFloor}F → ${destination.floorNum}F`;
     if(kind==='stairs')soundManager.playClick();else soundManager.playElevatorMotor();
+    const preloadPromise=Promise.resolve(onPrefetch?.(destination)).catch(error=>{
+      console.warn('[perf] destination prefetch failed',destination.zoneId,error);
+    });
     const glitch=kind!=='stairs'&&fromFloor===3&&destination.floorNum===4&&this.gameState.isTaskComplete('ARCHIVE_CLUE_FOUND');
     if(glitch){
       const digit=this.elevatorCutscene.querySelector('.floor-digit');
@@ -843,9 +846,15 @@ export class UIManager {
       seq.forEach((v,i)=>setTimeout(()=>{digit.textContent=v;},260+i*250));
       setTimeout(()=>{statusEl.textContent='電梯 3F → 4F';},1650);
     }
-    this.travelTimer=setTimeout(()=>{
-      try {onSelect(destination);soundManager.playElevatorChime();}
-      finally {this.elevatorCutscene.dataset.travelling='false';this.closeTravelSelector();}
+    this.travelTimer=setTimeout(async()=>{
+      try {
+        await preloadPromise;
+        onSelect(destination);
+        soundManager.playElevatorChime();
+      } finally {
+        this.elevatorCutscene.dataset.travelling='false';
+        this.closeTravelSelector();
+      }
     },kind==='stairs'?1100:(glitch?2100:1700));
   }
 
