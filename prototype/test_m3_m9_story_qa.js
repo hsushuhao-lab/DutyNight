@@ -16,6 +16,7 @@ const router=readFileSync('./src/world/WorldRouter.js','utf8');
 const routes=readFileSync('./src/world/shared/WorldRoutes.js','utf8');
 const html=readFileSync('./index.html','utf8');
 const ui=readFileSync('./src/ui/UIManager.js','utf8');
+const memorySource=readFileSync('./src/core/PersistentMemory.js','utf8');
 
 assert(!main.includes('工號'),'player-facing story copy must use 員編 terminology');
 assert(ui.includes("17:00｜值班身分驗證異常")&&main.includes("HANDOFF_DEFAULT"),'M1 must make the default-template choice a real 409 Patientization decision');
@@ -42,16 +43,16 @@ assert(main.includes("LEGEND 02 — 00:33 急診掛號")&&main.includes("ER0033_
 
 assert(ward.includes("type:'second_campus_nursing_report'")&&ward.includes("type:'second_chest_patient'")&&ward.includes("type:'second_chest_transfer'"),'M4 nursing report/patient/form sequence missing');
 assert(ward.includes("label:'查看病人處置醫囑'"),'M4 desk paper must retain its initial treatment-order name');
-assert(main.includes("SECOND_CAMPUS_5F_REPORTED")&&main.includes('病人是陳怡君，在 504B'),'M4 report must reveal patient identity and bed before assessment');
+assert(main.includes("SECOND_CAMPUS_5F_REPORTED")&&main.includes('醫師你剛剛開好了，現在簽名就好')&&main.includes('李承禮總醫師已經預開醫囑、預蓋章'),'M4 report must use Li doctor pre-open/prestamp identity misdirection');
 assert(main.includes("LEGEND 03 — 事先填妥的轉院單")&&main.includes("M4_CHEST_RESOLVED")&&main.includes("second_chest_roster_clue"),'M4 clinical/admin-horror decision flow or physical clue missing');
 
 assert(bridge.includes("type:'bridge_loop_event'")&&main.includes("LEGEND 04 — 不能回頭的天橋"),'M5 bridge legend missing');
 assert(main.includes("frag_givenName_2','恆'"),'M5 true-name fragment missing');
 assert(!bridge.includes("type:'true_name_clue_2'")&&floor6.includes("type:'floor6_stethoscope_search'")&&floor6.includes("type:'floor6_stethoscope_inspect'")&&main.includes("FLOOR6_STETHOSCOPE_INSPECTED"),'the physical name clue must be searched and inspected on 6F');
 
-assert(floor6.includes("type:'floor6_safe_return'")&&floor6.includes("type:'floor6_chase'"),'M6 phantom floor interactions missing');
+assert(floor6.includes("type:'floor6_safe_return'")&&!floor6.includes("type:'floor6_chase'"),'M6 must retain safe return and remove the obsolete white-coat chase');
 assert(router.includes("'phantom_6f': Phantom6F")&&routes.includes("phantom_6f_lift"),'M6 route registration missing');
-assert(main.includes("LEGEND 06 — 不存在的六樓")&&main.includes("M6_FLOOR6_RESOLVED"),'M6 safe/override logic missing');
+assert(main.includes("M6_FLOOR6_RESOLVED")&&!main.includes("interactable.type === 'floor6_chase'")&&!memorySource.includes('neverChaseFloor6'),'M6 safe resolution must remain without the obsolete chase override');
 
 assert(b2.includes("type:'b2_archive_terminal'")&&b2.includes("type:'b2_exit_door'")&&!b2.includes('B2_EscapeStairwell'),'M7 B2 must use terminal plus one-way exit door, with no stairwell');
 assert(html.includes('identity-matrix-modal')&&main.includes('IDENTITY_CANDIDATES')&&main.includes("candidate.id!=='ZHANG_SHOUHENG'"),'B2 must use the four-doctor contradiction matrix rather than auto-resolving identity');

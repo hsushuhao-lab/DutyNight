@@ -12,7 +12,7 @@ const routes=readFileSync('./src/world/shared/WorldRoutes.js','utf8');
 // Startup: no heavyweight synchronous preload before the first frame.
 assert(!main.includes('await Promise.all([preloadAssets(), preloadMaterials()])'),'startup must not block on full GLTF/PBR preload');
 assert(main.includes('await preloadCriticalAssets()'),'opening scene must wait only for critical 3F furniture');
-assert(assets.includes("openingCriticalAssets = new Set(['officeChair', 'storageCabinet'])"),'3F critical asset set must stay intentionally small');
+for(const asset of ['officeChair','storageCabinet','workDesk','printer','bench','plant'])assert(assets.includes(`'${asset}'`),'opening critical asset missing: '+asset);
 assert(main.includes('requestIdleCallback(deferredHospitalAssets'),'indoor quality assets must preload after first paint');
 
 // Batch split: outdoor assets and textures are not part of the indoor preload.
@@ -47,5 +47,9 @@ assert(b2FailForward>=0&&b2ReopenPrompt>=0&&b2FailForward<b2ReopenPrompt,'perman
 const adminBranch=main.slice(main.indexOf("['admin_roster_3f','admin_printer_doc_3f','admin_drawer_manual_3f']"),main.indexOf("} else if (interactable.type === 'spare_key_316')"));
 assert(adminBranch.includes('openArchiveDocument'),'admin documents must remain readable after loop reset');
 assert(!adminBranch.includes("if(gameState.getFlag('FAST_PATH_3F'))"),'FAST_PATH_3F must not suppress admin evidence');
+assert(main.includes("if(!gameState.getFlag('FOUND_316_SPARE_KEY'))"),'loop fast path must still require the patrol-point spare key');
+assert(main.includes("prefetchDestinationAssets({zoneId:'first_campus_4f'})"),'316 fast-path phone must preload 4F before card pickup');
+const fastPhone=main.slice(main.indexOf("gameState.getFlag('FAST_PATH_3F')&&gameState.getFlag('PHONE_RING_ACTIVE')"),main.indexOf("}else if(gameState.getFlag('SECOND_CAMPUS_PHONE_PENDING'))"));
+assert(!fastPhone.includes("markTaskComplete('KEY_PICKUP')")&&!fastPhone.includes("setFlag('STAFF_ACCESS_CARD',true)"),'fast phone must leave key and card in the locker');
 
 console.log('LOADING / B2 / LOOP2 REGRESSION QA PASS');

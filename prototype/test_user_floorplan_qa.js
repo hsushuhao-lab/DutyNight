@@ -103,7 +103,9 @@ for(const [zoneId,prefix] of [['first_campus_4f','40'],['second_campus_5f','50']
 
   if(zoneId==='second_campus_5f'){
     assert(zone.roomAreas.some(r=>r.id==='SECOND_DUTY'&&r.label==='值班室'));
-    assert(zone.accessDoors.second_duty_room?.closed);
+    assert.equal(zone.keyedDoors.second_duty_room?.closed,false);
+    assert.equal(zone.keyedDoors.second_duty_room?.keepOpen,true);
+    assert(zone.zoneGroup.getObjectByName('Second5F_DutyRoomDecor'));
     assert(!zone.roomAreas.some(r=>r.id==='DOCTOR'));
     const patient=zone.zoneGroup.getObjectByName('SecondCampus_ChestPainPatient');
     assert(patient?.isGroup,'M4 ordinary patient must have a visible scene model');

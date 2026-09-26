@@ -28,7 +28,7 @@ for(const id of ['first_campus_4f','second_campus_5f']){
  check(id+' entrance vestibule has storage and plant',()=>{const store=zone.roomAreas.find(r=>r.id==='STORE_ENTRY');assert(store);assert(zone.accessDoors[store.accessDoorId]?.closed||zone.keyedDoors[store.accessDoorId]?.closed);assert(zone.entrancePlant);});
 }
 zone=router.loadZone('second_campus_5f');
-check('Second-campus V5.2 uses duty room, not physician office',()=>{assert(zone.roomAreas.some(r=>r.id==='SECOND_DUTY'&&r.label==='值班室'));assert(zone.accessDoors.second_duty_room?.closed);assert(!zone.roomAreas.some(r=>r.id==='DOCTOR'));});
+check('Second-campus V5.2 uses an always-open horn-lock duty room',()=>{assert(zone.roomAreas.some(r=>r.id==='SECOND_DUTY'&&r.label==='值班室'));assert.equal(zone.keyedDoors.second_duty_room?.closed,false);assert.equal(zone.keyedDoors.second_duty_room?.keepOpen,true);assert(zone.zoneGroup.getObjectByName('Second5F_DutyRoomDecor'));assert(!zone.roomAreas.some(r=>r.id==='DOCTOR'));});
 check('Second-campus straight route reaches station then ward',()=>{zone.setWardGateClosed(false);zone.setInnerWardGateClosed(false);const d=zone.accessDoors.second_station_ward;d.setClosed(false);walk([72,1.7,3.2],[72,1.7,1]);walk([72,1.7,1],[72,1.7,-3]);walk([76,1.7,-7.3],[76,1.7,-9.8]);});
 check('Second-campus glass bypass independently reaches ward',()=>{const d=zone.accessDoors.second_ward_glass;d.setClosed(false);walk([78,1.7,1],[78,1.7,-1.2]);});
 zone=router.loadZone('first_campus_4f');
