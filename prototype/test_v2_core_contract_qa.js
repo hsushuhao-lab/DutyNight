@@ -23,7 +23,8 @@ assert(ward.keyedDoors['room_409']?.closed,'409 remains a closed room');
 assert(!ward.zoneGroup.getObjectByName('Bed_409A'),'409A must not be rendered as an ordinary bed');
 
 const actions=ward.interactables.map(item=>item.userData??item).filter(item=>item.type==='p1_action');
-assert.equal(actions.find(item=>item.action==='INSOMNIA_403')?.anchorRoom,'403');
+for(const retired of ['DUTY_ROOM_PREP','WARD_ROUND','INSOMNIA_403','END_SHIFT'])assert(!actions.some(item=>item.action===retired),retired+' must not survive the simplified 4F flow');
+assert.equal(actions.find(item=>item.action==='NURSE_REPORT')?.id,'4F_NURSING_REPORT');
 assert.equal(actions.find(item=>item.action==='NORMAL_EVENT')?.id,'408C_BED_PLAQUE');
 assert.doesNotMatch(mainSource,/KNOCK_403_49/,'403 cannot own the knock clue');
 assert.match(mainSource,/registerBed33Clue\('KNOCK_408C_49'\)/,'408C must own the knock clue');
