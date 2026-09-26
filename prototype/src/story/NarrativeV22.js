@@ -75,6 +75,15 @@ export const MEMORY_SEQUENCES=Object.freeze({
       F('00:54','黑皮鞋','一隻黑皮鞋踩過便條，紙面留下鞋印。','警告沒有送達。',['未知白袍'],'duty')
     ])
   }),
+  M5_GUARD_REST_LOG:Object.freeze({
+    id:'M5_GUARD_REST_LOG',mode:'ALBUM',title:'警衛休息室｜未送出的值勤快照',source:'第二院區 2F 警衛休息室｜抽屜底層',
+    frames:Object.freeze([
+      F('1998.10.12 01:36','交班桌','王世榮把 B-Panel 十字鑰匙掛回金屬鑰匙櫃。','紫色吊牌上只寫著 B-PANEL。',['王世榮'],'security'),
+      F('01:39','工務通報','劉志遠拿著 ENG-860214 吊牌與維修單要求開啟地下排煙通道。','他沒有拿走鑰匙；他只要求警衛解除門禁。',['劉志遠','王世榮'],'security'),
+      F('01:41','規章','王世榮指著夜間門禁規章，搖頭拒絕。','「沒有書面批示，我不能交付機房鑰匙。」',['王世榮'],'security'),
+      F('01:43','離開','劉志遠轉身往電梯跑。','幾分鐘後，監控拍到電梯樓層顯示「6」。',['劉志遠'],'elevator')
+    ])
+  }),
   M5_SECURITY_PLAYBACK:Object.freeze({
     id:'M5_SECURITY_PLAYBACK',mode:'CCTV',title:'第二院區監控室｜抽幀回放',source:'SECURITY ARCHIVE / LIVE FEED',
     frames:Object.freeze([
