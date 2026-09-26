@@ -1056,10 +1056,12 @@ export class UIManager {
           {id:'task-m6-elevator',text:currentZone==='phantom_6f'?(this.gameState.getFlag('FLOOR6_STETHOSCOPE_FOUND')?'檢視反光的老舊聽診器，翻面或擦去刻字上的灰塵':'查看焦黑器材旁反光的物件'):'搭乘一般電梯返回第一院區',state:'ready'}
         ]);
       }else if(this.gameState.getFlag('B2_EXITED_PERMANENTLY')&&!this.gameState.getFlag('M7_B2_RESOLVED')){
-        this.renderTaskBoard('B2 已永久封閉｜延後身分重建',[
+        this.renderTaskBoard('B2 已永久封閉｜最後身分宣告',[
           {
             id:'task-m7-deferred-316',
-            text:currentZone==='first_campus_3f'?'使用 316 電子交班工作站整合目前線索；若仍不足，系統會列出缺失來源':'繼續搜尋缺失的行政／文史／門禁／臨床資料；補齊後回第一院區 3F 316',
+            text:currentZone==='first_campus_3f'
+              ?'回 316 宣告真正姓名與員編；若仍想補線索，可先查看行政辦公室與文史封存'
+              :'回第一院區 3F 316 進行最後身分宣告；行政辦公室與文史封存可能仍有額外線索',
             state:'ready'
           }
         ]);
@@ -1069,7 +1071,7 @@ export class UIManager {
         ]);
       }else if(this.gameState.getFlag('M7_B2_OPEN')&&!this.gameState.getFlag('M7_B2_RESOLVED')){
         this.renderTaskBoard('翌日 02:17｜B2',[
-          {id:'task-m7-b2-terminal',text:this.gameState.getFlag('B2_IDENTITY_INCOMPLETE')?'可繼續在 B2 搜尋缺失原始資料；若由單向出口離開，B2 將永久封閉':'查看封存驗證終端，完成身分驗證',state:'ready'}
+          {id:'task-m7-b2-terminal',text:this.gameState.getFlag('B2_IDENTITY_INCOMPLETE')?'資料不完整仍可嘗試封存身分比對；也可由單向出口離開，但 B2 將永久封閉':'查看封存驗證終端，嘗試身分驗證',state:'ready'}
         ]);
       }else if(this.gameState.getFlag('M7_B2_RESOLVED')&&!this.gameState.getFlag('LAST_CALL_SEEN')){
         this.renderTaskBoard('B2｜身分驗證完成',[
@@ -1077,7 +1079,7 @@ export class UIManager {
         ]);
       }else if(this.gameState.getFlag('M8_IDENTITY_BATTLE_ACTIVE')&&!this.gameState.getFlag('GAME_COMPLETE')){
         this.renderTaskBoard('CODE BLACK｜04:09 前',[
-          {id:'task-m9-final-handoff',text:'全院門禁正在收縮：立刻回第一院區 3F 316，在李承禮覆寫模板完成前宣告真正姓名與員編',state:'ready'}
+          {id:'task-m9-final-handoff',text:'全院門禁正在收縮：立刻回第一院區 3F 316，在覆寫完成前宣告真正姓名與員編；這是最後一次機會',state:'ready'}
         ]);
       }else if(this.gameState.getFlag('GAME_COMPLETE')){
         this.renderTaskBoard('翌日 04:05｜交班完成',[
