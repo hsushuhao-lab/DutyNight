@@ -16,7 +16,7 @@ await preloadCriticalAssets();
 // Boot immediately with procedural/shared fallback materials and load heavyweight
 // GLTF/PBR assets after first paint. This removes 20+ asset requests from the
 // critical path while preserving full-quality assets once they are cached.
-const deferredHospitalAssets = () => Promise.all([preloadAssets(), preloadMaterials()])
+const deferredHospitalAssets = () => Promise.all([preloadAssets(), preloadMaterials(), preloadCampusBackdropAssets()])
   .catch(error => console.warn('[perf] deferred hospital asset preload failed', error));
 const blockingCampusBackdropZones = new Set(['first_campus_1f','first_campus_8f']);
 const nonBlockingCampusBackdropZones = new Set(['first_campus_2f']);
@@ -127,7 +127,10 @@ uiManager = new UIManager(
   }
 );
 
-const loopManager=new LoopManager({gameState,worldRouter,controller,uiManager});
+const loopManager=new LoopManager({
+  gameState,worldRouter,controller,uiManager,
+  prepareLoopReset:()=>Promise.all([preloadAssets(),preloadMaterials(),preloadCampusBackdropAssets()])
+});
 uiManager.setHandoffDecisionHandler(choice=>{
   if(choice==='default'){
     loopManager.triggerLegendOverride('HANDOFF_DEFAULT',{legend:'M1 — 預設值班模板覆寫',reason:'你接受了沒有姓名來源的預設身分。'});
