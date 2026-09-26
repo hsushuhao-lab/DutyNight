@@ -17,6 +17,9 @@ const routes=readFileSync('./src/world/shared/WorldRoutes.js','utf8');
 const html=readFileSync('./index.html','utf8');
 
 assert(!main.includes('工號'),'player-facing story copy must use 員編 terminology');
+assert(ui.includes("17:00｜值班身分驗證異常")&&main.includes("HANDOFF_DEFAULT"),'M1 must make the default-template choice a real 409 Patientization decision');
+assert(main.includes("M5_CCTV_RESOLVED")&&main.includes("SIX_FLOOR_HISTORY_CONFIRMED"),'M5 CCTV must seed the erased-6F story before M6 can unlock');
+assert(main.includes("M8_CODE_BLACK_ANNOUNCED")&&main.includes("CODE BLACK"),'B2 reconstruction must trigger systemic Code Black pursuit pressure');
 assert(!routes.includes('hill_from_')&&!routes.includes('pond_from_'),'production routes must not expose outdoor spawns');
 assert(!router.includes('HillsideRoute')&&!router.includes('EcologyPond'),'production router must not load outdoor zones');
 assert(main.includes("setTrueNameFragment('frag_employeePrefix','MED-87')"),'M3 MED-87 clue missing');
