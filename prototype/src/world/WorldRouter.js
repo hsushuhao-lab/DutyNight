@@ -106,7 +106,10 @@ export class WorldRouter {
       roomLamps:this.roomLamps
     });
     const codeBlack=gameState.getFlag('M8_IDENTITY_BATTLE_ACTIVE')&&!gameState.getFlag('GAME_COMPLETE');
-    if(this.identityAlarmLight)this.identityAlarmLight.intensity=codeBlack?.48:0;
+    if(this.identityAlarmLight){
+      this.identityAlarmLight.intensity=codeBlack?.48:0;
+      if(codeBlack&&!this.identityAlarmLight.parent)this.lightingGroup.add(this.identityAlarmLight);
+    }
   }
 
   /**
