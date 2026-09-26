@@ -129,8 +129,8 @@ export class FirstCampus3F {
       interactable:true,id:'3F_ADMIN_ROSTER_TASK',type:'admin_roster_3f',label:'核對正式夜間醫師值勤名冊',
       documentTitle:'正式夜間醫師值勤名冊',
       pages:[
-        '各科夜間值勤欄位都已填妥，唯獨「4F 精神科夜間值班」是一片空白。\n\n李醫師：\n「名冊是空的？那學長剛才到底把哪一班交給我？」',
-        '名冊右下角有淡淡的修正液痕跡。逆光看得到原本似乎寫過一個「李」字，但後面的名字已完全刮掉。'
+        '各科夜間值勤欄位都已填妥，唯獨「4F 精神科夜間值班」是一片空白。\n\n值班醫師：\n「名冊是空的？那學長剛才到底把哪一班交給我？」',
+        '名冊右下角有淡淡的修正液痕跡。逆光只看得到被刮除的員編字軌，姓名已經完全無法辨認。'
       ]
     };
     this.zoneGroup.add(rosterFace);this.interactables.push(rosterFace);
@@ -140,8 +140,8 @@ export class FirstCampus3F {
       interactable:true,id:'3F_ADMIN_PRINTER_DOC',type:'admin_printer_doc_3f',label:'抽出印表機卡住的補登單',
       documentTitle:'夜間值勤補登單',
       pages:[
-        '夜間值勤補登\n\n第一線：李住院醫師\n補登時間：21:17:42\n狀態：三樓巡查完成',
-        '現在明明才剛過 17:00。\n\n李醫師：\n「21:17……這張單子是誰印的？還是我待會真的會回來？」'
+        '夜間值勤補登\n\n第一線：值班醫師（姓名欄未同步）\n補登時間：21:17:42\n狀態：三樓巡查完成',
+        '現在明明才剛過 17:00。\n\n值班醫師：\n「21:17……這張單子是誰印的？還是我待會真的會回來？」'
       ]
     };
     this.interactables.push(printerPaper);
