@@ -23,7 +23,7 @@ assert.equal(zone.layoutPlan?.bed33Id,'409A');
 assert(!zone.bedAreas.some(b=>b.id==='409A'),'409A is an anomalous clue, not a physical bed');
 assert.equal(zone.bed33Legend?.id,'LEGEND_BED33');
 assert.equal(zone.bed33Legend?.bedId,'409A');
-assert.equal(zone.bed33Legend?.checkpoint,'CP_EXIT_403');
+assert.equal(zone.bed33Legend?.checkpoint,'CP_408C_KNOCK');
 
 for(const type of ['bed33_board','bed33_his_status','bed33_409_sealed','bed33_assignment']){
   assert(zone.interactables.some(o=>o.userData?.type===type),`${type} missing`);
