@@ -387,7 +387,7 @@ controller.onInteract = (interactable) => {
     if(changed)soundManager.playClick();
     else uiManager.showSubtitle('門鎖','請先離開門幅後再關門。',2500);
     if(keyedDoor===zone.dutyDoor)zone.dutyDoorClosed=keyedDoor.closed;
-    if(changed&&wasClosed&&keyedDoor===zone.dutyDoor&&gameState.isTaskComplete('P1_NORMAL_EVENT_DONE')&&!gameState.isTaskComplete('P1_REST_DONE')){
+    if(changed&&wasClosed&&keyedDoor===zone.dutyDoor&&gameState.isTaskComplete('P1_NORMAL_EVENT_DONE')&&gameState.getFlag('BED33_RESOLVED')&&!gameState.isTaskComplete('P1_REST_DONE')){
       dutyEvents.complete('P1_REST_DONE','20:00');
       gameState.setFlag('P1_ER_CALL_ANSWERED',false);
       startStoryPhoneCall('ER_JANE_2005');
@@ -654,13 +654,13 @@ controller.onInteract = (interactable) => {
     controller.enabled=false;
     uiManager.openArchiveDocument({title:interactable.documentTitle,pages:interactable.pages});
   } else if (interactable.type === 'bed33_assignment') {
-    if(!gameState.isTaskComplete('P1_INSOMNIA_DONE')){
-      uiManager.showSubtitle('夜班護理師','「這張先放著，醫師先去看 403。」',2500);
+    if(!gameState.isTaskComplete('P1_4F_REPORT')){
+      uiManager.showSubtitle('夜班護理師','「先完成護理站交班，再處理這張床位單。」',2500);
       return;
     }
     controller.enabled=false;
     uiManager.openBed33Assignment({
-      canReject:legendState.isBed33Understood(),
+      canReject:true,
       rememberedRule:persistentMemory.data.survivalRules.neverSignBed33
     });
   } else if (interactable.type === 'acute_gate') {
@@ -979,32 +979,26 @@ controller.onInteract = (interactable) => {
     const action=interactable.action;
     if(action==='NURSE_REPORT'){
       if(!gameState.isTaskComplete('WARD_ENTRY')) return uiManager.showSubtitle('李醫師','「先正式抵達 4F 再報到。」',2500);
+      if(gameState.isTaskComplete('P1_4F_REPORT')) return;
       dutyEvents.complete('P1_4F_REPORT','17:15');
-      uiManager.showSubtitle('晚班護理師','「李醫師，今晚四樓滿床，總共 32 床。403 說睡不好；另外 408C 的老先生一直說隔壁有人敲牆，待會巡房麻煩你幫忙看看。」',5600);
-    } else if(action==='DUTY_ROOM_PREP'){
-      if(!gameState.isTaskComplete('P1_4F_REPORT')) return uiManager.showSubtitle('李醫師','「先去護理站報到。」',2500);
-      dutyEvents.complete('P1_DUTY_ROOM_READY','17:30');
-      if(persistentMemory.claimOnce('hotCoffee'))uiManager.showSubtitle('李醫師','「值班電話正常……等等，桌上怎麼已經有一杯熱咖啡？值班室鑰匙剛才明明在我身上。」',5200);
-      else uiManager.showSubtitle('李醫師','「值班室整理好了，電話與門鎖都正常。」',3000);
-    } else if(action==='WARD_ROUND'){
-      if(!gameState.isTaskComplete('P1_DUTY_ROOM_READY')) return uiManager.showSubtitle('李醫師','「先把值班室整理好再巡房。」',2500);
-      dutyEvents.complete('P1_ROUND_COMPLETE','18:00');
-      uiManager.showSubtitle('值班電話','☎ 護理站：「李醫師，408C 的老先生說隔壁又有敲擊聲，麻煩巡房時確認一下。」',4200);
-    } else if(action==='INSOMNIA_403'){
-      if(!gameState.isTaskComplete('P1_ROUND_COMPLETE')) return uiManager.showSubtitle('李醫師','「先完成晚間巡房。」',2500);
-      dutyEvents.complete('P1_INSOMNIA_DONE','18:30');
-      uiManager.showSubtitle('403 病人','「醫師，我一直睡不著。」');
+      interactable.interactable=false;
+      uiManager.showSubtitle('晚班護理師','「李醫師，今晚四樓滿床 32 床。408C 的老先生一直說隔壁有人敲牆；409 仍封閉整修。19:30 麻煩你去 408C 看一下。」',5600);
     } else if(action==='NORMAL_EVENT'){
-      if(!gameState.isTaskComplete('P1_INSOMNIA_DONE')) return uiManager.showSubtitle('李醫師','「先處理 403 的睡眠問題。」',2500);
-      if(!gameState.getFlag('BED33_RESOLVED')) return uiManager.showSubtitle('李醫師','「護理站那張 409A 臨時床位單還沒釐清，不能就這樣簽掉。」',3200);
+      if(!gameState.isTaskComplete('P1_4F_REPORT')) return uiManager.showSubtitle('李醫師','「先去護理站報到。」',2500);
+      if(gameState.isTaskComplete('P1_NORMAL_EVENT_DONE')) return;
       dutyEvents.complete('P1_NORMAL_EVENT_DONE','19:30');
+      interactable.interactable=false;
       soundManager.playBed33KnockPattern();
       registerBed33Clue('KNOCK_408C_49');
+      worldRouter.activeZoneInstance?.setDutyDoorClosed?.(true);
       uiManager.showSubtitle('408C 老先生','「李醫師！隔壁又在敲了！每次都敲四下，停一下，又敲九下……」',5600);
-    } else if(action==='REST'){
-      if(!gameState.isTaskComplete('P1_NORMAL_EVENT_DONE')) return uiManager.showSubtitle('李醫師','「先把剛才的病房事件處理完。」',2500);
-      dutyEvents.complete('P1_REST_DONE','20:00');
-      uiManager.showSubtitle('值班電話','☎ 急診：「醫師您好，急診有一位病人需要精神科評估，可以麻煩下來嗎？」');
+      if(!gameState.getFlag('BED33_RESOLVED')){
+        setTimeout(()=>{
+          if(worldRouter.activeZoneId!=='first_campus_4f'||gameState.getFlag('BED33_RESOLVED'))return;
+          controller.enabled=false;
+          uiManager.openBed33Assignment({canReject:true,rememberedRule:persistentMemory.data.survivalRules.neverSignBed33});
+        },5800);
+      }
     } else if(action==='ER_ASSESS'){
       if(!gameState.getFlag('P1_ER_CALL_ANSWERED')) return uiManager.showSubtitle('李醫師','「先接聽值班室電話，確認急診通知。」',2500);
       dutyEvents.complete('P1_ER_ASSESSMENT_DONE','20:25');
