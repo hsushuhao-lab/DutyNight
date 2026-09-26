@@ -1,9 +1,6 @@
 export const NORMAL_DUTY_STEPS = [
   ['P1_316_COMPLETE','17:10'],
   ['P1_4F_REPORT','17:15'],
-  ['P1_DUTY_ROOM_READY','17:30'],
-  ['P1_ROUND_COMPLETE','18:00'],
-  ['P1_INSOMNIA_DONE','18:30'],
   ['P1_NORMAL_EVENT_DONE','19:30'],
   ['P1_REST_DONE','20:00'],
   ['P1_ER_ASSESSMENT_DONE','20:25'],
@@ -27,7 +24,7 @@ export class DutyEventManager {
   onZoneEntered(zoneId){
     if(zoneId==='first_campus_4f' && this.gameState.isTaskComplete('E_HANDOFF') && !this.gameState.isTaskComplete('P1_4F_REPORT')){
       this.gameState.setGameTime('17:15');
-      return {speaker:'晚班護理師',text:'「李醫師，你來啦。今晚 4F 共 32 床。403 說最近睡不好；408C 的老先生提到隔壁有敲擊聲，晚點巡房時再確認。」'};
+      return {speaker:'晚班護理師',text:'「李醫師，你來啦。今晚 4F 滿床 32 床。408C 的老先生一直說隔壁有人敲牆；409 仍封閉整修。19:30 麻煩你去 408C 確認。」'};
     }
     if(zoneId==='first_campus_4f' && this.gameState.isTaskComplete('P1_ER_NOTE_DONE') && !this.gameState.isTaskComplete('P1_RETURN_4F')){
       this.complete('P1_RETURN_4F','20:40');
