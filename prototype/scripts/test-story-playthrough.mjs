@@ -173,6 +173,24 @@ try{
   let mannequinCheck=await q(()=>{const level=window.__storyQA.worldRouter.activeZoneInstance.levelInstance;const a=level.anneGroup;const names=[];a.traverse(object=>names.push(object.name));return {state:a.userData.state,nose:!!a.getObjectByName('Annie_MoldedNose'),face:a.getObjectByName('Annie_SmoothVinylFace')?.material?.roughness,noEyesOrMouth:!names.some(name=>/^Annie_(FixedEye|UnfocusedIris|FixedPupil|Mouth|BlowTrainingMouth)/.test(name)),chestClear:!names.some(name=>/^Annie_(Stethoscope|CoatPocket|CoatButton|CompressionPlate|ScrubNeckline)/.test(name)),noBodyStethoscope:!level.anneStethoscopeProp}});
   assert.equal(mannequinCheck.state,'STORAGE_STATIC');assert(mannequinCheck.nose);assert(mannequinCheck.noEyesOrMouth);assert(mannequinCheck.chestClear);assert(mannequinCheck.face<.5);assert(mannequinCheck.noBodyStethoscope);
   await shot('m1-annie-close-inspection',null,null,'Annie_SmoothVinylFace',[12.81,1.7,5.8],[12.81,.84,5.16]);
+  // M1: keep the player unnamed and explicitly reject the system's identity template.
+  await load('first_campus_3f','m0_316_office');
+  await flag('OPENED_316',true);await flag('HIS_CREDENTIALS',true);
+  await interact({id:'E_HANDOFF'});
+  await domClick('#btn-sign-handoff');
+  await waitForPageCondition(page,()=>document.getElementById('story-choice-modal')?.classList.contains('active'),30000);
+  assert.match(await page.locator('#story-choice-title').innerText(),/值班身分驗證異常/);
+  assert.match(await page.locator('#story-choice-body').innerText(),/預設值班醫師模板/);
+  await functionalShot('m1-handoff-identity-choice.png');
+  await secondary();
+  await waitForPageCondition(page,()=>window.__storyQA.gameState.isTaskComplete('E_HANDOFF')===true,10000);
+  await waitForPageCondition(page,()=>document.getElementById('anomaly-modal')?.classList.contains('active'),10000);
+  await domClick('#btn-ack-anomaly');
+  let m1state=await snap();
+  assert.equal(m1state.flags.M1_HANDOFF_CHOICE_RESOLVED,true);
+  assert.equal(m1state.memory.loopCount,0,'correct M1 choice must not consume a loop');
+  await mark('M1 rejected default identity template');
+
   await shot('m2-4f-nursing-station','first_campus_4f','m3_4f_nursing_station','WorkstationDesk_first_station_A',[0,1.7,-4.6],[-3.35,1.0,-2.35]);
   await shot('m2-4f-duty-room','first_campus_4f','m2_4f_duty_room','DutyRoom_ExtensionPhone',[-10.8,1.7,4.8],[-9.62,.87,3.1]);
   await shot('m2-408c-bed','first_campus_4f','m2_4f_409','Bed_408C',[9.8,1.7,-8.2],[8.1,.8,-7.32]);
