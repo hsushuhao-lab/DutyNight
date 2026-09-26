@@ -624,6 +624,9 @@ controller.onInteract = (interactable) => {
       uiManager.showSubtitle('李醫師','「但是我沒有帳號密碼……」',2800);
     }
     checkElevatorReady();
+  } else if (interactable.type === 'era_poster') {
+    controller.enabled=false;
+    uiManager.openPoster(interactable.posterData);
   } else if (interactable.type === 'archive_document') {
     controller.enabled = false;
     uiManager.openArchiveDocument({title:interactable.documentTitle,pages:interactable.pages});
