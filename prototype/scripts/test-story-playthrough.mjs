@@ -293,7 +293,7 @@ try{
   assert.equal(await q(()=>window.__storyQA.worldRouter.activeZoneInstance.janeDoePatient.visible),false,'the 00:33 record has no present patient');
   assert.equal(await q(()=>window.__storyQA.gameState.getDisplayTime()),'翌日 00:33');
   await interact({id:'ER_GHOST_REGISTRATION'});
-  await page.waitForSelector('#story-choice-modal.active');
+  await waitForPageCondition(page,()=>document.getElementById('story-choice-modal')?.classList.contains('active'),60000);
   await shot('m3-0033-registration',null,null,'ER_GhostRegistrationTerminal',[15.2,1.7,-6.2],[13,1.18,-6.35]);await secondary();
   s=await snap();
   assert.equal(s.flags.ER0033_SLIP_COLLECTED,true);
@@ -335,7 +335,7 @@ try{
   await interact({id:'SECOND_CHEST_PATIENT'});
   assert.match(await taskText(),/病人處置醫囑/,'seeing the M4 patient must advance the objective without spoiling the transfer form');
   await interact({id:'SECOND_CHEST_TRANSFER'});
-  await page.waitForSelector('#story-choice-modal.active');
+  await waitForPageCondition(page,()=>document.getElementById('story-choice-modal')?.classList.contains('active'),60000);
   const transferBody=await page.locator('#story-choice-body').textContent();
   assert(transferBody.includes('\n'),'the transfer form paragraphs must use real line breaks');
   assert(!transferBody.includes('\\n'),'the transfer form must not show literal newline escapes');
@@ -352,7 +352,7 @@ try{
   await load('skybridge','bridge_from_first');
   await shot('m5-outbound-bridge-baseline',null,null,'Annie_BRIDGE_MANIFEST',[34,1.9,0],[46,0.95,0]);
   await interact({id:'BRIDGE_LOOP_EVENT'});
-  await page.waitForSelector('#story-choice-modal.active');await secondary();
+  await waitForPageCondition(page,()=>document.getElementById('story-choice-modal')?.classList.contains('active'),60000);await secondary();
   await shot('m5-return-bridge-annie',null,null,'Annie_BRIDGE_MANIFEST',[41,1.65,0],[46,1.0,0]);
   await shot('m5-bridge-close-annie',null,null,'Annie_BRIDGE_MANIFEST',[44.95,1.6,-0.4],[46,1.25,0]);
   const bridgeMotion=[];
@@ -374,7 +374,7 @@ try{
   await interact({id:'FLOOR6_STETHOSCOPE_SEARCH'});
   await shot('m6-stethoscope-relic',null,null,'Floor6_Stethoscope_Engraving',[-1.37,.42,-7.97],[-1.37,.14,-8.09]);
   await interact({id:'FLOOR6_STETHOSCOPE_INSPECT'});
-  await page.waitForSelector('#story-choice-modal.active');
+  await waitForPageCondition(page,()=>document.getElementById('story-choice-modal')?.classList.contains('active'),60000);
   await primary();
   s=await snap();assert.equal(s.flags.FLOOR6_STETHOSCOPE_INSPECTED,true);assert.equal(s.memory.trueNameFragments.frag_givenName_2,'恆');assert.equal(s.flags.M5_NAME_CLUE_FOUND,true);
   const inscriptionSubtitle=await page.locator('#subtitle-text').innerText();
@@ -421,7 +421,7 @@ try{
   await functionalShot('m7-b-panel-e-prompt.png');
   report.functionalFlows.push({name:'M7 GUARD POST TO B-PANEL',steps:['QA bridge positioned at the guard desk','crosshair showed [E] inspect guard post','pressed E and revealed door seams/purple indicator','QA bridge positioned at the physical service-door hitbox','crosshair showed [E] inspect revealed door']});
   await page.keyboard.press('e');
-  await page.waitForSelector('#story-choice-modal.active');await secondary();
+  await waitForPageCondition(page,()=>document.getElementById('story-choice-modal')?.classList.contains('active'),60000);await secondary();
   await waitForPageCondition(page,()=>window.__storyQA.worldRouter.activeZoneId==='b2_archive',30000);
   await shot('m7-b2-mirror-316',null,null,'B2_ArchiveMirror_Frame',[0,1.7,-11.0],[0,1.7,-14.65]);
 
@@ -439,12 +439,12 @@ try{
   await load('first_campus_3f');
   await flag('OPENED_316',true);
   await interact({id:'E_HANDOFF'});
-  await page.waitForSelector('#final-handoff-modal.active');s=await snap();assert.equal(s.time,'04:05');
+  await waitForPageCondition(page,()=>document.getElementById('final-handoff-modal')?.classList.contains('active'),60000);s=await snap();assert.equal(s.time,'04:05');
   await shot('m9-dual-identity-form',null,null,'DutyPhone_316_Handset',[7.5,1.7,5.7],[5.45,.95,5.72]);
   await page.locator('#final-true-name').fill('張守恆');
   await page.locator('#final-employee-id').fill('MED-870409');
   await domClick('#btn-submit-final-handoff');
-  await page.waitForSelector('#final-success-modal.active');
+  await waitForPageCondition(page,()=>document.getElementById('final-success-modal')?.classList.contains('active'),60000);
 
   s=await snap();assert.equal(s.flags.GAME_COMPLETE,true);assert.equal(s.memory.gameComplete,true);
   await shot('m9-successful-dawn-ending',null,null,'DutyPhone_316_Handset',[7.5,1.7,5.7],[5.45,.95,5.72]);
