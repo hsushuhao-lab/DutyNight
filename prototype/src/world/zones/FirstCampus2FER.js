@@ -435,11 +435,11 @@ export class FirstCampus2FER {
     const add=(material,position,size)=>solid(this.art,material,position,size);
     wallTrim(this.zoneGroup,m);
     this.janeDoePatient=new THREE.Group();
-    this.janeDoePatient.name='ER_JaneDoe_ObservationPatient';
+    this.janeDoePatient.name='ER_UnknownMale_ObservationPatient';
     this.janeDoePatient.position.set(10.5,.83,7.5);
     this.janeDoePatient.visible=false;
     this.zoneGroup.add(this.janeDoePatient);
-    const gown=new THREE.MeshStandardMaterial({color:0xd3d8d0,roughness:.96});
+    const gown=new THREE.MeshStandardMaterial({color:0x555a55,roughness:.98});
     const skin=new THREE.MeshStandardMaterial({color:0xc8b7a7,roughness:.94});
     const hair=new THREE.MeshStandardMaterial({color:0x383633,roughness:1});
     const torso=new THREE.Mesh(new THREE.SphereGeometry(1,32,24),gown);torso.scale.set(.28,.19,.46);torso.position.z=-.06;this.janeDoePatient.add(torso);
@@ -453,9 +453,9 @@ export class FirstCampus2FER {
     wristband.rotation.x=Math.PI/2;wristband.position.set(-.30,-.005,.25);this.janeDoePatient.add(wristband);
     const tag=new THREE.Mesh(new THREE.BoxGeometry(.16,.045,.07),new THREE.MeshStandardMaterial({color:0xe0cf87,roughness:.9}));tag.position.set(-.35,-.005,.25);this.janeDoePatient.add(tag);
     const janeHit=new THREE.Mesh(new THREE.BoxGeometry(.95,.65,1.45),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
-    janeHit.position.set(0,.08,.03);janeHit.userData={interactable:false,id:'2F_JANE_DOE_ASSESSMENT',type:'p1_action',action:'ER_ASSESS',label:'評估身分待確認女性病人'};
+    janeHit.position.set(0,.08,.03);janeHit.userData={interactable:false,id:'2F_JANE_DOE_ASSESSMENT',type:'p1_action',action:'ER_ASSESS',label:'評估身分不詳男性'};
     this.janeDoePatient.add(janeHit);this.janeDoeHit=janeHit;this.interactables.push(janeHit);
-    this.janeDoeWristband={id:'2F_OLD_WRISTBAND',format:'identity_unconfirmed'};
+    this.janeDoeWristband={id:'2F_CHARRED_MAINTENANCE_TAG',format:'ENG-860214 / 6F SKILL LAB / B-PANEL'};
     counterFront(this.art,m,3.5,3.135,4.8,1.1);
     add(m.counterTop,[3.5,1.115,3.5],[4.95,.055,.77]);
     add(m.doorWood,[3.5,2.55,3.5],[5.1,.5,.2]);
