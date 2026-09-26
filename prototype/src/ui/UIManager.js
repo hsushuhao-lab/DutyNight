@@ -41,6 +41,7 @@ export class UIManager {
     this.memoryFrameIndex = 0;
     this.memoryCloseHandler = null;
     this.identityMatrixHandler = null;
+    this.handoffDecisionHandler = null;
     this.storyChoiceHandlers = null;
     this.finalHandoffHandler = null;
     this.bed33Handlers = null;
@@ -92,18 +93,23 @@ export class UIManager {
     if (btnSignHandoff) {
       btnSignHandoff.addEventListener('click', () => {
         if(!this.gameState.getFlag('HIS_AUTHENTICATED')){document.getElementById('his-login-status').textContent='請先用值班本上的帳密登入';return;}
-        soundManager.playComputerBeep();
-        this.gameState.markTaskComplete('E_HANDOFF');
-        btnSignHandoff.disabled=true;
-        btnSignHandoff.textContent='交班資料送出中…';
-        document.querySelector('.his-system-msg').textContent='正在寫入夜間交班資料…';
-        setTimeout(()=>{
-          this.closeWorkstation();
-          btnSignHandoff.disabled=false;
-          btnSignHandoff.textContent='確認電子交班';
-          document.querySelector('.his-system-msg').textContent='系統連線正常 ｜ 資料庫版本 2026.09.21-1700';
-          this.showAnomalyMessage();
-        },1200);
+        if(!this.gameState.getFlag('M1_HANDOFF_CHOICE_RESOLVED')){
+          soundManager.playComputerBeep();
+          this.openStoryChoice({
+            title:'17:00｜值班身分驗證異常',
+            body:'一線值班身分欄位為 NULL。系統建議直接套用「院內預設值班醫師模板」以完成交接。\n\n但預設模板沒有顯示姓名來源，也沒有原始簽章。',
+            primaryText:'套用預設模板',
+            secondaryText:'拒絕模板，保留未確認身分',
+            onPrimary:()=>this.handoffDecisionHandler?.('default'),
+            onSecondary:()=>{
+              this.gameState.setFlag('M1_HANDOFF_CHOICE_RESOLVED',true);
+              this.handoffDecisionHandler?.('manual');
+              this.commitNightHandoff(btnSignHandoff);
+            }
+          });
+          return;
+        }
+        this.commitNightHandoff(btnSignHandoff);
       });
     }
 
@@ -630,6 +636,21 @@ export class UIManager {
     const employeeId=document.getElementById('final-employee-id');if(employeeId)employeeId.value='';
     document.getElementById('final-handoff-status').textContent='IDENTITY VERIFICATION REQUIRED';
     this.finalHandoffModal?.classList.add('active');
+  }
+
+  setHandoffDecisionHandler(handler){this.handoffDecisionHandler=handler;}
+
+  commitNightHandoff(btn=document.getElementById('btn-sign-handoff')){
+    soundManager.playComputerBeep();
+    this.gameState.markTaskComplete('E_HANDOFF');
+    if(btn){btn.disabled=true;btn.textContent='交班資料送出中…';}
+    const msg=document.querySelector('.his-system-msg');if(msg)msg.textContent='正在保留未確認值班身分，寫入夜間交班資料…';
+    setTimeout(()=>{
+      this.closeWorkstation();
+      if(btn){btn.disabled=false;btn.textContent='確認電子交班';}
+      if(msg)msg.textContent='系統連線正常 ｜ 夜班資料節點：時間欄位待同步';
+      this.showAnomalyMessage();
+    },1200);
   }
 
   setFinalHandoffStatus(text){const el=document.getElementById('final-handoff-status');if(el)el.textContent=text;}
