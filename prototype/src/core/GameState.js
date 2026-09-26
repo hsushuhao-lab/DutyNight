@@ -115,6 +115,7 @@ export class GameState {
     this.flags.set('B2_LEGACY_SOURCE', false);
     this.flags.set('B2_SECURITY_SOURCE', false);
     this.flags.set('CCTV_SELF_DUPLICATE_SEEN', false);
+    this.flags.set('SECOND_2F_CCTV_LURE_SEEN', false);
     this.flags.set('M7_B2_OPEN', false);
     this.flags.set('M7_B2_RESOLVED', false);
     this.flags.set('M8_IDENTITY_BATTLE_ACTIVE', false);
