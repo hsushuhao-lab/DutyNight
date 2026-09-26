@@ -537,7 +537,7 @@ controller.onInteract = (interactable) => {
       gameState.setFlag('P1_ER_CALL_ANSWERED',true);
       gameState.setFlag('ER_JANE_PRESENT',true);
       gameState.setGameTime('20:05');
-      uiManager.showSubtitle('急診護理師','「值班醫師，急診有一位身分資料不完整的女性病人，情緒很不穩定，麻煩精神科下來評估。」',5400);
+      uiManager.showSubtitle('急診護理師','「值班醫師，急診有一名身分不詳男性，身上有燒焦與煙灰、意識混亂，麻煩精神科下來評估。」',5400);
     }else if(callKind==='NIGHT_PATROL_2115'){
       gameState.setFlag('PHONE_CALL_KIND',null);
       gameState.setFlag('NIGHT_PATROL_RETURN_3F',true);
@@ -556,7 +556,7 @@ controller.onInteract = (interactable) => {
   } else if (interactable.type === 'cpr_anne') {
     const stage=gameState.getFlag('ANNE_STAGE')||0;
     uiManager.showSubtitle('值班醫師',stage===0?'「CPR 訓練用假人安妮。新的，看起來還沒怎麼用過。」':'「……剛才它是這個方向嗎？」',2600);
-  } else if (interactable.type === 'duty_log') {  } else if (interactable.type === 'duty_log') {
+  } else if (interactable.type === 'duty_log') {
     if(!gameState.getFlag('OPENED_316'))return;
     controller.enabled = false;
     uiManager.openDutyLog();
