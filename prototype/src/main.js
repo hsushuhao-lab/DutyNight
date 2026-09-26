@@ -130,6 +130,7 @@ uiManager.setBed33Handlers({
     persistentMemory.resolveLegend('bed33');
     persistentMemory.addJournalNote('BED33_RESOLVED','409A 的床位單不是正常流程；上面的電子簽名也不是我留下的。');
     uiManager.showSubtitle('夜班護理師','「409 整修中？……奇怪，這張不是我印的。可是上面是你的電子簽名。」',5200);
+    uiManager.updateTasks();
   }
 });
 
@@ -332,9 +333,11 @@ controller.onInteract = (interactable) => {
     controller.currentInteractable=null;uiManager.showPrompt(null);
   } else if (interactable.type === 'duty_door') {
     if(interactable.doorId==='room_409'){
+      if(gameState.isTaskComplete('P1_NORMAL_EVENT_DONE'))gameState.setFlag('FOURF_409_SEAL_CHECKED_AFTER_408C',true);
       registerBed33Clue('DOOR_409_SEALED');
       soundManager.playDoorLockClack();
       uiManager.showSubtitle('李醫師','「409 整修封閉中……可護理站那張舊床位卡卻還寫著 409A。」',3400);
+      uiManager.updateTasks();
       return;
     }
     if(interactable.doorId==='3F_ADMIN_OFFICE_DOOR'){
@@ -387,8 +390,8 @@ controller.onInteract = (interactable) => {
     if(changed)soundManager.playClick();
     else uiManager.showSubtitle('門鎖','請先離開門幅後再關門。',2500);
     if(keyedDoor===zone.dutyDoor)zone.dutyDoorClosed=keyedDoor.closed;
-    if(changed&&wasClosed&&keyedDoor===zone.dutyDoor&&gameState.isTaskComplete('P1_NORMAL_EVENT_DONE')&&gameState.getFlag('BED33_RESOLVED')&&!gameState.isTaskComplete('P1_REST_DONE')){
-      dutyEvents.complete('P1_REST_DONE','20:00');
+    if(changed&&wasClosed&&keyedDoor===zone.dutyDoor&&gameState.isTaskComplete('P1_NORMAL_EVENT_DONE')&&gameState.getFlag('BED33_RESOLVED')&&!gameState.isTaskComplete('P1_ER_CALL_RECEIVED')){
+      dutyEvents.complete('P1_ER_CALL_RECEIVED','20:00');
       gameState.setFlag('P1_ER_CALL_ANSWERED',false);
       startStoryPhoneCall('ER_JANE_2005');
     }
@@ -650,12 +653,22 @@ controller.onInteract = (interactable) => {
     controller.enabled=false;
     uiManager.openArchiveDocument({title:interactable.documentTitle,pages:interactable.pages});
   } else if (interactable.type === 'bed33_409_sealed') {
+    if(gameState.isTaskComplete('P1_NORMAL_EVENT_DONE'))gameState.setFlag('FOURF_409_SEAL_CHECKED_AFTER_408C',true);
     registerBed33Clue('DOOR_409_SEALED');
+    uiManager.updateTasks();
     controller.enabled=false;
     uiManager.openArchiveDocument({title:interactable.documentTitle,pages:interactable.pages});
   } else if (interactable.type === 'bed33_assignment') {
     if(!gameState.isTaskComplete('P1_4F_REPORT')){
       uiManager.showSubtitle('夜班護理師','「先完成護理站交班，再處理這張床位單。」',2500);
+      return;
+    }
+    if(!gameState.isTaskComplete('P1_NORMAL_EVENT_DONE')){
+      uiManager.showSubtitle('李醫師','「先去 408C 確認敲牆聲。」',2500);
+      return;
+    }
+    if(!gameState.getFlag('FOURF_409_SEAL_CHECKED_AFTER_408C')){
+      uiManager.showSubtitle('李醫師','「先去確認 409 的封條，再回護理站核對這張床位單。」',3200);
       return;
     }
     controller.enabled=false;
@@ -983,6 +996,7 @@ controller.onInteract = (interactable) => {
       dutyEvents.complete('P1_4F_REPORT','17:15');
       interactable.interactable=false;
       uiManager.showSubtitle('晚班護理師','「李醫師，今晚四樓滿床 32 床。408C 的老先生一直說隔壁有人敲牆；409 仍封閉整修。19:30 麻煩你去 408C 看一下。」',5600);
+      uiManager.updateTasks();
     } else if(action==='NORMAL_EVENT'){
       if(!gameState.isTaskComplete('P1_4F_REPORT')) return uiManager.showSubtitle('李醫師','「先去護理站報到。」',2500);
       if(gameState.isTaskComplete('P1_NORMAL_EVENT_DONE')) return;
@@ -992,13 +1006,7 @@ controller.onInteract = (interactable) => {
       registerBed33Clue('KNOCK_408C_49');
       worldRouter.activeZoneInstance?.setDutyDoorClosed?.(true);
       uiManager.showSubtitle('408C 老先生','「李醫師！隔壁又在敲了！每次都敲四下，停一下，又敲九下……」',5600);
-      if(!gameState.getFlag('BED33_RESOLVED')){
-        setTimeout(()=>{
-          if(worldRouter.activeZoneId!=='first_campus_4f'||gameState.getFlag('BED33_RESOLVED'))return;
-          controller.enabled=false;
-          uiManager.openBed33Assignment({canReject:true,rememberedRule:persistentMemory.data.survivalRules.neverSignBed33});
-        },5800);
-      }
+      uiManager.updateTasks();
     } else if(action==='ER_ASSESS'){
       if(!gameState.getFlag('P1_ER_CALL_ANSWERED')) return uiManager.showSubtitle('李醫師','「先接聽值班室電話，確認急診通知。」',2500);
       dutyEvents.complete('P1_ER_ASSESSMENT_DONE','20:25');
@@ -1023,7 +1031,7 @@ controller.onInteract = (interactable) => {
 
       if(gameState.isTaskComplete('ACT1_NORMAL_FLOW')||gameState.getFlag('NIGHT_PATROL_RETURN_3F')) return;
       dutyEvents.complete('ACT1_NORMAL_FLOW','21:00');
-      uiManager.showSubtitle('李醫師','「目前都處理完了。先躺一下吧。」');
+      uiManager.showSubtitle('李醫師','「桌上怎麼有熱咖啡？剛剛值班室鑰匙都在我身上，是誰進來了？」');
       setTimeout(()=>{
         if(gameState.getFlag('NIGHT_PATROL_RETURN_3F')) return;
         gameState.setGameTime('21:15');

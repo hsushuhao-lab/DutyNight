@@ -174,10 +174,20 @@ try{
 
   // M2: deliberately fail first, verify identity override + soft reset + persistent cognition.
   await setM2Checkpoint();
+  await task('P1_4F_REPORT');
+  await load('first_campus_4f','m3_4f_nursing_station');
+  await interact({id:'BED33_ASSIGNMENT'});
+  assert.equal(await page.locator('#bed33-modal.active').count(),0,'409A form must stay closed before the 408C event');
+  await interact({id:'408C_BED_PLAQUE'});
+  await page.waitForTimeout(6000);
+  assert.equal(await page.locator('#bed33-modal.active').count(),0,'408C must not open the 409A form automatically');
+  await load('first_campus_4f','m2_4f_409');
+  await pressEAt([6.72,1.18,-3.0],'BED33_409_SEALED');
+  await closeArchive();
   await load('first_campus_4f','m3_4f_nursing_station');
   await interact({id:'BED33_BOARD'});await closeArchive();
   await interact({id:'BED33_HIS_409'});await closeArchive();
-  let s=await snap();assert.equal(s.legend,'NOTICED');
+  let s=await snap();assert.equal(s.legend,'UNDERSTOOD','408C plus the sealed 409 clue must establish the bed-33 contradiction');
   await interact({id:'BED33_ASSIGNMENT'});
   await page.waitForSelector('#bed33-modal.active');
 
@@ -201,7 +211,10 @@ try{
   await mark('M2 override loops to 17:00 with memory');
 
   // M2 second loop: use remembered rule and reject without re-learning every clue.
-  await flag('STAFF_ACCESS_CARD',true);await flag('HOOK_409_ZERO_ROOM',true);await task('KEY_PICKUP');await task('WARD_ENTRY');await task('P1_4F_REPORT');await load('first_campus_4f');
+  await flag('STAFF_ACCESS_CARD',true);await flag('HOOK_409_ZERO_ROOM',true);await task('KEY_PICKUP');await task('WARD_ENTRY');await task('P1_4F_REPORT');await task('P1_NORMAL_EVENT_DONE');
+  await load('first_campus_4f','m2_4f_409');
+  await pressEAt([6.72,1.18,-3.0],'BED33_409_SEALED');await closeArchive();
+  await load('first_campus_4f','m3_4f_nursing_station');
   await interact({id:'BED33_ASSIGNMENT'});
   await page.waitForSelector('#bed33-modal.active');
   assert.equal(await page.locator('#btn-bed33-reject').isVisible(),true);
@@ -218,7 +231,7 @@ try{
   s=await snap();assert.equal(s.flags.P1_ER_CALL_ANSWERED,false);assert.equal(s.flags.ER_JANE_PRESENT,false);assert.equal(s.time,'20:00');
   assert.equal((await taskText()).trim(),'','the next objective waits for the 20:05 phone answer');
   await walkTo(-9.62,4.7);
-  await pressEAt([-9.62,.89,3.1],'4F_DUTY_PHONE');
+  await pressEAt([-9.45,.84,3.34],'4F_DUTY_PHONE');
   await waitForPageCondition(page,()=>window.__storyQA.gameState.getFlag('P1_ER_CALL_ANSWERED')===true);
   s=await snap();assert.equal(s.flags.PHONE_RING_ACTIVE,false);assert.equal(s.flags.PHONE_ANSWERED,true);assert.equal(s.flags.ER_JANE_PRESENT,true);assert.equal(s.time,'20:05');
   assert.equal(await page.locator('#task-er-assess').count(),1,'answering the 20:05 call reveals the ER assessment objective');
@@ -234,12 +247,14 @@ try{
 
   // Then the 21:15 call returns the player to 3F; noticing the panel is not enough — the logbook must be signed.
   await enter('first_campus_4f','m2_4f_duty_room');
-  await interact({action:'END_SHIFT'});
+  await walkTo(-9.5,4.7);
+  await pressEAt([-10,1.1,3.1],'4F_DUTY_COMPUTER');
+  assert((await page.locator('#subtitle-text').innerText()).includes('桌上怎麼有熱咖啡？剛剛值班室鑰匙都在我身上，是誰進來了？'));
   await waitForPageCondition(page,()=>window.__storyQA.gameState.getFlag('PHONE_RING_ACTIVE')&&window.__storyQA.gameState.getFlag('PHONE_CALL_KIND')==='NIGHT_PATROL_2115');
   s=await snap();assert.equal(s.flags.NIGHT_PATROL_RETURN_3F,false);assert.equal(s.time,'21:15');
   assert.equal((await taskText()).trim(),'','the 21:15 return objective waits for the phone answer');
   await walkTo(-9.62,4.7);
-  await pressEAt([-9.62,.89,3.1],'4F_DUTY_PHONE');
+  await pressEAt([-9.45,.84,3.34],'4F_DUTY_PHONE');
   await waitForPageCondition(page,()=>window.__storyQA.gameState.getFlag('NIGHT_PATROL_RETURN_3F')===true);
   s=await snap();assert.equal(s.flags.PHONE_RING_ACTIVE,false);assert.equal(s.flags.PHONE_ANSWERED,true);assert.equal(s.time,'21:15');
   assert.equal(await page.locator('#task-night-return').count(),1,'answering the 21:15 call reveals the return-to-3F objective');
@@ -263,7 +278,7 @@ try{
   assert.equal(await q(()=>window.__storyQA.gameState.getDisplayTime()),'翌日 00:30');
   assert.equal((await taskText()).trim(),'','the 00:33 registration objective waits for the call answer');
   await walkTo(-9.62,4.7);
-  await pressEAt([-9.62,.89,3.1],'4F_DUTY_PHONE');
+  await pressEAt([-9.45,.84,3.34],'4F_DUTY_PHONE');
   await waitForPageCondition(page,()=>window.__storyQA.gameState.getFlag('POST_2117_DUTY_CALL_DONE')===true);
   s=await snap();assert.equal(s.flags.PHONE_RING_ACTIVE,false);assert.equal(s.flags.PHONE_ANSWERED,true);assert.equal(s.time,'00:33');
   assert.equal(s.flags.GHOST_REGISTRATION_ARMED,true);assert.equal(s.flags.GHOST_REGISTRATION_AVAILABLE,true);

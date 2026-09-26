@@ -31,7 +31,25 @@ for(const id of ['room_407','room_408'])assert.equal(zone.keyedDoors[id]?.openDi
 assert.equal(zone.keyedDoors['room_409']?.openDirection,-1,'sealed 409 keeps its inward swing');
 const handoverBoard=zone.zoneGroup.getObjectByName('FourF_NursingHandoverBoard');
 assert(handoverBoard,'4F handover board missing');
-assert(handoverBoard.position.z>0,'4F handover board must be mounted on the corridor-facing station wall');
+assert.deepEqual(handoverBoard.position.toArray(),[-2,1.78,-8.495],'4F handover board must be back on the original north wall');
+const stationCabinet=zone.zoneGroup.children.find(object=>object.name==='ArtAsset/storageCabinet'&&Math.abs(object.position.x+3.6)<.01&&Math.abs(object.position.z+1.2)<.01);
+assert.equal(stationCabinet,undefined,'green station cabinet must no longer intersect the workstation chair');
+const architectureSource=readFileSync('./src/world/shared/PlanArchitecture.js','utf8');
+assert(architectureSource.includes("const printerDesk=zone.campus==='first'&&zone.floor===4?zone.workstations.find(w=>w.id===id+'_D'):null;"),'4F printer must use the open D workstation');
+assert(architectureSource.includes('printer.position.y+=deskTop-new THREE.Box3().setFromObject(printer).min.y;'),'4F printer must be grounded against the loaded desk surface');
+const dutyDesk=zone.workstations.find(w=>w.id==='duty_desk');
+const dutyDeskTop=dutyDesk.desk?new THREE.Box3().setFromObject(dutyDesk.desk).max.y:.76;
+assert(Math.abs(dutyDesk.screen.position.y-dutyDeskTop)<.002,'duty computer must sit on its desk top');
+const dutyCup=dutyDesk.screen.getObjectByName('WorkstationCoffeeCup');
+assert(dutyCup,'duty room must reuse the workstation coffee cup');
+assert(dutyDesk.screen.getObjectByName('DutyRoom_HotCoffeeSteam'),'the single duty-room cup must have visible steam');
+assert.equal(zone.zoneGroup.getObjectByName('DutyRoom_HotCoffee'),undefined,'duty room must not add a second coffee cup');
+assert(zone.dutyPhone.getObjectByName('DutyPhoneHandset'),'duty phone must have a recognizable handset');
+for(const object of [zone.dutyPhone,dutyCup]){
+  const bounds=new THREE.Box3().setFromObject(object);
+  assert(Math.abs(bounds.min.y-dutyDeskTop)<.002,`${object.name} must rest on the duty desk`);
+}
+assert(zone.interactables.some(object=>object.userData?.id==='4F_DUTY_COMPUTER'&&object.userData?.action==='END_SHIFT'),'21:00 rest must use the duty-room computer');
 for(const room of zone.roomAreas.filter(r=>r.kind==='ward')){
   const door=zone.keyedDoors[room.accessDoorId];
   assert(door?.hitPanel,`${room.id} interaction sensor missing`);
@@ -63,6 +81,15 @@ assert(zone.guardLog2117Visual?.visible===true,'21:17 visual logbook must be vis
 // 2F: the 00:33 terminal must be dormant during the first ER visit.
 gameState.resetForLoop();
 zone=router.loadZone('first_campus_2f');
+const triageGlass=zone.zoneGroup.getObjectByName('ER_TriageCounter_GlassPartition');
+assert(triageGlass,'2F triage glass divider missing');
+assert.equal(triageGlass.position.z,3.125,'2F glass divider must sit at the counter front edge');
+for(const id of ['ER_TriageMonitor_1','ER_TriageMonitor_2']){
+  const screen=zone.zoneGroup.getObjectByName(id);
+  assert(screen,`${id} missing`);
+  assert.equal(screen.position.y,1.1425,`${id} base must align with the counter top`);
+  assert.equal(screen.position.z,3.55,`${id} must sit behind the glass on the counter`);
+}
 assert.equal(zone.ghostRegistrationTerminal?.userData?.interactable,false,'00:33 terminal leaked before bootstrap');
 gameState.setFlag('GHOST_REGISTRATION_AVAILABLE',true);
 zone.syncStoryState();

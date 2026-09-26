@@ -116,18 +116,24 @@ export class WardFloorplan {
     solid(this.zoneGroup,this.gf.materials.doorWood,[-11.25,.28,8.1],[.5,.56,.5]);
     solid(this.zoneGroup,this.gf.materials.lightWarm,[-11.25,.76,8.1],[.19,.24,.19]);
     workstation(this,{x:-10.0,z:3.1,id:'duty_desk'});
-    const phone=new THREE.Group();phone.name='DutyRoom_ExtensionPhone';phone.position.set(-9.62,0,3.1);phone.userData={fixture:'EXTENSION_PHONE',extension:'316',interactable:true,id:'4F_DUTY_PHONE',type:'story_phone',label:'查看值班電話'};this.zoneGroup.add(phone);this.dutyPhone=phone;this.interactables.push(phone);
+    const dutyDesk=this.workstations.find(w=>w.id==='duty_desk');
+    const deskSurfaceY=dutyDesk?.desk?new THREE.Box3().setFromObject(dutyDesk.desk).max.y:.76;
+    if(dutyDesk?.screen){
+      dutyDesk.screen.userData={interactable:true,id:'4F_DUTY_COMPUTER',type:'p1_action',action:'END_SHIFT',label:'使用值班室電腦稍作休息'};
+      this.interactables.push(dutyDesk.screen);
+      dutyDesk.screen.getObjectByName('WorkstationCoffeeSurface').material=new THREE.MeshBasicMaterial({color:0x3b2417,side:THREE.DoubleSide});
+      const steam=new THREE.Group();steam.name='DutyRoom_HotCoffeeSteam';steam.position.set(-.34,.13,.14);dutyDesk.screen.add(steam);
+      const steamMaterial=new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.16,depthWrite:false});
+      for(const [x,y] of [[-.018,0],[.016,.06]]){const wisp=new THREE.Mesh(new THREE.SphereGeometry(.022,8,6),steamMaterial);wisp.scale.set(.65,1.8,.65);wisp.position.set(x,y,0);steam.add(wisp);}
+    }
+    const phone=new THREE.Group();phone.name='DutyRoom_ExtensionPhone';phone.position.set(-9.45,0,3.34);phone.userData={fixture:'EXTENSION_PHONE',extension:'316',interactable:true,id:'4F_DUTY_PHONE',type:'story_phone',label:'接聽值班電話'};this.zoneGroup.add(phone);this.dutyPhone=phone;this.interactables.push(phone);
     solid(phone,this.gf.materials.wallDark,[0,.84,0],[.28,.07,.20]);
     solid(phone,this.gf.materials.metal,[0,.89,-.01],[.19,.018,.09]);
     solid(phone,this.gf.materials.bedSheet,[0,.92,-.055],[.25,.035,.055]);
     for(let row=0;row<3;row++)for(let col=0;col<3;col++)solid(phone,this.gf.materials.stainless,[-.065+col*.065,.885,.025+row*.035],[.025,.008,.016]);
-    const coffeeCup=new THREE.Group();coffeeCup.name='DutyRoom_HotCoffee';this.zoneGroup.add(coffeeCup);
-    coffeeCup.position.set(-10.57,.762,2.98);
-    const cupBody=new THREE.Mesh(new THREE.CylinderGeometry(.07,.06,.13,18),this.gf.materials.bedSheet);cupBody.position.y=.065;coffeeCup.add(cupBody);
-    const coffee=new THREE.Mesh(new THREE.CircleGeometry(.055,18),new THREE.MeshBasicMaterial({color:0x3b2417,side:THREE.DoubleSide}));coffee.rotation.x=-Math.PI/2;coffee.position.y=.132;coffeeCup.add(coffee);
-    const handle=new THREE.Mesh(new THREE.TorusGeometry(.045,.012,8,16,Math.PI),this.gf.materials.bedSheet);handle.rotation.y=Math.PI/2;handle.position.set(.07,.075,0);coffeeCup.add(handle);
-    const steamMat=new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.16,depthWrite:false});
-    for(const [dx,dy] of [[-.018,.19],[.016,.25]]){const s=new THREE.Mesh(new THREE.SphereGeometry(.022,8,6),steamMat);s.scale.set(.65,1.8,.65);s.position.set(dx,dy,0);coffeeCup.add(s);}
+    const handset=new THREE.Mesh(new THREE.CapsuleGeometry(.025,.19,4,10),this.gf.materials.wallDark);handset.name='DutyPhoneHandset';handset.rotation.z=Math.PI/2;handset.position.set(0,.98,-.055);phone.add(handset);
+    phone.updateWorldMatrix(true,true);
+    phone.position.y+=deskSurfaceY-new THREE.Box3().setFromObject(phone).min.y;
     this.dutyCabinetAnchor=[-8.8,0,9.3];this.dutyCabinetYaw=Math.PI;
     asset(this.zoneGroup,'storageCabinet',this.dutyCabinetAnchor,[1,1,1],this.dutyCabinetYaw);
 
@@ -183,7 +189,7 @@ export class WardFloorplan {
     w.build();this.gf.buildCeilingLight(this.zoneGroup,-11,3.15,6,.7,7,0xffebce);
     this.dutyRoom={door:[-8,1.7,6],inside:[-9.5,1.7,6],outside:[-6.5,1.7,6],bounds:[-14,2,-8,10]};
     // V6 task flow: only the real nursing-station handoff remains as a free-standing target.
-    // 408C is interacted with through its wall-mounted bed plaque; 20:00 advances by opening the duty-room door.
+    // 408C starts the sealed-409 check; the duty-room computer owns the later 21:00 rest interaction.
     const reportTarget=new THREE.Mesh(new THREE.BoxGeometry(.85,.24,.16),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
     reportTarget.position.set(-3.35,1.22,-2.35);
     reportTarget.userData={interactable:true,id:'4F_NURSING_REPORT',type:'p1_action',action:'NURSE_REPORT',label:'向護理站報到'};

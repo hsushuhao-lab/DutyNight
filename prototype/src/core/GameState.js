@@ -46,6 +46,8 @@ export class GameState {
     this.flags.set('PHONE_ANSWERED', false);
     this.flags.set('PHONE_CALL_KIND', null);
     this.flags.set('P1_ER_CALL_ANSWERED', false);
+    this.flags.set('P1_ER_CALL_RECEIVED', false);
+    this.flags.set('FOURF_409_SEAL_CHECKED_AFTER_408C', false);
     this.flags.set('ER_JANE_PRESENT', false);
     this.flags.set('FAST_PATH_3F', false);
     this.flags.set('FAST_PATH_316_ENTERED', false);

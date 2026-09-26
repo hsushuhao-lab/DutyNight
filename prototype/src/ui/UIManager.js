@@ -895,7 +895,7 @@ export class UIManager {
 
     if (done('ACT1_NORMAL_FLOW')) {
       this.renderTaskBoard('夜班進度（21:00）', [
-        {id:'task-normal-flow-complete',text:'正常值班流程完成｜目前可在值班室休息',state:'completed'}
+        {id:'task-normal-flow-complete',text:'正常值班流程完成',state:'completed'}
       ]);
       return;
     }
@@ -903,25 +903,46 @@ export class UIManager {
     if (done('P1_RETURN_4F')) {
       this.renderTaskBoard('4F 病房｜20:40–21:00', sequential([
         {id:'task-return-4f',task:'P1_RETURN_4F',text:'20:40 已返回 4F 病房'},
-        {id:'task-end-shift',task:'ACT1_NORMAL_FLOW',text:'21:00 回值班室休息'}
+        {id:'task-end-shift',task:'ACT1_NORMAL_FLOW',text:'21:00 使用值班室桌上電腦短暫休息'}
       ]));
       return;
     }
 
-    if (done('P1_REST_DONE')) {
-      this.renderTaskBoard('2F 急診會診｜20:00–20:40', sequential([
-        {id:'task-er-assess',task:'P1_ER_ASSESSMENT_DONE',text:'20:05 前往 2F 急診完成精神科評估'},
-        {id:'task-er-note',task:'P1_ER_NOTE_DONE',text:'20:30 完成急診評估紀錄'},
-        {id:'task-return-4f',task:'P1_RETURN_4F',text:'返回 4F 病房'}
-      ]));
+    if (done('P1_ER_CALL_RECEIVED')) {
+      if(!this.gameState.getFlag('P1_ER_CALL_ANSWERED')){
+        this.renderTaskBoard('4F 值班室電話｜20:00', [
+          {id:'task-answer-er-call',text:'接聽值班室電話',state:'ready'}
+        ]);
+      }else{
+        this.renderTaskBoard('2F 急診會診｜20:05–20:40', sequential([
+          {id:'task-er-assess',task:'P1_ER_ASSESSMENT_DONE',text:'20:05 前往 2F 急診完成精神科評估'},
+          {id:'task-er-note',task:'P1_ER_NOTE_DONE',text:'20:30 完成急診評估紀錄'},
+          {id:'task-return-4f',task:'P1_RETURN_4F',text:'返回 4F 病房'}
+        ]));
+      }
       return;
     }
 
-    this.renderTaskBoard('4F 病房值班｜17:15–20:00', sequential([
-      {id:'task-4f-report',task:'P1_4F_REPORT',text:'17:15 向護理站報到並確認交班重點'},
-      {id:'task-408c-event',task:'P1_NORMAL_EVENT_DONE',text:'19:30 查看 408C 反映的敲牆聲'},
-      {id:'task-rest',task:'P1_REST_DONE',text:'20:00 回值班室短暫休息'}
-    ]));
+    const dutySteps=[
+      {id:'task-4f-report',complete:done('P1_4F_REPORT'),text:'17:15 向護理站報到並確認交班重點'},
+      {id:'task-408c-event',complete:done('P1_NORMAL_EVENT_DONE'),text:'19:30 查看 408C 反映的敲牆聲'},
+      {id:'task-409-seal',complete:this.gameState.getFlag('FOURF_409_SEAL_CHECKED_AFTER_408C'),text:'確認 409 房門封條與整修狀態'},
+      {id:'task-bed33-form',complete:this.gameState.getFlag('BED33_RESOLVED'),text:'回護理站核對 409A 臨時床位分配單'}
+    ];
+    let nextDutyStep=true;
+    const dutyItems=dutySteps.map(step=>{
+      const state=step.complete?'completed':nextDutyStep?'ready':'locked';
+      if(!step.complete)nextDutyStep=false;
+      return {id:step.id,text:step.text,state};
+    });
+    if(!this.gameState.getFlag('BED33_RESOLVED')){
+      this.renderTaskBoard('4F 病房值班｜17:15–20:00',dutyItems);
+      return;
+    }
+
+    this.renderTaskBoard('4F 病房｜20:00 急診來電', [
+      {id:'task-return-duty-room',text:'回值班室開門，接聽急診來電',state:'ready'}
+    ]);
   }
 
   toggleDebug() {

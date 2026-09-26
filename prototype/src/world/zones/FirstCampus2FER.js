@@ -128,7 +128,8 @@ export class FirstCampus2FER {
 
     // Protective reinforced clear glass partition over triage counter
     const triageGlass = new THREE.Mesh(new THREE.PlaneGeometry(4.6, 1.2), this.gf.materials.glass);
-    triageGlass.position.set(3.5, 1.75, 3.5);
+    triageGlass.name='ER_TriageCounter_GlassPartition';
+    triageGlass.position.set(3.5, 1.75, 3.125);
     this.zoneGroup.add(triageGlass);
     CollisionFactory.addBox(this.colliders,3.5,1.8,3.5,4.8,2.8,.12);
     this.gf.buildWall(this.zoneGroup,this.colliders,.55,1.6,3.5,1.1,3.2,.22);
@@ -428,10 +429,14 @@ export class FirstCampus2FER {
     counterFront(this.art,m,3.5,3.135,4.8,1.1);
     add(m.counterTop,[3.5,1.115,3.5],[4.95,.055,.77]);
     add(m.doorWood,[3.5,2.55,3.5],[5.1,.5,.2]);
-    [1.05,5.95].forEach(x=>add(m.doorWood,[x,1.58,3.5],[.065,3.16,.12]));
-    [1.8,5.2].forEach(x=>monitor(this.art,m,x,1.145,3.5));
-    asset(this.art,'printer',[4.15,1.145,3.5],[.8,.8,.8]);
-    asset(this.art,'plant',[3.15,1.145,3.5],[.25,.25,.25]);
+    [1.05,5.95].forEach(x=>add(m.doorWood,[x,1.58,3.125],[.065,3.16,.12]));
+    const triageDeskY=1.1425;
+    [1.8,5.2].forEach((x,index)=>{
+      const screen=monitor(this.art,m,x,triageDeskY,3.55);
+      screen.name=`ER_TriageMonitor_${index+1}`;
+    });
+    asset(this.art,'printer',[4.15,triageDeskY,3.55],[.8,.8,.8]);
+    asset(this.art,'plant',[3.15,triageDeskY,3.55],[.25,.25,.25]);
     // Observation sign is held by a ceiling-fastened beam, above the open route.
     add(m.wallBumper,[14.5,2.63,3.5],[10.9,.42,.14]);
     [9.2,14.5,19.8].forEach(x=>add(m.stainless,[x,2.94,3.5],[.025,.52,.025]));

@@ -10,7 +10,7 @@ const phases=new FloorStateManager(state);
 
 assert.equal(state.getGamePhase(),GamePhase.FIRST_ARRIVAL);
 state.setFlag('HOOK_0217',true);
-state.markTaskComplete('P1_REST_DONE');
+state.markTaskComplete('P1_ER_CALL_RECEIVED');
 let line=duty.onZoneEntered('first_campus_2f');
 assert.equal(line,null,'20:05 story content must wait for the player to answer the duty-room phone');
 assert.equal(state.gameTime,'17:00');

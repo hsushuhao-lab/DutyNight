@@ -103,7 +103,8 @@ export function workstation(zone,{x,z,yaw=0,id}){
   const desk=asset(zone.zoneGroup,'workDesk',[x,0,z],[1.3,1,1],yaw);
   if(desk)desk.name=`WorkstationDesk_${id}`;
   CollisionFactory.addBox(zone.colliders,x,.4,z,1.85,.8,.85);
-  const face=monitor(zone.zoneGroup,zone.gf.materials,x,.80,z,yaw);
+  const deskSurfaceY=desk?new THREE.Box3().setFromObject(desk).max.y:.76;
+  const face=monitor(zone.zoneGroup,zone.gf.materials,x,deskSurfaceY,z,yaw);
   const cx=x+Math.sin(yaw)*.95,cz=z+Math.cos(yaw)*.95;
   const chairObject=asset(zone.zoneGroup,'officeChair',[cx,0,cz],[1,1,1],yaw+Math.PI);
   if(chairObject)chairObject.name=`WorkstationChair_${id}`;
@@ -223,15 +224,21 @@ export function nursingStationV5(zone,{x,z=-4.3,id}){
   workstation(zone,{x:x-1.35,z:z+1.95,yaw:0,id:id+'_B'});
   workstation(zone,{x:x-3.35,z:z-1.85,yaw:Math.PI,id:id+'_C'});
   workstation(zone,{x:x-1.35,z:z-1.85,yaw:Math.PI,id:id+'_D'});
-  asset(zone.zoneGroup,'storageCabinet',[x-3.6,0,z+3.1],[1,1,1],Math.PI/2);
-  asset(zone.zoneGroup,'printer',[x-1.35,.8,z+1.95],[.7,.7,.7]);
+  if(zone.campus!=='first'||zone.floor!==4)asset(zone.zoneGroup,'storageCabinet',[x-3.6,0,z+3.1],[1,1,1],Math.PI/2);
+  const printerDesk=zone.campus==='first'&&zone.floor===4?zone.workstations.find(w=>w.id===id+'_D'):null;
+  const printer=printerDesk?.desk
+    ?asset(zone.zoneGroup,'printer',[printerDesk.desk.position.x+.61,0,printerDesk.desk.position.z],[.7,.7,.7],Math.PI)
+    :asset(zone.zoneGroup,'printer',[x-1.35,.8,z+1.95],[.7,.7,.7]);
+  if(printerDesk?.desk&&printer){
+    printerDesk.desk.updateWorldMatrix(true,true);printer.updateWorldMatrix(true,true);
+    const deskTop=new THREE.Box3().setFromObject(printerDesk.desk).max.y;
+    printer.position.y+=deskTop-new THREE.Box3().setFromObject(printer).min.y;
+  }
   const clinicalPropIds=buildNursingStationClinicalProps(zone,{x,z,id});
 
   if(zone.campus==='first'&&zone.floor===4){
     const board=new THREE.Group();board.name='FourF_NursingHandoverBoard';
-    // Mount on the corridor-facing south wall segment instead of the deep north wall.
-    // This keeps all three handoff rows readable from the ward entrance and out from behind station furniture.
-    board.position.set(x-2.9,1.74,south+.115);zone.zoneGroup.add(board);
+    board.position.set(x-2.0,1.78,north+.105);zone.zoneGroup.add(board);
     solid(board,m.wallBumper,[0,0,0],[2.72,1.12,.055],.018);
     const canvas=document.createElement('canvas');canvas.width=1024;canvas.height=480;
     const ctx=canvas.getContext('2d');
@@ -261,24 +268,26 @@ export function nursingStationV5(zone,{x,z=-4.3,id}){
     board.userData.text=rows;
 
     const deskSet=new THREE.Group();deskSet.name='FourF_StationDesktopSet';
-    deskSet.position.set(x-3.35,.80,z+1.95);zone.zoneGroup.add(deskSet);
+    const stationDesk=zone.workstations.find(w=>w.id===id+'_A')?.desk;
+    const deskSurfaceY=stationDesk?new THREE.Box3().setFromObject(stationDesk).max.y:.76;
+    deskSet.position.set(x-3.35,deskSurfaceY,z+1.95);zone.zoneGroup.add(deskSet);
     const binder=(name,color,px)=>{
       const cover=new THREE.Mesh(new THREE.BoxGeometry(.23,.035,.30),new THREE.MeshStandardMaterial({color,roughness:.9}));
-      cover.name=name;cover.position.set(px,.012,-.23);deskSet.add(cover);
+      cover.name=name;cover.position.set(px,.0175,-.23);deskSet.add(cover);
       const label=new THREE.Mesh(new THREE.PlaneGeometry(.16,.12),new THREE.MeshStandardMaterial({color:0xe5e0d0,roughness:.9}));
       label.position.set(px,.032,-.23);label.rotation.x=-Math.PI/2;deskSet.add(label);
     };
     binder('FourF_StationGreenHandoverBinder',0x526b59,-.36);
     binder('FourF_StationBlueHandoverBinder',0x536573,-.08);
     const tissue=new THREE.Mesh(new THREE.BoxGeometry(.19,.105,.17),new THREE.MeshStandardMaterial({color:0xe7e5dc,roughness:.94}));
-    tissue.name='FourF_StationTissueBox';tissue.position.set(.34,.065,-.20);deskSet.add(tissue);
+    tissue.name='FourF_StationTissueBox';tissue.position.set(.34,.0525,-.20);deskSet.add(tissue);
     const cup=new THREE.Mesh(new THREE.CylinderGeometry(.042,.037,.105,20),new THREE.MeshStandardMaterial({color:0xd7d2c2,roughness:.88}));
-    cup.name='FourF_StationColdCoffee';cup.position.set(.47,.052,.18);deskSet.add(cup);
+    cup.name='FourF_StationColdCoffee';cup.position.set(.47,.0525,.18);deskSet.add(cup);
     const coffee=new THREE.Mesh(new THREE.CircleGeometry(.032,20),new THREE.MeshBasicMaterial({color:0x37271d}));
     coffee.rotation.x=-Math.PI/2;coffee.position.set(.47,.106,.18);deskSet.add(coffee);
     for(let i=0;i<3;i++){
       const pen=new THREE.Mesh(new THREE.CylinderGeometry(.005,.005,.20,8),new THREE.MeshStandardMaterial({color:[0x30455b,0x35533e,0x7b4e3b][i],roughness:.7}));
-      pen.name=`FourF_StationPen_${i+1}`;pen.position.set(.56,.025+i*.004,.23+i*.025);pen.rotation.z=Math.PI/2;deskSet.add(pen);
+      pen.name=`FourF_StationPen_${i+1}`;pen.position.set(.56,.005+i*.002,.23+i*.025);pen.rotation.z=Math.PI/2;deskSet.add(pen);
     }
   }
   zone.gf.buildCeilingLight(zone.zoneGroup,x,3.15,z,.8,8);

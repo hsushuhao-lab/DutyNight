@@ -72,11 +72,11 @@ export function monitor(parent, materials, x, y, z, yaw = 0) {
   ]);
   root.add(new THREE.Mesh(new THREE.TubeGeometry(cablePath,20,.003,5,false),materials.wallDark));
   const cup=new THREE.Mesh(new THREE.CylinderGeometry(.04,.035,.105,24,1,true),materials.bedSheet);
-  cup.position.set(-.34,.053,.14);root.add(cup);
+  cup.name='WorkstationCoffeeCup';cup.position.set(-.34,.053,.14);root.add(cup);
   const inside=new THREE.Mesh(new THREE.CircleGeometry(.033,24),materials.doorWood);
-  inside.rotation.x=-Math.PI/2;inside.position.set(-.34,.084,.14);root.add(inside);
+  inside.name='WorkstationCoffeeSurface';inside.rotation.x=-Math.PI/2;inside.position.set(-.34,.084,.14);root.add(inside);
   const handle=new THREE.Mesh(new THREE.TorusGeometry(.025,.007,8,18),materials.bedSheet);
-  handle.position.set(-.391,.055,.14);root.add(handle);
+  handle.name='WorkstationCoffeeHandle';handle.position.set(-.391,.055,.14);root.add(handle);
   for(let i=0;i<3;i++) {
     const file=solid(root,i%2?materials.wallBumper:materials.wallDark,[.39+i*.055,.155,-.055],[.048,.30,.22]);
     solid(root,materials.bedSheet,[file.position.x,.19,.058],[.025,.12,.004],.001);
