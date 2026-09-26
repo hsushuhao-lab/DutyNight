@@ -542,14 +542,14 @@ controller.onInteract = (interactable) => {
       gameState.setFlag('PHONE_CALL_KIND',null);
       gameState.setFlag('NIGHT_PATROL_RETURN_3F',true);
       floorStateManager.setPhase(GamePhase.NIGHT_PATROL);
-      uiManager.showSubtitle('護理站','「值班醫師，三樓警衛說你剛才在查哨點少簽一個名字，21:17 前要送巡查大表。你現在立刻下去補簽。」\\n李醫師：「我？我一直在四樓值班室啊……」\\n護理站：「三樓說看著你的背影走過去的。快去吧。」',7200);
+      uiManager.showSubtitle('護理站','「值班醫師，三樓警衛說你剛才在查哨點少簽一個名字，21:17 前要送巡查大表。你現在立刻下去補簽。」\\n值班醫師：「我？我一直在四樓值班室啊……」\\n護理站：「三樓說看著你的背影走過去的。快去吧。」',7200);
     }else if(callKind==='ER_GHOST_0033'){
       gameState.setFlag('PHONE_CALL_KIND',null);
       gameState.setFlag('POST_2117_DUTY_CALL_DONE',true);
       gameState.setFlag('GHOST_REGISTRATION_ARMED',true);
       gameState.setFlag('GHOST_REGISTRATION_AVAILABLE',true);
       gameState.setGameTime('00:33');
-      uiManager.showSubtitle('急診護理師','「值班醫師，不好意思。系統裡突然多了一筆掛號資料，可是我們這邊找不到病人。你對這筆資料有印象嗎？」\\n李醫師：「我沒有印象。我下去看看病歷紀錄。」',6200);
+      uiManager.showSubtitle('急診護理師','「值班醫師，不好意思。系統裡突然多了一筆掛號資料，可是我們這邊找不到病人。你對這筆資料有印象嗎？」\\n值班醫師：「我沒有印象。我下去看看病歷紀錄。」',6200);
     }else return;
     worldRouter.activeZoneInstance?.syncStoryState?.();
     uiManager.updateTasks();
@@ -605,7 +605,7 @@ controller.onInteract = (interactable) => {
           controller.enabled=false;
         }else{
           const hasInput=name||employeeId;
-          uiManager.setFinalHandoffStatus(hasInput?'姓名或員編不符｜交班遭另一個「李醫師」接管':'請輸入姓名與員編');
+          uiManager.setFinalHandoffStatus(hasInput?'姓名或員編不符｜李承禮覆寫模板正在接管交班':'請輸入姓名與員編');
           if(hasInput){
             setTimeout(()=>{
               uiManager.closeFinalHandoff(false);
@@ -614,7 +614,7 @@ controller.onInteract = (interactable) => {
           }
         }
       });
-    uiManager.setFinalHandoffStatus('另一個「李醫師」已在 316 登入｜請核對真正姓名與員編');
+    uiManager.setFinalHandoffStatus('李承禮 MED-820316 覆寫模板已在 316 登入｜請宣告真正姓名與員編');
       return;
     }
     controller.enabled = false;
@@ -1086,7 +1086,7 @@ controller.onInteract = (interactable) => {
       soundManager.playBed33KnockPattern();
       registerBed33Clue('KNOCK_408C_49');
       worldRouter.activeZoneInstance?.setDutyDoorClosed?.(true);
-      uiManager.showSubtitle('408C 老先生','「李醫師！隔壁又在敲了！每次都敲四下，停一下，又敲九下……」',5600);
+      uiManager.showSubtitle('408C 老先生','「醫師！隔壁又在敲了！每次都敲四下，停一下，又敲九下……」',5600);
       uiManager.updateTasks();
     } else if(action==='ER_ASSESS'){
       if(!gameState.getFlag('P1_ER_CALL_ANSWERED')) return uiManager.showSubtitle('值班醫師','「先接聽值班室電話，確認急診通知。」',2500);
