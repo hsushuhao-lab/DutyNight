@@ -102,6 +102,13 @@ uiManager = new UIManager(
 );
 
 const loopManager=new LoopManager({gameState,worldRouter,controller,uiManager});
+uiManager.setHandoffDecisionHandler(choice=>{
+  if(choice==='default'){
+    loopManager.triggerLegendOverride('HANDOFF_DEFAULT',{legend:'M1 — 預設值班模板覆寫',reason:'你接受了沒有姓名來源的預設身分。'});
+    return;
+  }
+  persistentMemory.addJournalNote('M1_MANUAL_IDENTITY','17:00：拒絕院內預設值班模板，保留「值班醫師／姓名待核」狀態，直到找到原始紀錄。');
+});
 
 function registerBed33Clue(clueId){
   const previous=legendState.getState('LEGEND_BED33');
@@ -182,9 +189,14 @@ function unlockSecondCampusAccess(){
 
 function completeM5IfReady(){
   if(!gameState.getFlag('M5_ROUTE_CHOICE_RESOLVED'))return false;
+  if(!gameState.getFlag('M5_CCTV_RESOLVED')){
+    uiManager.updateTasks();
+    return false;
+  }
   gameState.setGameTime('02:00');
   gameState.setFlag('M5_ROUTE_RESOLVED',true);
   gameState.setFlag('FLOOR6_AVAILABLE',true);
+  gameState.setFlag('SIX_FLOOR_HISTORY_CONFIRMED',true);
   if(gameState.getFlag('CHEST_RECORD_MATCH')){gameState.setFlag('IDENTITY_PROOF',true);persistentMemory.setProof('identity',true);}
   uiManager.updateTasks();
   return true;
@@ -600,6 +612,7 @@ controller.onInteract = (interactable) => {
       uiManager.openFinalHandoff(({name,employeeId})=>{
         if(name===TRUE_NAME_CANON&&employeeId==='MED-870409'&&persistentMemory.data.trueNameResolved&&persistentMemory.hasAllProofs()){
           gameState.setFlag('GAME_COMPLETE',true);
+          gameState.setFlag('M8_IDENTITY_BATTLE_ACTIVE',false);
           persistentMemory.completeGame();
           uiManager.showFinalSuccess(TRUE_NAME_CANON);
           controller.enabled=false;
@@ -797,8 +810,11 @@ controller.onInteract = (interactable) => {
     worldRouter.loadZone('first_campus_1f');
     if(resolved){
       gameState.setFlag('LAST_CALL_SEEN',true);
+      gameState.setFlag('M8_CODE_BLACK_ANNOUNCED',true);
       persistentMemory.resolveLegend('lastCall');
-      setTimeout(()=>uiManager.showSubtitle('不明來電','☎「……快逃。」',3000),900);
+      persistentMemory.addJournalNote('M8_CODE_BLACK','B2 身分重建後，全院系統將 MED-870409 判定為「已死亡／已除籍卻重新登入」的人員，開始自動封門並搶回 316 交班權限。');
+      soundManager.playDoorLockClack();
+      setTimeout(()=>uiManager.showSubtitle('全院廣播','「CODE BLACK。偵測到已除籍死亡人員 MED-870409 重新登入。門禁完整性程序啟動。04:09 前，夜班紀錄將由李承禮覆寫模板封存。」',7200),700);
     }else{
       gameState.setFlag('B2_IDENTITY_INCOMPLETE',true);
       setTimeout(()=>uiManager.showSubtitle('值班醫師','「先離開封存層，補齊線索後再回來。」',3400),700);
@@ -806,10 +822,15 @@ controller.onInteract = (interactable) => {
     controller.enabled=true;
   } else if (interactable.type === 'security_monitor_anomaly') {
     gameState.setFlag('CCTV_SELF_DUPLICATE_SEEN',true);
+    gameState.setFlag('M5_CCTV_RESOLVED',true);
+    gameState.setFlag('SIX_FLOOR_HISTORY_CONFIRMED',true);
     persistentMemory.rememberEvidence('M5_SECURITY_PLAYBACK');
     persistentMemory.addJournalNote('CCTV_SELF_DUPLICATE','第二院區監控抽幀先拍到 1998 的 6F、劉志遠與警衛衝突；即時畫面又同時出現我和另一個值班醫師。辨識框短暫顯示 LI_CHENG_LI / MED-820316。');
     controller.enabled=false;
-    uiManager.openMemorySequence(getMemorySequence('M5_SECURITY_PLAYBACK'));
+    uiManager.openMemorySequence(getMemorySequence('M5_SECURITY_PLAYBACK'),()=>{
+      completeM5IfReady();
+      uiManager.updateTasks();
+    });
   } else if (interactable.type === 'exit_door' || interactable.type === 'closed_door') {
     soundManager.playClick();
     if (interactable.id === '1F_MAIN_DOOR') {
@@ -967,6 +988,11 @@ controller.onInteract = (interactable) => {
         controller.enabled=true;
       }
     });  } else if (interactable.type === 'bridge_loop_event') {
+    if(!gameState.getFlag('M5_CCTV_RESOLVED')){
+      uiManager.showSubtitle('值班醫師','「第二院區監控室那段影像還沒看完。裡面出現了不存在的 6F，先回去確認。」',4200);
+      uiManager.updateTasks();
+      return;
+    }
     if(gameState.getFlag('M5_BRIDGE_RESOLVED')){
       uiManager.showSubtitle('值班醫師','「一直往前。不要回頭。」',2200);return;
     }
