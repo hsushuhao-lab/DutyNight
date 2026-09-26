@@ -5,11 +5,14 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
-import { preloadAssets } from './art/AssetRegistry.js';
+import { preloadAssets, preloadCriticalAssets } from './art/AssetRegistry.js';
 import { preloadMaterials } from './art/MaterialRegistry.js';
 import { preloadCampusBackdropAssets } from './art/CampusBackdrop.js';
 
 RectAreaLightUniformsLib.init();
+// Preserve the authored opening 3F furniture without putting the entire hospital
+// asset library back on the critical path.
+await preloadCriticalAssets();
 // Boot immediately with procedural/shared fallback materials and load heavyweight
 // GLTF/PBR assets after first paint. This removes 20+ asset requests from the
 // critical path while preserving full-quality assets once they are cached.
