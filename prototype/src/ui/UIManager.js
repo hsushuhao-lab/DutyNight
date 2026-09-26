@@ -598,6 +598,39 @@ export class UIManager {
     ctx.strokeStyle=cctv?'#708c76':'#5d4b35';ctx.lineWidth=8;ctx.strokeRect(42,42,w-84,h-84);
     ctx.fillStyle=cctv?'#b6cfb9':'#3d3427';ctx.font='bold 30px ui-monospace, monospace';ctx.fillText(frame.stamp||'',70,92);
     ctx.font='bold 44px sans-serif';ctx.fillText(frame.title||'',70,150);
+    const sceneKind=frame.scene||'corridor';
+    ctx.save();
+    ctx.globalAlpha=cctv?.34:.28;
+    ctx.strokeStyle=cctv?'#9ab49f':'#3d3327';ctx.fillStyle=cctv?'#26362b':'#7d6b50';ctx.lineWidth=6;
+    if(sceneKind==='office'){
+      ctx.fillRect(95,410,1080,28);ctx.strokeRect(140,205,340,160);ctx.fillRect(760,330,300,28);
+      for(let i=0;i<4;i++)ctx.strokeRect(790+i*62,210,44,90);
+    }else if(sceneKind==='duty'){
+      ctx.strokeRect(90,330,300,150);ctx.fillRect(560,405,430,30);ctx.strokeRect(930,235,150,145);
+      ctx.beginPath();ctx.arc(720,360,24,0,Math.PI*2);ctx.stroke();
+    }else if(sceneKind==='er'){
+      ctx.strokeRect(90,310,300,150);ctx.fillRect(510,395,420,28);ctx.strokeRect(975,220,170,180);
+      for(let x=130;x<390;x+=65){ctx.beginPath();ctx.moveTo(x,310);ctx.lineTo(x,460);ctx.stroke();}
+    }else if(sceneKind==='security'){
+      ctx.fillRect(90,410,420,30);for(let row=0;row<2;row++)for(let col=0;col<4;col++)ctx.strokeRect(610+col*125,205+row*115,100,82);
+      ctx.strokeRect(120,210,260,150);
+    }else if(sceneKind==='skills'){
+      ctx.strokeRect(170,365,520,90);ctx.strokeRect(790,205,260,220);ctx.beginPath();ctx.arc(430,340,45,0,Math.PI*2);ctx.stroke();
+      ctx.moveTo(430,385);ctx.lineTo(430,445);ctx.stroke();
+    }else if(sceneKind==='bridge'){
+      ctx.beginPath();ctx.moveTo(110,520);ctx.lineTo(500,220);ctx.lineTo(780,220);ctx.lineTo(1170,520);ctx.stroke();
+      for(let i=0;i<6;i++){const x=210+i*160;ctx.moveTo(x,465);ctx.lineTo(x+80,255);ctx.stroke();}
+    }else if(sceneKind==='elevator'){
+      ctx.strokeRect(390,205,500,330);ctx.moveTo(640,205);ctx.lineTo(640,535);ctx.stroke();ctx.strokeRect(930,260,120,220);
+    }else if(sceneKind==='map'){
+      ctx.strokeRect(130,205,950,330);ctx.moveTo(420,205);ctx.lineTo(420,535);ctx.moveTo(760,205);ctx.lineTo(760,535);ctx.moveTo(130,350);ctx.lineTo(1080,350);ctx.stroke();
+      for(let i=0;i<6;i++){ctx.beginPath();ctx.arc(235+i*145,285+(i%2)*120,16,0,Math.PI*2);ctx.fill();}
+    }else if(sceneKind==='static'){
+      for(let i=0;i<75;i++){const y=190+(i*19)%350,x=70+(i*73)%1100;ctx.fillRect(x,y,35+(i%5)*20,3);}
+    }else{
+      ctx.moveTo(100,500);ctx.lineTo(1180,500);ctx.moveTo(210,230);ctx.lineTo(210,500);ctx.moveTo(1040,230);ctx.lineTo(1040,500);ctx.stroke();
+    }
+    ctx.restore();
     const people=frame.people||[],count=Math.max(1,people.length),gap=(w-260)/count;
     for(let i=0;i<people.length;i++){const x=130+gap*(i+.5);ctx.fillStyle=cctv?'#54685a':'#6a5942';ctx.beginPath();ctx.arc(x,270,46,0,Math.PI*2);ctx.fill();ctx.fillRect(x-55,318,110,162);if(people[i]==='Annie'){ctx.strokeStyle=cctv?'#9db5a1':'#4a4031';ctx.lineWidth=8;ctx.strokeRect(x-52,315,104,166);}ctx.fillStyle=cctv?'#d4ded5':'#30291f';ctx.font='22px sans-serif';ctx.textAlign='center';ctx.fillText(people[i],x,535);}
     ctx.textAlign='left';if(people.length===0){ctx.fillStyle=cctv?'#405044':'#7a684c';ctx.fillRect(210,240,w-420,260);}
