@@ -40,13 +40,7 @@ export class FirstCampus3F {
     if(persistentMemory.data.loopCount>=1){
       const officeAnnie=createAnnieArt(this.zoneGroup,{materials:m,state:'STORAGE_STATIC',position:[3.8,0,7.25],rotationY:Math.PI});
       officeAnnie.name='Annie_316_SecondLoop';this.officeAnnie=officeAnnie;
-      const relic=new THREE.Group();relic.name='Annie_316_Stethoscope';relic.position.set(3.8,.78,7.03);this.zoneGroup.add(relic);
-      const tubeMat=new THREE.MeshStandardMaterial({color:0x171a18,roughness:.9});
-      const tube=new THREE.Mesh(new THREE.TorusGeometry(.22,.018,8,30,Math.PI*1.65),tubeMat);tube.rotation.x=Math.PI/2;relic.add(tube);
-      const chestpiece=new THREE.Mesh(new THREE.CylinderGeometry(.085,.095,.04,24),m.stainless);chestpiece.rotation.x=Math.PI/2;chestpiece.position.set(.20,-.02,.12);relic.add(chestpiece);
-      const hit=new THREE.Mesh(new THREE.BoxGeometry(1.5,1.75,1.5),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
-      hit.position.set(3.8,1.0,7.2);hit.userData={interactable:true,id:'ANNIE_316_STETHOSCOPE',type:'office_annie_stethoscope',label:'查看坐在 316 裡的安妮與聽診器'};
-      this.zoneGroup.add(hit);this.interactables.push(hit);this.officeAnnieHit=hit;
+      // v2.2: Annie may echo here, but the engraved stethoscope clue exists only on hidden 6F.
     }
 
     // 3F office mirrors the 4F duty-room position relative to the shared elevator core.
