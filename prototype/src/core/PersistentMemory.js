@@ -231,6 +231,7 @@ export class PersistentMemory {
 
   applyToGameState(gameState){
     gameState.setFlag('LOOP_COUNT',this.data.loopCount);
+    gameState.setFlag('FAST_PATH_3F',this.data.loopCount>=1);
     gameState.setFlag('MEMORY_PASS_1700',this.data.knownCodes.pass_1700);
     gameState.setFlag('MEMORY_PASS_3082',this.data.knownCodes.pass_3082);
     gameState.setFlag('MEMORY_CODE_0217',this.data.knownCodes.code_0217);
