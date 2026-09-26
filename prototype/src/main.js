@@ -9,7 +9,11 @@ import { preloadAssets } from './art/AssetRegistry.js';
 import { preloadMaterials } from './art/MaterialRegistry.js';
 
 RectAreaLightUniformsLib.init();
-await Promise.all([preloadAssets(), preloadMaterials()]);
+// Boot immediately with procedural/shared fallback materials and load heavyweight
+// GLTF/PBR assets after first paint. This removes 20+ asset requests from the
+// critical path while preserving full-quality assets once they are cached.
+const deferredHospitalAssets = () => Promise.all([preloadAssets(), preloadMaterials()])
+  .catch(error => console.warn('[perf] deferred hospital asset preload failed', error));
 import { gameState } from './core/GameState.js';
 import { DutyEventManager } from './core/DutyEventManager.js';
 import { Level3FBlockout } from './world/Level3FBlockout.js';
@@ -45,6 +49,10 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.0;
 container.appendChild(renderer.domElement);
+requestAnimationFrame(() => {
+  if ('requestIdleCallback' in window) requestIdleCallback(deferredHospitalAssets, { timeout: 2500 });
+  else setTimeout(deferredHospitalAssets, 500);
+});
 const reflectionRoom = new RoomEnvironment();
 const reflectionGenerator = new THREE.PMREMGenerator(renderer);
 scene.environment = reflectionGenerator.fromScene(reflectionRoom, .04).texture;
