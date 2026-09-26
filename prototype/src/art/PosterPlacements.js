@@ -1,0 +1,62 @@
+const P=(posterId,x,y,z,rotationY,width=.78,variant='clean',inspectable=true,rotationZ=0)=>Object.freeze({
+  posterId,x,y,z,rotationY,width,variant,inspectable,rotationZ
+});
+
+export const ERA_POSTER_PLACEMENTS=Object.freeze({
+  first_campus_1f:Object.freeze([
+    P('poster_04_hospital_history_1998',7.2,1.65,-7.76,Math.PI,.86,'stained',true,-.012),
+    P('poster_01_restraint_sop',17.76,1.62,0,-Math.PI/2,.70,'clean',false,.008),
+    P('poster_06_night_shift_attendance',-13.76,1.58,1.55,Math.PI/2,.72,'stained',true,-.018)
+  ]),
+  first_campus_2f:Object.freeze([
+    P('poster_08_er_jane_doe_triage',3.5,1.72,8.28,Math.PI,.88,'clean',true,-.008),
+    P('poster_01_restraint_sop',11.0,1.66,9.28,Math.PI,.66,'stained',false,.014),
+    P('poster_03_doppelganger_delusion',15.78,1.62,-6.5,-Math.PI/2,.68,'redacted',true,-.018),
+    P('poster_05_derealization_dissociation',3.5,1.62,-9.28,0,.70,'stained',false,.01)
+  ]),
+  first_campus_3f:Object.freeze([
+    P('poster_06_night_shift_attendance',-21.78,1.62,7.7,Math.PI/2,.78,'stained',true,-.008),
+    P('poster_04_hospital_history_1998',-19.0,1.62,11.28,Math.PI,.76,'stained',true,.012),
+    P('poster_03_doppelganger_delusion',-17.0,1.62,3.72,0,.66,'redacted',true,-.02)
+  ]),
+  first_campus_4f:Object.freeze([
+    P('poster_01_restraint_sop',-3.15,1.66,.13,0,.68,'clean',false,-.01),
+    P('poster_06_night_shift_attendance',2.55,1.66,.13,0,.68,'stained',true,.012),
+    P('poster_02_auditory_hallucination_knocking',6.73,1.58,-1.15,Math.PI/2,.78,'stained',true,-.018),
+    P('poster_07_ect_identity_memory',-13.86,1.64,7.75,Math.PI/2,.66,'clean',true,.008)
+  ]),
+  second_campus_5f:Object.freeze([
+    P('poster_01_restraint_sop',68.85,1.64,.13,0,.68,'clean',false,.01),
+    P('poster_05_derealization_dissociation',74.6,1.64,.13,0,.70,'stained',true,-.012),
+    P('poster_08_er_jane_doe_triage',78.72,1.62,-3.0,Math.PI/2,.62,'stained',false,.016)
+  ]),
+  second_campus_4f_story:Object.freeze([
+    P('poster_01_restraint_sop',68.85,1.64,.13,0,.68,'clean',false,.01),
+    P('poster_05_derealization_dissociation',74.6,1.64,.13,0,.70,'stained',true,-.012)
+  ]),
+  first_campus_8f:Object.freeze([
+    P('poster_04_hospital_history_1998',-3.25,1.55,-1.78,0,.66,'stained',true,-.02),
+    P('poster_03_doppelganger_delusion',-1.75,1.55,-1.78,0,.60,'redacted',false,.018),
+    P('poster_06_night_shift_attendance',-3.25,1.55,1.78,Math.PI,.62,'stained',false,.012)
+  ]),
+  skybridge:Object.freeze([
+    P('poster_05_derealization_dissociation',8,1.55,-1.78,0,.64,'stained',true,-.016),
+    P('poster_05_derealization_dissociation',20,1.55,1.78,Math.PI,.62,'stained',false,.018),
+    P('poster_03_doppelganger_delusion',30,1.55,-1.78,0,.58,'redacted',true,-.012),
+    P('poster_05_derealization_dissociation',40,1.55,1.78,Math.PI,.62,'torn',false,.014),
+    P('poster_04_hospital_history_1998',50,1.55,-1.78,0,.60,'torn',false,-.02)
+  ]),
+  phantom_6f:Object.freeze([
+    P('poster_07_ect_identity_memory',-3.82,1.55,-4.2,Math.PI/2,.72,'burnt',true,-.018),
+    P('poster_04_hospital_history_1998',3.82,1.55,-8.0,-Math.PI/2,.72,'burnt',true,.014),
+    P('poster_03_doppelganger_delusion',-3.82,1.55,-11.2,Math.PI/2,.62,'redacted',false,.022)
+  ]),
+  b2_archive:Object.freeze([
+    P('poster_04_hospital_history_1998',-4.82,1.55,-4.5,Math.PI/2,.76,'burnt',true,-.016),
+    P('poster_06_night_shift_attendance',4.82,1.55,-7.2,-Math.PI/2,.68,'burnt',true,.016),
+    P('poster_07_ect_identity_memory',-4.82,1.55,-10.2,Math.PI/2,.68,'torn',false,-.012),
+    P('poster_03_doppelganger_delusion',4.82,1.55,-12.8,-Math.PI/2,.62,'redacted',false,.018)
+  ])
+});
+
+export function getEraPosterPlacements(zoneId){ return ERA_POSTER_PLACEMENTS[zoneId] || []; }
