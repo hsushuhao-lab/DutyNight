@@ -345,8 +345,17 @@ try{
   await interact({id:'SECOND_CHEST_NAME_CLUE'});await closeArchive();
   await shot('m4-guard-roster-clue',null,null,'SecondCampus_TrueNameRosterFragment',[68.7,1.7,-19.0],[68.26,.91,-20.04]);
   s=await snap();assert.equal(s.flags.M4_NAME_CLUE_FOUND,true);assert.equal(s.memory.trueNameFragments.frag_givenName_1,'守');
-  assert.match(await taskText(),/返回第一院區/,'M4 resolution must push the player toward the next route');
+  assert.match(await taskText(),/第二院區 2F[\s\S]*監控/,'M4 resolution must push the player into the second-campus CCTV prelude');
   await mark('M4 chest-pain duplicate resolved');
+
+  // M5 prelude: the erased 6F must be seeded by CCTV before the bridge can resolve.
+  await load('second_campus_2f','second_2f_lift');
+  await interact({id:'SECOND_2F_CCTV_SELF'});
+  await waitForPageCondition(page,()=>document.getElementById('memory-modal')?.classList.contains('active'),30000);
+  await shot('m5-security-playback',null,null,'Second2F_CCTVWall',[74,1.7,-7.7],[74,1.5,-10.25]);
+  await domClick('#btn-close-memory');
+  s=await snap();assert.equal(s.flags.M5_CCTV_RESOLVED,true);assert.equal(s.flags.SIX_FLOOR_HISTORY_CONFIRMED,true);
+  assert.match(await taskText(),/天橋/,'after CCTV playback the route must advance to the bridge');
 
   // M5A: skybridge rule.
   await load('skybridge','bridge_from_first');
