@@ -47,6 +47,8 @@ assert(router.includes("'phantom_6f': Phantom6F")&&routes.includes("phantom_6f_l
 assert(main.includes("LEGEND 06 — 不存在的六樓")&&main.includes("M6_FLOOR6_RESOLVED"),'M6 safe/override logic missing');
 
 assert(b2.includes("type:'b2_archive_terminal'")&&b2.includes("type:'b2_escape_stairs'"),'M7 B2 convergence interactions missing');
+assert(html.includes('identity-matrix-modal')&&main.includes('IDENTITY_CANDIDATES')&&main.includes("candidate.id!=='ZHANG_SHOUHENG'"),'B2 must use the four-doctor contradiction matrix rather than auto-resolving identity');
+assert(main.includes("B_PANEL_CLUE_KNOWN")&&main.includes("WANG_B_PANEL_KEY")&&!main.includes('她掉下來的舊十字鑰匙'),'B-Panel key provenance must resolve through the 1F guard post');
 assert(main.includes("interactable.type === 'er_nurse_computer'")&&main.includes('這個電腦是護理師專用'),'ER nurse computers must redirect the physician');
 assert(main.includes("gameState.setFlag('B2_IDENTITY_INCOMPLETE',true)")&&main.includes("interactable.type === 'b2_escape_stairs'"),'B2 insufficient identity route must fail forward to stairs');
 assert(router.includes("'b2_archive': B2Archive")&&routes.includes("b2_archive_stairs")&&!routes.includes("b2_archive_lift"),'M7 B2 stair route registration missing');
