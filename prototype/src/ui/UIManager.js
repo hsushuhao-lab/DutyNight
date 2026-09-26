@@ -845,7 +845,7 @@ export class UIManager {
   }
 
   updateTime() {
-    if (this.timeEl) this.timeEl.textContent = `${this.gameState.getDisplayTime?.()||this.gameState.gameTime} ｜ 第一線值班：李住院醫師`;
+    if (this.timeEl) this.timeEl.textContent = `${this.gameState.getDisplayTime?.()||this.gameState.gameTime} ｜ 第一線值班：值班醫師｜姓名待核`;
   }
 
   renderTaskBoard(header, items) {
