@@ -10,7 +10,9 @@ export const assetManifest = Object.freeze({
 });
 const vegetation = { shrub: 'shrub_02', fern: 'fern_02' };
 const outdoorAssets = new Set(['shrub', 'fern', 'campusTree']);
+const openingCriticalAssets = new Set(['officeChair', 'storageCabinet']);
 const assets = new Map();
+let criticalPreload;
 let preload;
 let outdoorPreload;
 
@@ -67,10 +69,19 @@ async function loadAssetEntries(entries) {
   }));
 }
 
+export function preloadCriticalAssets() {
+  if (criticalPreload) return criticalPreload;
+  criticalPreload = loadAssetEntries(Object.entries(assetManifest).filter(([name]) => openingCriticalAssets.has(name)))
+    .catch(error => { throw new Error(`Opening GLTF asset preload failed: ${error.message}`, { cause: error }); });
+  return criticalPreload;
+}
+
 export function preloadAssets() {
   if (preload) return preload;
-  preload = loadAssetEntries(Object.entries(assetManifest).filter(([name]) => !outdoorAssets.has(name)))
-    .catch(error => { throw new Error(`Hospital GLTF asset preload failed: ${error.message}`, { cause: error }); });
+  preload = Promise.all([
+    preloadCriticalAssets(),
+    loadAssetEntries(Object.entries(assetManifest).filter(([name]) => !outdoorAssets.has(name) && !openingCriticalAssets.has(name)))
+  ]).catch(error => { throw new Error(`Hospital GLTF asset preload failed: ${error.message}`, { cause: error }); });
   return preload;
 }
 
