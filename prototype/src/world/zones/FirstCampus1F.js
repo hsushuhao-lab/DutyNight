@@ -387,7 +387,7 @@ export class FirstCampus1F {
   }
 
   syncStoryState(){
-    const discovered=gameState.getFlag('HIDDEN_SERVICE_DOOR_DISCOVERED')===true;
+    const discovered=gameState.getFlag('HIDDEN_SERVICE_DOOR_DISCOVERED')===true&&!gameState.getFlag('B2_EXITED_PERMANENTLY');
     if(this.guardPostObject)this.guardPostObject.userData.interactable=!discovered;
     if(this.hiddenServiceHit)this.hiddenServiceHit.userData.interactable=discovered;
     if(this.hiddenServiceFrame)this.hiddenServiceFrame.visible=discovered;

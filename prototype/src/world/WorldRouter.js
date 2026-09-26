@@ -89,7 +89,7 @@ export class WorldRouter {
   closeZoneDoors(zone){
     if(!zone)return;
     for(const door of Object.values(zone.accessDoors||{}))door.setClosed?.(true);
-    for(const door of Object.values(zone.keyedDoors||{}))door.setClosed?.(true);
+    for(const door of Object.values(zone.keyedDoors||{}))if(!door.keepOpen)door.setClosed?.(true);
     zone.setDutyDoorClosed?.(true);
     zone.setWardGateClosed?.(true);
     zone.setInnerWardGateClosed?.(true);

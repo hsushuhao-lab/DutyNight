@@ -960,9 +960,13 @@ export class UIManager {
       return;
     }
 
-    if(this.gameState.getFlag('FAST_PATH_3F')&&!this.gameState.getFlag('FAST_PATH_316_CALL_DONE')){
+    if(this.gameState.getFlag('FAST_PATH_3F')&&!this.gameState.getFlag('KEY_PICKUP')){
+      let text='輸入相同密碼，從櫃子取得感應卡與 4F 值班室鑰匙';
+      if(!this.gameState.getFlag('FOUND_316_SPARE_KEY'))text='先去警衛查哨點取得 316 備援鑰匙';
+      else if(!opened316)text='使用備援鑰匙進入 316';
+      else if(!this.gameState.getFlag('FAST_PATH_316_CALL_DONE'))text='接聽 316 辦公室裡響起的電話';
       this.renderTaskBoard('回溯後的值班',[
-        {id:'task-fastpath-316',text:'進入 316，取得感應卡與 4F 值班室鑰匙',state:'ready'}
+        {id:'task-fastpath-316',text,state:'ready'}
       ]);
       return;
     }

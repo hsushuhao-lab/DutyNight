@@ -166,16 +166,6 @@ export class SecondCampus2F {
     const art = this.art;
     counterFront(art, this.gf.materials, 67, 2.78, 4.2, 1.1);
     asset(art, 'bench', [70, 0, -3.85]);
-    asset(art,'bench',[63.0,0,3.75]);
-    asset(art,'bench',[63.0,0,-3.75]);
-    asset(art,'plant',[61.3,0,-3.4]);
-    asset(art,'plant',[61.4,0,3.65]);
-    for(const [index,z] of [-2.2,2.2].entries()){
-      const stand=new THREE.Group();stand.name=`Second2F_BridgeLobbyStand_${index+1}`;stand.position.set(62.2,0,z);art.add(stand);
-      solid(stand,this.gf.materials.metal,[0,.62,0],[.05,1.24,.05]);
-      solid(stand,this.gf.materials.wallBumper,[0,1.02,0],[.78,.48,.06]);
-      solid(stand,this.gf.materials.metal,[0,.03,0],[.65,.06,.36]);
-    }
     const oldBridgeDoor=this.zoneGroup.getObjectByName('Doorway_60_0');
     for(const leaf of oldBridgeDoor.children)if(leaf.geometry?.parameters.height===2.35||leaf.geometry?.parameters.height===2.45)leaf.visible=false;
     new AccessDoor(this,{id:'BRIDGE_ACCESS',x:60,z:0,yaw:Math.PI/2,width:2.8,title:'天橋感應門',portal:'bridge_from_second'});

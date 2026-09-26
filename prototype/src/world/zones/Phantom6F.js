@@ -59,11 +59,6 @@ export class Phantom6F {
     safe.userData={interactable:true,id:'FLOOR6_SAFE_RETURN',type:'floor6_safe_return',label:'留在電梯前，不往深處走'};
     this.zoneGroup.add(safe);this.interactables.push(safe);
 
-    const chase=new THREE.Mesh(new THREE.BoxGeometry(2.8,2.4,3.0),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
-    chase.position.set(0,1.2,-10.5);
-    chase.userData={interactable:true,id:'FLOOR6_CHASE',type:'floor6_chase',label:'追上走廊深處的白袍'};
-    this.zoneGroup.add(chase);this.interactables.push(chase);
-
     const burntBed=new THREE.Group();burntBed.name='Annie_CPR_BurntBed';burntBed.position.set(.6,0,-7.3);this.zoneGroup.add(burntBed);
     const charred=new THREE.MeshStandardMaterial({color:0x77766d,roughness:0.94});
     solid(burntBed,m.wallDark,[0,.38,0],[1.18,.18,2.12]);solid(burntBed,charred,[0,.57,0],[1.24,.20,2.18]);

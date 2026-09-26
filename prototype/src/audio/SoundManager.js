@@ -214,18 +214,18 @@ export class SoundManager {
     if (!this.ctx || this.isMuted) return;
     try {
       const ringAt=(t)=>{
-        for(const [freq,offset] of [[440,0],[560,.09]]){
+        for(const [freq,offset] of [[930,0],[1380,.055],[1040,.11]]){
           const osc=this.ctx.createOscillator();const gain=this.ctx.createGain();
-          osc.type='sine';osc.frequency.setValueAtTime(freq,t+offset);
+          osc.type='square';osc.frequency.setValueAtTime(freq,t+offset);
           gain.gain.setValueAtTime(.001,t+offset);
-          gain.gain.linearRampToValueAtTime(.09,t+offset+.02);
-          gain.gain.exponentialRampToValueAtTime(.001,t+offset+.42);
+          gain.gain.linearRampToValueAtTime(.13,t+offset+.012);
+          gain.gain.exponentialRampToValueAtTime(.001,t+offset+.30);
           osc.connect(gain);gain.connect(this.ctx.destination);
-          osc.start(t+offset);osc.stop(t+offset+.45);
+          osc.start(t+offset);osc.stop(t+offset+.32);
         }
       };
       const now=this.ctx.currentTime;
-      ringAt(now);ringAt(now+.72);ringAt(now+2.95);ringAt(now+3.67);
+      ringAt(now);ringAt(now+.48);ringAt(now+2.35);ringAt(now+2.83);
     } catch (e) {}
   }
 

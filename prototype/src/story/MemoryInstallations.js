@@ -9,7 +9,8 @@ const PLACEMENTS=Object.freeze({
   ]),
   first_campus_4f:Object.freeze([P('M2_DUTYROOM_ALBUM',-13.84,1.55,8.65,Math.PI/2,.72)]),
   first_campus_2f:Object.freeze([P('M3_ER_PHOTO',15.78,1.55,-7.55,-Math.PI/2,.72)]),
-  second_campus_2f:Object.freeze([P('M4_SECOND_DUTY_NOTE',75.78,1.52,10.45,-Math.PI/2,.72),P('M5_GUARD_REST_LOG',63.7,1.50,-10.28,0,.70)]),
+  second_campus_2f:Object.freeze([P('M5_GUARD_REST_LOG',63.7,1.50,-10.28,0,.70)]),
+  second_campus_5f:Object.freeze([P('M4_SECOND_DUTY_NOTE',85.74,1.52,8.65,-Math.PI/2,.72)]),
   phantom_6f:Object.freeze([P('M6_6F_PLAYBACK',3.83,1.55,-5.15,-Math.PI/2,.78)]),
   first_campus_1f:Object.freeze([P('M7_GUARD_0217',-13.70,1.58,2.30,Math.PI/2,.70)]),
   b2_archive:Object.freeze([P('B2_VICTIM_MAP',4.82,1.55,-9.55,-Math.PI/2,.82)])

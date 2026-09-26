@@ -470,8 +470,13 @@ export class Level3FBlockout {
     this.scene.add(lampShade);
 
     // 316 desk phone: ordinary before handoff, uncanny afterwards.
-    const phoneBase=new THREE.Mesh(new THREE.BoxGeometry(.34,.09,.22),this.materials.fixture);phoneBase.name='DutyPhone_316_Base';phoneBase.position.set(5.45,.86,5.72);this.scene.add(phoneBase);
-    const handset=new THREE.Mesh(new THREE.BoxGeometry(.38,.07,.10),this.materials.wallDark);handset.name='DutyPhone_316_Handset';handset.position.set(5.45,.95,5.72);this.scene.add(handset);
+    const phoneBase=new THREE.Group();phoneBase.name='DutyPhone_316_Base';phoneBase.position.set(5.45,.02,5.72);this.scene.add(phoneBase);
+    const phonePart=(material,position,size)=>{const part=new THREE.Mesh(new THREE.BoxGeometry(...size),material);part.position.set(...position);phoneBase.add(part);return part;};
+    phonePart(this.materials.wallDark,[0,.84,0],[.28,.07,.20]);
+    phonePart(this.materials.fixture,[0,.89,-.01],[.19,.018,.09]);
+    phonePart(this.materials.ceiling,[0,.92,-.055],[.25,.035,.055]);
+    for(let row=0;row<3;row++)for(let col=0;col<3;col++)phonePart(this.materials.metal,[-.065+col*.065,.885,.025+row*.035],[.025,.008,.016]);
+    const handset=new THREE.Mesh(new THREE.CapsuleGeometry(.025,.19,4,10),this.materials.wallDark);handset.name='DutyPhone_316_Handset';handset.rotation.z=Math.PI/2;handset.position.set(0,.98,-.055);phoneBase.add(handset);
     const phoneHit=new THREE.Mesh(new THREE.BoxGeometry(.55,.35,.42),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
     phoneHit.position.set(5.45,.95,5.72);phoneHit.userData={interactable:true,id:'316_PHONE',type:'office_phone_316',label:'查看 316 辦公室電話'};
     this.scene.add(phoneHit);this.interactables.push(phoneHit);this.phoneMesh=phoneHit;

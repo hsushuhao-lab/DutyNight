@@ -278,7 +278,17 @@ export class WardFloorplan {
     this.gf.buildFloor(this.zoneGroup,this.walkables,o+11,0,6,6,8,this.gf.materials.floorWood);
     this.gf.buildCeiling(this.zoneGroup,o+11,3.2,6,6,8);
     workstation(this,{x:o+12,z:3.1,id:'second_duty_desk'});
-    const door=new AccessDoor(this,{id:'second_duty_room',x:o+8,z:6,yaw:Math.PI/2,width:1.4,title:'值班室'});door.setClosed(true);
+    const door=new KeyedKnobDoor(this,{id:'second_duty_room',x:o+8,z:6,yaw:Math.PI/2,width:1.4,title:'值班室',openDirection:1});
+    door.keepOpen=true;door.setClosed(false);
+    door.root.traverse(object=>{if(object.userData?.doorId==='second_duty_room')object.userData.interactable=false;});
+    SignAnchor.buildWallPlaque({scene:this.zoneGroup,x:o+8.115,y:2.62,z:6,rotationY:-Math.PI/2,width:1.18,height:.34,code:'5F',title:'值班室',subtitle:'ON-CALL ROOM',header:''});
+    const decor=new THREE.Group();decor.name='Second5F_DutyRoomDecor';this.zoneGroup.add(decor);
+    asset(decor,'bench',[o+10,0,8.85],[.72,.72,.72],Math.PI);
+    asset(decor,'plant',[o+13.15,0,8.85],[.62,.62,.62]);
+    solid(decor,this.gf.materials.metal,[o+9.2,.64,8.9],[.05,1.28,.05]);
+    solid(decor,this.gf.materials.wallBumper,[o+9.2,1.10,8.9],[.82,.52,.06]);
+    solid(decor,this.gf.materials.doorWood,[o+13.84,1.55,6.65],[.05,1.05,1.35]);
+    solid(decor,this.gf.materials.lightWarm,[o+13.80,1.55,6.65],[.018,.90,1.20]);
     asset(this.zoneGroup,'hospitalBed',[o+12.3,0,7.7],[1.1,.95,.97]);CollisionFactory.addBox(this.colliders,o+12.3,.45,7.7,1.3,.9,2.1);
     asset(this.zoneGroup,'storageCabinet',[o+9.4,0,8.7],[1,1,1],Math.PI);
     solid(this.zoneGroup,this.gf.materials.doorWood,[o+10.75,.28,8.1],[.5,.56,.5]);

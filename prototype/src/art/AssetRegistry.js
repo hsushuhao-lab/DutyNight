@@ -10,7 +10,7 @@ export const assetManifest = Object.freeze({
 });
 const vegetation = { shrub: 'shrub_02', fern: 'fern_02' };
 const outdoorAssets = new Set(['shrub', 'fern', 'campusTree']);
-const openingCriticalAssets = new Set(['officeChair', 'storageCabinet']);
+const openingCriticalAssets = new Set(['officeChair', 'storageCabinet', 'workDesk', 'printer', 'bench', 'plant']);
 const assets = new Map();
 let criticalPreload;
 let preload;

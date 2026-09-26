@@ -24,6 +24,7 @@ const prefetchDestinationAssets = destination => Promise.all([
   preloadMaterials(),
   campusBackdropZones.has(destination?.zoneId) ? preloadCampusBackdropAssets() : Promise.resolve()
 ]);
+let fastPathWorldPreload=Promise.resolve();
 import { gameState } from './core/GameState.js';
 import { DutyEventManager } from './core/DutyEventManager.js';
 import { Level3FBlockout } from './world/Level3FBlockout.js';
@@ -186,6 +187,7 @@ function triggerPost2117DutyRoomSequence(){
 }
 
 function startStoryPhoneCall(kind){
+  if(kind==='FAST_PATH_316')fastPathWorldPreload=prefetchDestinationAssets({zoneId:'first_campus_4f'});
   gameState.setFlag('PHONE_CALL_KIND',kind);
   gameState.setFlag('PHONE_ANSWERED',false);
   gameState.setFlag('PHONE_RING_ACTIVE',true);
@@ -330,7 +332,7 @@ controller.onHoverChange = (interactable) => {
   }
 };
 
-controller.onInteract = (interactable) => {
+controller.onInteract = async (interactable) => {
   console.log('Interacting with:', interactable);
 
   if (interactable.type === 'access_door') {
@@ -470,7 +472,7 @@ controller.onInteract = (interactable) => {
       uiManager.showPrompt(null);
     }
   } else if (interactable.type === 'office_316_door') {
-    if(!gameState.getFlag('FOUND_316_SPARE_KEY')&&!gameState.getFlag('FAST_PATH_3F')){
+    if(!gameState.getFlag('FOUND_316_SPARE_KEY')){
       soundManager.playClick();
       uiManager.showSubtitle('316 總醫師辦公室','門鎖著。學長說過可以先去警衛查哨點看看。',3200);
       return;
@@ -538,11 +540,10 @@ controller.onInteract = (interactable) => {
       gameState.setFlag('FAST_PATH_316_CALL_DONE',true);
       gameState.markTaskComplete('P1_316_COMPLETE');
       gameState.markTaskComplete('DUTY_LOG');
-      gameState.markTaskComplete('KEY_PICKUP');
       gameState.markTaskComplete('E_HANDOFF');
-      gameState.setFlag('STAFF_ACCESS_CARD',true);
+      await fastPathWorldPreload;
       soundManager.playClick();
-      uiManager.showSubtitle('316 電話','「感應卡和 4F 值班室鑰匙留在桌上。別再重走那些流程，回到今晚的病房值班。」',4800);
+      uiManager.showSubtitle('316 電話','「密碼一樣，拿了鑰匙跟感應卡後就去四樓吧。東西還在櫃子裡。」',4800);
       uiManager.updateTasks();
     }else if(gameState.getFlag('SECOND_CAMPUS_PHONE_PENDING')){
       gameState.setFlag('SECOND_CAMPUS_PHONE_PENDING',false);
@@ -873,6 +874,8 @@ controller.onInteract = (interactable) => {
     const resolved=gameState.getFlag('M7_B2_RESOLVED')===true;
     gameState.setFlag('B2_EXITED_PERMANENTLY',true);
     gameState.setFlag('M7_B2_OPEN',false);
+    gameState.setFlag('HIDDEN_SERVICE_DOOR_DISCOVERED',false);
+    gameState.setFlag('SECURITY_RECORD_OBJECTIVE',false);
     if(resolved)gameState.setGameTime('03:30');
     worldRouter.loadZone('first_campus_1f','first_1f_guard_back');
     if(resolved){
@@ -967,9 +970,9 @@ controller.onInteract = (interactable) => {
     }
     if(!gameState.getFlag('SECOND_CAMPUS_5F_REPORTED')){
       gameState.setFlag('SECOND_CAMPUS_5F_REPORTED',true);
-      persistentMemory.addJournalNote('SECOND_5F_REPORT','第二院區 5F 護理站交班：陳怡君，504B，因胸悶與心悸需要精神科評估。');
+      persistentMemory.addJournalNote('SECOND_5F_REPORT','第二院區 5F 護理站交班：陳怡君，504B。李承禮總醫師已預開醫囑並預蓋章，只等值班醫師簽名。');
       worldRouter.activeZoneInstance?.syncStoryState?.();
-      uiManager.showSubtitle('第二院區護理師','「病人是陳怡君，在 504B。她因胸悶、心悸留置觀察，麻煩你先去評估。」',4800);
+      uiManager.showSubtitle('第二院區護理師','「醫師你剛剛開好了，現在簽名就好。病人是陳怡君，在 504B；李承禮總醫師已經預開醫囑、預蓋章。你先去看一下她。」',5600);
     }
   } else if (interactable.type === 'second_chest_patient') {
     if(!gameState.getFlag('SECOND_CAMPUS_ACCESS')){
@@ -1043,7 +1046,7 @@ controller.onInteract = (interactable) => {
 
 重新核對病人後才發現，這份「病人處置醫囑」的第二頁其實是已填妥的轉院單：目的地「第一院區 409A」，預審醫師「李承禮 MED-820316」。
 
-護理師：「值班醫師，這張單已經有李承禮總醫師的預審章，只差你的接治簽名。」`,
+護理師：「醫師你剛剛開好了，現在簽名就好。李承禮總醫師已經預開醫囑、預蓋章，只差你的接治簽名。」`,
       primaryText:'補上簽名',
       secondaryText:'拒絕簽署並重新查核',
       onPrimary:()=>loopManager.triggerLegendOverride('CHEST',{legend:'LEGEND 03 — 事先填妥的轉院單',reason:'轉院目的地是 409A。'}),
@@ -1084,8 +1087,6 @@ controller.onInteract = (interactable) => {
         controller.enabled=true;
       }
     });
-  } else if (interactable.type === 'floor6_chase') {
-    loopManager.triggerLegendOverride('FLOOR6',{legend:'LEGEND 06 — 不存在的六樓',reason:'查無此樓層。'});
   } else if (interactable.type === 'floor6_safe_return') {
     if(!gameState.getFlag('FLOOR6_STETHOSCOPE_FOUND')){
       uiManager.showSubtitle('值班醫師','「等等……焦黑器材旁好像有東西在反光，應該先看一下。」',3400);

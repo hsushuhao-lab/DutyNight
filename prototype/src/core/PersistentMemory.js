@@ -29,7 +29,6 @@ const defaults=()=>({
     neverSignChestTransfer:false,
     neverLookBackOnBridge:false,
     ignorePondReflection:false,
-    neverChaseFloor6:false
   },
   trueNameFragments:{
     frag_employeePrefix:null,
@@ -215,7 +214,6 @@ export class PersistentMemory {
       CHEST:{legend:'chestPain',rule:'neverSignChestTransfer',notes:[['RULE_CHEST','第二院區多出的胸痛病人，不能替他簽轉院單。']]},
       BRIDGE:{legend:'bridge',rule:'neverLookBackOnBridge',notes:[['RULE_BRIDGE','天橋過中線後，不要回頭。']]},
       POND:{legend:'pond',rule:'ignorePondReflection',notes:[['RULE_POND','生態池的倒影如果沒有跟著我停下，就離開水邊。']]},
-      FLOOR6:{legend:'floor6',rule:'neverChaseFloor6',notes:[['RULE_FLOOR6','電梯停在不存在的 6F 時，不要追走廊裡的白袍。']]},
       TIMELOOP:{legend:null,rule:null,notes:[['RULE_0217','02:17 的舊紀錄不是操作說明；完全照著做只會重演事故。']]},
       FINAL:{legend:'lastCall',rule:null,notes:[['RULE_FINAL','316 只接受真正的姓名。錯的名字會把我重新送回第33床。']]}
     };
