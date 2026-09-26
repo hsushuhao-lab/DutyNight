@@ -1,11 +1,11 @@
 # DutyNight visual/loading/cinematic closeout status
 
-Current status: **IN_PROGRESS**. `DEPLOYED_AND_VISUALLY_VERIFIED` is reserved for the full gate in [the current closeout specification](../DUTYNIGHT_VISUAL_LOADING_CG_CLOSEOUT_20260927.md). This file records current evidence and gaps so the GitHub repository remains the long-term handoff source.
+Current status: **IN_PROGRESS — PUBLIC VALIDATION PENDING**. `DEPLOYED_AND_VISUALLY_VERIFIED` is reserved for one release application SHA that passes M1–M9, WebGL material runtime audit, cold/warm loading, reviewed before/after visuals, and public Pages fingerprint plus public visual/story checks. A successful push or deploy workflow alone is not completion. This is also required by the [closeout specification](../DUTYNIGHT_VISUAL_LOADING_CG_CLOSEOUT_20260927.md).
 
 ## Source and scope
 
 - Starting remote `master`: `a82cf1b5c186f69a9ba92162c345e96d3a56d12b` (verified by `git ls-remote origin refs/heads/master` on 2026-09-27). Work commit `1eede462362abb3facab7e4b4d20eb7a9ca18a59` was pushed to the feature branch; `master` and Pages remain on the starting revision.
-- Work branch: `fix/visual-loading-closeout` in a clean worktree. The original dirty `DutyNight` checkout was not modified.
+- Work branch: `fix/visual-loading-closeout`; current application commit: `f0d66e8b7f12fbe2034b3614fdd06e613e84b327`. The original dirty `DutyNight` checkout was not modified.
 - Historical ACT1 specifications do not remove the completed M1–M9, Bed 33, 6F, B2, Annie, or second-campus content. The current story contracts remain in [DN_V2_REMAINING_GAPS_CLOSEOUT_01.md](../DN_V2_REMAINING_GAPS_CLOSEOUT_01.md).
 - The public Pages `build-info.json` was observed at the starting SHA before this work; no current work-branch release is claimed.
 
@@ -22,15 +22,16 @@ Current status: **IN_PROGRESS**. `DEPLOYED_AND_VISUALLY_VERIFIED` is reserved fo
 
 | Gate | Current evidence | Status |
 | --- | --- | --- |
-| M1–M9 browser story | `prototype/qa-results/story-playthrough-final/result.json`: 11 milestones, 27 story frames, 5 motion frames, 3 functional frames, 4 flows, zero errors or screenshot warnings; true-name handoff accepted. This is a local browser run against the work tree before the commit was made, not SHA-pinned public evidence. | Local PASS; repeat on final revision |
-| Material runtime | `prototype/qa-results/material-runtime.json`: mapped and decoded PBR surfaces over 11 zone visits. | Local PASS; repeat on final revision |
+| M1–M9 browser story | `docs/visual-qa/evidence/20260927/story-playthrough-f0d66e8/result.json`: 11 milestones, 27 story frames, 5 motion frames, 3 functional frames, 4 interaction flows, zero errors/warnings; true-name handoff accepted. `sourceSha` is the application commit above. | Local PASS |
+| Elevator travel cinematics | `docs/visual-qa/evidence/20260927/cinematic-travel-flows-f0d66e8/result.json`: 00:33 arrival from 4F→2F and erased-6F stop from 3F→4F; both finished, controls restored, no errors. `sourceSha` is the application commit above. | Local PASS |
+| Material runtime | `docs/visual-qa/evidence/20260927/material-runtime.json`: PBR texture channels decoded and audited over 11 zone visits, zero errors. Run against the built application commit above. | Local PASS |
 | GPU resources | `prototype/qa-results/browser-resources-final.json`: four whole-world cycles, 651 geometry / 32 texture each. | Local PASS; repeat on final revision |
-| Cold/warm loading | `prototype/qa-results/LOADING_PERFORMANCE_FINAL.csv`: 12 browser rows, zero errors; cold opening 3.424 s and slowest measured transition 5.428 s. Warm 2F/1F transfers still account for about 16.4 MB, so resource attribution needs review before calling the optional load budget fully clean. | Local timing PASS; byte-budget review open |
-| Before/after images | Corrected zone-aware local capture: `prototype/qa-results/visual-after-corrected/capture-manifest.json` records 88 frames, zero errors, and five explicitly skipped unregistered hillside/pond spawns. Public baseline captured 88 frames but flagged an underexposed 4F duty-room detail. The earlier 108-frame sets are invalid because they did not switch zones. The new fixed-spawn images still start at 17:00 and some detail views face a wall, so they are not a complete story-state visual review. | Partial; curated comparison and visual fixes open |
-| Skybridge return | `prototype/qa-results/bridge-horror/` has outbound, return stage 1 and stage 3 frames and state audit. Visual contrast remains conservative. | Partial art pass |
-| Eight in-engine CG beats | Not yet implemented or QA verified. | Open release blocker |
-| Public Pages | Existing Pages still serves the starting master. | Not deployed/verified |
+| Cold/warm loading | `docs/visual-qa/evidence/20260927/loading-cold-warm.csv` and `.json`: 12 route samples, 0 errors/timeouts. | Local PASS |
+| Before/after images | `docs/visual-qa/comparison/` contains 25 matched views. Current build capture: `docs/visual-qa/evidence/20260927/visual-after-f0d66e8/capture-manifest.json` records 88 captures, zero errors, and five skipped hillside/pond spawns not registered as playable zones. The original public baseline is pinned to `a82cf1b5c186f69a9ba92162c345e96d3a56d12b`; its single 4F duty-room detail capture warning is retained as baseline evidence. The 25-pair sheet was visually reviewed; current after frames have no capture warnings. | Local PASS |
+| Skybridge return | `prototype/qa-results/bridge-horror/` has outbound, return stage 1 and stage 3 frames and state audit. The return white-coat runtime trigger is covered in M1–M9, but final public visual comparison remains pending. | Local pass; public check pending |
+| Eight in-engine CG beats | Runtime paths exist for 21:17, 00:33, first 409/Bed 33, skybridge return, B2 closure, Patientization, true-name finale and erased-6F elevator stop. Current local evidence directly asserts the first 409 beat, 00:33 travel and erased-6F travel; a complete trigger-by-trigger cinematic matrix is still open. | Partial; public checks pending |
+| Public Pages | Before release, `verify-live-build.mjs` confirmed the site served starting SHA `a82cf1b5c186f69a9ba92162c345e96d3a56d12b`. The application commit is approved for publication so the user can play it; exact public build fingerprint and public story/visual checks are still pending. | Publish now; final gate pending |
 
-No merge to `master`, Pages deployment, or `DEPLOYED_AND_VISUALLY_VERIFIED` claim is authorized by the current evidence.
+Publication is authorized. Keep the release status `IN_PROGRESS` until the public Pages fingerprint matches the application SHA and the public M1–M9, material runtime, cold/warm loading and visual before/after checks pass on that deployed version.
 
-The five skipped hillside/pond debug spawns are not routes registered by `WorldRouter`; they are not counted as missing captures of playable zones. The full visual gate still requires time- and story-state-specific comparison, especially the return skybridge and eight requested in-engine CG beats.
+The five skipped hillside/pond debug spawns are not routes registered by `WorldRouter`; they are not counted as missing captures of playable zones. Keep every public check tied to the deployed application SHA; a successful push or Pages workflow alone does not close the gate.

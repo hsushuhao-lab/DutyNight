@@ -1,0 +1,18 @@
+{
+  "verdict": "PASS",
+  "before": {
+    "paperVisible": false,
+    "interactable": false
+  },
+  "after": {
+    "paperVisible": true,
+    "interactable": true,
+    "screenVariance": 583.8980851933159,
+    "textureNeedsUpdate": true
+  },
+  "errors": [],
+  "screenshots": [
+    "before.png",
+    "after.png"
+  ]
+}

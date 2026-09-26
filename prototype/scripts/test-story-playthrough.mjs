@@ -21,7 +21,7 @@ const requiredShots=[
   'm6-annie-cpr-long.png','m6-stethoscope-relic.png','m6-annie-cpr.png','m6-annie-cpr-close.png','m7-1f-guard-post.png','m7-b-panel-concealed-door.png','m7-b2-mirror-316.png',
   'm9-dual-identity-form.png','m9-successful-dawn-ending.png'
 ];
-const report={url,sourceSha:process.env.GITHUB_SHA||'local-working-tree',started:new Date().toISOString(),milestones:[],screenshots:[],motionScreenshots:[],functionalScreenshots:[],functionalFlows:[],screenshotWarnings:[],errors:[],method:'Browser-driven M2-M9 story checkpoint playthrough with named scene-anchor frustum checks, 27 required full-resolution captures, bridge-idle/CPR motion frames, QA-positioned phone raycast + E checks, and physical M7 guard-post-to-B-Panel interaction.'};
+const report={url,sourceSha:process.env.GITHUB_SHA||'local-working-tree',started:new Date().toISOString(),milestones:[],cinematicFlags:[],screenshots:[],motionScreenshots:[],functionalScreenshots:[],functionalFlows:[],screenshotWarnings:[],errors:[],method:'Browser-driven M1-M9 story playthrough with named scene-anchor frustum checks, 27 required full-resolution captures, bridge-idle/CPR motion frames, QA-positioned phone raycast + E checks, physical M7 guard-post-to-B-Panel interaction, and runtime cinematic completion flags.'};
 let page;
 
 async function snap(){return page.evaluate(()=>window.__storyQA.snapshot());}
@@ -100,6 +100,11 @@ async function taskText(){return q(()=>document.getElementById('task-panel')?.in
 async function load(zone,spawn){await q(zone=>window.__storyQA.prefetch({zoneId:zone}),zone);await q(({zone,spawn})=>window.__storyQA.load(zone,spawn),{zone,spawn});await page.waitForTimeout(120);}
 async function enter(zone,spawn){await q(({zone,spawn})=>window.__storyQA.enter(zone,spawn),{zone,spawn});await page.waitForTimeout(160);}
 async function flag(k,v=true){await q(({k,v})=>window.__storyQA.setFlag(k,v),{k,v});}
+async function assertCinematicPlayed(id){
+  const flag=`CG_${id}_PLAYED`;
+  await page.waitForFunction(flag=>window.__storyQA.gameState.getFlag(flag)===true,flag,{timeout:10000});
+  report.cinematicFlags.push({id,played:true});
+}
 async function task(id){await q(id=>window.__storyQA.task(id),id);}
 async function interact(query){await q(query=>window.__storyQA.interact(query),query);await page.waitForTimeout(100);}
 async function pressEAt(target,id){
@@ -214,6 +219,7 @@ try{
   let s=await snap();assert.equal(s.legend,'UNDERSTOOD','408C plus the sealed 409 clue must establish the bed-33 contradiction');
   await interact({id:'BED33_ASSIGNMENT'});
   await page.waitForSelector('#bed33-modal.active');
+  await assertCinematicPlayed('FIRST_409_BED33_ANOMALY');
 
   await q(()=>new Promise((resolve,reject)=>{
     document.getElementById('btn-bed33-confirm').click();

@@ -72,6 +72,14 @@ DO NOT:
 PUBLIC GitHub Pages 上可以實際玩到新的畫面與 CG，
 並且材質、loading、story regression、visual QA 全部通過。
 
+RELEASE STATUS HARD GATE:
+只有同一個 release application SHA 同時通過 M1–M9 browser playthrough、
+WebGL material runtime audit、cold/warm loading audit、before/after visual review，
+且 public Pages 的 build fingerprint 與該 SHA 一致、public M1–M9 與視覺檢視通過，
+狀態才能標記為 `DEPLOYED_AND_VISUALLY_VERIFIED`。
+Build、push、GitHub Actions deploy success 只證明建置／部署完成，不能單獨滿足此狀態。
+任一證據尚缺或對不上 SHA 時，狀態必須保持 `IN_PROGRESS` 或回報具體 blocker。
+
 ============================================================
 0. NON-NEGOTIABLE PRIORITY
 ============================================================

@@ -1,0 +1,9 @@
+{
+  "sourceSha": "f0d66e8b7f12fbe2034b3614fdd06e613e84b327",
+  "verdict": "FAIL",
+  "flows": [],
+  "errors": [
+    "locator.waitFor: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button[data-floor=\"first_campus_2f\"]') to be visible\u001b[22m\n\n    at chooseFloor (C:\\Users\\Asher\\Documents\\game\\DutyNight-visual-closeout\\prototype\\scripts\\test-cinematic-travel-flows.mjs:26:16)\n    at async file:///C:/Users/Asher/Documents/game/DutyNight-visual-closeout/prototype/scripts/test-cinematic-travel-flows.mjs:36:3"
+  ],
+  "finished": "2026-09-26T22:51:37.473Z"
+}
