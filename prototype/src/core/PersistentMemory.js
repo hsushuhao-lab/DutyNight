@@ -23,6 +23,7 @@ const defaults=()=>({
     code_0409:false
   },
   survivalRules:{
+    neverUseDefaultDutyTemplate:false,
     neverSignBed33:false,
     neverCreateGhostRecord:false,
     neverSignChestTransfer:false,
@@ -204,6 +205,7 @@ export class PersistentMemory {
     this.data.loopCount+=1;
     this.raiseErosion(1);
     const configs={
+      HANDOFF_DEFAULT:{legend:null,rule:'neverUseDefaultDutyTemplate',notes:[['RULE_HANDOFF_TEMPLATE','值班身分未確認時，不要套用院內預設模板；保留未確認身分再查原始資料。']]},
       BED33:{legend:'bed33',rule:'neverSignBed33',notes:[
         ['RULE_BED33','不要簽 409A 的床位。'],
         ['CODE_0409','04:09 不是時間，是 409。'],
