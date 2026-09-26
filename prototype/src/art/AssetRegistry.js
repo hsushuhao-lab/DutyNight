@@ -82,6 +82,8 @@ export function preloadOutdoorAssets() {
 }
 
 // Geometry/materials remain shared across clones; zone cleanup must skip sharedAsset resources.
+export function isAssetReady(name) { return assets.has(name); }
+
 export function instantiateAsset(name) {
   const source = assets.get(name);
   if (!source) return null;
