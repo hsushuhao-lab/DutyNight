@@ -661,7 +661,13 @@ export class UIManager {
 
   showFinalSuccess(name){
     this.finalHandoffModal?.classList.remove('active');
-    const last=this.finalSuccessModal?.querySelector('.anomaly-last');if(last)last.textContent='409-A 無名病人紀錄已失效；值班醫師姓名已恢復：'+name+'。';
+    const win=this.finalSuccessModal?.querySelector('.anomaly-window');
+    const title=win?.querySelector('h2');if(title)title.textContent='OFFICIAL SHIFT COMPLETED';
+    const paragraphs=win?.querySelectorAll('p');
+    if(paragraphs?.[0])paragraphs[0].textContent='DUTY R1：'+name+'（MED-870409）｜COMPLETED & RESTORED';
+    if(paragraphs?.[1])paragraphs[1].textContent='409-A PATIENTIZATION ORDER：INVALIDATED｜歷史覆寫：REVOKED｜八名罹難者姓名已永久寫回紀念紀錄。';
+    const last=this.finalSuccessModal?.querySelector('.anomaly-last');
+    if(last)last.textContent='答錄磁帶最後留下林婉真的聲音：「張醫師……如果你還聽得到，天亮了。辛苦了。這一班，你可以交了。」';
     this.finalSuccessModal?.classList.add('active');
   }
 
@@ -987,8 +993,9 @@ export class UIManager {
           }
         ]);
       }else if(this.gameState.getFlag('M4_CHEST_RESOLVED')&&!this.gameState.getFlag('M5_ROUTE_RESOLVED')){
-        this.renderTaskBoard('翌日 01:45｜離開第二院區',[
-          {id:'task-m5-route',text:'穿越封閉天橋，返回第一院區',state:'ready'}
+        const cctvDone=this.gameState.getFlag('M5_CCTV_RESOLVED');
+        this.renderTaskBoard(cctvDone?'翌日 01:45｜天橋回程':'翌日 01:45｜第二院區監控異常',[
+          {id:'task-m5-route',text:cctvDone?'穿越封閉天橋，保持視線向前返回第一院區':'先到第二院區 2F 安檢監控支援室；閃爍的 CRT 正在播放不存在的 6F',state:'ready'}
         ]);
       }else if(this.gameState.getFlag('M5_ROUTE_RESOLVED')&&!this.gameState.getFlag('M6_FLOOR6_RESOLVED')){
         this.renderTaskBoard('翌日 02:00｜返回第一院區',[
@@ -1007,8 +1014,8 @@ export class UIManager {
           {id:'task-m8-b2-exit',text:'沿逃生梯離開封存層',state:'ready'}
         ]);
       }else if(this.gameState.getFlag('M8_IDENTITY_BATTLE_ACTIVE')&&!this.gameState.getFlag('GAME_COMPLETE')){
-        this.renderTaskBoard('翌日 03:30｜真正的交班',[
-          {id:'task-m9-final-handoff',text:'回第一院區 3F 的 316 總醫師辦公室，用工作站完成真正的晨間交班',state:'ready'}
+        this.renderTaskBoard('CODE BLACK｜04:09 前',[
+          {id:'task-m9-final-handoff',text:'全院門禁正在收縮：立刻回第一院區 3F 316，在李承禮覆寫模板完成前宣告真正姓名與員編',state:'ready'}
         ]);
       }else if(this.gameState.getFlag('GAME_COMPLETE')){
         this.renderTaskBoard('翌日 04:05｜交班完成',[
