@@ -24,6 +24,12 @@ assert(ui.includes("if(el===this.loopCutscene)return;"),'loop reset overlay clea
 // Batch split: outdoor assets and textures are not part of the indoor preload.
 assert(assets.includes("outdoorAssets = new Set(['shrub', 'fern', 'campusTree'])"),'outdoor GLTF split missing');
 assert(materials.includes("outdoorSurfaces = new Set(['ground', 'asphalt'])"),'outdoor PBR split missing');
+assert(!materials.includes("if (surface === 'plaster') material.map = null"),'plaster albedo must never be discarded; walls must render real texture maps');
+assert(materials.includes("surface === 'plaster' ? .11")&&materials.includes("surface === 'vinyl' ? .12"),'indoor normal detail must remain visibly scaled');
+const geometryFactory=readFileSync('./src/world/shared/GeometryFactory.js','utf8');
+const level3=readFileSync('./src/world/Level3FBlockout.js','utf8');
+assert(geometryFactory.includes('this.surface(material, width, height)'),'shared architectural walls must use dimension-aware repeated PBR materials');
+assert(level3.includes('materialForSurface(materialName,width,height)'),'3F walls must use dimension-aware repeated PBR materials');
 assert(campus.includes('preloadCampusBackdropAssets'),'campus backdrop preload hook missing');
 
 // Transition prefetch: destination resources begin loading while elevator/stair transition is visible.

@@ -54,7 +54,10 @@ export class Level3FBlockout {
 
   buildWall(x, y, z, width, height, depth, mat = this.materials.wall) {
     const geo = new THREE.BoxGeometry(width, height, depth);
-    const mesh = new THREE.Mesh(geo, mat);
+    const shared=getMaterials();
+    const materialName=Object.keys(shared).find(key=>shared[key]===mat);
+    const resolvedMaterial=materialName?materialForSurface(materialName,width,height):mat;
+    const mesh = new THREE.Mesh(geo, resolvedMaterial);
     mesh.position.set(x, y, z);
     mesh.castShadow = true;
     mesh.receiveShadow = true;
