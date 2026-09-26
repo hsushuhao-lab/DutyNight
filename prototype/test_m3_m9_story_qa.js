@@ -19,6 +19,9 @@ const ui=readFileSync('./src/ui/UIManager.js','utf8');
 
 assert(!main.includes('工號'),'player-facing story copy must use 員編 terminology');
 assert(ui.includes("17:00｜值班身分驗證異常")&&main.includes("HANDOFF_DEFAULT"),'M1 must make the default-template choice a real 409 Patientization decision');
+const adminBranch=main.slice(main.indexOf("['admin_roster_3f','admin_printer_doc_3f','admin_drawer_manual_3f']"),main.indexOf("} else if (interactable.type === 'spare_key_316')"));
+assert(adminBranch.includes('openArchiveDocument'),'3F admin evidence documents must remain readable');
+assert(!adminBranch.includes("if(gameState.getFlag('FAST_PATH_3F'))"),'loop fast path must never suppress unread 3F admin evidence after an early HANDOFF_DEFAULT override');
 assert(main.includes("M5_CCTV_RESOLVED")&&main.includes("SIX_FLOOR_HISTORY_CONFIRMED"),'M5 CCTV must seed the erased-6F story before M6 can unlock');
 assert(main.includes("M8_CODE_BLACK_ANNOUNCED")&&main.includes("CODE BLACK"),'B2 reconstruction must trigger systemic Code Black pursuit pressure');
 assert(!routes.includes('hill_from_')&&!routes.includes('pond_from_'),'production routes must not expose outdoor spawns');
