@@ -16,6 +16,11 @@ export class UIManager {
     this.workstationModal = document.getElementById('workstation-modal');
     this.dutyLogModal = document.getElementById('dutylog-modal');
     this.archiveModal = document.getElementById('archive-modal');
+    this.posterModal = document.getElementById('poster-modal');
+    this.posterTitleEl = document.getElementById('poster-title');
+    this.posterCategoryEl = document.getElementById('poster-category');
+    this.posterImageEl = document.getElementById('poster-image');
+    this.posterCommentaryEl = document.getElementById('poster-commentary');
     this.lockerModal = document.getElementById('locker-modal');
     this.anomalyModal = document.getElementById('anomaly-modal');
     this.office302Modal = document.getElementById('office302-modal');
@@ -122,6 +127,7 @@ export class UIManager {
     }
 
     document.getElementById('btn-close-archive')?.addEventListener('click',()=>this.closeArchiveDocument());
+    document.getElementById('btn-close-poster')?.addEventListener('click',()=>this.closePoster());
     document.getElementById('btn-archive-prev')?.addEventListener('click',()=>{
       if(this.archivePageIndex>0){this.archivePageIndex--;this.renderArchivePage();soundManager.playClick();}
     });
@@ -213,6 +219,7 @@ export class UIManager {
           this.closeDutyLog();
         }
         if (this.archiveModal?.classList.contains('active')) this.closeArchiveDocument();
+        if (this.posterModal?.classList.contains('active')) this.closePoster();
         if (this.lockerModal?.classList.contains('active')) this.closeLocker();
         if (this.office302Modal?.classList.contains('active')) this.close302Keypad();
         if (this.inspect302Modal?.classList.contains('active')) this.close302Inspect();
@@ -422,6 +429,33 @@ export class UIManager {
   closeArchiveDocument() {
     this.archiveModal?.classList.remove('active');
     if(this.onTerminalClose)this.onTerminalClose();
+  }
+
+  openPoster(posterData) {
+    if(!posterData||!this.posterModal)return;
+    document.exitPointerLock();
+    if(this.posterTitleEl)this.posterTitleEl.textContent=posterData.title||'院內年代海報';
+    if(this.posterCategoryEl){
+      const label={TRUE_CLUE:'院內年代資料｜可能是真線索',AMBIGUOUS:'院內年代資料｜內容待判讀',FALSE_CLUE:'院內年代資料｜可能是體制性誤導'}[posterData.category]||'院內年代資料';
+      this.posterCategoryEl.textContent=label;
+    }
+    if(this.posterImageEl){
+      const base=import.meta.env?.BASE_URL ?? '/';
+      this.posterImageEl.src=base+(posterData.inspectTexture||posterData.displayTexture||'').replace(/^\//,'');
+      this.posterImageEl.alt=posterData.title||'院內年代海報';
+    }
+    if(this.posterCommentaryEl){
+      this.posterCommentaryEl.textContent=posterData.commentary||'';
+      this.posterCommentaryEl.style.display=posterData.commentary?'block':'none';
+    }
+    this.posterModal.classList.add('active');
+    soundManager.playPaperSign();
+  }
+
+  closePoster() {
+    this.posterModal?.classList.remove('active');
+    if(this.posterImageEl)this.posterImageEl.removeAttribute('src');
+    this.onTerminalClose?.();
   }
 
   setBed33Handlers(handlers){this.bed33Handlers=handlers;}
