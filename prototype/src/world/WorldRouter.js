@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { applyZoneLighting } from '../art/VisualProfile.js';
 import { applyExteriorTime } from '../art/CampusBackdrop.js';
 import { installEraPosters } from '../art/PosterFactory.js';
+import { installMemoryEvidence } from '../story/MemoryInstallations.js';
 import { GeometryFactory } from './shared/GeometryFactory.js';
 import { WORLD_SPAWNS as DEBUG_SPAWN_POINTS, ROUTE_PORTALS, FIRST_FLOORS, SECOND_FLOORS } from './shared/WorldRoutes.js';
 import { addTravelFixtures } from './shared/TravelFixtures.js';
@@ -127,6 +128,7 @@ export class WorldRouter {
     this.activeZoneInstance.build();
     applyExteriorTime(this.activeZoneInstance.zoneGroup,gameState.gameTime);
     installEraPosters(this.activeZoneInstance, zoneId);
+    installMemoryEvidence(this.activeZoneInstance, zoneId);
     addTravelFixtures(this.activeZoneInstance, zoneId);
     floorStateManager.apply(zoneId,this.activeZoneInstance);
     this.activeZoneInstance.zoneGroup.updateMatrixWorld(true);
