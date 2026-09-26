@@ -536,15 +536,15 @@ export class UIManager {
     if(card){card.querySelector('strong').textContent=legend;card.querySelector('span').textContent=reason;}
     this.loopCutscene?.classList.add('active');
     const later=(ms,fn)=>this.loopCutsceneTimers.push(setTimeout(fn,ms));
-    later(850,()=>{title.textContent='';body.textContent='畫面恢復時，你正仰躺在綠色斑駁的 409-A 鐵床。\n四條粗糙的皮革約束帶已扣住手腕與腳踝。';});
-    later(2300,()=>{band?.classList.add('visible');body.textContent='一條泛黃塑膠手圈被套上手腕：\n【無名病人】／床號 409-A。';});
-    later(3850,()=>{body.textContent='床頭舊終端吐出點陣紙：\nSTAFF ID: NOT FOUND\nOVERWRITE CONFIRMED: TEMPORARY PATIENT RECORD CREATED\nLOCATION: WARD 409-A';});
-    later(5650,()=>{body.textContent='面孔被雜訊抹去的護理師低頭準備針劑：\n「病人急性精神混亂，自稱是醫師……先執行四點約束，通報總值班。」\n\n「放開我！我是今晚的值班醫師！名冊在 316……！」';});
-    later(7700,()=>{body.textContent='一名沒有名牌的白袍人影從門外經過，抽走床尾的值班日誌。\n金屬厚門「匡啷」反鎖。';});
-    later(9300,()=>{body.textContent='舊式機械火警鈴開始尖叫。\n焦臭濃煙從門底縫隙湧入，視野逐漸全黑。';});
-    later(10800,()=>{title.textContent='17:00';body.textContent='黑暗中傳來電梯到站的「叮——」。\n秒針倒轉。日期欄短暫閃過：1998-10-12。';});
-    later(12400,()=>{body.textContent='';card?.classList.add('visible');});
-    later(14200,()=>this.finishLoopCutscene());
+    later(350,()=>{title.textContent='';body.textContent='畫面恢復時，你正仰躺在綠色斑駁的 409-A 鐵床。\n四條粗糙的皮革約束帶已扣住手腕與腳踝。';});
+    later(900,()=>{band?.classList.add('visible');body.textContent='一條泛黃塑膠手圈被套上手腕：\n【無名病人】／床號 409-A。';});
+    later(1500,()=>{body.textContent='床頭舊終端吐出點陣紙：\nSTAFF ID: NOT FOUND\nOVERWRITE CONFIRMED: TEMPORARY PATIENT RECORD CREATED\nLOCATION: WARD 409-A';});
+    later(2150,()=>{body.textContent='面孔被雜訊抹去的護理師低頭準備針劑：\n「病人急性精神混亂，自稱是醫師……先執行四點約束，通報總值班。」\n\n「放開我！我是今晚的值班醫師！名冊在 316……！」';});
+    later(2750,()=>{body.textContent='一名沒有名牌的白袍人影從門外經過，抽走床尾的值班日誌。\n金屬厚門「匡啷」反鎖。';});
+    later(3400,()=>{body.textContent='舊式機械火警鈴開始尖叫。\n焦臭濃煙從門底縫隙湧入，視野逐漸全黑。';});
+    later(4000,()=>{title.textContent='17:00';body.textContent='黑暗中傳來電梯到站的「叮——」。\n秒針倒轉。日期欄短暫閃過：1998-10-12。';});
+    later(5400,()=>{body.textContent='';card?.classList.add('visible');});
+    later(6500,()=>this.finishLoopCutscene());
   }
 
   async finishLoopCutscene(){

@@ -163,6 +163,18 @@ export class FirstCampus2FER {
     buildClinicalCart(this.art,this.gf.materials,{x:6.15,z:7.2,yaw:Math.PI/2,name:'ER_MedicationCart'});
     asset(this.art,'officeChair',[3.55,0,7.75],[.92,.92,.92],0);
     const printer=solid(this.art,this.gf.materials.metal,[3.55,.86,6.72],[.52,.20,.38]);printer.name='ER_NursePrinter';
+    const slipCanvas=document.createElement('canvas');slipCanvas.width=512;slipCanvas.height=720;
+    const slipContext=slipCanvas.getContext('2d');
+    slipContext.fillStyle='#e7e2d3';slipContext.fillRect(0,0,512,720);
+    slipContext.fillStyle='#365447';slipContext.fillRect(24,28,464,62);
+    slipContext.fillStyle='#f5f3e9';slipContext.font='bold 28px sans-serif';slipContext.fillText('急診掛號紀錄',42,69);
+    slipContext.fillStyle='#29342f';slipContext.font='24px sans-serif';
+    ['1998-ER-0217','建檔時間　00:33','病人姓名　＿＿＿＿','床位　未指定'].forEach((line,index)=>slipContext.fillText(line,42,166+index*76));
+    const slipTexture=new THREE.CanvasTexture(slipCanvas);slipTexture.colorSpace=THREE.SRGBColorSpace;
+    this.ghostRegistrationSlip=new THREE.Mesh(new THREE.PlaneGeometry(.23,.32),new THREE.MeshBasicMaterial({map:slipTexture,side:THREE.DoubleSide}));
+    this.ghostRegistrationSlip.name='ER_GhostRegistration_Printout';
+    this.ghostRegistrationSlip.position.set(3.55,.965,6.72);this.ghostRegistrationSlip.rotation.x=-Math.PI/2;
+    this.ghostRegistrationSlip.visible=false;this.art.add(this.ghostRegistrationSlip);
     asset(this.art,'plant',[.55,0,4.25],[.7,.7,.7]);
 
     // ==========================================
@@ -308,6 +320,7 @@ export class FirstCampus2FER {
     asset(this.art, 'workDesk', [13, 0, -8.55], [2 / 1.405, 1, 1 / .725]);
     // Privacy: the doctor's screen faces the inner/back wall, never the doorway.
     const doctorScreen=monitor(this.art,this.gf.materials,13,.76,-8.55,0);
+    this.ghostRegistrationScreen=doctorScreen.children.find(child=>child.isMesh&&child.material?.map);
     this.workstations=[{id:'ER_DOCTOR',screen:doctorScreen,chair:[13,0,-7.45],yaw:0}];
     asset(this.art,'officeChair',[13,0,-7.45],[1,1,1],Math.PI);
     asset(this.art,'storageCabinet',[10.2,0,-8.55],[.9,.9,.9],Math.PI);
@@ -399,6 +412,18 @@ export class FirstCampus2FER {
 
   syncStoryState(){
     const ghostAvailable=gameState.getFlag('GHOST_REGISTRATION_AVAILABLE')===true;
+    if(this.ghostRegistrationSlip)this.ghostRegistrationSlip.visible=ghostAvailable;
+    if(ghostAvailable&&this.ghostRegistrationScreen?.material?.map){
+      const canvas=this.ghostRegistrationScreen.material.map.image;
+      const context=canvas.getContext('2d');
+      context.fillStyle='#07110e';context.fillRect(0,0,canvas.width,canvas.height);
+      context.fillStyle='#17392c';context.fillRect(0,0,canvas.width,65);
+      context.fillStyle='#b8d1c1';context.font='bold 28px sans-serif';context.fillText('急診掛號系統　／　夜間紀錄',28,43);
+      context.fillStyle='#e4ece4';context.font='bold 42px monospace';context.fillText('00:33　1998-ER-0217',38,178);
+      context.font='26px sans-serif';context.fillText('資料狀態：已存在',38,244);context.fillText('病人位置：未回報',38,298);
+      context.fillStyle='#718779';context.fillRect(38,350,820,3);
+      this.ghostRegistrationScreen.material.map.needsUpdate=true;
+    }
     if(this.ghostRegistrationTerminal){
       this.ghostRegistrationTerminal.userData.interactable=ghostAvailable;
     }

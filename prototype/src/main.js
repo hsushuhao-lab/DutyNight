@@ -31,6 +31,7 @@ import { legendState, NodeState } from './core/LegendStateManager.js';
 import { LoopManager } from './core/LoopManager.js';
 import { canAccess } from './core/AccessGraph.js';
 import { getMemorySequence, IDENTITY_CANDIDATES } from './story/NarrativeV22.js';
+import { CinematicDirector } from './story/CinematicDirector.js';
 
 // Setup Three.js Scene & Renderer
 const container = document.getElementById('canvas-container');
@@ -73,6 +74,7 @@ const controller = new FPSController(
   [],
   []
 );
+const cinematicDirector = new CinematicDirector({ camera, controller, gameState });
 
 // Instantiate World Router
 const worldRouter = new WorldRouter(scene, camera, controller);
@@ -165,20 +167,18 @@ function triggerPost2117DutyRoomSequence(){
   gameState.setFlag('POST_2117_DUTY_ROOM_TRIGGERED',true);
   gameState.setFlag('POST_2117_RETURN_TO_DUTY_ROOM',false);
   controller.cancelAutoMove();
-  controller.enabled=false;
   gameState.setGameTime('23:55');
-  uiManager.showSubtitle('值班醫師','「先把今晚看到的東西寫下來……21:17、316、409。等等，已經快午夜了？」',4300);
   uiManager.updateTasks();
-
-  setTimeout(()=>{
-    if(gameState.getFlag('POST_2117_DUTY_CALL_DONE')){
-      controller.enabled=true;
-      return;
-    }
-    gameState.setGameTime('00:30');
-    controller.enabled=true;
-    startStoryPhoneCall('ER_GHOST_0033');
-  },2200);
+  void cinematicDirector.play({
+    id:'21_17_DUTY_ROOM_ACTIVATION',
+    durationMs:700,
+    keyframes:[{at:.62,yaw:-.075,pitch:-.012},{at:1,yaw:0,pitch:0}],
+    cues:[{at:.72,run:()=>{
+      if(gameState.getFlag('POST_2117_DUTY_CALL_DONE'))return;
+      gameState.setGameTime('00:30');
+      startStoryPhoneCall('ER_GHOST_0033');
+    }}]
+  }).catch(error=>console.error('[cinematic] 21:17 activation failed',error));
   return true;
 }
 
@@ -254,6 +254,37 @@ function completeFinalIdentityAt316(name,employeeId,{deferred=false}={}) {
   return true;
 }
 
+function revealFinal316Handoff({deferred=false}={}) {
+  const openForm=()=>{
+    controller.enabled=false;
+    uiManager.openFinalHandoff(({name,employeeId})=>{
+      if(completeFinalIdentityAt316(name,employeeId,{deferred}))return;
+      const hasInput=name||employeeId;
+      uiManager.setFinalHandoffStatus(hasInput?'姓名或員編不符｜覆寫模板正在接管交班':'請輸入姓名與員編');
+      if(hasInput){
+        setTimeout(()=>{
+          uiManager.closeFinalHandoff(false);
+          loopManager.triggerLegendOverride('FINAL',{legend:'最終覆寫 — 晨間交班',reason:'今日值班醫師已確認；你已被收治。'});
+        },650);
+      }
+    });
+    const hints=deferred?getDeferred316IdentityHints():[];
+    uiManager.setFinalHandoffStatus(
+      (hints.length?'線索可能仍在'+hints.join('與')+'。':'')+
+      '有人嘗試覆寫模板已在 316 登入｜請宣告真正姓名與員編｜最後一次機會'
+    );
+  };
+  const reveal=()=>uiManager.showSubtitle('316 舊終端','姓名、員編與夜班記憶正在重新排列。只有完成真正交班的人，才能留下自己的名字。',3600);
+  void cinematicDirector.play({
+    id:'316_TRUE_NAME_FINAL_HANDOFF',
+    durationMs:1700,
+    keyframes:[{at:.28,yaw:-.045,pitch:-.01},{at:.72,yaw:.025,pitch:0},{at:1,yaw:0,pitch:0}],
+    cues:[{at:.18,run:reveal},{at:.56,run:()=>soundManager.playComputerBeep()}],
+    onComplete:openForm
+  }).then(played=>{if(!played)openForm();})
+    .catch(error=>{console.error('[cinematic] final identity reveal failed',error);openForm();});
+}
+
 function resolveAdminIdentityPuzzleIfReady() {
   if(gameState.getFlag('ADMIN_IDENTITY_PUZZLE_RESOLVED')) return;
   const complete=
@@ -277,7 +308,7 @@ if(new URLSearchParams(location.search).get('qa')==='story'){
     });
   };
   window.__storyQA={
-    gameState,persistentMemory,legendState,worldRouter,uiManager,loopManager,dutyEvents,GamePhase,floorStateManager,controller,
+    gameState,persistentMemory,legendState,worldRouter,uiManager,loopManager,dutyEvents,GamePhase,floorStateManager,controller,cinematicDirector,
     prefetch:prefetchDestinationAssets,
     load:(zone,spawn)=>{worldRouter.loadZone(zone,spawn);worldRouter.activeZoneInstance?.syncStoryState?.();},
     enter:(zone,spawn)=>{
@@ -658,40 +689,12 @@ controller.onInteract = async (interactable) => {
     uiManager.showSubtitle('316 舊資料終端','「1998-ER-0217｜責任醫師：張○○｜員編前綴：MED-87。」\n\n終端機停止後，桌上的院內電話立刻響起。',5200);
   } else if (interactable.type === 'workstation') {
     if(gameState.getFlag('B2_EXITED_PERMANENTLY')&&!gameState.getFlag('M7_B2_RESOLVED')&&worldRouter.activeZoneId==='first_campus_3f'){
-      const hints=getDeferred316IdentityHints();
-      controller.enabled=false;
-      uiManager.openFinalHandoff(({name,employeeId})=>{
-        if(completeFinalIdentityAt316(name,employeeId,{deferred:true}))return;
-        const hasInput=name||employeeId;
-        uiManager.setFinalHandoffStatus(hasInput?'姓名或員編不符｜覆寫模板正在接管交班':'請輸入姓名與員編');
-        if(hasInput){
-          setTimeout(()=>{
-            uiManager.closeFinalHandoff(false);
-            loopManager.triggerLegendOverride('FINAL',{legend:'最終覆寫 — 晨間交班',reason:'今日值班醫師已確認；你已被收治。'});
-          },650);
-        }
-      });
-      uiManager.setFinalHandoffStatus(
-        (hints.length?'線索可能仍在'+hints.join('與')+'。':'')+
-        '有人嘗試覆寫模板已在 316 登入｜請宣告真正姓名與員編｜最後一次機會'
-      );
+      revealFinal316Handoff({deferred:true});
       return;
     }
     if(gameState.getFlag('M8_IDENTITY_BATTLE_ACTIVE')&&worldRouter.activeZoneId==='first_campus_3f'){
       gameState.setGameTime('04:05');
-      controller.enabled=false;
-      uiManager.openFinalHandoff(({name,employeeId})=>{
-        if(completeFinalIdentityAt316(name,employeeId))return;
-        const hasInput=name||employeeId;
-        uiManager.setFinalHandoffStatus(hasInput?'姓名或員編不符｜覆寫模板正在接管交班':'請輸入姓名與員編');
-        if(hasInput){
-          setTimeout(()=>{
-            uiManager.closeFinalHandoff(false);
-            loopManager.triggerLegendOverride('FINAL',{legend:'最終覆寫 — 晨間交班',reason:'今日值班醫師已確認；你已被收治。'});
-          },650);
-        }
-      });
-      uiManager.setFinalHandoffStatus('有人嘗試覆寫模板已在 316 登入｜請宣告真正姓名與員編｜最後一次機會');
+      revealFinal316Handoff();
       return;
     }
     controller.enabled = false;
@@ -764,10 +767,24 @@ controller.onInteract = async (interactable) => {
       return;
     }
     controller.enabled=false;
-    uiManager.openBed33Assignment({
+    const openAssignment=()=>uiManager.openBed33Assignment({
       canReject:true,
       rememberedRule:persistentMemory.data.survivalRules.neverSignBed33
     });
+    void cinematicDirector.play({
+      id:'FIRST_409_BED33_ANOMALY',
+      durationMs:2200,
+      keyframes:[{at:.48,yaw:.035,pitch:.025},{at:1,yaw:0,pitch:0}],
+      cues:[
+        {at:.08,run:()=>{
+          document.body.classList.add('his-flicker');
+          setTimeout(()=>document.body.classList.remove('his-flicker'),460);
+        }},
+        {at:.2,run:()=>soundManager.playBed33KnockPattern()},
+        {at:.4,run:()=>uiManager.showSubtitle('值班醫師','「今日滿床只有 32 床……為什麼這張寫著第 33 床，位置卻是 409A？」',3400)}
+      ],
+      onComplete:openAssignment
+    }).catch(error=>console.error('[cinematic] first 409 anomaly failed',error));
   } else if (interactable.type === 'acute_gate') {
     const changed = worldRouter.activeZoneInstance.toggleAcuteGate(controller.position);
     if (changed) {
@@ -878,27 +895,46 @@ controller.onInteract = async (interactable) => {
       gameState.setFlag('M7_B2_OPEN',false);
       gameState.setFlag('HIDDEN_SERVICE_DOOR_DISCOVERED',false);
       gameState.setFlag('SECURITY_RECORD_OBJECTIVE',false);
-      worldRouter.loadZone('first_campus_1f','first_1f_guard_back');
-      if(resolved){
-        gameState.setGameTime('03:30');
-        gameState.setFlag('LAST_CALL_SEEN',true);
-        gameState.setFlag('M8_CODE_BLACK_ANNOUNCED',true);
-        persistentMemory.resolveLegend('lastCall');
-        persistentMemory.addJournalNote('M8_CODE_BLACK','B2 身分重建完成後，系統偵測到已除籍人員重新登入，開始收縮門禁並搶回 316 交班權限。');
-        soundManager.playDoorLockClack();
-        setTimeout(()=>uiManager.showSubtitle('全院廣播','「CODE BLACK。偵測到已除籍死亡人員重新登入。門禁完整性程序啟動。04:09 前，夜班紀錄將被覆寫封存。」',7200),700);
-      }else{
-        gameState.setFlag('B2_IDENTITY_INCOMPLETE',true);
-        gameState.setFlag('M8_IDENTITY_BATTLE_ACTIVE',true);
-        gameState.setFlag('LAST_CALL_SEEN',true);
-        gameState.setFlag('M8_CODE_BLACK_ANNOUNCED',true);
-        gameState.setGameTime('03:10');
-        persistentMemory.addJournalNote('B2_EXIT_INCOMPLETE','身分驗證尚未完成就離開 B2；B2 永久鎖閉。缺失線索可能仍在 3F 行政辦公室與文史封存，但 316 仍可進行最後身分宣告。');
-        soundManager.playDoorLockClack();
-        setTimeout(()=>uiManager.showSubtitle('值班醫師','「回不去 B2 了。若還缺線索，也許在 3F 行政辦公室或文史封存；但我還可以直接回 316 宣告身分。」',5600),700);
-      }
-      uiManager.updateTasks();
-      controller.enabled=true;
+      controller.enabled=false;
+      const finishLeavingB2=()=>{
+        worldRouter.loadZone('first_campus_1f','first_1f_guard_back');
+        if(resolved){
+          gameState.setGameTime('03:30');
+          gameState.setFlag('LAST_CALL_SEEN',true);
+          gameState.setFlag('M8_CODE_BLACK_ANNOUNCED',true);
+          persistentMemory.resolveLegend('lastCall');
+          persistentMemory.addJournalNote('M8_CODE_BLACK','B2 身分重建完成後，系統偵測到已除籍人員重新登入，開始收縮門禁並搶回 316 交班權限。');
+          soundManager.playDoorLockClack();
+          setTimeout(()=>uiManager.showSubtitle('全院廣播','「CODE BLACK。偵測到已除籍死亡人員重新登入。門禁完整性程序啟動。04:09 前，夜班紀錄將被覆寫封存。」',7200),700);
+        }else{
+          gameState.setFlag('B2_IDENTITY_INCOMPLETE',true);
+          gameState.setFlag('M8_IDENTITY_BATTLE_ACTIVE',true);
+          gameState.setFlag('LAST_CALL_SEEN',true);
+          gameState.setFlag('M8_CODE_BLACK_ANNOUNCED',true);
+          gameState.setGameTime('03:10');
+          persistentMemory.addJournalNote('B2_EXIT_INCOMPLETE','身分驗證尚未完成就離開 B2；B2 永久鎖閉。缺失線索可能仍在 3F 行政辦公室與文史封存，但 316 仍可進行最後身分宣告。');
+          soundManager.playDoorLockClack();
+          setTimeout(()=>uiManager.showSubtitle('值班醫師','「回不去 B2 了。若還缺線索，也許在 3F 行政辦公室或文史封存；但我還可以直接回 316 宣告身分。」',5600),700);
+        }
+        uiManager.updateTasks();
+        controller.enabled=true;
+      };
+      const lights=[];
+      worldRouter.activeZoneInstance?.zoneGroup?.traverse(object=>{if(object.isLight)lights.push(object);});
+      const shutLights=count=>lights.slice(0,count).forEach(light=>{light.intensity=0;});
+      void cinematicDirector.play({
+        id:'B2_PERMANENT_CLOSURE',
+        durationMs:1900,
+        keyframes:[{at:.35,yaw:-.08,pitch:.012},{at:.74,yaw:-.14,pitch:.01},{at:1,yaw:0,pitch:0}],
+        cues:[
+          {at:.18,run:()=>shutLights(Math.ceil(lights.length/3))},
+          {at:.42,run:()=>shutLights(Math.ceil(lights.length*2/3))},
+          {at:.68,run:()=>shutLights(lights.length)},
+          {at:.84,run:()=>soundManager.playDoorLockClack()}
+        ],
+        onComplete:finishLeavingB2
+      }).then(played=>{if(!played)finishLeavingB2();})
+        .catch(error=>{console.error('[cinematic] B2 closure failed',error);finishLeavingB2();});
     };
 
     if(!resolved){
@@ -955,12 +991,29 @@ controller.onInteract = async (interactable) => {
     const travelFrom=worldRouter.activeZoneId;
     uiManager.openTravelSelector(worldRouter.floorDestinations(interactable.kind), travelFrom, destination => {
       if(interactable.kind==='elevator'&&destination.zoneId.startsWith('first_campus_')&&gameState.getFlag('FLOOR6_AVAILABLE')&&!gameState.getFlag('M6_FLOOR6_RESOLVED')){
-        gameState.setFlag('PHANTOM6_RETURN_ZONE',destination.zoneId);
-        gameState.setFlag('FLOOR6_AVAILABLE',false);
-        floorStateManager.setPhase(GamePhase.ELEVATOR_GLITCH);
-        worldRouter.loadZone('phantom_6f','phantom_6f_lift');
-        uiManager.showSubtitle('電梯樓層顯示器','6',2200);
-        controller.enabled=true;
+        const returnZone=destination.zoneId;
+        void Promise.all([
+          preloadZoneEssential('phantom_6f'),
+          cinematicDirector.play({
+            id:'ELEVATOR_STOP_AT_ERASED_6F',
+            durationMs:1650,
+            keyframes:[{at:.28,yaw:-.025,pitch:-.012},{at:.7,yaw:.018,pitch:0},{at:1,yaw:0,pitch:0}],
+            cues:[{at:.42,run:()=>uiManager.showSubtitle('電梯樓層顯示器','6',1600)},{at:.62,run:()=>soundManager.playDoorLockClack()}]
+          })
+        ]).then(()=>{
+          gameState.setFlag('PHANTOM6_RETURN_ZONE',returnZone);
+          gameState.setFlag('FLOOR6_AVAILABLE',false);
+          floorStateManager.setPhase(GamePhase.ELEVATOR_GLITCH);
+          worldRouter.loadZone('phantom_6f','phantom_6f_lift');
+          controller.enabled=true;
+        }).catch(error=>{
+          console.error('[cinematic] 6F elevator stop failed',error);
+          gameState.setFlag('PHANTOM6_RETURN_ZONE',returnZone);
+          gameState.setFlag('FLOOR6_AVAILABLE',false);
+          floorStateManager.setPhase(GamePhase.ELEVATOR_GLITCH);
+          worldRouter.loadZone('phantom_6f','phantom_6f_lift');
+          controller.enabled=true;
+        });
         return;
       }
       if(destination.zoneId==='phantom_6f')gameState.setFlag('PHANTOM6_RETURN_ZONE',travelFrom);
@@ -982,7 +1035,23 @@ controller.onInteract = async (interactable) => {
         if(destination.zoneId==='first_campus_2f'&&gameState.gameTime==='20:05')soundManager.playPhoneRingPattern();
         uiManager.showSubtitle(dutyLine.speaker,dutyLine.text);
       }
-      controller.enabled = true;
+      if(destination.zoneId==='first_campus_2f'&&gameState.getFlag('GHOST_REGISTRATION_AVAILABLE')){
+        const targetYaw=Math.atan2(controller.position.x-13,8.55+controller.position.z);
+        const turn=Math.atan2(Math.sin(targetYaw-controller.yaw),Math.cos(targetYaw-controller.yaw));
+        void cinematicDirector.play({
+          id:'00_33_GHOST_REGISTRATION',
+          durationMs:1250,
+          keyframes:[{at:.55,yaw:turn*.72,pitch:-.008},{at:.78,yaw:turn,pitch:0},{at:1,yaw:0,pitch:0}],
+          cues:[
+            {at:.22,run:()=>{
+              document.body.classList.add('his-flicker');
+              setTimeout(()=>document.body.classList.remove('his-flicker'),460);
+            }},
+            {at:.48,run:()=>soundManager.playComputerBeep()}
+          ]
+        }).then(()=>{controller.enabled=true;})
+          .catch(error=>{controller.enabled=true;console.error('[cinematic] 00:33 registration failed',error);});
+      }else controller.enabled = true;
     }, interactable.kind, prefetchDestinationAssets);
   } else if (interactable.type === 'second_campus_nursing_report') {
     if(!gameState.getFlag('SECOND_CAMPUS_ACCESS')){
@@ -1093,7 +1162,7 @@ controller.onInteract = async (interactable) => {
       uiManager.showSubtitle('值班醫師','「一直往前。不要回頭。」',2200);return;
     }
     controller.enabled=false;
-    uiManager.openStoryChoice({
+    const openBridgeChoice=()=>uiManager.openStoryChoice({
       title:'8F 天橋｜窗戶倒影',
       body:'走到一半，腳步忽然停住。窗戶倒影裡多出一個穿白袍的人影。她站在你身後，雙臂平舉，雙手交疊。\n\n要回頭看清楚，還是忍住不回頭？',
       primaryText:'回頭看清楚',
@@ -1110,6 +1179,25 @@ controller.onInteract = async (interactable) => {
         controller.enabled=true;
       }
     });
+    const bridge=worldRouter.activeZoneInstance;
+    if(interactable.forcedReflection&&bridge?.returnBridgeActive){
+      void cinematicDirector.play({
+        id:'SKYBRIDGE_RETURN_WHITE_COAT',
+        durationMs:2900,
+        keyframes:[{at:.32,yaw:-1.05,pitch:-.008},{at:.67,yaw:-2.75,pitch:0},{at:.86,yaw:-Math.PI,pitch:0},{at:1,yaw:0,pitch:0}],
+        cues:[
+          {at:.12,run:()=>soundManager.playDoorLockClack()},
+          {at:.34,run:()=>{if(bridge.bridgeAnomalyLight)bridge.bridgeAnomalyLight.intensity=.82;}},
+          {at:.53,run:()=>{document.body.classList.add('his-flicker');setTimeout(()=>document.body.classList.remove('his-flicker'),460);}},
+          {at:.68,run:()=>{if(bridge.bridgeDoppelganger)bridge.bridgeDoppelganger.visible=true;}},
+          {at:.78,run:()=>uiManager.showSubtitle('值班醫師','「那不是我的倒影……她一直站在我後面。」',2600)}
+        ],
+        onComplete:openBridgeChoice
+      }).then(played=>{if(!played)openBridgeChoice();})
+        .catch(error=>{console.error('[cinematic] skybridge return reflection failed',error);openBridgeChoice();});
+      return;
+    }
+    openBridgeChoice();
   } else if (interactable.type === 'floor6_safe_return') {
     if(!gameState.getFlag('FLOOR6_STETHOSCOPE_FOUND')){
       uiManager.showSubtitle('值班醫師','「等等……焦黑器材旁好像有東西在反光，應該先看一下。」',3400);
