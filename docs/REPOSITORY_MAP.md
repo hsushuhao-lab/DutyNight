@@ -1,17 +1,40 @@
-# Repository Map
+# Repository Map — Current Source Only
 
-## Production
-- `prototype/src/` — active game code
-- `prototype/public/assets/` — runtime assets copied into the web build
-- `.github/workflows/deploy-pages.yml` — production GitHub Pages deployment
+**Authoritative branch:** `master` (repository default/mainline)
 
-## Current documentation
-Use dated folders under `docs/` as implementation records. The most recent narrative/design material should be treated as authoritative over older root-level reports.
+## Active runtime
 
-## Legacy / historical material
-- `SONGDE_NIGHT_DUTY_ACT1_HANDOFF_v0.1/` — historical handoff package
-- root-level ACT1 reports — legacy snapshots
-- duplicated root `assets/A01...A08` — reference copies, not the canonical runtime source
+- `prototype/src/main.js` — interaction routing, story integration, production runtime
+- `prototype/src/core/` — transient and persistent state
+- `prototype/src/story/` — current narrative, characters, memory/cinematic directors
+- `prototype/src/world/` — current hospital zones and routing
+- `prototype/src/art/` — PBR, models, Art Pass assets, loading/readiness
+- `prototype/src/audio/` — Web Audio
+- `prototype/src/ui/` — UI/dialogue/archive/finale
+- `prototype/public/` — production runtime assets
+- `prototype/scripts/` — browser QA and deployment verification
+- `prototype/test_*.js` — structural regression contracts
 
-## Rule
-New runtime files belong under `prototype/`. New project documentation belongs under `docs/YYYYMMDD_topic/`. Do not add new reports or screenshots to repository root.
+## Current design authority
+
+- `docs/ART_STYLE_LOCK.md`
+- `docs/CHARACTER_BIBLE_V3.md`
+- `docs/20260925_v2_upgrade/`
+- `docs/20260926_narrative_v2_2/`
+- `docs/20260926_loading_performance/`
+- `docs/20260927_character_identity/`
+- `docs/20260927_three_act_presentation/`
+- `docs/story/`
+
+## Not authoritative
+
+Do not copy implementation from:
+- non-default branches
+- old Act 1 packages
+- old UE5 skeletons
+- committed build output
+- old screenshots / comparison galleries
+- hash-specific QA evidence
+- chat summaries when they conflict with current `master`
+
+Historical material remains recoverable through Git history and merged PR history; it should not be restored to the working tree unless explicitly requested.

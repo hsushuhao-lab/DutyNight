@@ -1,24 +1,24 @@
-# Unreal Engine
-Binaries/
-DerivedDataCache/
-Intermediate/
-Saved/
-.vs/
-*.sln
-
-# Restricted Reference Protection
-02_ART/RESTRICTED_REFERENCE/
-**/RESTRICTED_REFERENCE/
-
 # Web / Prototype
 node_modules/
 dist/
 .vite/
 *.log
-
-# Import dropboxes
-DutyNight_progress_*/
+prototype/qa-results/
 
 # Local reproducible visual QA working files
 .visual-work/
 prototype/.model-baseline/
+
+# Generated / obsolete root web output — production deploy comes from prototype/dist
+/assets/
+/index.html
+
+# Historical packages and QA evidence must stay in Git history / Actions artifacts
+SONGDE_NIGHT_DUTY_ACT1_HANDOFF_v0.1/
+docs/screenshots/
+docs/traversal-qa/
+docs/visual-qa/
+docs/story/qa-*/
+
+# Import dropboxes
+DutyNight_progress_*/
