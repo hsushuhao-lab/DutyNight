@@ -1,9 +1,21 @@
+import {readFileSync} from 'node:fs';
+import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js';
+import {preloadAssetNames} from './src/art/AssetRegistry.js';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
 import {WorldRouter} from './src/world/WorldRouter.js';
 import {FPSController} from './src/player/FPSController.js';
 
 global.document={querySelector:()=>null,addEventListener(){},createElement:()=>({getContext:()=>new Proxy({measureText:t=>({width:t.length*20})},{get:(o,k)=>o[k]||(()=>({addColorStop(){}}))})})};
+// Mirror production's essential-model readiness before measuring workstation bounds.
+const originalLoad=GLTFLoader.prototype.loadAsync;
+GLTFLoader.prototype.loadAsync=async function(url){
+  const bytes=readFileSync(new URL('./public'+url,import.meta.url));
+  return this.parseAsync(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength),'');
+};
+try{await preloadAssetNames(['officeChair','workDesk','storageCabinet','hospitalBed','bench','printer','plant']);}
+finally{GLTFLoader.prototype.loadAsync=originalLoad;}
+
 const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(),c=new FPSController(camera,{addEventListener(){}},[],[],[]),r=new WorldRouter(scene,camera,c);
 const zone=r.loadZone('second_campus_5f');
 const outer=zone.accessDoors.second_ward,inner=zone.accessDoors.second_ward_inner,bypass=zone.accessDoors.second_ward_glass,stationWard=zone.accessDoors.second_station_ward;

@@ -1,3 +1,5 @@
+import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js';
+import {preloadAssetNames} from './src/art/AssetRegistry.js';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
 import {readFileSync} from 'node:fs';
@@ -8,6 +10,15 @@ global.document={querySelector:()=>null,addEventListener(){},createElement:()=>(
 
 const bridge=readFileSync('./src/world/zones/FirstCampus8FBridgeEntry.js','utf8');
 const main=readFileSync('./src/main.js','utf8');
+// Mirror production's essential-model readiness before measuring workstation bounds.
+const originalLoad=GLTFLoader.prototype.loadAsync;
+GLTFLoader.prototype.loadAsync=async function(url){
+  const bytes=readFileSync(new URL('./public'+url,import.meta.url));
+  return this.parseAsync(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength),'');
+};
+try{await preloadAssetNames(['officeChair','workDesk','storageCabinet','hospitalBed','bench','printer','plant']);}
+finally{GLTFLoader.prototype.loadAsync=originalLoad;}
+
 const router=new WorldRouter(new THREE.Scene(),new THREE.PerspectiveCamera(),null);
 
 for(const [zoneId,prefix] of [['first_campus_4f','40'],['second_campus_5f','50']]){
