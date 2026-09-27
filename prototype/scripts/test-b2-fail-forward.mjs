@@ -31,6 +31,17 @@ try {
     qa.load('b2_archive', 'b2_archive_entry');
     qa.interact({ type: 'b2_archive_terminal' });
   });
+  await page.waitForFunction(()=>document.getElementById('identity-matrix-modal')?.classList.contains('active'),null,{timeout:30000});
+  await page.locator('#identity-candidate-LI_CHENGLI').click();
+  const firstAttempt = await page.evaluate(() => ({
+    used: window.__storyQA.gameState.getFlag('B2_IDENTITY_ATTEMPT_USED'),
+    resolved: window.__storyQA.gameState.getFlag('M7_B2_RESOLVED'),
+    disabled: [...document.querySelectorAll('#identity-candidate-grid button')].every(button => button.disabled),
+    status: document.querySelector('#identity-matrix-status')?.textContent || ''
+  }));
+  assert.deepEqual({ used: firstAttempt.used, resolved: firstAttempt.resolved, disabled: firstAttempt.disabled }, { used: true, resolved: false, disabled: true });
+  assert.match(firstAttempt.status, /比對失敗|載入事故紀錄/);
+  report.checkpoints.push({ id: 'ONE_ATTEMPT_ONLY', ...firstAttempt });
   await page.waitForFunction(()=>document.getElementById('b2-fire-recap')?.classList.contains('active'),null,{timeout:30000});
   for(let i=0;i<6;i++){
     await page.waitForTimeout(360);
@@ -43,25 +54,11 @@ try {
     battle:window.__storyQA.gameState.getFlag('M8_IDENTITY_BATTLE_ACTIVE')
   }));
   assert.deepEqual(recap,{seen:true,overwrite:true,battle:true});
-  report.checkpoints.push({id:'B2_FIRE_RECAP_CONVERGENCE',...recap});
-
-  await page.evaluate(() => window.__storyQA.interact({ type: 'b2_archive_terminal' }));
-  await page.waitForFunction(()=>document.getElementById('identity-matrix-modal')?.classList.contains('active'),null,{timeout:30000});
-  await page.locator('#identity-candidate-LI_CHENGLI').click();
-  const firstAttempt = await page.evaluate(() => ({
-    used: window.__storyQA.gameState.getFlag('B2_IDENTITY_ATTEMPT_USED'),
-    resolved: window.__storyQA.gameState.getFlag('M7_B2_RESOLVED'),
-    disabled: [...document.querySelectorAll('#identity-candidate-grid button')].every(button => button.disabled),
-    status: document.querySelector('#identity-matrix-status')?.textContent || ''
-  }));
-  assert.deepEqual({ used: firstAttempt.used, resolved: firstAttempt.resolved, disabled: firstAttempt.disabled }, { used: true, resolved: false, disabled: true });
-  assert.match(firstAttempt.status, /機會已用盡/);
-  report.checkpoints.push({ id: 'ONE_ATTEMPT_ONLY', ...firstAttempt });
+  report.checkpoints.push({id:'B2_FIRE_RECAP_AFTER_FAILED_IDENTITY',...recap});
   await page.screenshot({ path: `${output}/01-attempt-consumed.png` });
 
-  await page.locator('#btn-close-identity-matrix').click();
   await page.evaluate(() => window.__storyQA.interact({ type: 'b2_archive_terminal' }));
-  await page.waitForTimeout(100);
+  await page.waitForTimeout(120);
   const retry = await page.evaluate(() => ({
     modalActive: document.querySelector('#identity-matrix-modal')?.classList.contains('active'),
     used: window.__storyQA.gameState.getFlag('B2_IDENTITY_ATTEMPT_USED'),
@@ -69,8 +66,8 @@ try {
   }));
   assert.equal(retry.used, true);
   assert.equal(retry.modalActive, false);
-  assert.match(retry.subtitle, /永久鎖閉|嘗試已用盡/);
-  report.checkpoints.push({ id: 'RETRY_BLOCKED', ...retry, subtitle: retry.subtitle.slice(0, 180) });
+  assert.match(retry.subtitle, /UNKNOWN SESSION|返回 316|單向出口/);
+  report.checkpoints.push({ id: 'TERMINAL_AFTER_RECAP_REDIRECTS_TO_316', ...retry, subtitle: retry.subtitle.slice(0, 180) });
 
   await page.evaluate(() => window.__storyQA.captureView({position:[0,1.65,-1.5],target:[0,1.2,2],anchorName:'B2_OneWayExitDoor'}));
   await page.evaluate(() => window.__storyQA.interact({ type: 'b2_exit_door' }));
