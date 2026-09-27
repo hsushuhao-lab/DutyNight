@@ -24,7 +24,7 @@ const adminBranch=main.slice(main.indexOf("['admin_roster_3f','admin_printer_doc
 assert(adminBranch.includes('openArchiveDocument'),'3F admin evidence documents must remain readable');
 assert(!adminBranch.includes("if(gameState.getFlag('FAST_PATH_3F'))"),'loop fast path must never suppress unread 3F admin evidence after an early HANDOFF_DEFAULT override');
 assert(main.includes("M5_CCTV_RESOLVED")&&main.includes("SIX_FLOOR_HISTORY_CONFIRMED"),'M5 CCTV must seed the erased-6F story before M6 can unlock');
-assert(main.includes("M8_CODE_BLACK_ANNOUNCED")&&main.includes("有人正在覆寫紀錄，時間不多了，請找到正確權限輸入避免被覆蓋。"),'B2 reconstruction must trigger record overwrite pressure');
+assert(main.includes("M8_CODE_BLACK_ANNOUNCED")&&main.includes("UNKNOWN SESSION")&&main.includes("B2_FIRE_RECAP_SEEN"),'B2 terminal fire recap must trigger anonymous record-overwrite pressure');
 assert(!routes.includes('hill_from_')&&!routes.includes('pond_from_'),'production routes must not expose outdoor spawns');
 assert(!router.includes('HillsideRoute')&&!router.includes('EcologyPond'),'production router must not load outdoor zones');
 assert(main.includes("setTrueNameFragment('frag_employeePrefix','MED-87')"),'M3 MED-87 clue missing');
@@ -63,10 +63,10 @@ assert(b2.includes("type:'b2_archive_terminal'")&&b2.includes("type:'b2_exit_doo
 assert(html.includes('identity-matrix-modal')&&main.includes('IDENTITY_CANDIDATES')&&main.includes("candidate.id!=='ZHANG_SHOUHENG'"),'B2 must use the four-doctor contradiction matrix rather than auto-resolving identity');
 assert(main.includes("B_PANEL_CLUE_KNOWN")&&main.includes("WANG_B_PANEL_KEY")&&!main.includes('她掉下來的舊十字鑰匙'),'B-Panel key provenance must resolve through the 1F guard post');
 assert(main.includes("interactable.type === 'er_nurse_computer'")&&main.includes('這個電腦是護理師專用'),'ER nurse computers must redirect the physician');
-assert(main.includes("gameState.setFlag('B2_IDENTITY_INCOMPLETE',true)")&&main.includes("interactable.type === 'b2_exit_door'")&&main.includes("B2_EXITED_PERMANENTLY"),'B2 insufficient identity route must fail forward through a permanent one-way exit');
-assert(main.includes("尚未完成身分驗證。離開後 B2 將永久鎖閉，確定離開？"),'B2 unresolved exit must require confirmation');
-assert(main.includes("資料不完整：")&&main.includes("可先嘗試比對"),'B2 evidence gaps must warn without hard-blocking identity comparison');
-assert(main.includes("completeFinalIdentityAt316")&&main.includes("getDeferred316IdentityHints"),'316 must allow a last-chance direct identity declaration with advisory hints only');
+assert(main.includes("gameState.setFlag('B2_IDENTITY_INCOMPLETE',true)")&&main.includes("interactable.type === 'b2_exit_door'")&&main.includes("B2_EXITED_PERMANENTLY"),'B2 unresolved identity may still fail forward through the permanent one-way exit');
+assert(main.includes("先啟動 B2 封存終端")&&main.includes("B2_FIRE_RECAP_SEEN"),'B2 exit must remain locked until the fire-history recap has been viewed');
+assert(main.includes("資料不完整：")&&main.includes("可先嘗試比對"),'B2 evidence gaps must warn without hard-blocking optional identity comparison');
+assert(main.includes("completeFinalIdentityAt316")&&main.includes("gameState.getFlag('B2_FIRE_RECAP_SEEN')"),'316 final authorization must unlock after the B2 fire recap even if B2 identity reconstruction was incomplete');
 assert(router.includes("'b2_archive': B2Archive")&&routes.includes("b2_archive_entry")&&routes.includes("first_1f_guard_back")&&!routes.includes("b2_archive_lift"),'M7 B2 entry and 1F guard-back exit route registration missing');
 assert(main.includes("M7_B2_RESOLVED")&&main.includes("02:17｜警衛台後方 B-Panel"),'M7 02:17/B2 logic missing');
 
