@@ -502,7 +502,7 @@ try{
 
   s=await snap();assert.equal(s.flags.GAME_COMPLETE,true);assert.equal(s.memory.gameComplete,true);assert.equal(s.memory.finalDisposition,'success_pending');
   for(let i=0;i<8;i++){
-    await page.waitForTimeout(160);
+    await page.waitForTimeout(360);
     await page.keyboard.press('E');
   }
   await waitForPageCondition(page,()=>document.querySelector('#final-success-recap .fsr-choice.visible'),30000);
