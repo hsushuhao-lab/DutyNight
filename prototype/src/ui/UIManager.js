@@ -611,7 +611,7 @@ export class UIManager {
     if(resume)this.onTerminalClose?.();
   }
 
-  playLegendOverride({legend='409 PATIENTIZATION',reason='你重演了當年的錯誤。'}={},onComplete){
+  playLegendOverride({legend='409 PATIENTIZATION',reason='你重演了當年的錯誤。',recovery=null}={},onComplete){
     document.exitPointerLock();
     this.patientizationScene?.dispose();
     this.patientizationScene=new PatientizationScene(this.loopCutscene);
@@ -634,8 +634,23 @@ export class UIManager {
     later(2150,()=>{body.textContent='面孔被雜訊抹去的護理師低頭準備針劑：\n「病人急性精神混亂，自稱是醫師……先執行四點約束，通報總值班。」\n\n「放開我！我是今晚的值班醫師！名冊在 316……！」';});
     later(2750,()=>{body.textContent='一名沒有名牌的白袍人影從門外經過，抽走床尾的值班日誌。\n金屬厚門「匡啷」反鎖。';});
     later(3400,()=>{body.textContent='舊式機械火警鈴開始尖叫。\n焦臭濃煙從門底縫隙湧入，視野逐漸全黑。';});
-    later(4000,()=>{title.textContent='17:00';body.textContent='黑暗中傳來電梯到站的「叮——」。\n秒針倒轉。日期欄短暫閃過：1998-10-12。';});
-    later(5400,()=>{body.textContent='';card?.classList.add('visible');});
+    later(4000,()=>{
+      if(recovery){
+        title.textContent='MEMORY ANCHOR';
+        body.textContent=(recovery.trace||['17:00',recovery.time]).join('  →  ')+'\n\n「這些我已經記得。」\n記憶不再完整重演，只回到這次錯誤之前。';
+      }else{
+        title.textContent='17:00';
+        body.textContent='黑暗中傳來電梯到站的「叮——」。\n秒針倒轉。日期欄短暫閃過：1998-10-12。';
+      }
+    });
+    later(5400,()=>{
+      body.textContent='';
+      if(recovery&&card){
+        card.querySelector('strong').textContent='MEMORY ANCHOR RESTORED';
+        card.querySelector('span').textContent='回溯至：'+recovery.label;
+      }
+      card?.classList.add('visible');
+    });
     later(6500,()=>this.finishLoopCutscene());
   }
 
@@ -866,6 +881,17 @@ export class UIManager {
     el?.classList.remove('active');void el?.offsetWidth;el?.classList.add('active');
     setTimeout(()=>this.showSubtitle('學長','「醫師？發什麼呆，我先走了……」',3600),850);
     setTimeout(()=>this.showSubtitle('值班醫師',`「手腕……這不是夢。這已經是第 ${loopCount+1} 次了。」`,4200),4200);
+  }
+
+  showMemoryAnchorRestored(recovery,loopCount){
+    const el=document.getElementById('loop-wake-flash');
+    el?.classList.remove('active');void el?.offsetWidth;el?.classList.add('active');
+    const label=recovery?.label||'已確認記憶點';
+    setTimeout(()=>this.showSubtitle(
+      'MEMORY ANCHOR RESTORED',
+      `回溯至：${label}\n已保留：已確認身分線索、院史資料與生存規則。\n「這些我已經記得。這次只需要改正眼前的錯誤。」`,
+      6200
+    ),650);
   }
 
   openTravelSelector(destinations, currentZone, onSelect, kind = 'elevator', onPrefetch = null) {
