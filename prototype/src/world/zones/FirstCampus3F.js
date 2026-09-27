@@ -210,9 +210,9 @@ export class FirstCampus3F {
     patrolFace.position.set(19,1.38,1.625);patrolFace.rotation.y=Math.PI;this.zoneGroup.add(patrolFace);
     const hiddenKey=new THREE.Mesh(new THREE.TorusGeometry(.045,.009,10,20),m.stainless);hiddenKey.visible=false;hiddenKey.position.set(19,1.18,1.61);this.zoneGroup.add(hiddenKey);
     // Interaction slab is physically aligned to the visible patrol board.
-    // Keep it only slightly larger than the plaque so the prompt appears when
-    // the player is actually aiming at the board, not at the floor/shelf nearby.
-    const patrolHit=new THREE.Mesh(new THREE.BoxGeometry(.66,.58,.18),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
+    // Keep a forgiving first-person hit area, but center it on the visible plaque so
+    // the prompt no longer floats above/below the board.
+    const patrolHit=new THREE.Mesh(new THREE.BoxGeometry(1.55,1.30,.18),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
     patrolHit.position.set(19,1.38,1.58);
     patrolHit.userData={interactable:true,id:'316_SPARE_KEY',type:'spare_key_316',label:'檢查夜間警衛查哨點',targetGroup:hiddenKey};
     this.zoneGroup.add(patrolHit);this.interactables.push(patrolHit);this.spareKeyMesh=patrolHit;
@@ -222,7 +222,7 @@ export class FirstCampus3F {
     // when the player looks at the panel but never hits a tiny overlapping trigger.
     // 21:17 uses the same physical board position as the initial checkpoint.
     // Do not leave a second oversized hotspot floating above/below the plaque.
-    const futureSignHit=new THREE.Mesh(new THREE.BoxGeometry(.66,.58,.18),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
+    const futureSignHit=new THREE.Mesh(new THREE.BoxGeometry(1.55,1.30,.18),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
     futureSignHit.position.set(19,1.38,1.58);
     futureSignHit.name='Guard2117_SignSensor';
     futureSignHit.userData={interactable:false,id:'GUARD_SIGN_2117',type:'guard_sign_2117',label:'查看 21:17 查哨紀錄'};
