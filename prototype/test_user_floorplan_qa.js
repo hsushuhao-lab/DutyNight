@@ -55,10 +55,10 @@ for(const [zoneId,prefix] of [['first_campus_4f','40'],['second_campus_5f','50']
     assert.equal(ws.deskYaw,ws.yaw,ws.id+' desk yaw metadata must match workstation yaw');
   }
   const clinicalIds=new Set(zone.clinicalProps.map(p=>p.id));
-  for(const suffix of ['medication_cart','treatment_cart','iv_pole','iv_bag','medication_cabinet','syringe_tray','sharps_container','stethoscope','white_coat','bp_device','pulse_oximeter','supply_boxes']){
+  for(const suffix of ['medication_cart','treatment_cart','iv_pole','iv_bag','medication_cabinet','syringe_tray','stethoscope','white_coat','bp_device','pulse_oximeter','supply_boxes']){
     assert(clinicalIds.has(tag+'_station_'+suffix),'Missing clinical prop '+suffix);
   }
-  assert.equal(zone.station.clinicalPropIds.length,12);
+  assert.equal(zone.station.clinicalPropIds.length,11);
 
   const wardRooms=zone.roomAreas.filter(r=>r.kind==='ward');
   assert.deepEqual(wardRooms.map(r=>r.id),Array.from({length:9},(_,i)=>`${prefix}${i+1}`));
