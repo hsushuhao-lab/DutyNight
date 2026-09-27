@@ -1,7 +1,7 @@
 name: Story Browser Playthrough
 on:
   push:
-    branches: [master]
+    branches: [main]
   workflow_dispatch:
 permissions:
   contents: read
