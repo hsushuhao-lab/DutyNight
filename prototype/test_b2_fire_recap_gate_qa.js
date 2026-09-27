@@ -16,8 +16,14 @@ for(const token of [
 ]) assert(director.includes(token),'B2 fire recap missing beat: '+token);
 
 assert(main.includes("import { B2FireRecapDirector } from './story/B2FireRecapDirector.js';"),'B2 fire recap director integration missing');
-assert(main.includes("onAttemptComplete:()=>playB2FireRecap()"),'B2 identity success or failure must converge into the fire recap');
-assert(main.includes("if(gameState.getFlag('M7_B2_RESOLVED')||gameState.getFlag('B2_IDENTITY_ATTEMPT_USED'))")&&main.includes('playB2FireRecap()'),'already-completed or already-consumed B2 terminal state must also launch the recap');
+const terminalStart=main.indexOf("} else if (interactable.type === 'b2_archive_terminal') {");
+const exitStart=main.indexOf("} else if (interactable.type === 'b2_exit_door') {",terminalStart);
+const terminalBranch=main.slice(terminalStart,exitStart);
+assert(terminalStart>=0&&exitStart>terminalStart,'B2 terminal branch missing');
+assert(terminalBranch.includes("if(!gameState.getFlag('B2_FIRE_RECAP_SEEN'))")&&terminalBranch.includes('playB2FireRecap();'),'first B2 terminal interaction must always launch the fire recap');
+assert(terminalBranch.indexOf('playB2FireRecap();')<terminalBranch.indexOf('openIdentityMatrix'),'fire recap must occur before any optional identity comparison');
+assert(terminalBranch.includes("M7_B2_RESOLVED")&&terminalBranch.includes("B2_IDENTITY_ATTEMPT_USED"),'completed/consumed B2 identity state must still be handled after the mandatory recap');
+assert(terminalBranch.includes('身分矩陣為選擇性比對；可直接離開 B2 返回 316'),'identity matrix must be optional after the recap, never a route blocker');
 assert(main.includes("gameState.setFlag('B2_TERMINAL_CONTACTED',true)"),'B2 terminal contact flag missing');
 assert(main.includes("gameState.setFlag('B2_FIRE_RECAP_SEEN',true)"),'B2 recap completion flag missing');
 assert(main.includes("gameState.setFlag('RECORD_OVERWRITE_ACTIVE',true)"),'B2 recap must activate overwrite pressure');
