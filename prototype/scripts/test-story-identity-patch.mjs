@@ -45,6 +45,10 @@ try{
   const identity=await dialogue();assert.match(identity.join(' '),/劉志遠／ENG-860214／工務機電技師/);assert.match(identity.join(' '),/這名字好熟悉，在哪裡看過/);
   await q(()=>window.__storyQA.interact({type:'p1_action',action:'ER_NOTE'}));
   assert.match(await page.locator('#subtitle-text').textContent(),/劉志遠/);check('ER_CANONICAL_IDENTITY',{lines:identity});
+  await q(()=>{const a=window.__storyQA;a.setFlag('ER_LIU_IDENTITY_REVEALED',false);a.load('first_campus_3f');a.load('first_campus_2f');});
+  const rememberedLabel=await q(()=>window.__storyQA.worldRouter.activeZoneInstance.janeDoeHit.userData.label);
+  assert.equal(rememberedLabel,'評估劉志遠／ENG-860214','persistent identity must survive re-entry without the current-loop reveal flag');
+  check('ER_IDENTITY_SURVIVES_REENTRY',{label:rememberedLabel});
   await q(()=>{const a=window.__storyQA;a.load('first_campus_3f');});
   const roster=await q(()=>window.__storyQA.worldRouter.activeZoneInstance.interactables.find(x=>x.userData?.id==='ARCHIVE_PERSONNEL_1998').userData);
   assert.equal(roster.pages.length,7);assert.equal(roster.documentTitle,'1998 夜班核心人員名錄');assert(!JSON.stringify(roster).includes('4+3'));check('SEVEN_PERSONNEL_PAGES',{count:roster.pages.length});
