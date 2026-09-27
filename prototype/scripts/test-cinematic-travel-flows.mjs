@@ -51,12 +51,19 @@ try{
   const erPage=await startPage('first_campus_4f');
   await erPage.evaluate(()=>window.__storyQA.setFlag('GHOST_REGISTRATION_AVAILABLE',true));
   await chooseFloor(erPage,'first_campus_2f');
+  await erPage.waitForFunction(()=>window.__storyQA.worldRouter.activeZoneId==='first_campus_2f'&&window.__storyQA.controller.enabled);
+  assert.equal(await erPage.evaluate(()=>!!window.__storyQA.gameState.getFlag('CG_00_33_GHOST_REGISTRATION_PLAYED')),false);
+  await erPage.evaluate(()=>{
+    const qa=window.__storyQA;qa.gameState.setGameTime('00:33');
+    qa.captureView({position:[13,1.65,-5.8],target:[13,1.18,-8.55],anchorName:'ER_GhostRegistrationTerminal'});
+  });
   await erPage.waitForFunction(()=>window.__storyQA.gameState.getFlag('CG_00_33_GHOST_REGISTRATION_ACTIVE')===true,null,{timeout:15000});
+  await erPage.waitForFunction(()=>window.__storyQA.worldRouter.activeZoneInstance.registrationStage===2);
   await erPage.screenshot({path:`${output}/00-33-registration-active.png`});
   await erPage.waitForFunction(()=>window.__storyQA.gameState.getFlag('CG_00_33_GHOST_REGISTRATION_PLAYED')===true,null,{timeout:15000});
   const erState=await erPage.evaluate(()=>({zone:window.__storyQA.worldRouter.activeZoneId,enabled:window.__storyQA.controller.enabled,played:window.__storyQA.gameState.getFlag('CG_00_33_GHOST_REGISTRATION_PLAYED')}));
   assert.deepEqual(erState,{zone:'first_campus_2f',enabled:true,played:true});
-  report.flows.push({id:'00_33_GHOST_REGISTRATION',steps:['opened the elevator selector from 4F','selected 2F','camera turn and flicker played during zone arrival'],state:erState});
+  report.flows.push({id:'00_33_GHOST_REGISTRATION',steps:['opened the elevator selector from 4F','selected 2F','entered the diagnostic room; actual screen fields appeared during the automatic cinematic'],state:erState});
   await erPage.close();
 
   const sixPage=await startPage('first_campus_3f');

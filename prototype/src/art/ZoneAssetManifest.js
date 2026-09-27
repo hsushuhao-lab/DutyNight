@@ -5,7 +5,7 @@ const clinicalSurfaces = ['plaster', 'vinyl', 'terrazzo', 'wood'];
 const clinicalFurniture = ['officeChair', 'storageCabinet', 'workDesk', 'printer', 'bench', 'plant'];
 const exteriorModels = ['shrub', 'fern', 'campusTree'];
 const indoor = models => ({ essential: { models, surfaces: clinicalSurfaces }, optional: { models: [], surfaces: [] } });
-const withExterior = models => ({ essential: { models, surfaces: [...clinicalSurfaces, 'ground', 'asphalt'] }, optional: { models: exteriorModels, surfaces: [] } });
+const withExterior = models => ({ essential: { models, surfaces: clinicalSurfaces }, optional: { models: exteriorModels, surfaces: ['ground', 'asphalt'] } });
 
 export const zoneAssetManifest = Object.freeze({
   first_campus_3f: withExterior(clinicalFurniture),
@@ -14,7 +14,7 @@ export const zoneAssetManifest = Object.freeze({
   first_campus_1f: withExterior(clinicalFurniture),
   first_campus_8f: withExterior(clinicalFurniture),
   // Skybridge scenery uses procedural distant silhouettes; campusTree is not on the entry path.
-  skybridge: { essential: { models: clinicalFurniture, surfaces: [...clinicalSurfaces, 'ground', 'asphalt'] }, optional: { models: ['shrub', 'fern'], surfaces: [] } },
+  skybridge: { essential: { models: clinicalFurniture, surfaces: clinicalSurfaces }, optional: { models: ['shrub', 'fern'], surfaces: ['ground', 'asphalt'] } },
   second_campus_1f: indoor(clinicalFurniture),
   second_campus_2f: indoor([...clinicalFurniture, 'hospitalBed']),
   second_campus_4f_story: indoor([...clinicalFurniture, 'hospitalBed']),

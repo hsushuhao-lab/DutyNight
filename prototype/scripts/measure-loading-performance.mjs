@@ -18,14 +18,32 @@ const routes = [
 ];
 const rows = [];
 const errors = [];
+let activeSample = null;
+
+async function saveResults(verdict) {
+  const fields = ['fromZone','toZone','coldOrWarm','sourcePreparationMs','essentialBytes','optionalBytes','elevatorAnimationMs','extraWaitMs','totalTransitionMs','transitionStart','essentialReady','zoneBuilt','transitionEnd','status'];
+  await mkdir(dirname(output), { recursive: true });
+  await writeFile(output, [fields.join(','), ...rows.map(row => fields.map(field => row[field] ?? '').join(','))].join('\n') + '\n');
+  await writeFile(output.replace(/\.csv$/, '.json'), JSON.stringify({ verdict: errors.length ? 'FAIL' : verdict, url, activeSample, rows, errors, browser: browser.version() }, null, 2));
+}
+
 
 async function visit(page, fromZone, toZone, coldOrWarm) {
   console.log(`Measuring ${coldOrWarm} ${fromZone} → ${toZone}`);
+  activeSample.phase = 'source-material-readiness';
+  await saveResults('IN_PROGRESS');
+  const sourcePreparationStart = Date.now();
+  await page.evaluate(zone => window.__storyQA.load(zone), fromZone);
+  await page.waitForFunction(zone => {
+    const audit = window.__materialAudit();
+    const surfaces = audit.materials.filter(item => ['wall', 'wallDark', 'floor', 'floorTile', 'floorWood', 'doorWood', 'ceiling', 'handrail'].includes(item.materialName.slice(9)));
+    return audit.zoneId === zone && surfaces.length > 0 && surfaces.every(item => item.hasMap && item.hasNormalMap && item.hasRoughnessMap && item.mapImageWidth > 0);
+  }, fromZone, { timeout: 300000 });
+  const sourcePreparationMs = Date.now() - sourcePreparationStart;
   await page.evaluate(zone => {
     const qa = window.__storyQA;
     qa.setFlag('STAFF_ACCESS_CARD', true);
     for (const task of ['KEY_PICKUP', 'DUTY_LOG', 'E_HANDOFF']) qa.task(task);
-    qa.load(zone);
     const router = qa.worldRouter;
     const loadZone = router.loadZone.bind(router);
     router.loadZone = (...args) => {
@@ -44,18 +62,20 @@ async function visit(page, fromZone, toZone, coldOrWarm) {
       window.__perfTransitionStart = performance.now();
     }, { capture: true, once: true });
   }, toZone);
+  activeSample.phase = 'destination-transition';
+  await saveResults('IN_PROGRESS');
   await button.click();
   try {
-    await page.waitForFunction(toZone => window.worldRouter.activeZoneId === toZone && document.querySelector('#elevator-cutscene')?.classList.contains('active') === false, toZone, { timeout: publicUrl ? 10000 : 45000 });
+    await page.waitForFunction(toZone => window.worldRouter.activeZoneId === toZone && document.querySelector('#elevator-cutscene')?.classList.contains('active') === false, toZone, { timeout: 300000 });
   } catch (error) {
     const state = await page.evaluate(() => ({ zone: window.worldRouter.activeZoneId, transition: document.querySelector('#elevator-cutscene')?.className, status: document.querySelector('#elevator-status-text')?.textContent,
       transitionStart: window.__perfTransitionStart, essentialReady: window.__perfEssentialReady, zoneBuilt: window.__perfZoneBuilt, transitionEnd: performance.now() }));
-    errors.push(`${fromZone} → ${toZone} ${coldOrWarm}: transition unresolved after 10 seconds; ${JSON.stringify(state)}`);
-    rows.push({ fromZone, toZone, coldOrWarm, essentialBytes: 0, optionalBytes: 0, elevatorAnimationMs: 1700,
+    errors.push(`${fromZone} → ${toZone} ${coldOrWarm}: transition unresolved after 300 seconds; ${JSON.stringify(state)}`);
+    rows.push({ fromZone, toZone, coldOrWarm, sourcePreparationMs, essentialBytes: 0, optionalBytes: 0, elevatorAnimationMs: 1700,
       extraWaitMs: '', totalTransitionMs: state.transitionEnd - state.transitionStart,
       transitionStart: state.transitionStart, essentialReady: state.essentialReady,
       zoneBuilt: state.zoneBuilt, transitionEnd: state.transitionEnd, status: 'TIMEOUT' });
-    return;
+    return false;
   }
   const data = await page.evaluate(() => {
     const start = window.__perfTransitionStart;
@@ -70,7 +90,8 @@ async function visit(page, fromZone, toZone, coldOrWarm) {
       elevatorAnimationMs: 1700, extraWaitMs: Math.max(0, ready - start - 1700), totalTransitionMs: end - start };
   });
   if (data.totalTransitionMs >= 10000) errors.push(`${fromZone} → ${toZone} ${coldOrWarm}: ${Math.round(data.totalTransitionMs)}ms`);
-  rows.push({ fromZone, toZone, coldOrWarm, ...data });
+  rows.push({ fromZone, toZone, coldOrWarm, sourcePreparationMs, ...data });
+  return true;
 }
 
 try {
@@ -79,6 +100,8 @@ try {
     const page = await context.newPage();
     page.on('pageerror', error => errors.push(error.message));
     for (const coldOrWarm of ['cold', 'warm']) {
+      activeSample = { fromZone, toZone, coldOrWarm, phase: 'boot' };
+      await saveResults('IN_PROGRESS');
       const bootStart = Date.now();
       await page.goto(`${url}${url.includes('?') ? '&' : '?'}qa=story`, { waitUntil: 'domcontentloaded', timeout: 120000 });
       await page.waitForFunction(() => window.__storyQA?.worldRouter?.activeZoneInstance, null, { timeout: 120000 });
@@ -87,16 +110,19 @@ try {
           essentialBytes: await page.evaluate(() => performance.getEntriesByType('resource').reduce((sum, item) => sum + (item.transferSize || 0), 0)),
           optionalBytes: 0, elevatorAnimationMs: 0, extraWaitMs: 0, totalTransitionMs: Date.now() - bootStart });
       }
-      await visit(page, fromZone, toZone, coldOrWarm);
+      const completed = await visit(page, fromZone, toZone, coldOrWarm);
+      await saveResults('IN_PROGRESS');
+      if (!completed) break; // An unfinished cold run cannot establish a warm cache.
     }
     await context.close();
   }
-  const fields = ['fromZone','toZone','coldOrWarm','essentialBytes','optionalBytes','elevatorAnimationMs','extraWaitMs','totalTransitionMs','transitionStart','essentialReady','zoneBuilt','transitionEnd','status'];
-  await mkdir(dirname(output), { recursive: true });
-  await writeFile(output, [fields.join(','), ...rows.map(row => fields.map(field => row[field] ?? '').join(','))].join('\n') + '\n');
-  await writeFile(output.replace(/\.csv$/, '.json'), JSON.stringify({ verdict: errors.length ? 'FAIL' : 'PASS', url, rows, errors, browser: browser.version() }, null, 2));
+  await saveResults('PASS');
   if (errors.length) throw new Error(errors.join('\n'));
   console.log(`LOADING PERFORMANCE ${errors.length ? 'BASELINE FAIL' : 'PASS'}: ${rows.length} cold/warm route samples, ${errors.length} errors`);
+} catch (error) {
+  errors.push(`${JSON.stringify(activeSample)}: ${error.stack || error.message}`);
+  await saveResults('FAIL');
+  throw error;
 } finally {
   await browser.close();
   if (server) await new Promise(resolve => server.httpServer.close(resolve));

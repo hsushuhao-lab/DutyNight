@@ -411,15 +411,16 @@ export class FirstCampus2FER {
 
   syncStoryState(){
     const ghostAvailable=gameState.getFlag('GHOST_REGISTRATION_AVAILABLE')===true;
-    if(this.ghostRegistrationSlip)this.ghostRegistrationSlip.visible=ghostAvailable;
+    const registrationStage=this.registrationStage ?? (gameState.getFlag('CG_00_33_GHOST_REGISTRATION_PLAYED') ? 3 : 0);
+    if(this.ghostRegistrationSlip)this.ghostRegistrationSlip.visible=ghostAvailable&&registrationStage>=3;
     if(ghostAvailable&&this.ghostRegistrationScreen?.material?.map){
       const canvas=this.ghostRegistrationScreen.material.map.image;
       const context=canvas.getContext('2d');
       context.fillStyle='#07110e';context.fillRect(0,0,canvas.width,canvas.height);
       context.fillStyle='#17392c';context.fillRect(0,0,canvas.width,65);
       context.fillStyle='#b8d1c1';context.font='bold 28px sans-serif';context.fillText('急診掛號系統　／　夜間紀錄',28,43);
-      context.fillStyle='#e4ece4';context.font='bold 42px monospace';context.fillText('00:33　1998-ER-0217',38,178);
-      context.font='26px sans-serif';context.fillText('資料狀態：已存在',38,244);context.fillText('病人位置：未回報',38,298);
+      context.fillStyle='#e4ece4';context.font='bold 42px monospace';if(registrationStage>=1)context.fillText('00:33　1998-ER-0217',38,178);
+      context.font='26px sans-serif';if(registrationStage>=2)context.fillText('資料狀態：已存在',38,244);if(registrationStage>=3)context.fillText('病人位置：未回報',38,298);
       context.fillStyle='#718779';context.fillRect(38,350,820,3);
       this.ghostRegistrationScreen.material.map.needsUpdate=true;
     }

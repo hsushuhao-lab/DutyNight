@@ -1,3 +1,4 @@
+import { zoneAssetManifest } from './src/art/ZoneAssetManifest.js';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 
@@ -34,7 +35,16 @@ const level3=readFileSync('./src/world/Level3FBlockout.js','utf8');
 assert(geometryFactory.includes('this.surface(material, width, height)'),'shared architectural walls must use dimension-aware repeated PBR materials');
 assert(level3.includes('materialForSurface(materialName,width,height)'),'3F walls must use dimension-aware repeated PBR materials');
 assert(campus.includes('preloadCampusBackdropAssets'),'campus backdrop preload hook missing');
-assert(zoneAssets.includes("'ground', 'asphalt'"),'visible exterior ground must have PBR maps before scene build');
+for (const zone of ['first_campus_3f','first_campus_2f','first_campus_1f','first_campus_8f','skybridge']) {
+  const { essential, optional } = zoneAssetManifest[zone];
+  for (const surface of ['ground','asphalt']) {
+    assert(!essential.surfaces.includes(surface), `${zone}: distant ${surface} must not block entry`);
+    assert(optional.surfaces.includes(surface), `${zone}: distant ${surface} must retain background PBR hydration`);
+  }
+  for (const surface of ['plaster','vinyl','terrazzo','wood'])
+    assert(essential.surfaces.includes(surface), `${zone}: core ${surface} must remain essential`);
+  assert(!essential.models.includes('campusTree'), `${zone}: optional tree must not block entry`);
+}
 
 assert(ui.includes("openTravelSelector(destinations, currentZone, onSelect, kind = 'elevator', onPrefetch = null)"),'travel prefetch callback missing');
 assert(ui.includes('const preloadPromise=Promise.resolve(onPrefetch?.(destination))'),'destination preload must start at transition start');

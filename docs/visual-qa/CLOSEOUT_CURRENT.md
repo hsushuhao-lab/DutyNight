@@ -43,3 +43,17 @@ Local evidence paths are working artifacts, not proof of public deployment. Olde
 - Independent review rejected previous cinematic screenshots (wrong moments/framing). Corrected316 recap screenshot is in `prototype/qa-results/b2-recap-current`; B2 closure,00:33 and6F cinematic framing still need refreshed evidence.
 
 Publication may proceed for user playtesting as authorized, but release status remains IN_PROGRESS until all public and visual gates pass.
+
+## Public verification continuation (2026-09-27)
+
+- Public Pages workflow36302734768 deployed `ab714894276c1e373941f26e8649fdc5da5500be`; fingerprint verified.
+- Public material runtime audit:11 visits PASS,159636ms total. This proves eventual material correctness, not loading performance.
+- CI story workflow36302734770 stopped at M6 after its30-minute step limit. M7–M9/public steps did not pass in that run.
+- Local `c84adc9` separates the once-only6F preview from the later required6F visit, as explicitly selected by the user. Browser travel regression passed both paths. Not yet deployed.
+- Loading measurement now waits for source-zone core PBR readiness and records that preparation separately. It allows a slow cold transition to finish before warming;10seconds remains the failure threshold. Local12 samples PASS (`prototype/qa-results/loading-corrected-local.csv`). Public corrected audit is still running; no PASS claim.
+- Exterior ground/asphalt surfaces are being moved to background priority, retaining unchanged full-resolution PBR assets. Indoor core PBR remains essential. This follows specification section8; the previous test wording incorrectly demanded distant-ground readiness before scene build. Runtime/visual verification of this change remains required.
+
+- Background-priority working tree: build PASS; actual imported manifest assertions PASS (core PBR essential, distant ground/asphalt optional, no essential campusTree); material runtime11visits PASS (`prototype/qa-results/material-background-priority.json`); cinematic travel3flows PASS (`prototype/qa-results/travel-background-priority/result.json`). These targeted checks do not prove the full00:33 visual sequence or final public acceptance.
+
+-00:33 capture review confirmed the old arrival camera faced a wall. The cinematic now starts automatically inside the diagnostic room, displays real terminal fields in stages and restores control. `prototype/qa-results/registration-visible-trigger/result.json` PASS; its1440x900 active screenshot was inspected and shows the terminal. Remaining: full narrative-state screenshot and printer staging.
+-Loading audit now persists IN_PROGRESS/FAIL checkpoints and partial samples. Previous public corrected run ended without output; no pass inferred. Replacement logged audit: `prototype/qa-results/public-loading-diagnostic.*`.

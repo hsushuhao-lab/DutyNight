@@ -14,7 +14,9 @@ const requestedOpeningZone = new URLSearchParams(location.search).get('zone');
 const openingZoneId = zoneAssetManifest[requestedOpeningZone] ? requestedOpeningZone : 'first_campus_3f';
 const openingAssets = zoneAssetManifest[openingZoneId].essential;
 await preloadAssetNames(openingAssets.models);
-void preloadMaterialSurfaces(openingAssets.surfaces).catch(error => console.warn('[art] opening material surface preload failed', error));
+void preloadMaterialSurfaces(openingAssets.surfaces)
+  .then(() => preloadMaterialSurfaces(zoneAssetManifest[openingZoneId].optional.surfaces))
+  .catch(error => console.warn('[art] opening material surface preload failed', error));
 const prefetchDestinationAssets = async destination => {
   const zoneId=destination?.zoneId;
   await preloadZoneEssential(zoneId);
@@ -183,9 +185,9 @@ function triggerPost2117DutyRoomSequence(){
   uiManager.updateTasks();
   void cinematicDirector.play({
     id:'21_17_DUTY_ROOM_ACTIVATION',
-    durationMs:700,
+    durationMs:3800,
     keyframes:[{at:.62,yaw:-.075,pitch:-.012},{at:1,yaw:0,pitch:0}],
-    cues:[{at:.72,run:()=>{
+    cues:[{at:.17,run:()=>{
       if(gameState.getFlag('POST_2117_DUTY_CALL_DONE'))return;
       gameState.setGameTime('00:30');
       startStoryPhoneCall('ER_GHOST_0033');
@@ -686,6 +688,18 @@ controller.onInteract = async (interactable) => {
       gameState.setFlag('GHOST_REGISTRATION_ARMED',true);
       gameState.setFlag('GHOST_REGISTRATION_AVAILABLE',true);
       gameState.setGameTime('00:33');
+      const roomLights=[];
+      worldRouter.activeZoneInstance.zoneGroup.traverse(object=>{if(object.isPointLight)roomLights.push(object);});
+      const lightPosition=new THREE.Vector3();
+      roomLights.sort((a,b)=>a.getWorldPosition(lightPosition).distanceToSquared(controller.position)-b.getWorldPosition(lightPosition).distanceToSquared(controller.position));
+      const practical=roomLights[0];
+      if(practical){
+        const brightness=practical.intensity;
+        practical.intensity=brightness*.15;
+        setTimeout(()=>{practical.intensity=brightness;},180);
+      }
+      if(roomLights[1])roomLights[1].intensity*=.4;
+      soundManager.playBed33KnockPattern();
       uiManager.showSubtitle('急診護理師','「值班醫師，不好意思。系統裡突然多了一筆掛號資料，可是我們這邊找不到病人。你對這筆資料有印象嗎？」\\n值班醫師：「我沒有印象。我下去看看病歷紀錄。」',6200);
     }else return;
     worldRouter.activeZoneInstance?.syncStoryState?.();
@@ -1091,23 +1105,7 @@ controller.onInteract = async (interactable) => {
         if(destination.zoneId==='first_campus_2f'&&gameState.gameTime==='20:05')soundManager.playPhoneRingPattern();
         uiManager.showSubtitle(dutyLine.speaker,dutyLine.text);
       }
-      if(destination.zoneId==='first_campus_2f'&&gameState.getFlag('GHOST_REGISTRATION_AVAILABLE')){
-        const targetYaw=Math.atan2(controller.position.x-13,8.55+controller.position.z);
-        const turn=Math.atan2(Math.sin(targetYaw-controller.yaw),Math.cos(targetYaw-controller.yaw));
-        void cinematicDirector.play({
-          id:'00_33_GHOST_REGISTRATION',
-          durationMs:1250,
-          keyframes:[{at:.55,yaw:turn*.72,pitch:-.008},{at:.78,yaw:turn,pitch:0},{at:1,yaw:0,pitch:0}],
-          cues:[
-            {at:.22,run:()=>{
-              document.body.classList.add('his-flicker');
-              setTimeout(()=>document.body.classList.remove('his-flicker'),460);
-            }},
-            {at:.48,run:()=>soundManager.playComputerBeep()}
-          ]
-        }).then(()=>{controller.enabled=true;})
-          .catch(error=>{controller.enabled=true;console.error('[cinematic] 00:33 registration failed',error);});
-      }else controller.enabled = true;
+      controller.enabled = true;
     }, interactable.kind, prefetchDestinationAssets);
   } else if (interactable.type === 'second_campus_nursing_report') {
     if(!gameState.getFlag('SECOND_CAMPUS_ACCESS')){
@@ -1417,6 +1415,30 @@ window.addEventListener('resize', () => {
   composer.setSize(window.innerWidth, window.innerHeight);
 });
 
+function triggerGhostRegistrationCinematic(){
+  const targetYaw=Math.atan2(controller.position.x-13,8.55+controller.position.z);
+  const turn=Math.atan2(Math.sin(targetYaw-controller.yaw),Math.cos(targetYaw-controller.yaw));
+  const registrationZone=worldRouter.activeZoneInstance;
+  const showRegistrationStage=stage=>{registrationZone.registrationStage=stage;registrationZone.syncStoryState();};
+  void cinematicDirector.play({
+    id:'00_33_GHOST_REGISTRATION',
+    durationMs:3200,
+    onComplete:()=>showRegistrationStage(3),
+    keyframes:[{at:.55,yaw:turn*.72,pitch:-.008},{at:.78,yaw:turn,pitch:0},{at:1,yaw:0,pitch:0}],
+    cues:[
+      {at:.22,run:()=>{
+        document.body.classList.add('his-flicker');
+        setTimeout(()=>document.body.classList.remove('his-flicker'),460);
+      }},
+      {at:0,run:()=>showRegistrationStage(0)},
+      {at:.30,run:()=>showRegistrationStage(1)},
+      {at:.48,run:()=>{showRegistrationStage(2);soundManager.playComputerBeep();}},
+      {at:.72,run:()=>{showRegistrationStage(3);soundManager.playPaperSign();}}
+    ]
+  }).then(()=>{controller.enabled=true;})
+    .catch(error=>{controller.enabled=true;console.error('[cinematic] 00:33 registration failed',error);});
+}
+
 // Animation Loop
 const clock = new THREE.Clock();
 function animate() {
@@ -1425,6 +1447,11 @@ function animate() {
 
   controller.update(delta);
   worldRouter.update(delta);
+  if(worldRouter.activeZoneId==='first_campus_2f' && controller.enabled && !cinematicDirector.activeId &&
+    gameState.getFlag('GHOST_REGISTRATION_AVAILABLE') && !gameState.getFlag('LEGEND_ER0033_RESOLVED') && !gameState.getFlag('CG_00_33_GHOST_REGISTRATION_PLAYED') &&
+    controller.position.x>10.5 && controller.position.x<15.5 && controller.position.z>-9.7 && controller.position.z<-4.5){
+    triggerGhostRegistrationCinematic();
+  }
   actPresentationDirector.update();
   if(gameState.getFlag('BRIDGE_REFLECTION_NOTICE_PENDING')){
     gameState.setFlag('BRIDGE_REFLECTION_NOTICE_PENDING',false);

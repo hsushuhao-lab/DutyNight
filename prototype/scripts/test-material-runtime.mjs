@@ -15,15 +15,14 @@ const zones = [
   'first_campus_8f', 'skybridge', 'second_campus_2f', 'second_campus_5f',
   'phantom_6f', 'b2_archive'
 ];
+const results=[];const errors=[];const started=Date.now();let page;
 try {
-  const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
-  const errors = [];
+  page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
   page.on('pageerror', error => errors.push(error.message));
   page.on('response', response => { if (response.status() >= 400) errors.push(`${response.status()} ${response.url()}`); });
   await page.goto(`${url}${url.includes('?') ? '&' : '?'}debug=1`);
   await page.waitForFunction(() => window.worldRouter?.activeZoneInstance && typeof window.__materialAudit === 'function');
-  await page.waitForFunction(() => window.__materialAudit().materials.some(item => item.materialName === 'hospital/wall' && item.hasMap), null, { timeout: 120000 });
-  const results = [];
+  await page.waitForFunction(() => window.__materialAudit().materials.some(item => item.materialName === 'hospital/wall' && item.hasMap), null, { timeout: publicUrl ? 300000 : 120000 });
   for (const zone of [...zones, 'first_campus_3f']) {
     await page.evaluate(zoneId => window.worldRouter.loadZone(zoneId), zone);
     await page.waitForFunction(zoneId => {
@@ -32,7 +31,7 @@ try {
       return audit.materials
         .filter(item => ['wall', 'wallDark', 'floor', 'floorTile', 'floorWood', 'doorWood', 'ceiling', 'handrail', 'terrainGrass', 'pathGravel'].includes(item.materialName.slice(9)))
         .every(item => item.hasMap && item.hasNormalMap && item.hasRoughnessMap && item.mapImageWidth > 0 && item.mapImageHeight > 0);
-    }, zone, { timeout: 120000 });
+    }, zone, { timeout: publicUrl ? 300000 : 120000 });
     const audit = await page.evaluate(() => window.__materialAudit());
     assert.equal(audit.zoneId, zone);
     assert(audit.texturedMeshCount > 0, `${zone}: no textured meshes`);
@@ -45,8 +44,13 @@ try {
   }
   assert.equal(errors.length, 0, JSON.stringify(errors));
   await mkdir(dirname(output), { recursive: true });
-  await writeFile(output, JSON.stringify({ verdict: 'PASS', results, errors }, null, 2));
+  await writeFile(output, JSON.stringify({ verdict: 'PASS', elapsedMs:Date.now()-started, results, errors }, null, 2));
   console.log(`MATERIAL RUNTIME PASS: ${results.length} zone visits`);
+} catch(error) {
+  await mkdir(dirname(output),{recursive:true});
+  const current=page?await page.evaluate(()=>window.__materialAudit?.()).catch(()=>null):null;
+  await writeFile(output,JSON.stringify({verdict:'FAIL',elapsedMs:Date.now()-started,results,current,errors:[...errors,error.message]},null,2));
+  throw error;
 } finally {
   await browser.close();
   if (server) await new Promise(resolve => server.httpServer.close(resolve));
