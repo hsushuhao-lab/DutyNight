@@ -6,7 +6,9 @@ import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const output=process.argv[2]||'qa-results/cinematic-travel-flows';
-const server=await preview({root:fileURLToPath(new URL('..',import.meta.url)),preview:{port:4173,strictPort:true}});
+const publicUrl=process.argv[3];
+const base=publicUrl||'http://localhost:4173/';
+const server=publicUrl?null:await preview({root:fileURLToPath(new URL('..',import.meta.url)),preview:{port:4173,strictPort:true}});
 const browser=await chromium.launch({channel:'chrome',headless:true});
 const report={sourceSha:process.env.GITHUB_SHA||'local-working-tree',verdict:'FAIL',flows:[],errors:[]};
 
@@ -14,7 +16,7 @@ async function startPage(zone){
   const page=await browser.newPage({viewport:{width:1440,height:900}});
   page.on('pageerror',error=>report.errors.push(error.message));
   page.on('response',response=>{if(response.status()>=400)report.errors.push(`${response.status()} ${response.url()}`);});
-  await page.goto('http://localhost:4173/?qa=story');
+  await page.goto(base+'?qa=story');
   await page.waitForFunction(()=>window.__storyQA?.worldRouter?.activeZoneInstance);
   await page.evaluate(zoneId=>{
     const qa=window.__storyQA;
@@ -85,7 +87,7 @@ try{
   report.finished=new Date().toISOString();
   await writeFile(`${output}/result.json`,JSON.stringify(report,null,2));
   await browser.close();
-  await new Promise(resolve=>server.httpServer.close(resolve));
+  if(server)await new Promise(resolve=>server.httpServer.close(resolve));
 }
 
 console.log(JSON.stringify(report));

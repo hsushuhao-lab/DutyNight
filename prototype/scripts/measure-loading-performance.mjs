@@ -18,13 +18,16 @@ const routes = [
 ];
 const rows = [];
 const errors = [];
+const builds = [];
 let activeSample = null;
+let activePage = null;
+let failureAudit = null;
 
 async function saveResults(verdict) {
   const fields = ['fromZone','toZone','coldOrWarm','sourcePreparationMs','essentialBytes','optionalBytes','elevatorAnimationMs','extraWaitMs','totalTransitionMs','transitionStart','essentialReady','zoneBuilt','transitionEnd','status'];
   await mkdir(dirname(output), { recursive: true });
   await writeFile(output, [fields.join(','), ...rows.map(row => fields.map(field => row[field] ?? '').join(','))].join('\n') + '\n');
-  await writeFile(output.replace(/\.csv$/, '.json'), JSON.stringify({ verdict: errors.length ? 'FAIL' : verdict, url, activeSample, rows, errors, browser: browser.version() }, null, 2));
+  await writeFile(output.replace(/\.csv$/, '.json'), JSON.stringify({ verdict: errors.length ? 'FAIL' : verdict, url, builds, activeSample, failureAudit, rows, errors, browser: browser.version() }, null, 2));
 }
 
 
@@ -98,6 +101,9 @@ try {
   for (const [fromZone, toZone] of routes) {
     const context = await browser.newContext({ viewport: { width: 1280, height: 720 } });
     const page = await context.newPage();
+    activePage = page;
+    page.on('requestfailed', request => errors.push(`${request.url()}: ${request.failure()?.errorText}`));
+    page.on('response', response => { if (response.status() >= 400) errors.push(`${response.status()} ${response.url()}`); });
     page.on('pageerror', error => errors.push(error.message));
     for (const coldOrWarm of ['cold', 'warm']) {
       activeSample = { fromZone, toZone, coldOrWarm, phase: 'boot' };
@@ -105,6 +111,12 @@ try {
       const bootStart = Date.now();
       await page.goto(`${url}${url.includes('?') ? '&' : '?'}qa=story`, { waitUntil: 'domcontentloaded', timeout: 120000 });
       await page.waitForFunction(() => window.__storyQA?.worldRouter?.activeZoneInstance, null, { timeout: 120000 });
+      const moduleUrl = await page.locator('script[type=module][src]').first().getAttribute('src');
+      const fingerprint = publicUrl ? await (await page.request.get(new URL('build-info.json', url).href, { headers: { 'Cache-Control': 'no-cache' } })).json() : null;
+      builds.push({ fromZone, toZone, coldOrWarm, moduleUrl, fingerprint });
+      if (process.env.GITHUB_SHA && publicUrl && fingerprint?.commit !== process.env.GITHUB_SHA)
+        throw new Error(`Public revision changed: expected ${process.env.GITHUB_SHA}, got ${fingerprint?.commit}`);
+      if (builds.some(build => build.moduleUrl !== moduleUrl)) throw new Error('Production module changed during loading audit');
       if (fromZone === 'first_campus_3f' && toZone === 'first_campus_4f') {
         rows.push({ fromZone: 'BOOT', toZone: 'first_campus_3f', coldOrWarm,
           essentialBytes: await page.evaluate(() => performance.getEntriesByType('resource').reduce((sum, item) => sum + (item.transferSize || 0), 0)),
@@ -120,6 +132,7 @@ try {
   if (errors.length) throw new Error(errors.join('\n'));
   console.log(`LOADING PERFORMANCE ${errors.length ? 'BASELINE FAIL' : 'PASS'}: ${rows.length} cold/warm route samples, ${errors.length} errors`);
 } catch (error) {
+  failureAudit = await activePage?.evaluate(() => window.__materialAudit?.()).catch(() => null);
   errors.push(`${JSON.stringify(activeSample)}: ${error.stack || error.message}`);
   await saveResults('FAIL');
   throw error;

@@ -19,7 +19,7 @@ try{
    await page.waitForFunction(()=>window.__storyQA?.worldRouter?.activeZoneInstance);
    await page.evaluate(route=>{
     const q=window.__storyQA;
-    for(const flag of ['STAFF_ACCESS_CARD','SECOND_CAMPUS_ACCESS','HIDDEN_SERVICE_DOOR_DISCOVERED','B_PANEL_KEY','M7_B2_OPEN'])q.setFlag(flag,true);
+    for(const flag of ['M6_FLOOR6_RESOLVED','STAFF_ACCESS_CARD','SECOND_CAMPUS_ACCESS','HIDDEN_SERVICE_DOOR_DISCOVERED','B_PANEL_KEY','M7_B2_OPEN'])q.setFlag(flag,true);
     for(const task of ['KEY_PICKUP','DUTY_LOG','E_HANDOFF'])q.task(task);
     q.load(route==='skybridge'?'first_campus_8f':route==='b2_archive'?'first_campus_1f':'first_campus_3f');
     if(route==='phantom_6f')q.setFlag('FLOOR6_AVAILABLE',true);

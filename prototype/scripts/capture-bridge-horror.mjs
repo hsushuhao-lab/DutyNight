@@ -6,12 +6,14 @@ import assert from 'node:assert/strict';
 
 const out = process.argv[2] || 'qa-results/bridge-horror';
 await mkdir(out, { recursive: true });
-const server = await preview({ root: fileURLToPath(new URL('..', import.meta.url)), preview: { port: 4173, strictPort: true } });
+const publicUrl=process.argv[3];
+const base=publicUrl||'http://localhost:4173/';
+const server = publicUrl?null:await preview({ root: fileURLToPath(new URL('..', import.meta.url)), preview: { port: 4173, strictPort: true } });
 const browser = await chromium.launch({ channel: 'chrome', headless: true });
 const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
 const report = {};
 try {
-  await page.goto('http://localhost:4173/?qa=story');
+  await page.goto(base+'?qa=story');
   await page.waitForFunction(() => !!window.__storyQA);
   await page.evaluate(() => window.__storyQA.prefetch({ zoneId: 'skybridge' }));
   for (const [name, returnTrip, looks] of [['outbound', false, 0], ['return-stage-1', true, 0], ['return-stage-2', true, 1], ['return-stage-3', true, 2]]) {
@@ -50,6 +52,6 @@ try {
 } finally {
   await writeFile(`${out}/result.json`, JSON.stringify(report, null, 2));
   await browser.close();
-  await new Promise(resolve => server.httpServer.close(resolve));
+  if(server)await new Promise(resolve => server.httpServer.close(resolve));
 }
 console.log(JSON.stringify(report));

@@ -36,9 +36,15 @@ try {
     if (await page.evaluate(() => window.worldRouter.activeZoneId) !== spawn.zoneId) {
       const target = new URL(url);
       target.searchParams.set('zone', spawn.zoneId);
+      target.searchParams.set('capture', '1');
       await page.goto(target.href);
       await page.waitForFunction(zone => window.worldRouter?.activeZoneId === zone, spawn.zoneId);
     }
+    await page.waitForFunction(() => {
+      const audit=window.__materialAudit();
+      const surfaces=audit.materials.filter(item=>['wall','wallDark','floor','floorTile','floorWood','doorWood','ceiling','handrail','terrainGrass','pathGravel'].includes(item.materialName.slice(9)));
+      return surfaces.length>0&&surfaces.every(item=>item.flatMeshCount===0&&item.pbrMeshCount===item.meshCount&&item.mapImageWidth>0);
+    },null,{timeout:300000});
     for (const [view, yawDelta, pitchDelta, fov] of [['entrance', 0, 0, 68], ['mid', .6, 0, 68], ['detail', 0, .12, 36], ['junction', -.55, .32, 68]]) {
       await page.evaluate(({ id, yawDelta, pitchDelta, fov }) => {
         const router = window.worldRouter;
