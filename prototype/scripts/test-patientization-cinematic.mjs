@@ -21,17 +21,6 @@ try{
     const scene=await page.evaluate(()=>({canvas:!!document.querySelector('.patientization-canvas'),meshes:window.__storyQA.uiManager.patientizationScene.scene.children.filter(o=>o.isMesh).map(o=>o.name),enabled:window.__storyQA.controller.enabled}));
     assert(scene.canvas&&scene.meshes.includes('409 patient wristband')&&scene.meshes.includes('Leather wrist restraint'));
     assert.equal(scene.enabled,false);
-    if(skip){
-      await page.waitForFunction(()=>document.getElementById('loop-stage-title')?.textContent==='MEMORY ANCHOR',null,{timeout:7000});
-      const rewind=await page.evaluate(()=>({
-        title:document.getElementById('loop-stage-title')?.textContent||'',
-        body:document.getElementById('loop-stage-body')?.textContent||''
-      }));
-      assert.equal(rewind.title,'MEMORY ANCHOR');
-      assert.match(rewind.body,/17:00[\s\S]*19:30/);
-      assert.match(rewind.body,/這些我已經記得/);
-      await page.locator('#btn-loop-skip').click();
-    }
     await page.waitForFunction(()=>!document.querySelector('#loop-cutscene').classList.contains('active'),null,{timeout:20000});
     await page.waitForTimeout(800);
     const after=await page.evaluate(()=>({
@@ -47,6 +36,12 @@ try{
       assert.deepEqual(after,{loop:1,zone:'first_campus_3f',time:'17:00',anchor:null,bed33Resolved:false,enabled:true,canvas:false});
     }else{
       assert.deepEqual(after,{loop:before+1,zone:'first_campus_4f',time:'19:30',anchor:'BED33',bed33Resolved:false,enabled:true,canvas:false});
+      const restoredCard=await page.evaluate(()=>({
+        title:document.querySelector('#loop-gameover-card strong')?.textContent||'',
+        detail:document.querySelector('#loop-gameover-card span')?.textContent||''
+      }));
+      assert.equal(restoredCard.title,'MEMORY ANCHOR RESTORED');
+      assert.match(restoredCard.detail,/19:30｜4F 第 33 床決策前/);
     }
     report.runs.push({skip,scene,after});
   }
