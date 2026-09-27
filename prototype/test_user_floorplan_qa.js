@@ -106,13 +106,18 @@ for(const [zoneId,prefix] of [['first_campus_4f','40'],['second_campus_5f','50']
   if(firstCampus4F){
     const legacyActions=new Set(['DUTY_ROOM_PREP','WARD_ROUND','INSOMNIA_403']);
     assert(!zone.interactables.some(o=>!o?.isObject3D&&legacyActions.has(o?.action)),'legacy 4F proximity actions must be removed');
-    const report=zone.interactables.find(o=>(o?.userData??o)?.id==='4F_NURSING_REPORT');
-    assert.equal(report,zone.zoneGroup.getObjectByName('FourF_NursingHandoverBoard'),'4F report must use the information board itself');
+    const reportBoard=zone.zoneGroup.getObjectByName('FourF_NursingHandoverBoard');
+    assert(reportBoard,'4F handover board must remain visible');
+    assert.equal(reportBoard.userData.interactable,false,'4F handover board is informational; opening the ward access door completes report');
+    assert(!zone.interactables.some(o=>(o?.userData??o)?.id==='4F_NURSING_REPORT'),'4F must not expose a second manual report hotspot');
+    assert(main.includes('function completeFirstCampus4FWardReport()'),'door-triggered 4F report helper missing');
     assert(zone.interactables.some(o=>o?.userData?.id==='408C_BED_PLAQUE'&&o?.userData?.action==='NORMAL_EVENT'),'408C task must live on the bed plaque');
     assert(zone.interactables.some(o=>o?.userData?.id==='4F_DUTY_COMPUTER'&&o?.userData?.action==='END_SHIFT'),'21:00 rest must live on the duty-room computer');
   }
 
   if(zoneId==='second_campus_5f'){
+    assert.equal(zone.secondCampusNursingReport?.interactable,false,'5F separate nursing-report hotspot must stay disabled');
+    assert(main.includes('function completeSecondCampus5FWardReport()'),'door-triggered 5F report helper missing');
     assert(zone.roomAreas.some(r=>r.id==='SECOND_DUTY'&&r.label==='值班室'));
     assert.equal(zone.keyedDoors.second_duty_room?.closed,false);
     assert.equal(zone.keyedDoors.second_duty_room?.keepOpen,true);
