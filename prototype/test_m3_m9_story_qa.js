@@ -32,8 +32,8 @@ assert(main.includes("setTrueNameFragment('frag_employeeFull','MED-870409')"),'M
 assert(main.includes("setFlag('SECOND_CAMPUS_OBJECTIVE_ACTIVE',true)"),'M3 lookup must activate the second-campus objective');
 assert(main.includes('八樓天橋的門禁權限已開放'),'second-campus call must identify the bridge floor');
 assert(main.includes('怎麼知道我在 316 辦公室'),'M3 phone must establish the 316 privacy violation');
-assert(html.includes('final-employee-id'),'M9 must collect the full 員編');
-assert(main.includes("name!==TRUE_NAME_CANON||employeeId!=='MED-870409'"),'M9 must require both the exact canonical name and employee ID');
+assert(html.includes('final-employee-id'),'M9 must collect the four-digit employee suffix');
+assert(main.includes("name!==TRUE_NAME_CANON||employeeId!=='0409'"),'M9 must require both the exact canonical name and employee ID');
 assert(!readFileSync('./src/ui/UIManager.js','utf8').includes('突然出現在樓層選單裡的「6F」'),'M6 task must not spoil the floor');
 assert(!readFileSync('./src/world/WorldRouter.js','utf8').includes("label:'6F'"),'phantom 6F must never be a selectable floor');
 
@@ -71,7 +71,7 @@ assert(router.includes("'b2_archive': B2Archive")&&routes.includes("b2_archive_e
 assert(main.includes("M7_B2_RESOLVED")&&main.includes("02:17｜警衛台後方 B-Panel"),'M7 02:17/B2 logic missing');
 
 assert(main.includes("M8_IDENTITY_BATTLE_ACTIVE")&&main.includes("LAST_CALL_SEEN"),'M8 identity battle/last call missing');
-assert(main.includes("有人嘗試覆寫模板已在 316 登入｜請宣告真正姓名與員編｜最後一次機會"),'M9 overwrite warning must not reveal Li Chengli');
+assert(main.includes("有人嘗試覆寫模板已在 316 登入｜請輸入真正員編末四碼｜最後一次機會"),'M9 overwrite warning must not reveal Li Chengli');
 assert(!main.includes("李承禮 MED-820316 覆寫模板已在 316 登入"),'M9 must not explicitly identify the overwrite actor before the final declaration');
 assert(html.includes('final-handoff-modal')&&main.includes("TRUE_NAME_CANON")&&main.includes("GAME_COMPLETE"),'M9 true-name final handoff missing');
 

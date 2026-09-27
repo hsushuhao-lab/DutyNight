@@ -53,7 +53,7 @@ assert(main.includes("B2_EXITED_PERMANENTLY"),'B2 one-way exit lockout missing')
 assert(main.includes("M7_IDENTITY_RESOLVED_AT_316"),'B2 fail-forward must allow direct identity declaration at 316');
 assert(main.includes("getDeferred316IdentityHints"),'316 advisory evidence hints missing');
 assert(main.includes("尚未完成身分驗證。離開後 B2 將永久鎖閉，確定離開？"),'unresolved B2 exit must require irreversible confirmation');
-assert(main.includes("有人嘗試覆寫模板已在 316 登入｜請宣告真正姓名與員編｜最後一次機會"),'final 316 warning must stay anonymous and explicit');
+assert(main.includes("有人嘗試覆寫模板已在 316 登入｜請輸入真正員編末四碼｜最後一次機會"),'final 316 warning must stay anonymous and explicit');
 assert(!main.includes("trueNameResolved&&persistentMemory.hasAllProofs()"),'final 316 identity declaration must not hard-block on the full proof bundle');
 assert(!ui.includes('沿 B2 逃生梯返回'),'B2 task board must not tell the player to use a removed staircase');
 assert(!ui.includes('沿逃生梯離開封存層'),'B2 completion task must use the one-way door, not a staircase');

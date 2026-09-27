@@ -14,7 +14,7 @@ const requestedOpeningZone = new URLSearchParams(location.search).get('zone');
 const openingZoneId = zoneAssetManifest[requestedOpeningZone] ? requestedOpeningZone : 'first_campus_3f';
 const openingAssets = zoneAssetManifest[openingZoneId].essential;
 await preloadAssetNames(openingAssets.models);
-await preloadMaterialSurfaces(openingAssets.surfaces);
+void preloadMaterialSurfaces(openingAssets.surfaces).catch(error => console.warn('[art] opening material surface preload failed', error));
 const prefetchDestinationAssets = async destination => {
   const zoneId=destination?.zoneId;
   await preloadZoneEssential(zoneId);
@@ -749,24 +749,16 @@ controller.onInteract = async (interactable) => {
     uiManager.showSubtitle('值班醫師','「這個電腦是護理師專用，請醫師用醫師診療室專用電腦。」',3600);
   } else if (interactable.type === 'archive_document') {
     controller.enabled = false;
-    uiManager.openArchiveDocument({title:interactable.documentTitle,pages:interactable.pages,onComplete:interactable.id==='ARCHIVE_PERSONNEL_4_PLUS_3'?()=>{
+    uiManager.openArchiveDocument({title:interactable.documentTitle,pages:interactable.pages,onComplete:interactable.id==='ARCHIVE_PERSONNEL_1998'?()=>{
       gameState.setFlag('HISTORY_PERSONNEL_PROFILES_REVIEWED',true);
       gameState.setFlag('ARCHIVE_PERSONNEL_OBJECTIVE',false);
-      gameState.setFlag('M8_IDENTITY_BATTLE_ACTIVE',true);
+      if(gameState.getFlag('B2_EXITED_PERMANENTLY'))gameState.setFlag('M8_IDENTITY_BATTLE_ACTIVE',true);
       persistentMemory.addJournalNote('ARCHIVE_PERSONNEL_REVIEWED','完成 4+3 夜班核心人員檔案核對。員編、職務與門禁資料支持返回 316 進行最終交班驗證。');
       uiManager.updateTasks();
     }:null});
     gameState.addEvidence(1);
     if(interactable.id?.startsWith('ADMIN_'))gameState.setFlag('B2_ADMIN_SOURCE',true);
     if(interactable.id?.startsWith('ARCHIVE_'))gameState.setFlag('B2_HISTORY_SOURCE',true);
-    if(interactable.id==='ARCHIVE_PERSONNEL_1998'&&!gameState.getFlag('HISTORY_PERSONNEL_PROFILES_REVIEWED')){
-      gameState.setFlag('HISTORY_PERSONNEL_PROFILES_REVIEWED',true);
-      persistentMemory.addJournalNote(
-        'HISTORY_PERSONNEL_PROFILES',
-        '3F 文史室的 1998 夜班核心人員名錄記下四位醫師與三位院內關係人；每個人都有不同的工作習慣、語氣與物件線索。'
-      );
-      uiManager.updateTasks();
-    }
     if(interactable.id==='ARCHIVE_UNINDEXED_HANDOFF'&&gameState.getFlag('ARCHIVE_OBJECTIVE')){
       gameState.markTaskComplete('ARCHIVE_CLUE_FOUND');
       gameState.setFlag('ARCHIVE_CLUE_FOUND',true);

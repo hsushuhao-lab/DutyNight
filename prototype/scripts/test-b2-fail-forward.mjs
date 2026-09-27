@@ -80,8 +80,8 @@ try {
   assert.equal(blockedAt316, false);
   report.checkpoints.push({ id: '316_BLOCKED_BEFORE_HISTORY', finalModalActive: blockedAt316 });
 
-  await page.evaluate(() => window.__storyQA.interact({ id: 'ARCHIVE_PERSONNEL_4_PLUS_3' }));
-  for (let index = 0; index < 6; index += 1) await page.locator('#btn-archive-next').click();
+  await page.evaluate(() => window.__storyQA.interact({ id: 'ARCHIVE_PERSONNEL_1998' }));
+  while (await page.locator('#btn-archive-next').isEnabled()) await page.locator('#btn-archive-next').click();
   await page.locator('#btn-close-archive').click();
   const history = await page.evaluate(() => ({
     reviewed: window.__storyQA.gameState.getFlag('HISTORY_PERSONNEL_PROFILES_REVIEWED'),
