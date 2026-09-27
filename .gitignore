@@ -3,6 +3,8 @@ node_modules/
 dist/
 .vite/
 *.log
+
+# Generated QA evidence belongs in Actions artifacts, not branch heads.
 prototype/qa-results/
 
 # Local reproducible visual QA working files
