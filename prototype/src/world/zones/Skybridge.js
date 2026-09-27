@@ -325,10 +325,30 @@ export class Skybridge {
     soundManager.playDoorLockClack();
     this.bridgeAnomalyLight.intensity=Math.min(.35*this.lookbackCount,1.05);
     this.bridgeDoppelganger.position.x=Math.max(31,46-5*this.lookbackCount);
+
+    // Choosing "忍住，不要回頭" only survives the scripted reflection moment.
+    // The player must still physically keep facing forward until leaving the bridge.
+    // A deliberate sustained manual lookback after the safe choice is an immediate
+    // violation of the legend and triggers 409 Patientization on the first turn.
+    const manualRuleActive=
+      gameState.getFlag('BRIDGE_NO_LOOKBACK_RULE_ACTIVE') &&
+      gameState.getFlag('M5_BRIDGE_RESOLVED');
+    if(manualRuleActive){
+      gameState.setFlag('BRIDGE_MANUAL_LOOKBACK_AFTER_SAFE_CHOICE',true);
+      gameState.setFlag('BRIDGE_OVERRIDE_PENDING',true);
+      return;
+    }
+
     if(this.lookbackCount>=3)gameState.setFlag('BRIDGE_OVERRIDE_PENDING',true);
   }
 
+  armManualNoLookbackRule(){
+    this.lookbackArmed=true;
+    this.lookbackTimer=0;
+  }
+
   cleanup() {
+    gameState.setFlag('BRIDGE_NO_LOOKBACK_RULE_ACTIVE',false);
     if (this.zoneGroup) {
       this.scene.remove(this.zoneGroup);
       this.scene.fog=null;
