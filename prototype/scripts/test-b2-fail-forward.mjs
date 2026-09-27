@@ -31,9 +31,25 @@ try {
     qa.load('b2_archive', 'b2_archive_entry');
     qa.interact({ type: 'b2_archive_terminal' });
   });
+  await page.waitForFunction(()=>document.getElementById('b2-fire-recap')?.classList.contains('active'),null,{timeout:30000});
+  for(let i=0;i<6;i++){
+    await page.waitForTimeout(360);
+    await page.keyboard.press('E');
+  }
+  await page.waitForFunction(()=>window.__storyQA.gameState.getFlag('B2_FIRE_RECAP_SEEN')===true,null,{timeout:30000});
+  const recap=await page.evaluate(()=>({
+    seen:window.__storyQA.gameState.getFlag('B2_FIRE_RECAP_SEEN'),
+    overwrite:window.__storyQA.gameState.getFlag('RECORD_OVERWRITE_ACTIVE'),
+    battle:window.__storyQA.gameState.getFlag('M8_IDENTITY_BATTLE_ACTIVE')
+  }));
+  assert.deepEqual(recap,{seen:true,overwrite:true,battle:true});
+  report.checkpoints.push({id:'B2_FIRE_RECAP_CONVERGENCE',...recap});
+
+  await page.evaluate(() => window.__storyQA.interact({ type: 'b2_archive_terminal' }));
+  await page.waitForFunction(()=>document.getElementById('identity-matrix-modal')?.classList.contains('active'),null,{timeout:30000});
   await page.locator('#identity-candidate-LI_CHENGLI').click();
   const firstAttempt = await page.evaluate(() => ({
-    used: window.__storyQA.persistentMemory.data.b2IdentityAttemptUsed,
+    used: window.__storyQA.gameState.getFlag('B2_IDENTITY_ATTEMPT_USED'),
     resolved: window.__storyQA.gameState.getFlag('M7_B2_RESOLVED'),
     disabled: [...document.querySelectorAll('#identity-candidate-grid button')].every(button => button.disabled),
     status: document.querySelector('#identity-matrix-status')?.textContent || ''
@@ -48,7 +64,7 @@ try {
   await page.waitForTimeout(100);
   const retry = await page.evaluate(() => ({
     modalActive: document.querySelector('#identity-matrix-modal')?.classList.contains('active'),
-    used: window.__storyQA.persistentMemory.data.b2IdentityAttemptUsed,
+    used: window.__storyQA.gameState.getFlag('B2_IDENTITY_ATTEMPT_USED'),
     subtitle: document.querySelector('#subtitle-text')?.textContent || document.body.textContent || ''
   }));
   assert.equal(retry.used, true);
@@ -58,7 +74,6 @@ try {
 
   await page.evaluate(() => window.__storyQA.captureView({position:[0,1.65,-1.5],target:[0,1.2,2],anchorName:'B2_OneWayExitDoor'}));
   await page.evaluate(() => window.__storyQA.interact({ type: 'b2_exit_door' }));
-  await page.locator('#btn-story-primary').click();
   await page.waitForFunction(() => window.__storyQA.gameState.getFlag('CG_B2_PERMANENT_CLOSURE_ACTIVE'));
   await page.waitForTimeout(650);
   assert.equal(await page.evaluate(() => !!window.__storyQA.gameState.getFlag('CG_B2_PERMANENT_CLOSURE_ACTIVE')),true);
@@ -66,37 +81,23 @@ try {
   await page.waitForFunction(() => window.__storyQA.worldRouter.activeZoneId === 'first_campus_3f', null, { timeout: 15000 });
   const afterExit = await page.evaluate(() => window.__storyQA.snapshot());
   assert.equal(afterExit.flags.B2_EXITED_PERMANENTLY, true);
-  assert.equal(afterExit.flags.B2_HISTORY_FALLBACK_ACTIVE, true);
-  assert.equal(afterExit.flags.ARCHIVE_PERSONNEL_OBJECTIVE, true);
+  assert.equal(afterExit.flags.B2_HISTORY_FALLBACK_ACTIVE, false);
+  assert.equal(afterExit.flags.ARCHIVE_PERSONNEL_OBJECTIVE, false);
+  assert.equal(afterExit.flags.M8_IDENTITY_BATTLE_ACTIVE, true);
+  assert.equal(afterExit.flags.RECORD_OVERWRITE_ACTIVE, true);
   assert.equal(afterExit.flags.HIDDEN_SERVICE_DOOR_DISCOVERED, false);
   assert.equal(afterExit.flags.M7_B2_OPEN, false);
-  report.checkpoints.push({ id: 'PERMANENT_EXIT_TO_HISTORY', zone: afterExit.zone, flags: {
+  report.checkpoints.push({ id: 'PERMANENT_EXIT_DIRECT_TO_316', zone: afterExit.zone, flags: {
     B2_EXITED_PERMANENTLY: afterExit.flags.B2_EXITED_PERMANENTLY,
     B2_HISTORY_FALLBACK_ACTIVE: afterExit.flags.B2_HISTORY_FALLBACK_ACTIVE,
-    ARCHIVE_PERSONNEL_OBJECTIVE: afterExit.flags.ARCHIVE_PERSONNEL_OBJECTIVE,
+    M8_IDENTITY_BATTLE_ACTIVE: afterExit.flags.M8_IDENTITY_BATTLE_ACTIVE,
+    RECORD_OVERWRITE_ACTIVE: afterExit.flags.RECORD_OVERWRITE_ACTIVE,
     HIDDEN_SERVICE_DOOR_DISCOVERED: afterExit.flags.HIDDEN_SERVICE_DOOR_DISCOVERED,
     M7_B2_OPEN: afterExit.flags.M7_B2_OPEN
   }});
 
-  await page.evaluate(() => {
-    const qa = window.__storyQA;
-    qa.load('first_campus_3f', 'first_3f_316');
-    qa.interact({ type: 'workstation' });
-  });
-  const blockedAt316 = await page.evaluate(() => document.querySelector('#final-handoff-modal')?.classList.contains('active'));
-  assert.equal(blockedAt316, false);
-  report.checkpoints.push({ id: '316_BLOCKED_BEFORE_HISTORY', finalModalActive: blockedAt316 });
-
-  await page.evaluate(() => window.__storyQA.interact({ id: 'ARCHIVE_PERSONNEL_1998' }));
-  while (await page.locator('#btn-archive-next').isEnabled()) await page.locator('#btn-archive-next').click();
-  await page.locator('#btn-close-archive').click();
-  const history = await page.evaluate(() => ({
-    reviewed: window.__storyQA.gameState.getFlag('HISTORY_PERSONNEL_PROFILES_REVIEWED'),
-    battle: window.__storyQA.gameState.getFlag('M8_IDENTITY_BATTLE_ACTIVE')
-  }));
-  assert.deepEqual(history, { reviewed: true, battle: true });
-  report.checkpoints.push({ id: 'HISTORY_REQUIRED_AND_REVIEWED', ...history });
-
+  // Even with a failed B2 identity attempt, the completed fire recap unlocks
+  // the 316 final-authorization sequence. History review is optional.
   await page.evaluate(() => {
     const q=window.__storyQA;
     const screen=q.worldRouter.activeZoneInstance.zoneGroup.getObjectByName('DutyTerminal_316_LegacyScreen');
