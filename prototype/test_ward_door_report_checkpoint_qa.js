@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
+import {FPSController} from './src/player/FPSController.js';
 
 const main=readFileSync('./src/main.js','utf8');
 const ward=readFileSync('./src/world/shared/WardFloorplan.js','utf8');
@@ -30,5 +31,21 @@ assert(floor3.includes("guardPatrolPoint={id:'3F_GUARD_PATROL_POINT',position:[1
 // Raycast selection must skip a disabled front hit instead of masking the active 21:17 hotspot.
 assert(fpsController.includes('for (const hit of hits)'),'raycast must scan all geometric hits for the first active interactable');
 assert(!fpsController.includes('let cur = hits[0].object;'),'inactive nearest hit must not mask an overlapping active interaction');
+
+// Behavioral regression: the retired 17:00 sensor is geometrically first, while
+// the 21:17 sensor at the same board position is active. The active one must win.
+const retiredSensor={isObject3D:true,userData:{interactable:false,id:'316_SPARE_KEY'},parent:null};
+const patrol2117Sensor={isObject3D:true,userData:{interactable:true,id:'GUARD_SIGN_2117'},parent:null};
+const controller=Object.create(FPSController.prototype);
+controller.camera={};
+controller.interactables=[retiredSensor,patrol2117Sensor];
+controller.raycaster={
+  setFromCamera(){},
+  intersectObjects(){return [{object:retiredSensor},{object:patrol2117Sensor}];}
+};
+controller.currentInteractable=null;
+controller.onHoverChange=()=>{};
+controller.updateRaycast();
+assert.equal(controller.currentInteractable,patrol2117Sensor.userData,'21:17 patrol interaction must remain reachable behind the inactive 17:00 sensor');
 
 console.log('WARD DOOR REPORT / 3F CHECKPOINT ALIGNMENT QA PASS');
