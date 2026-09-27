@@ -16,8 +16,8 @@ for(const token of [
 ]) assert(director.includes(token),'B2 fire recap missing beat: '+token);
 
 assert(main.includes("import { B2FireRecapDirector } from './story/B2FireRecapDirector.js';"),'B2 fire recap director integration missing');
-assert(main.includes("if(!gameState.getFlag('B2_FIRE_RECAP_SEEN'))"),'first B2 terminal contact must route into the recap');
-assert(main.includes('playB2FireRecap()'),'B2 terminal must launch fire recap');
+assert(main.includes("onAttemptComplete:()=>playB2FireRecap()"),'B2 identity success or failure must converge into the fire recap');
+assert(main.includes("if(gameState.getFlag('M7_B2_RESOLVED')||gameState.getFlag('B2_IDENTITY_ATTEMPT_USED'))")&&main.includes('playB2FireRecap()'),'already-completed or already-consumed B2 terminal state must also launch the recap');
 assert(main.includes("gameState.setFlag('B2_TERMINAL_CONTACTED',true)"),'B2 terminal contact flag missing');
 assert(main.includes("gameState.setFlag('B2_FIRE_RECAP_SEEN',true)"),'B2 recap completion flag missing');
 assert(main.includes("gameState.setFlag('RECORD_OVERWRITE_ACTIVE',true)"),'B2 recap must activate overwrite pressure');
