@@ -54,6 +54,7 @@ jobs:
           node test_bed33_gold_slice_qa.js
           node test_m3_m9_story_qa.js
           node test_b2_attempt_scope_qa.js
+          node test_b2_fire_recap_gate_qa.js
           node test_final_patientization_choice_qa.js
           node test_final_success_recap_qa.js
           node test_release_perf_b2_loop2_qa.js

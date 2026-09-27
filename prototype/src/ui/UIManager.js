@@ -764,7 +764,7 @@ export class UIManager {
     this.memoryModal?.classList.remove('active');const cb=this.memoryCloseHandler;this.memoryCloseHandler=null;this.memorySequence=null;cb?.();if(resume)this.onTerminalClose?.();
   }
 
-  openIdentityMatrix({candidates=[],onSelect}={}){
+  openIdentityMatrix({candidates=[],onSelect,onAttemptComplete=null}={}){
     document.exitPointerLock();this.identityMatrixHandler=onSelect;let attemptUsed=false;
     const grid=document.getElementById('identity-candidate-grid');grid.replaceChildren();
     for(const candidate of candidates){
@@ -776,7 +776,22 @@ export class UIManager {
       cue.textContent=profile?`人物記憶：「${profile.signatureQuote}」｜${profile.hobby}`:'';
       cue.style.display='block';cue.style.marginTop='4px';cue.style.opacity='.78';
       button.append(strong,meta,cue);
-      button.addEventListener('click',()=>{if(attemptUsed)return;attemptUsed=true;grid.querySelectorAll('button').forEach(item=>item.disabled=true);soundManager.playComputerBeep();const result=this.identityMatrixHandler?.(candidate)||{};this.setIdentityMatrixStatus(result.message||'',result.resolved?'match':'error');if(result.resolved)setTimeout(()=>this.closeIdentityMatrix(),1500);});
+      button.addEventListener('click',()=>{
+        if(attemptUsed)return;
+        attemptUsed=true;
+        grid.querySelectorAll('button').forEach(item=>item.disabled=true);
+        soundManager.playComputerBeep();
+        const result=this.identityMatrixHandler?.(candidate)||{};
+        this.setIdentityMatrixStatus(result.message||'',result.resolved?'match':'error');
+        if(onAttemptComplete){
+          setTimeout(()=>{
+            this.closeIdentityMatrix(false);
+            onAttemptComplete(result,candidate);
+          },result.resolved?1500:1900);
+        }else if(result.resolved){
+          setTimeout(()=>this.closeIdentityMatrix(),1500);
+        }
+      });
       grid.appendChild(button);
     }
     this.setIdentityMatrixStatus('等待候選身分比對。','');this.identityMatrixModal?.classList.add('active');
@@ -1185,22 +1200,21 @@ export class UIManager {
         this.renderTaskBoard('翌日 02:00｜返回第一院區',[
           {id:'task-m6-elevator',text:currentZone==='phantom_6f'?(this.gameState.getFlag('FLOOR6_STETHOSCOPE_FOUND')?'檢視反光的老舊聽診器，翻面或擦去刻字上的灰塵':'查看焦黑器材旁反光的物件'):'搭乘一般電梯返回第一院區',state:'ready'}
         ]);
-      }else if(this.gameState.getFlag('B2_EXITED_PERMANENTLY')&&!this.gameState.getFlag('M7_B2_RESOLVED')){
-        const reviewed=this.gameState.getFlag('HISTORY_PERSONNEL_PROFILES_REVIEWED');
-        this.renderTaskBoard(reviewed?'身份檔案核對完成｜返回 316':'B2 身分驗證失敗｜文史資料室',[
-          {id:'task-m7-deferred-316',text:reviewed?'返回 316，輸入員編末四碼阻止紀錄覆寫':'前往第一院區 3F 文史資料室，查閱1998 夜班核心人員名錄',state:'ready'}
+      }else if(this.gameState.getFlag('B2_EXITED_PERMANENTLY')&&this.gameState.getFlag('B2_FIRE_RECAP_SEEN')&&this.gameState.getFlag('M8_IDENTITY_BATTLE_ACTIVE')){
+        this.renderTaskBoard('RECORD OVERWRITE｜紀錄覆寫中',[
+          {id:'task-m9-final-handoff',text:'立即返回 316，輸入正確權限阻止事故與身分紀錄被再次覆蓋',state:'ready'}
         ]);
       }else if(this.gameState.getFlag('M6_FLOOR6_RESOLVED')&&!this.gameState.getFlag('M7_B2_OPEN')&&!this.gameState.getFlag('M7_B2_RESOLVED')){
         this.renderTaskBoard('翌日 02:17 前｜門禁紀錄',[
           {id:'task-m7-service-door',text:this.gameState.getFlag('HIDDEN_SERVICE_DOOR_DISCOVERED')?'檢查警衛台後方浮現的舊門框':'02:17 前往第一院區 1F 警衛台，查找異常門禁與監視紀錄',state:'ready'}
         ]);
-      }else if(this.gameState.getFlag('M7_B2_OPEN')&&!this.gameState.getFlag('M7_B2_RESOLVED')){
-        this.renderTaskBoard('翌日 02:17｜B2',[
-          {id:'task-m7-b2-terminal',text:this.gameState.getFlag('B2_IDENTITY_ATTEMPT_USED')?'唯一一次身分建立嘗試已用盡；由單向出口離開 B2':'查閱來源後，只能進行一次封存身分建立嘗試',state:'ready'}
+      }else if(this.gameState.getFlag('M7_B2_OPEN')&&!this.gameState.getFlag('B2_FIRE_RECAP_SEEN')){
+        this.renderTaskBoard('翌日 02:17｜B2 封存終端',[
+          {id:'task-m7-b2-fire-recap',text:'啟動封存驗證終端，讀取當年火災與人員封存紀錄',state:'ready'}
         ]);
-      }else if(this.gameState.getFlag('M7_B2_RESOLVED')&&!this.gameState.getFlag('LAST_CALL_SEEN')){
-        this.renderTaskBoard('B2｜身分驗證完成',[
-          {id:'task-m8-b2-exit',text:'由封存防火門返回 3F',state:'ready'}
+      }else if(this.gameState.getFlag('M7_B2_OPEN')&&this.gameState.getFlag('B2_FIRE_RECAP_SEEN')){
+        this.renderTaskBoard('B2｜UNKNOWN SESSION 正在覆寫',[
+          {id:'task-m8-b2-exit',text:'由單向封存防火門返回 3F；前往 316 阻止紀錄覆寫',state:'ready'}
         ]);
       }else if(this.gameState.getFlag('M8_IDENTITY_BATTLE_ACTIVE')&&!this.gameState.getFlag('GAME_COMPLETE')){
         this.renderTaskBoard('RECORD OVERWRITE｜紀錄覆寫中',[

@@ -40,7 +40,7 @@ assert(!main.includes('persistentMemory.data.b2IdentityAttemptUsed'),'B2 attempt
 assert(main.includes("gameState.setFlag('B2_IDENTITY_ATTEMPT_USED',false)"),'opening B2 must explicitly arm the attempt for this run');
 assert(main.includes("gameState.setFlag('B2_IDENTITY_ATTEMPT_USED',true)"),'selecting a B2 identity candidate must consume this run attempt');
 assert(main.includes("if(gameState.getFlag('B2_IDENTITY_ATTEMPT_USED'))"),'B2 terminal must guard against a second attempt in the same run');
-assert(ui.includes("this.gameState.getFlag('B2_IDENTITY_ATTEMPT_USED')?'唯一一次身分建立嘗試已用盡"),'B2 task board must use transient state');
+assert(ui.includes("this.gameState.getFlag('B2_FIRE_RECAP_SEEN')"),'B2 task board must now prioritize the fire-recap gate while identity attempt state remains transient in main');
 assert(memorySource.includes('delete data.b2IdentityAttemptUsed'),'legacy localStorage lock migration missing');
 
 console.log('B2 ATTEMPT SESSION-SCOPE QA PASS');
