@@ -62,6 +62,7 @@ import { CinematicDirector } from './story/CinematicDirector.js';
 import { ActPresentationDirector } from './story/ActPresentationDirector.js';
 import { FinalPatientizationDirector } from './story/FinalPatientizationDirector.js';
 import { FinalSuccessDirector } from './story/FinalSuccessDirector.js';
+import { B2FireRecapDirector } from './story/B2FireRecapDirector.js';
 
 // Setup Three.js Scene & Renderer
 const container = document.getElementById('canvas-container');
@@ -158,6 +159,10 @@ const finalPatientizationDirector=new FinalPatientizationDirector({
 });
 
 const finalSuccessDirector=new FinalSuccessDirector({
+  soundManager
+});
+
+const b2FireRecapDirector=new B2FireRecapDirector({
   soundManager
 });
 
@@ -339,6 +344,45 @@ function establishCanonicalIdentity({at316=false}={}) {
   return persistentMemory.data.trueNameResolved===true;
 }
 
+function activateB2OverwriteRoute(){
+  gameState.setFlag('B2_TERMINAL_CONTACTED',true);
+  gameState.setFlag('B2_FIRE_RECAP_SEEN',true);
+  gameState.setFlag('RECORD_OVERWRITE_ACTIVE',true);
+  gameState.setFlag('M8_IDENTITY_BATTLE_ACTIVE',true);
+  gameState.setFlag('M8_CODE_BLACK_ANNOUNCED',true);
+  gameState.setFlag('LAST_CALL_SEEN',true);
+  gameState.setFlag('B2_HISTORY_FALLBACK_ACTIVE',false);
+  gameState.setFlag('ARCHIVE_PERSONNEL_OBJECTIVE',false);
+  persistentMemory.resolveLegend('lastCall');
+  persistentMemory.addJournalNote(
+    'B2_FIRE_RECAP',
+    'B2 封存終端重播 1998 火災：02:17 的錯誤程序使防火門與備援排煙失常；八名罹難者的最後位置重新對上。回放結束時，一個 UNKNOWN SESSION 正在再次覆寫這些紀錄。必須返回 316，以正確權限阻止覆寫。'
+  );
+  uiManager.updateTasks();
+}
+
+function playB2FireRecap(){
+  if(gameState.getFlag('B2_FIRE_RECAP_SEEN'))return false;
+  gameState.setFlag('B2_TERMINAL_CONTACTED',true);
+  controller.enabled=false;
+  void b2FireRecapDirector.play({
+    onComplete:()=>{
+      activateB2OverwriteRoute();
+      uiManager.showSubtitle(
+        '封存終端',
+        '「UNKNOWN SESSION：紀錄覆寫進行中。有人正在把火災與人員資料再次塗掉。快離開 B2，回到 316，用正確權限阻止這一切。」',
+        7200
+      );
+      controller.enabled=true;
+    }
+  }).catch(error=>{
+    console.error('[cinematic] B2 fire recap failed',error);
+    activateB2OverwriteRoute();
+    controller.enabled=true;
+  });
+  return true;
+}
+
 function restartFreshExperience(){
   persistentMemory.reset();
   try{
@@ -353,7 +397,10 @@ function restartFreshExperience(){
 }
 
 function completeFinalIdentityAt316(name,employeeId,{deferred=false}={}) {
-  const sourceVerified=gameState.getFlag('M7_B2_RESOLVED')||gameState.getFlag('HISTORY_PERSONNEL_PROFILES_REVIEWED');
+  const sourceVerified=
+    gameState.getFlag('B2_FIRE_RECAP_SEEN') ||
+    gameState.getFlag('M7_B2_RESOLVED') ||
+    gameState.getFlag('HISTORY_PERSONNEL_PROFILES_REVIEWED');
   if(name!==TRUE_NAME_CANON||employeeId!=='0409'||!sourceVerified)return false;
   establishCanonicalIdentity({at316:deferred});
   gameState.setFlag('LAST_CALL_SEEN',true);
@@ -971,11 +1018,7 @@ controller.onInteract = async (interactable) => {
     soundManager.startPhoneRing();
     uiManager.showSubtitle('316 舊資料終端','「1998-ER-0217｜病人：劉志遠／ENG-860214｜責任醫師：張○○｜員編前綴：MED-87。」\n\n終端機停止後，桌上的院內電話立刻響起。',5200);
   } else if (interactable.type === 'workstation') {
-    if(gameState.getFlag('B2_EXITED_PERMANENTLY')&&!gameState.getFlag('M7_B2_RESOLVED')&&worldRouter.activeZoneId==='first_campus_3f'&&!gameState.getFlag('HISTORY_PERSONNEL_PROFILES_REVIEWED')){
-      uiManager.showSubtitle('316 舊終端','「身分檔案尚未完成來源核對。先去三樓文史資料室查閱夜班核心人員檔案。」',4000);
-      return;
-    }
-    if(gameState.getFlag('M8_IDENTITY_BATTLE_ACTIVE')&&worldRouter.activeZoneId==='first_campus_3f'){
+    if(gameState.getFlag('M8_IDENTITY_BATTLE_ACTIVE')&&gameState.getFlag('B2_FIRE_RECAP_SEEN')&&worldRouter.activeZoneId==='first_campus_3f'){
       revealFinal316Handoff({deferred:gameState.getFlag('B2_HISTORY_FALLBACK_ACTIVE')});
       return;
     }
@@ -1140,6 +1183,12 @@ controller.onInteract = async (interactable) => {
       }
     });
   } else if (interactable.type === 'b2_archive_terminal') {
+    // First contact with the B2 terminal always plays the historical fire recap,
+    // regardless of whether identity reconstruction will later succeed or fail.
+    if(!gameState.getFlag('B2_FIRE_RECAP_SEEN')){
+      playB2FireRecap();
+      return;
+    }
     if(gameState.getFlag('M7_B2_RESOLVED')){
       uiManager.showSubtitle('封存終端','IDENTITY RECONSTRUCTED：'+TRUE_NAME_CANON+'｜MED-870409｜第一線住院醫師',3600);
       return;
@@ -1185,39 +1234,55 @@ controller.onInteract = async (interactable) => {
       );
     }
   } else if (interactable.type === 'b2_exit_door') {
+    if(!gameState.getFlag('B2_FIRE_RECAP_SEEN')){
+      soundManager.playDoorLockClack();
+      uiManager.showSubtitle(
+        '值班醫師',
+        '「先啟動 B2 封存終端。這扇單向門一旦關上，就沒有機會再回來看火災紀錄。」',
+        4200
+      );
+      return;
+    }
+
     const resolved=gameState.getFlag('M7_B2_RESOLVED')===true;
     const leaveB2=()=>{
       gameState.setFlag('B2_EXITED_PERMANENTLY',true);
       gameState.setFlag('M7_B2_OPEN',false);
       gameState.setFlag('HIDDEN_SERVICE_DOOR_DISCOVERED',false);
       gameState.setFlag('SECURITY_RECORD_OBJECTIVE',false);
+      gameState.setFlag('RECORD_OVERWRITE_ACTIVE',true);
+      gameState.setFlag('M8_IDENTITY_BATTLE_ACTIVE',true);
+      gameState.setFlag('LAST_CALL_SEEN',true);
       controller.enabled=false;
       worldRouter.activeZoneInstance?.beginExitClosure?.();
+
+      if(!resolved){
+        gameState.setFlag('B2_IDENTITY_INCOMPLETE',true);
+        persistentMemory.addJournalNote(
+          'B2_EXIT_INCOMPLETE',
+          'B2 身分矩陣尚未完整重建，但火災回放已證明紀錄正在被重新覆寫。B2 關閉後直接返回 316，以已掌握的正確權限進行最後驗證。'
+        );
+      }else{
+        persistentMemory.addJournalNote(
+          'B2_EXIT_RESOLVED',
+          'B2 身分矩陣與火災回放均已完成。封存層永久關閉；返回 316 阻止 UNKNOWN SESSION 繼續覆寫。'
+        );
+      }
+
       const finishLeavingB2=async()=>{
         await prepareZoneWithRetry('first_campus_3f');
         worldRouter.loadZone('first_campus_3f','first_3f_316');
-        if(resolved){
-          gameState.setGameTime('03:30');
-          gameState.setFlag('LAST_CALL_SEEN',true);
-          gameState.setFlag('M8_CODE_BLACK_ANNOUNCED',true);
-          persistentMemory.resolveLegend('lastCall');
-          persistentMemory.addJournalNote('M8_CODE_BLACK','B2 身分重建完成後，系統偵測到已除籍人員重新登入，開始收縮門禁並搶回 316 交班權限。');
-          soundManager.playDoorLockClack();
-          setTimeout(()=>uiManager.showSubtitle('全院廣播','「有人正在覆寫紀錄，時間不多了，請找到正確權限輸入避免被覆蓋。」',7200),700);
-        }else{
-          gameState.setFlag('B2_IDENTITY_INCOMPLETE',true);
-          gameState.setFlag('B2_HISTORY_FALLBACK_ACTIVE',true);
-          gameState.setFlag('M8_IDENTITY_BATTLE_ACTIVE',false);
-          gameState.setFlag('LAST_CALL_SEEN',false);
-          gameState.setGameTime('03:10');
-          persistentMemory.addJournalNote('B2_EXIT_INCOMPLETE','B2 身分建立失敗後永久鎖閉。需回 3F 文史資料室查閱夜班核心人員檔案，再回 316 完成最終員編核對。');
-          gameState.setFlag('ARCHIVE_PERSONNEL_OBJECTIVE',true);
-          soundManager.playDoorLockClack();
-          setTimeout(()=>uiManager.showSubtitle('值班醫師','「有人正在覆寫紀錄，時間不多了，請找到正確權限輸入避免被覆蓋。先去文史資料室查閱夜班核心人員名錄。」',5200),700);
-        }
+        gameState.setGameTime('03:30');
+        soundManager.playDoorLockClack();
+        setTimeout(()=>uiManager.showSubtitle(
+          '全院廣播',
+          '「RECORD OVERWRITE ACTIVE。有人正在覆蓋事故與人員紀錄。請立即返回 316，以正確權限終止覆寫。」',
+          7200
+        ),700);
         uiManager.updateTasks();
         controller.enabled=true;
       };
+
       const lights=[];
       worldRouter.activeZoneInstance?.zoneGroup?.traverse(object=>{if(object.isLight)lights.push(object);});
       const shutLights=count=>lights.slice(0,count).forEach(light=>{light.intensity=0;});
@@ -1236,18 +1301,6 @@ controller.onInteract = async (interactable) => {
         .catch(error=>{console.error('[cinematic] B2 closure failed',error);finishLeavingB2();});
     };
 
-    if(!resolved){
-      controller.enabled=false;
-      uiManager.openStoryChoice({
-        title:'B2｜單向出口',
-        body:'尚未完成身分驗證。離開後 B2 將永久鎖閉，確定離開？',
-        primaryText:'確定離開',
-        secondaryText:'留在 B2',
-        onPrimary:leaveB2,
-        onSecondary:()=>{controller.enabled=true;}
-      });
-      return;
-    }
     leaveB2();
   } else if (interactable.type === 'security_monitor_anomaly') {
     gameState.setFlag('CCTV_SELF_DUPLICATE_SEEN',true);
