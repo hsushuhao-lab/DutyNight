@@ -2,12 +2,11 @@ export const TRUE_NAME_CANON='張守恆';
 const STORAGE_KEY='DutyNight_PersistentData';
 
 const defaults=()=>({
-  version:4,
+  version:5,
   loopCount:0,
   hasSeenHandoffAcknowledgement:false,
   seenOnce:{hotCoffee:false,unregisteredMessage3F:false},
   hasSeenOverride_Bed33:false,
-  b2IdentityAttemptUsed:false,
   identityErosionLevel:0,
   proofs:{space:false,identity:false,time:false},
   legends:{
@@ -98,6 +97,10 @@ export class PersistentMemory {
       }
       if((parsed.version||1)<3)data.version=3;
       if((parsed.version||1)<4)data.version=4;
+      if((parsed.version||1)<5){
+        delete data.b2IdentityAttemptUsed;
+        data.version=5;
+      }
       const engineerNote=data.journalNotes.find(note=>note.id==='LIU_MAINTENANCE_TAG');
       if(engineerNote)engineerNote.text='劉志遠／ENG-860214／工務機電技師。燒焦吊牌標示 6F SKILL LAB／B-PANEL；他提到紫色備援與王世榮保管的鑰匙。';
       for(const note of data.journalNotes)note.text=note.text.replaceAll('4+3 夜班核心人員檔案','1998 夜班核心人員名錄');
