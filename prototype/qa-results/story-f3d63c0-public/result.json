@@ -1,0 +1,1371 @@
+{
+  "url": "https://hsushuhao-lab.github.io/DutyNight/?qa=story",
+  "sourceSha": "f3d63c096745a859aba6cab357e02f7150a86c57",
+  "started": "2026-09-27T11:18:05.103Z",
+  "milestones": [
+    {
+      "label": "Story QA bridge ready",
+      "zone": "first_campus_3f",
+      "time": "17:00",
+      "loopCount": 0,
+      "erosion": 0
+    },
+    {
+      "label": "M1 rejected default identity template",
+      "zone": "first_campus_3f",
+      "time": "17:00",
+      "loopCount": 0,
+      "erosion": 0
+    },
+    {
+      "label": "M2 override loops to 17:00 with memory",
+      "zone": "first_campus_3f",
+      "time": "17:00",
+      "loopCount": 1,
+      "erosion": 1
+    },
+    {
+      "label": "M2 resolved by persistent cognition",
+      "zone": "first_campus_4f",
+      "time": "17:00",
+      "loopCount": 1,
+      "erosion": 1
+    },
+    {
+      "label": "21:17 room entry then answered 00:30 ER call",
+      "zone": "first_campus_4f",
+      "time": "00:33",
+      "loopCount": 1,
+      "erosion": 1
+    },
+    {
+      "label": "M3 00:33 slip decoded at 316; second campus unlocked",
+      "zone": "first_campus_3f",
+      "time": "01:15",
+      "loopCount": 1,
+      "erosion": 1
+    },
+    {
+      "label": "M4 chest-pain duplicate resolved",
+      "zone": "second_campus_5f",
+      "time": "01:45",
+      "loopCount": 1,
+      "erosion": 2
+    },
+    {
+      "label": "M5 bridge rule resolved",
+      "zone": "skybridge",
+      "time": "02:00",
+      "loopCount": 1,
+      "erosion": 2
+    },
+    {
+      "label": "M6 nonexistent 6F resolved",
+      "zone": "first_campus_1f",
+      "time": "02:00",
+      "loopCount": 1,
+      "erosion": 3
+    },
+    {
+      "label": "M7 B2 reveals true name; M8 identity battle active",
+      "zone": "first_campus_3f",
+      "time": "03:30",
+      "loopCount": 1,
+      "erosion": 4
+    },
+    {
+      "label": "M9 TRUE NAME handoff accepted",
+      "zone": "first_campus_3f",
+      "time": "03:30",
+      "loopCount": 1,
+      "erosion": 4
+    }
+  ],
+  "cinematicFlags": [
+    {
+      "id": "FIRST_409_BED33_ANOMALY",
+      "played": true
+    }
+  ],
+  "screenshots": [
+    {
+      "file": "m1-3f-admin-316.png",
+      "anchorName": "AdminDesk_Monitor",
+      "rect": {
+        "left": 559.096036745989,
+        "top": 339.0103161050936,
+        "width": 321.8079265080189,
+        "height": 185.73869970129635
+      },
+      "bytes": 1085862,
+      "camera": {
+        "position": [
+          -19.25,
+          1.7,
+          3.65
+        ],
+        "target": [
+          -19.25,
+          1.25,
+          5.18
+        ],
+        "distance": 1.59
+      },
+      "sha256": "cd75d850f89b5c058a2307dab687659f809701e5eebdb85e170217c3a753d49a"
+    },
+    {
+      "file": "m1-3f-storage-annie-static.png",
+      "anchorName": "Annie_STORAGE_STATIC",
+      "rect": {
+        "left": 55.65384162255669,
+        "top": 105.10639604499582,
+        "width": 747.2027089005945,
+        "height": 656.1992551314015
+      },
+      "bytes": 1066704,
+      "camera": {
+        "position": [
+          14.8,
+          1.7,
+          5.85
+        ],
+        "target": [
+          14.2,
+          0.9,
+          5.15
+        ],
+        "distance": 1.22
+      },
+      "sha256": "2866a6f3e6cc3a04f0912ebdc4f3305148fadd2a403d88cb8e925e12a2474b12"
+    },
+    {
+      "file": "m1-annie-close-inspection.png",
+      "anchorName": "Annie_SmoothVinylFace",
+      "rect": {
+        "left": 639.25651376829,
+        "top": 380.26182180898564,
+        "width": 161.48697246342,
+        "height": 138.9815351019369
+      },
+      "bytes": 1018292,
+      "camera": {
+        "position": [
+          12.81,
+          1.7,
+          5.8
+        ],
+        "target": [
+          12.81,
+          0.84,
+          5.16
+        ],
+        "distance": 1.07
+      },
+      "sha256": "d5348abcdcc48f26b7b3f2e54751788da6bf02f9433372dbd5deea6317c4be7e"
+    },
+    {
+      "file": "m2-4f-nursing-station.png",
+      "anchorName": "WorkstationDesk_first_station_A",
+      "rect": {
+        "left": 569.406065933302,
+        "top": 459.49693849602255,
+        "width": 265.96597906906175,
+        "height": 219.6692599075322
+      },
+      "bytes": 1347779,
+      "camera": {
+        "position": [
+          0,
+          1.7,
+          -4.6
+        ],
+        "target": [
+          -3.35,
+          1,
+          -2.35
+        ],
+        "distance": 4.1
+      },
+      "sha256": "ac18c058a3d102c594da394c659201213e737dab054df13f4ce7c21edb41e46e"
+    },
+    {
+      "file": "m2-4f-duty-room.png",
+      "anchorName": "DutyRoom_ExtensionPhone",
+      "rect": {
+        "left": 751.9768633848277,
+        "top": 418.8061346605803,
+        "width": 111.12195603749251,
+        "height": 97.29097617467806
+      },
+      "bytes": 1207710,
+      "camera": {
+        "position": [
+          -10.8,
+          1.7,
+          4.8
+        ],
+        "target": [
+          -9.62,
+          0.87,
+          3.1
+        ],
+        "distance": 2.23
+      },
+      "sha256": "b014b357c8deb4656fd3cb956c2edc4771e5029576c0c4696515402d121f199d"
+    },
+    {
+      "file": "m2-408c-bed.png",
+      "anchorName": "Bed_408C",
+      "rect": {
+        "left": 342.7281374612913,
+        "top": 318.2482434283609,
+        "width": 780.350308365722,
+        "height": 581.7517565716391
+      },
+      "bytes": 1231472,
+      "camera": {
+        "position": [
+          9.8,
+          1.7,
+          -8.2
+        ],
+        "target": [
+          8.1,
+          0.8,
+          -7.32
+        ],
+        "distance": 2.12
+      },
+      "sha256": "32bf530fa42151835efef9d76f47f7beadffdb36d3ecc2df0269139b81d61841"
+    },
+    {
+      "file": "m2-409-sealed.png",
+      "anchorName": "Bed33_409_WarningTape",
+      "rect": {
+        "left": 474.5225948928126,
+        "top": 494.6487264334351,
+        "width": 490.95481021437485,
+        "height": 88.6451405226141
+      },
+      "bytes": 1111757,
+      "camera": {
+        "position": [
+          5,
+          1.7,
+          -3
+        ],
+        "target": [
+          6.88,
+          1.2,
+          -3
+        ],
+        "distance": 1.95
+      },
+      "sha256": "abe9fc56d4b143ffb364dc7b9731064ec82cab5f5aecbe28c509341cb669fc52"
+    },
+    {
+      "file": "m3-er-nursing-station.png",
+      "anchorName": "ER_TriageCounter",
+      "rect": {
+        "left": 55.2985030786262,
+        "top": 490.8169393953781,
+        "width": 1329.4029938427477,
+        "height": 317.71683596581613
+      },
+      "bytes": 988677,
+      "camera": {
+        "position": [
+          3.5,
+          2.2,
+          0.8
+        ],
+        "target": [
+          3.5,
+          1.45,
+          6.4
+        ],
+        "distance": 5.65
+      },
+      "sha256": "a832a6ab9507915e3727b496f8a6e62b6b74bb33fd55ff04b56420ddbc85bedc"
+    },
+    {
+      "file": "m3-0033-registration.png",
+      "anchorName": "ER_GhostRegistrationTerminal",
+      "rect": {
+        "left": 1075.4197799157396,
+        "top": 303.0397538937014,
+        "width": 364.5802200842604,
+        "height": 361.64205243793316
+      },
+      "bytes": 189067,
+      "camera": {
+        "position": [
+          15.2,
+          1.7,
+          -6.2
+        ],
+        "target": [
+          13,
+          1.18,
+          -6.35
+        ],
+        "distance": 2.27
+      },
+      "sha256": "935a7d55a34b4a0bc37771eaa685c850c665bd8d390391218f11648227984bb8"
+    },
+    {
+      "file": "m3-316-legacy-terminal-phone.png",
+      "anchorName": "DutyTerminal_316_LegacyScreen",
+      "rect": {
+        "left": 625.2784633205973,
+        "top": 434.45037708752267,
+        "width": 61.89864717431112,
+        "height": 40.60888704697328
+      },
+      "bytes": 973805,
+      "camera": {
+        "position": [
+          3.4,
+          1.65,
+          5.72
+        ],
+        "target": [
+          9.55,
+          1.25,
+          5.5
+        ],
+        "distance": 6.17
+      },
+      "sha256": "1eade322b89df07ddddb3530644a8ddb2d5a902bbb27f37e5de9969586a9b4c9"
+    },
+    {
+      "file": "m4-ordinary-patient.png",
+      "anchorName": "SecondCampus_ChestPainPatient",
+      "rect": {
+        "left": 565.054294442931,
+        "top": 408.13660032283786,
+        "width": 383.9905078195334,
+        "height": 205.0589698640843
+      },
+      "bytes": 1182721,
+      "camera": {
+        "position": [
+          65.8,
+          1.7,
+          -18.5
+        ],
+        "target": [
+          67.9,
+          0.95,
+          -20.68
+        ],
+        "distance": 3.12
+      },
+      "sha256": "7452b9023e38dc84ad8ba697e358361cf5da4a82df54c81393abc5f0b5adb4b7"
+    },
+    {
+      "file": "m4-transfer-form.png",
+      "anchorName": "SecondCampus_ChestTransferForm",
+      "rect": {
+        "left": 591.9077722448035,
+        "top": 475.48409840234797,
+        "width": 239.52790418131576,
+        "height": 133.71729841843933
+      },
+      "bytes": 334186,
+      "camera": {
+        "position": [
+          70.9,
+          1.5,
+          -1.2
+        ],
+        "target": [
+          70.72,
+          0.83,
+          -2.18
+        ],
+        "distance": 1.2
+      },
+      "sha256": "5243dcb87324210e1649c15c62fe99666218fe26742857acca36f1a1b62f65d8"
+    },
+    {
+      "file": "m4-guard-roster-clue.png",
+      "anchorName": "SecondCampus_TrueNameRosterFragment",
+      "rect": {
+        "left": 652.5222283641472,
+        "top": 420.519273723243,
+        "width": 134.43046869983095,
+        "height": 62.679379586760376
+      },
+      "bytes": 1390981,
+      "camera": {
+        "position": [
+          68.7,
+          1.7,
+          -19
+        ],
+        "target": [
+          68.26,
+          0.91,
+          -20.04
+        ],
+        "distance": 1.38
+      },
+      "sha256": "9670538e142ff098ae7e97867ece04fec9bfbedf3a027d5739dada150e51f8bc"
+    },
+    {
+      "file": "m5-security-playback.png",
+      "anchorName": "Second2F_CCTVWall",
+      "rect": {
+        "left": 440.61877073372943,
+        "top": 231.7074063505336,
+        "width": 558.7624585325411,
+        "height": 299.95547052087875
+      },
+      "bytes": 273640,
+      "camera": {
+        "position": [
+          74,
+          1.7,
+          -7.7
+        ],
+        "target": [
+          74,
+          1.5,
+          -10.25
+        ],
+        "distance": 2.56
+      },
+      "sha256": "10723935e3354d2cc1517aaf70b6e44460ba99215758e2517d9cf4cc4fbdad74"
+    },
+    {
+      "file": "m5-outbound-bridge-baseline.png",
+      "anchorName": "Annie_BRIDGE_MANIFEST",
+      "rect": {
+        "left": 700.9249464658448,
+        "top": 400.7649077872789,
+        "width": 38.15010706831083,
+        "height": 96.37104252117427
+      },
+      "bytes": 1175911,
+      "camera": {
+        "position": [
+          34,
+          1.9,
+          0
+        ],
+        "target": [
+          46,
+          0.95,
+          0
+        ],
+        "distance": 12.04
+      },
+      "sha256": "3e21e37e0fb0cf56005c6c2507041a04201597cdda68389b027ca11731b22474"
+    },
+    {
+      "file": "m5-return-bridge-annie.png",
+      "anchorName": "Annie_BRIDGE_MANIFEST",
+      "rect": {
+        "left": 669.3698402903693,
+        "top": 371.7325516734537,
+        "width": 101.26031941926158,
+        "height": 248.51537844140216
+      },
+      "bytes": 1197093,
+      "camera": {
+        "position": [
+          41,
+          1.65,
+          0
+        ],
+        "target": [
+          46,
+          1,
+          0
+        ],
+        "distance": 5.04
+      },
+      "sha256": "7779debfa4085b785cff86c5e12fbe53e7e2da41b2bdbf63a456e70d3e521028"
+    },
+    {
+      "file": "m5-bridge-close-annie.png",
+      "anchorName": "Annie_BRIDGE_MANIFEST",
+      "rect": {
+        "left": 507.88788725903976,
+        "top": 275.36641996456007,
+        "width": 911.9599355219219,
+        "height": 624.63358003544
+      },
+      "bytes": 1279799,
+      "camera": {
+        "position": [
+          44.95,
+          1.6,
+          -0.4
+        ],
+        "target": [
+          46,
+          1.25,
+          0
+        ],
+        "distance": 1.18
+      },
+      "sha256": "a42da1952ea234d8c0797d3da2fd59370c8c92e04562bde20327e6753472f094"
+    },
+    {
+      "file": "m6-elevator-display-6.png",
+      "anchorName": "Phantom6F_ElevatorDisplay",
+      "rect": {
+        "left": 566.3599406966084,
+        "top": 0,
+        "width": 307.2801186067834,
+        "height": 117.78531912674248
+      },
+      "bytes": 376868,
+      "camera": {
+        "position": [
+          0,
+          2.48,
+          0.6
+        ],
+        "target": [
+          0,
+          2.48,
+          1.78
+        ],
+        "distance": 1.18
+      },
+      "sha256": "aa986a330e49f76162f56b08350dcbfc7f1b37da5b0e2b3529d8614f8e1c7cd7"
+    },
+    {
+      "file": "m6-annie-cpr-long.png",
+      "anchorName": "Annie_FLOOR6_CPR",
+      "rect": {
+        "left": 707.2880594333487,
+        "top": 409.7035727997565,
+        "width": 131.20799546434546,
+        "height": 115.08354400198544
+      },
+      "bytes": 1342558,
+      "camera": {
+        "position": [
+          0,
+          2.8,
+          1.2
+        ],
+        "target": [
+          0.6,
+          0.9,
+          -7.3
+        ],
+        "distance": 8.73
+      },
+      "sha256": "f4616e332449b3f9946c52d36ad85bef8fd10c8446621873a15976270d02baee"
+    },
+    {
+      "file": "m6-stethoscope-relic.png",
+      "anchorName": "Floor6_Stethoscope_Engraving",
+      "rect": {
+        "left": 522.7067442453244,
+        "top": 425.31322778146557,
+        "width": 394.58651150935225,
+        "height": 86.137920283737
+      },
+      "bytes": 1774629,
+      "camera": {
+        "position": [
+          -1.37,
+          0.42,
+          -7.97
+        ],
+        "target": [
+          -1.37,
+          0.14,
+          -8.09
+        ],
+        "distance": 0.3
+      },
+      "sha256": "6449bff5812b2bfbe56ce59c8221059f6a04373b7e2d63cd755b3f8624404090"
+    },
+    {
+      "file": "m6-annie-cpr.png",
+      "anchorName": "Annie_FLOOR6_CPR",
+      "rect": {
+        "left": 456.21804201807674,
+        "top": 307.9513165611845,
+        "width": 398.8027311635925,
+        "height": 425.2307207199424
+      },
+      "bytes": 1369472,
+      "camera": {
+        "position": [
+          3.3,
+          1.9,
+          -9.3
+        ],
+        "target": [
+          1,
+          0.95,
+          -7.3
+        ],
+        "distance": 3.19
+      },
+      "sha256": "a939e676684e64693aa44542fc5739a883525a507c5bd321a2e3b7673023d303"
+    },
+    {
+      "file": "m6-annie-cpr-close.png",
+      "anchorName": "Annie_HandStack_Top",
+      "rect": {
+        "left": 762.7269907940788,
+        "top": 421.51287412574095,
+        "width": 81.03006899169941,
+        "height": 58.78922632364345
+      },
+      "bytes": 1381770,
+      "camera": {
+        "position": [
+          1.55,
+          1.65,
+          -8
+        ],
+        "target": [
+          0.82,
+          1,
+          -7.3
+        ],
+        "distance": 1.2
+      },
+      "sha256": "423a621315f608ffec81f3530f32f42a801d142276ca28609f68c56de00f73ee"
+    },
+    {
+      "file": "m7-1f-guard-post.png",
+      "anchorName": "FirstCampus1F_OldGuardPost",
+      "rect": {
+        "left": 250.7215688649346,
+        "top": 288.9632044657647,
+        "width": 872.3300087876246,
+        "height": 536.2745763149471
+      },
+      "bytes": 1333450,
+      "camera": {
+        "position": [
+          -7.8,
+          1.7,
+          3.2
+        ],
+        "target": [
+          -10.7,
+          1,
+          3.2
+        ],
+        "distance": 2.98
+      },
+      "sha256": "4f8edf328b85771ebcff7a6ebd0d828803cbe78cf538698778e92eeb16b9061b"
+    },
+    {
+      "file": "m7-b-panel-concealed-door.png",
+      "anchorName": "FirstFloor_BPanel_ConcealedDoor",
+      "rect": {
+        "left": 561.7692409118165,
+        "top": 159.73686799525439,
+        "width": 316.46151817636655,
+        "height": 536.7875642938657
+      },
+      "bytes": 879423,
+      "camera": {
+        "position": [
+          -11.2,
+          1.7,
+          4.55
+        ],
+        "target": [
+          -13.78,
+          1.18,
+          4.55
+        ],
+        "distance": 2.63
+      },
+      "sha256": "672376f2031094c2a01dd6aea4cc6d2cf832724b84e011d294740aa1298ea8a3"
+    },
+    {
+      "file": "m7-b2-mirror-316.png",
+      "anchorName": "B2_ArchiveMirror_Frame",
+      "rect": {
+        "left": 402.75267869369964,
+        "top": 300.70714710223405,
+        "width": 634.4946426126007,
+        "height": 466.540165305519
+      },
+      "bytes": 986123,
+      "camera": {
+        "position": [
+          0,
+          1.7,
+          -11
+        ],
+        "target": [
+          0,
+          1.7,
+          -14.65
+        ],
+        "distance": 3.65
+      },
+      "sha256": "66b768f4dd284f647b12dd44b3b8a72e5fa7b7708caba15d8caedd14012d7279"
+    },
+    {
+      "file": "m9-dual-identity-form.png",
+      "anchorName": "DutyPhone_316_Handset",
+      "rect": {
+        "left": 729.0949852321926,
+        "top": 417.5509027403301,
+        "width": 16.63067332159403,
+        "height": 37.9101739864808
+      },
+      "bytes": 200299,
+      "camera": {
+        "position": [
+          7.5,
+          1.7,
+          5.7
+        ],
+        "target": [
+          5.45,
+          0.95,
+          5.72
+        ],
+        "distance": 2.18
+      },
+      "sha256": "adbe1a12245ab02ea68655a6853d014d27b6a7b728e8c81a2f85c52979bb7b8c"
+    },
+    {
+      "file": "m9-successful-dawn-ending.png",
+      "anchorName": "DutyPhone_316_Handset",
+      "rect": {
+        "left": 729.0949852321926,
+        "top": 417.5509027403301,
+        "width": 16.63067332159403,
+        "height": 37.9101739864808
+      },
+      "bytes": 179447,
+      "camera": {
+        "position": [
+          7.5,
+          1.7,
+          5.7
+        ],
+        "target": [
+          5.45,
+          0.95,
+          5.72
+        ],
+        "distance": 2.18
+      },
+      "sha256": "2d10394ce64062e7f9d0024d8a390c63cdd3ce0633f8fc746be0761d83693116"
+    }
+  ],
+  "motionScreenshots": [
+    {
+      "file": "motion/m5-bridge-idle-1.png",
+      "anchorName": "Annie_BRIDGE_MANIFEST",
+      "rect": {
+        "left": 669.3691188995938,
+        "top": 371.6714370982937,
+        "width": 101.26176220081277,
+        "height": 248.57649301656215
+      },
+      "motionValue": {
+        "body": 0.004143377689812611,
+        "head": 0.005112648131696179
+      },
+      "camera": {
+        "position": [
+          41,
+          1.65,
+          0
+        ],
+        "target": [
+          46,
+          1,
+          0
+        ],
+        "distance": 5.04
+      },
+      "bytes": 1196834,
+      "sha256": "cb5bdd847d5c1584d1439510344f05d69a110423c46a62e1518e7530a32dc340"
+    },
+    {
+      "file": "motion/m5-bridge-idle-2.png",
+      "anchorName": "Annie_BRIDGE_MANIFEST",
+      "rect": {
+        "left": 669.3689876087358,
+        "top": 371.66031447045987,
+        "width": 101.26202478252856,
+        "height": 248.587615644396
+      },
+      "motionValue": {
+        "body": 0.004496255753721642,
+        "head": 0.005891121182234159
+      },
+      "camera": {
+        "position": [
+          41,
+          1.65,
+          0
+        ],
+        "target": [
+          46,
+          1,
+          0
+        ],
+        "distance": 5.04
+      },
+      "bytes": 1196829,
+      "sha256": "12e382f0cddbe321eb51dc7d5662a0ab807afeeac064865d8c0b0e286d82d106"
+    },
+    {
+      "file": "motion/m5-bridge-idle-3.png",
+      "anchorName": "Annie_BRIDGE_MANIFEST",
+      "rect": {
+        "left": 669.369055385318,
+        "top": 371.66605632899706,
+        "width": 101.2618892293641,
+        "height": 248.58187378585882
+      },
+      "motionValue": {
+        "body": 0.004204834709586008,
+        "head": 0.0058628758721674295
+      },
+      "camera": {
+        "position": [
+          41,
+          1.65,
+          0
+        ],
+        "target": [
+          46,
+          1,
+          0
+        ],
+        "distance": 5.04
+      },
+      "bytes": 1196825,
+      "sha256": "06e6c6ec2ee9e19cea9a8fdab08185011e5e52939fd401bb8ea7e97ec14a4139"
+    },
+    {
+      "file": "motion/m6-cpr-press-1.png",
+      "anchorName": "Annie_HandStack_Top",
+      "rect": {
+        "left": 761.1233566534997,
+        "top": 401.8974070310055,
+        "width": 82.86524747090402,
+        "height": 57.661738847659706
+      },
+      "motionValue": 1,
+      "camera": {
+        "position": [
+          1.55,
+          1.65,
+          -8
+        ],
+        "target": [
+          0.82,
+          1,
+          -7.3
+        ],
+        "distance": 1.2
+      },
+      "bytes": 1383867,
+      "sha256": "0347f90474e64741b8938bf5d4bbd45b102a6084e64502c353e5c5597a720f25"
+    },
+    {
+      "file": "motion/m6-cpr-release.png",
+      "anchorName": "Annie_HandStack_Top",
+      "rect": {
+        "left": 761.3326409344627,
+        "top": 404.39289052145443,
+        "width": 82.63136283695292,
+        "height": 57.811647148892405
+      },
+      "motionValue": 0,
+      "camera": {
+        "position": [
+          1.55,
+          1.65,
+          -8
+        ],
+        "target": [
+          0.82,
+          1,
+          -7.3
+        ],
+        "distance": 1.2
+      },
+      "bytes": 1376528,
+      "sha256": "d38c156cb3e94a301c7eced7435e4374f60ef5c6abe7960f58783d9310c10fc1"
+    }
+  ],
+  "functionalScreenshots": [
+    {
+      "file": "functional/m1-handoff-identity-choice.png",
+      "bytes": 133192,
+      "sha256": "c3b8130e97d5a97b070748dfb5b08cae992026ec536956a41f94d8a6b3299933"
+    },
+    {
+      "file": "functional/m7-guard-post-approach.png",
+      "bytes": 1287088,
+      "sha256": "a8cee8b625d9317470a1f77d5fb3fde953f040db31cba5f29185bee66d15ec18"
+    },
+    {
+      "file": "functional/m7-b-panel-e-prompt.png",
+      "bytes": 852843,
+      "sha256": "de703c105ed9689b5ac2d0443e22d32e7a6a96afdfe083ad0312bedabe0b89d7"
+    }
+  ],
+  "functionalFlows": [
+    {
+      "name": "20:05 ER call phone interaction",
+      "steps": [
+        "QA bridge positioned on phone near side",
+        "live crosshair raycast resolved 4F_DUTY_PHONE",
+        "pressed E"
+      ],
+      "raycast": {
+        "current": "4F_DUTY_PHONE",
+        "position": [
+          -9.45,
+          1.7000000000000004,
+          4.1
+        ],
+        "hits": [
+          {
+            "name": "",
+            "distance": 1.1290099587188327
+          },
+          {
+            "name": "",
+            "distance": 1.1610386093191862
+          }
+        ]
+      }
+    },
+    {
+      "name": "21:15 night return phone interaction",
+      "steps": [
+        "QA bridge positioned on phone near side",
+        "live crosshair raycast resolved 4F_DUTY_PHONE",
+        "pressed E"
+      ],
+      "raycast": {
+        "current": "4F_DUTY_PHONE",
+        "position": [
+          -9.45,
+          1.7000000000000004,
+          4.1
+        ],
+        "hits": [
+          {
+            "name": "",
+            "distance": 1.1290099587188327
+          },
+          {
+            "name": "",
+            "distance": 1.1610386093191862
+          }
+        ]
+      }
+    },
+    {
+      "name": "00:30 ER registration phone interaction",
+      "steps": [
+        "QA bridge positioned on phone near side",
+        "live crosshair raycast resolved 4F_DUTY_PHONE",
+        "pressed E"
+      ],
+      "raycast": {
+        "current": "4F_DUTY_PHONE",
+        "position": [
+          -9.45,
+          1.7000000000000004,
+          4.1
+        ],
+        "hits": [
+          {
+            "name": "",
+            "distance": 1.1290099587188327
+          },
+          {
+            "name": "",
+            "distance": 1.1610386093191862
+          }
+        ]
+      }
+    },
+    {
+      "name": "M7 GUARD POST TO B-PANEL",
+      "steps": [
+        "QA bridge positioned at the guard desk",
+        "crosshair showed [E] inspect guard post",
+        "pressed E and revealed door seams/purple indicator",
+        "QA bridge positioned at the physical service-door hitbox",
+        "crosshair showed [E] inspect revealed door"
+      ]
+    }
+  ],
+  "screenshotWarnings": [],
+  "errors": [
+    "console: Failed to load resource: net::ERR_HTTP2_PROTOCOL_ERROR",
+    "console: Failed to load resource: net::ERR_HTTP2_PROTOCOL_ERROR",
+    "console: Failed to load resource: net::ERR_HTTP2_PROTOCOL_ERROR",
+    "console: Failed to load resource: net::ERR_HTTP2_PROTOCOL_ERROR"
+  ],
+  "method": "Browser-driven M1-M9 story playthrough with named scene-anchor frustum checks, 27 required full-resolution captures, bridge-idle/CPR motion frames, QA-positioned phone raycast + E checks, physical M7 guard-post-to-B-Panel interaction, and runtime cinematic completion flags.",
+  "verdict": "FAIL",
+  "failure": "AssertionError [ERR_ASSERTION]: [\n  \"console: Failed to load resource: net::ERR_HTTP2_PROTOCOL_ERROR\",\n  \"console: Failed to load resource: net::ERR_HTTP2_PROTOCOL_ERROR\",\n  \"console: Failed to load resource: net::ERR_HTTP2_PROTOCOL_ERROR\",\n  \"console: Failed to load resource: net::ERR_HTTP2_PROTOCOL_ERROR\"\n]\n\n4 !== 0\n\n    at file:///C:/Users/Asher/Documents/game/DutyNight-visual-closeout/prototype/scripts/test-story-playthrough.mjs:508:10",
+  "last": {
+    "zone": "first_campus_3f",
+    "time": "03:30",
+    "controllerEnabled": false,
+    "flags": {
+      "ACT1_STARTED": true,
+      "CURRENT_FLOOR": "3F",
+      "SUPERNATURAL_ENABLED": false,
+      "STAFF_ACCESS_CARD": true,
+      "FOUND_316_SPARE_KEY": false,
+      "OPENED_316": true,
+      "LOCKER_OPENED": false,
+      "HIS_CREDENTIALS": false,
+      "M1_HANDOFF_CHOICE_RESOLVED": false,
+      "ARCHIVE_OBJECTIVE": false,
+      "ARCHIVE_LOCKED_SEEN": false,
+      "ARCHIVE_ACCESS_KEY": false,
+      "ARCHIVE_KEY_CLUE_4F": false,
+      "OFFICE_302_UNLOCKED": false,
+      "INTERACTED_302": false,
+      "FOUND_302_CODE": false,
+      "PHONE_RING_ACTIVE": true,
+      "PHONE_ANSWERED": false,
+      "PHONE_CALL_KIND": "FAST_PATH_316",
+      "P1_ER_CALL_ANSWERED": true,
+      "P1_ER_CALL_RECEIVED": true,
+      "FOURF_409_SEAL_CHECKED_AFTER_408C": true,
+      "ER_JANE_PRESENT": false,
+      "FAST_PATH_3F": true,
+      "FAST_PATH_316_ENTERED": true,
+      "FAST_PATH_316_CALL_DONE": false,
+      "STORAGE_ANNE_VISIT_COUNT": 0,
+      "FLOOR6_STETHOSCOPE_FOUND": true,
+      "FLOOR6_STETHOSCOPE_INSPECTED": true,
+      "HIS_ANOMALY_SEEN": false,
+      "ANOMALY_ACKNOWLEDGED": false,
+      "ANNE_STAGE": 0,
+      "GUARD_FUTURE_ENTRY": false,
+      "HOOK_409_ZERO_ROOM": true,
+      "HOOK_1F_HIDDEN_DOOR": false,
+      "HOOK_0217": true,
+      "HOOK_0316_COMMAND_POINT": false,
+      "ER_JANE_DOE_WRISTBAND": false,
+      "FIRST_FLOOR_GUARD_KEY": true,
+      "STAIR_SHORTCUT_3F_4F": false,
+      "FORCE_3F_ELEVATOR_STOP": true,
+      "FORCED_3F_ELEVATOR_STOP_DONE": false,
+      "NIGHT_PATROL_RETURN_3F": true,
+      "HIDDEN_SERVICE_DOOR_DISCOVERED": false,
+      "B_PANEL_CLUE_KNOWN": true,
+      "B_PANEL_KEY": true,
+      "CLUE_403_0409": false,
+      "ADMIN_ROSTER_CHECKED": false,
+      "ADMIN_PRINTER_DOC_CHECKED": false,
+      "ADMIN_DRAWER_MANUAL_CHECKED": false,
+      "ADMIN_IDENTITY_PUZZLE_RESOLVED": false,
+      "ECHO_2117_KNOWN": false,
+      "ADMIN_OFFICE_ENTERED": false,
+      "GUARD_SIGN_EXAMINED": true,
+      "BOOTSTRAP_2117_RESOLVED": true,
+      "GHOST_REGISTRATION_ARMED": true,
+      "GHOST_REGISTRATION_AVAILABLE": true,
+      "SANDBOX_MODE": false,
+      "ER0033_SLIP_COLLECTED": true,
+      "M3_316_DECODED": true,
+      "LEGEND_ER0033_RESOLVED": true,
+      "SECOND_CAMPUS_ACCESS": true,
+      "SECOND_CAMPUS_OBJECTIVE_ACTIVE": true,
+      "SECOND_CAMPUS_5F_REPORTED": true,
+      "BRIDGE_ACCESS": true,
+      "M4_CHEST_RESOLVED": true,
+      "M5_BRIDGE_RESOLVED": true,
+      "M5_CCTV_RESOLVED": true,
+      "SIX_FLOOR_HISTORY_CONFIRMED": true,
+      "M5_ROUTE_RESOLVED": true,
+      "M5_ROUTE_CHOICE_RESOLVED": true,
+      "M5_NAME_CLUE_FOUND": true,
+      "M5_BRIDGE_COMMITTED": true,
+      "BRIDGE_REFLECTION_NOTICE_PENDING": false,
+      "BRIDGE_REFLECTION_NOTICE_SEEN": false,
+      "BRIDGE_OVERRIDE_PENDING": false,
+      "SECOND_CAMPUS_PHONE_PENDING": false,
+      "FLOOR6_AVAILABLE": true,
+      "M6_FLOOR6_RESOLVED": true,
+      "SECURITY_RECORD_OBJECTIVE": false,
+      "B2_ADMIN_SOURCE": true,
+      "B2_HISTORY_SOURCE": true,
+      "B2_LEGACY_SOURCE": true,
+      "B2_SECURITY_SOURCE": true,
+      "CCTV_SELF_DUPLICATE_SEEN": true,
+      "SECOND_2F_CCTV_LURE_SEEN": false,
+      "M7_B2_OPEN": false,
+      "M7_B2_RESOLVED": true,
+      "HISTORY_PERSONNEL_PROFILES_REVIEWED": false,
+      "B2_HISTORY_FALLBACK_ACTIVE": false,
+      "ARCHIVE_PERSONNEL_OBJECTIVE": false,
+      "ER_LIU_NAME_RECOGNIZED": false,
+      "M8_IDENTITY_BATTLE_ACTIVE": false,
+      "M8_CODE_BLACK_ANNOUNCED": true,
+      "LAST_CALL_SEEN": true,
+      "GAME_COMPLETE": true,
+      "POST_2117_RETURN_TO_DUTY_ROOM": false,
+      "POST_2117_DUTY_ROOM_TRIGGERED": true,
+      "POST_2117_DUTY_CALL_DONE": true,
+      "LOOP_COUNT": 1,
+      "MEMORY_PASS_1700": false,
+      "MEMORY_PASS_3082": false,
+      "MEMORY_CODE_0217": false,
+      "MEMORY_CODE_0316": false,
+      "MEMORY_CODE_0409": true,
+      "MEMORY_NEVER_SIGN_BED33": true,
+      "IDENTITY_EROSION_LEVEL": 1,
+      "SPACE_PROOF": false,
+      "IDENTITY_PROOF": true,
+      "TIME_PROOF": true,
+      "TRUE_NAME_RESOLVED": false,
+      "KEY_PICKUP": true,
+      "WARD_ENTRY": true,
+      "P1_4F_REPORT": true,
+      "P1_NORMAL_EVENT_DONE": true,
+      "KNOCK_408C_POST_SEAL_PLAYED": true,
+      "CG_FIRST_409_BED33_ANOMALY_ACTIVE": false,
+      "CG_FIRST_409_BED33_ANOMALY_PLAYED": true,
+      "BED33_RESOLVED": true,
+      "WHERE_0409": true,
+      "LEGEND_BED33_RESOLVED": true,
+      "P1_ER_ASSESSMENT_DONE": true,
+      "ER_UNKNOWN_MALE_TAG": true,
+      "ER_LIU_IDENTITY_REVEALED": true,
+      "P1_ER_NOTE_DONE": true,
+      "P1_RETURN_4F": true,
+      "ACT1_NORMAL_FLOW": true,
+      "TIME_PROOF_FRAGMENT": true,
+      "CG_21_17_DUTY_ROOM_ACTIVATION_ACTIVE": false,
+      "CG_21_17_DUTY_ROOM_ACTIVATION_PLAYED": true,
+      "CG_00_33_GHOST_REGISTRATION_ACTIVE": false,
+      "ER0033_INDEX_MATCH": true,
+      "CG_00_33_GHOST_REGISTRATION_PLAYED": true,
+      "SECOND_CHEST_PATIENT_SEEN": true,
+      "CHEST_RECORD_MATCH": true,
+      "M4_NAME_CLUE_FOUND": true,
+      "PHANTOM6_RETURN_ZONE": "second_campus_5f",
+      "VERTICAL_PROOF_FRAGMENT": true,
+      "B2_DOOR_READY": true,
+      "B2_EXITED_PERMANENTLY": true,
+      "CG_B2_PERMANENT_CLOSURE_ACTIVE": false,
+      "CG_B2_PERMANENT_CLOSURE_PLAYED": true,
+      "CG_316_TRUE_NAME_FINAL_HANDOFF_ACTIVE": false,
+      "CG_316_TRUE_NAME_FINAL_HANDOFF_PLAYED": true,
+      "CG_FINAL_SHIFT_COMPLETION_CG_ACTIVE": false,
+      "CG_FINAL_SHIFT_COMPLETION_CG_PLAYED": true
+    },
+    "tasks": [
+      "KEY_PICKUP",
+      "WARD_ENTRY",
+      "P1_4F_REPORT",
+      "P1_NORMAL_EVENT_DONE",
+      "LEGEND_BED33_RESOLVED",
+      "P1_ER_CALL_RECEIVED",
+      "P1_ER_ASSESSMENT_DONE",
+      "P1_ER_NOTE_DONE",
+      "P1_RETURN_4F",
+      "ACT1_NORMAL_FLOW"
+    ],
+    "memory": {
+      "version": 3,
+      "loopCount": 1,
+      "hasSeenHandoffAcknowledgement": true,
+      "seenOnce": {
+        "hotCoffee": false,
+        "unregisteredMessage3F": true
+      },
+      "hasSeenOverride_Bed33": true,
+      "b2IdentityAttemptUsed": true,
+      "identityErosionLevel": 4,
+      "proofs": {
+        "space": true,
+        "identity": true,
+        "time": true
+      },
+      "legends": {
+        "bed33": true,
+        "er0033": true,
+        "chestPain": true,
+        "bridge": true,
+        "pond": false,
+        "floor6": true,
+        "lastCall": true
+      },
+      "trueNameResolved": true,
+      "trueName": "張守恆",
+      "gameComplete": true,
+      "knownCodes": {
+        "pass_1700": false,
+        "pass_3082": false,
+        "code_0217": true,
+        "code_0316": false,
+        "code_0409": true
+      },
+      "survivalRules": {
+        "neverUseDefaultDutyTemplate": false,
+        "neverSignBed33": true,
+        "neverCreateGhostRecord": false,
+        "neverSignChestTransfer": false,
+        "neverLookBackOnBridge": false,
+        "ignorePondReflection": false
+      },
+      "trueNameFragments": {
+        "frag_employeePrefix": "MED-87",
+        "frag_surname": "張",
+        "frag_givenName_1": "守",
+        "frag_givenName_2": "恆",
+        "frag_title": "住院醫師",
+        "frag_employeeFull": "MED-870409"
+      },
+      "journalNotes": [
+        {
+          "id": "M1_MANUAL_IDENTITY",
+          "text": "17:00：拒絕院內預設值班模板，保留「值班醫師／姓名待核」狀態，直到找到原始紀錄。",
+          "loop": 0
+        },
+        {
+          "id": "INFER_0409",
+          "text": "04:09……不是時間。是 409？",
+          "loop": 0
+        },
+        {
+          "id": "RULE_BED33",
+          "text": "不要簽 409A 的床位。",
+          "loop": 1
+        },
+        {
+          "id": "CODE_0409",
+          "text": "04:09 不是時間，是 409。",
+          "loop": 1
+        },
+        {
+          "id": "IDENTITY_DOCTOR",
+          "text": "如果我被登記成病人，系統就會讓另一個值班身分接手我的工作。",
+          "loop": 1
+        },
+        {
+          "id": "BED33_RESOLVED",
+          "text": "409A 的床位單不是正常流程；上面的電子簽名也不是我留下的。",
+          "loop": 1
+        },
+        {
+          "id": "LIU_MAINTENANCE_TAG",
+          "text": "劉志遠／ENG-860214／工務機電技師。燒焦吊牌另標示 6F SKILL LAB／B-PANEL；劉志遠反覆說「不要拉三個、紫色燈、王世榮有鑰匙」。",
+          "loop": 1
+        },
+        {
+          "id": "ECHO_2117",
+          "text": "17點看到的「21:17 三樓巡查完成」，最後是我自己回來完成的。",
+          "loop": 1
+        },
+        {
+          "id": "ER0033_SLIP",
+          "text": "00:33 系統已有一筆劉志遠／ENG-860214 的 1998-ER-0217 掛號，但急診現場沒有病人。先不要建新檔，把舊掛號聯帶回 316 查封存索引。",
+          "loop": 1
+        },
+        {
+          "id": "ER0033_DECODED",
+          "text": "316 舊終端解出劉志遠／ENG-860214 的 1998-ER-0217：責任醫師員編以 MED-87 開頭，姓氏是「張」。",
+          "loop": 1
+        },
+        {
+          "id": "SECOND_CAMPUS_CALL",
+          "text": "第二院區護理站主動開了八樓天橋權限；在這之前我根本沒有跨院區資格。",
+          "loop": 1
+        },
+        {
+          "id": "SECOND_5F_REPORT",
+          "text": "第二院區 5F 護理站交班：陳怡君，504B。李承禮總醫師已預開醫囑並預蓋章，只等值班醫師簽名。",
+          "loop": 1
+        },
+        {
+          "id": "CHEST_PATIENT",
+          "text": "陳怡君因胸悶、心悸與焦慮前來；生命徵象穩定，表現符合焦慮伴隨換氣過度。",
+          "loop": 1
+        },
+        {
+          "id": "CHEST_RESOLVED",
+          "text": "焦慮引起的胸悶已改善；轉院單卻事先填妥第一院區 409A，並留有「李○○」簽名。",
+          "loop": 1
+        },
+        {
+          "id": "TRUE_NAME_SHOU",
+          "text": "第二院區病床旁的舊名冊殘頁：第一線：張 守 [墨漬]。",
+          "loop": 1
+        },
+        {
+          "id": "CCTV_SELF_DUPLICATE",
+          "text": "第二院區監控抽幀先拍到 1998 的 6F、劉志遠與警衛衝突；即時畫面又同時出現我和另一個值班醫師。辨識框短暫顯示 LI_CHENG_LI / MED-820316。",
+          "loop": 1
+        },
+        {
+          "id": "BRIDGE_SAFE",
+          "text": "越過天橋中線後不要回頭；保持前進，直到返回第一院區。",
+          "loop": 1
+        },
+        {
+          "id": "TRUE_NAME_HENG",
+          "text": "在 6F 焦黑器材旁找到的老舊聽診器，經翻面／拭塵後讀到「祝 守恆 醫師／1997／執業誌慶」。",
+          "loop": 1
+        },
+        {
+          "id": "FLOOR6_SAFE",
+          "text": "文史相簿與監控都證明 6F 臨床技能教學室曾存在。取得證物後不要深入濃煙區；先查警衛門禁。",
+          "loop": 1
+        },
+        {
+          "id": "WANG_B_PANEL_KEY",
+          "text": "王世榮 SEC-760117 的值勤簿記載：B-Panel 十字鑰匙屬警衛門禁設備，實體仍掛在警衛台金屬鑰匙櫃。",
+          "loop": 1
+        },
+        {
+          "id": "B2_OPEN",
+          "text": "02:17 的 1→3→4 是歷史錯誤。我改用王世榮保管的十字鑰匙啟動紫色備援排煙；隱藏服務門因此鬆開。",
+          "loop": 1
+        },
+        {
+          "id": "TRUE_NAME",
+          "text": "B2 的時間、空間、病歷與物證一致指向「張守恆」。",
+          "loop": 1
+        },
+        {
+          "id": "B2_ARCHIVE_VERIFY",
+          "text": "B2 身分矩陣排除其他候選；時間、病歷、門禁與院史人員資料一致指向張守恆 MED-870409。",
+          "loop": 1
+        },
+        {
+          "id": "M8_CODE_BLACK",
+          "text": "B2 身分重建完成後，系統偵測到已除籍人員重新登入，開始收縮門禁並搶回 316 交班權限。",
+          "loop": 1
+        }
+      ],
+      "memoryEvidence": {
+        "M3_ER_PHOTO": true,
+        "M5_SECURITY_PLAYBACK": true,
+        "B2_VICTIM_MAP": true
+      }
+    },
+    "legend": "RESOLVED"
+  },
+  "ended": "2026-09-27T11:27:37.138Z"
+}

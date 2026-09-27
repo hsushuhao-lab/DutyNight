@@ -1,0 +1,11 @@
+Measuring cold first_campus_3f → first_campus_4f
+Measuring warm first_campus_3f → first_campus_4f
+Measuring cold first_campus_4f → first_campus_2f
+Measuring warm first_campus_4f → first_campus_2f
+Measuring cold first_campus_2f → first_campus_3f
+Measuring warm first_campus_2f → first_campus_3f
+Measuring cold first_campus_3f → first_campus_1f
+Measuring warm first_campus_3f → first_campus_1f
+Measuring cold second_campus_5f → second_campus_2f
+Measuring warm second_campus_5f → second_campus_2f
+LOADING PERFORMANCE PASS: 12 cold/warm route samples, 0 errors

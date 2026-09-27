@@ -1,0 +1,135 @@
+{
+  "sourceSha": "working-tree",
+  "verdict": "PASS",
+  "rows": [
+    {
+      "route": "skybridge",
+      "cache": "cold",
+      "zone": "skybridge",
+      "elapsedMs": 4320.700000047684,
+      "zoneReadyMs": 1966.8000000715256,
+      "enabled": true,
+      "resources": [
+        {
+          "name": "http://localhost:4173/assets/models/shrub_02/shrub_02_2k.gltf",
+          "bytes": 8819
+        },
+        {
+          "name": "http://localhost:4173/assets/models/fern_02/fern_02_2k.gltf",
+          "bytes": 7590
+        },
+        {
+          "name": "http://localhost:4173/assets/posters/era/display/poster_05_derealization_dissociation.webp",
+          "bytes": 28358
+        }
+      ]
+    },
+    {
+      "route": "skybridge",
+      "cache": "warm",
+      "zone": "skybridge",
+      "elapsedMs": 1217.8999999761581,
+      "zoneReadyMs": 755.5,
+      "enabled": true,
+      "resources": [
+        {
+          "name": "http://localhost:4173/assets/posters/era/display/poster_05_derealization_dissociation.webp",
+          "bytes": 300
+        }
+      ]
+    },
+    {
+      "route": "phantom_6f",
+      "cache": "cold",
+      "zone": "phantom_6f",
+      "elapsedMs": 8928.399999976158,
+      "zoneReadyMs": 6666.399999976158,
+      "enabled": true,
+      "resources": [
+        {
+          "name": "http://localhost:4173/assets/models/hospitalBed.glb",
+          "bytes": 250612
+        },
+        {
+          "name": "http://localhost:4173/assets/posters/era/display/poster_07_ect_identity_memory.webp",
+          "bytes": 24434
+        }
+      ]
+    },
+    {
+      "route": "phantom_6f",
+      "cache": "warm",
+      "zone": "phantom_6f",
+      "elapsedMs": 4021.899999976158,
+      "zoneReadyMs": 3562.600000023842,
+      "enabled": true,
+      "resources": [
+        {
+          "name": "http://localhost:4173/assets/models/hospitalBed.glb",
+          "bytes": 300
+        },
+        {
+          "name": "http://localhost:4173/assets/posters/era/display/poster_07_ect_identity_memory.webp",
+          "bytes": 300
+        }
+      ]
+    },
+    {
+      "route": "b2_archive",
+      "cache": "cold",
+      "zone": "b2_archive",
+      "elapsedMs": 1272.3000000715256,
+      "zoneReadyMs": 37.5,
+      "enabled": true,
+      "resources": [
+        {
+          "name": "http://localhost:4173/assets/posters/era/display/poster_01_restraint_sop.webp",
+          "bytes": 27176
+        },
+        {
+          "name": "http://localhost:4173/assets/posters/era/display/poster_02_auditory_hallucination_knocking.webp",
+          "bytes": 25906
+        },
+        {
+          "name": "http://localhost:4173/assets/posters/era/display/poster_05_derealization_dissociation.webp",
+          "bytes": 28358
+        },
+        {
+          "name": "http://localhost:4173/assets/posters/era/display/poster_07_ect_identity_memory.webp",
+          "bytes": 24434
+        },
+        {
+          "name": "http://localhost:4173/assets/posters/era/display/poster_08_er_jane_doe_triage.webp",
+          "bytes": 27978
+        }
+      ]
+    },
+    {
+      "route": "b2_archive",
+      "cache": "warm",
+      "zone": "b2_archive",
+      "elapsedMs": 513.0999999046326,
+      "zoneReadyMs": 49.799999952316284,
+      "enabled": true,
+      "resources": [
+        {
+          "name": "http://localhost:4173/assets/posters/era/display/poster_02_auditory_hallucination_knocking.webp",
+          "bytes": 300
+        },
+        {
+          "name": "http://localhost:4173/assets/posters/era/display/poster_05_derealization_dissociation.webp",
+          "bytes": 300
+        },
+        {
+          "name": "http://localhost:4173/assets/posters/era/display/poster_07_ect_identity_memory.webp",
+          "bytes": 300
+        },
+        {
+          "name": "http://localhost:4173/assets/posters/era/display/poster_08_er_jane_doe_triage.webp",
+          "bytes": 300
+        }
+      ]
+    }
+  ],
+  "errors": []
+}

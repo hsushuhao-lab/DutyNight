@@ -1,0 +1,61 @@
+Story QA bridge ready {"zone":"first_campus_3f","time":"17:00","loop":0,"erosion":0}
+SCREENSHOT {"file":"m1-3f-admin-316.png","anchorName":"AdminDesk_Monitor","rect":{"left":559.096036745989,"top":339.0103161050936,"width":321.8079265080189,"height":185.73869970129635},"bytes":1085862}
+SCREENSHOT {"file":"m1-3f-storage-annie-static.png","anchorName":"Annie_STORAGE_STATIC","rect":{"left":55.65384162255669,"top":105.10639604499582,"width":747.2027089005945,"height":656.1992551314015},"bytes":1066704}
+SCREENSHOT {"file":"m1-annie-close-inspection.png","anchorName":"Annie_SmoothVinylFace","rect":{"left":639.25651376829,"top":380.26182180898564,"width":161.48697246342,"height":138.9815351019369},"bytes":1018583}
+M1 rejected default identity template {"zone":"first_campus_3f","time":"17:00","loop":0,"erosion":0}
+SCREENSHOT {"file":"m2-4f-nursing-station.png","anchorName":"WorkstationDesk_first_station_A","rect":{"left":569.406065933302,"top":459.49693849602255,"width":265.96597906906175,"height":219.6692599075322},"bytes":1347779}
+SCREENSHOT {"file":"m2-4f-duty-room.png","anchorName":"DutyRoom_ExtensionPhone","rect":{"left":751.9768633848277,"top":418.8061346605803,"width":111.12195603749251,"height":97.29097617467806},"bytes":1207710}
+SCREENSHOT {"file":"m2-408c-bed.png","anchorName":"Bed_408C","rect":{"left":342.7281374612913,"top":318.2482434283609,"width":780.350308365722,"height":581.7517565716391},"bytes":1231472}
+SCREENSHOT {"file":"m2-409-sealed.png","anchorName":"Bed33_409_WarningTape","rect":{"left":474.5225948928126,"top":494.6487264334351,"width":490.95481021437485,"height":88.6451405226141},"bytes":1111757}
+M2 override loops to 17:00 with memory {"zone":"first_campus_3f","time":"17:00","loop":1,"erosion":1}
+M2 resolved by persistent cognition {"zone":"first_campus_4f","time":"17:00","loop":1,"erosion":1}
+21:17 room entry then answered 00:30 ER call {"zone":"first_campus_4f","time":"00:33","loop":1,"erosion":1}
+SCREENSHOT {"file":"m3-er-nursing-station.png","anchorName":"ER_TriageCounter","rect":{"left":55.2985030786262,"top":490.8169393953781,"width":1329.4029938427477,"height":317.71683596581613},"bytes":988677}
+SCREENSHOT {"file":"m3-0033-registration.png","anchorName":"ER_GhostRegistrationTerminal","rect":{"left":1075.4197799157396,"top":303.0397538937014,"width":364.5802200842604,"height":361.64205243793316},"bytes":189067}
+SCREENSHOT {"file":"m3-316-legacy-terminal-phone.png","anchorName":"DutyTerminal_316_LegacyScreen","rect":{"left":625.2784633205973,"top":434.45037708752267,"width":61.89864717431112,"height":40.60888704697328},"bytes":984466}
+M3 00:33 slip decoded at 316; second campus unlocked {"zone":"first_campus_3f","time":"01:15","loop":1,"erosion":1}
+SCREENSHOT {"file":"m4-ordinary-patient.png","anchorName":"SecondCampus_ChestPainPatient","rect":{"left":565.054294442931,"top":408.13660032283786,"width":383.9905078195334,"height":205.0589698640843},"bytes":1182721}
+SCREENSHOT {"file":"m4-transfer-form.png","anchorName":"SecondCampus_ChestTransferForm","rect":{"left":591.9077722448035,"top":475.48409840234797,"width":239.52790418131576,"height":133.71729841843933},"bytes":334678}
+SCREENSHOT {"file":"m4-guard-roster-clue.png","anchorName":"SecondCampus_TrueNameRosterFragment","rect":{"left":652.5222283641472,"top":420.519273723243,"width":134.43046869983095,"height":62.679379586760376},"bytes":1390981}
+M4 chest-pain duplicate resolved {"zone":"second_campus_5f","time":"01:45","loop":1,"erosion":2}
+SCREENSHOT {"file":"m5-security-playback.png","anchorName":"Second2F_CCTVWall","rect":{"left":440.61877073372943,"top":231.7074063505336,"width":558.7624585325411,"height":299.95547052087875},"bytes":273640}
+SCREENSHOT {"file":"m5-outbound-bridge-baseline.png","anchorName":"Annie_BRIDGE_MANIFEST","rect":{"left":700.9249464658448,"top":400.7649077872789,"width":38.15010706831083,"height":96.37104252117427},"bytes":1175911}
+SCREENSHOT {"file":"m5-return-bridge-annie.png","anchorName":"Annie_BRIDGE_MANIFEST","rect":{"left":669.369961085888,"top":371.7427852233681,"width":101.26007782822398,"height":248.50514489148776},"bytes":1196801}
+SCREENSHOT {"file":"m5-bridge-close-annie.png","anchorName":"Annie_BRIDGE_MANIFEST","rect":{"left":507.89316624759294,"top":275.41478753939685,"width":911.9178553023437,"height":624.5852124606031},"bytes":1280499}
+M5 bridge rule resolved {"zone":"skybridge","time":"02:00","loop":1,"erosion":2}
+SCREENSHOT {"file":"m6-elevator-display-6.png","anchorName":"Phantom6F_ElevatorDisplay","rect":{"left":566.3599406966084,"top":0,"width":307.2801186067834,"height":117.78531912674248},"bytes":376868}
+SCREENSHOT {"file":"m6-annie-cpr-long.png","anchorName":"Annie_FLOOR6_CPR","rect":{"left":707.2880594333487,"top":409.7035727997565,"width":131.20799546434546,"height":115.08354400198544},"bytes":1342558}
+SCREENSHOT {"file":"m6-stethoscope-relic.png","anchorName":"Floor6_Stethoscope_Engraving","rect":{"left":522.7067442453244,"top":425.31322778146557,"width":394.58651150935225,"height":86.137920283737},"bytes":1774629}
+SCREENSHOT {"file":"m6-annie-cpr.png","anchorName":"Annie_FLOOR6_CPR","rect":{"left":456.3719554525634,"top":308.8455243339352,"width":398.70041380185273,"height":424.3365129471917},"bytes":1369973}
+SCREENSHOT {"file":"m6-annie-cpr-close.png","anchorName":"Annie_HandStack_Top","rect":{"left":761.1233566534997,"top":401.8974070310055,"width":82.86524747090402,"height":57.661738847659706},"bytes":1349665}
+M6 nonexistent 6F resolved {"zone":"first_campus_1f","time":"02:00","loop":1,"erosion":3}
+SCREENSHOT {"file":"m7-1f-guard-post.png","anchorName":"FirstCampus1F_OldGuardPost","rect":{"left":250.7215688649346,"top":288.9632044657647,"width":872.3300087876246,"height":536.2745763149471},"bytes":1333450}
+SCREENSHOT {"file":"m7-b-panel-concealed-door.png","anchorName":"FirstFloor_BPanel_ConcealedDoor","rect":{"left":561.7692409118165,"top":159.73686799525439,"width":316.46151817636655,"height":536.7875642938657},"bytes":879423}
+SCREENSHOT {"file":"m7-b2-mirror-316.png","anchorName":"B2_ArchiveMirror_Frame","rect":{"left":402.75267869369964,"top":300.70714710223405,"width":634.4946426126007,"height":466.540165305519},"bytes":967592}
+M7 B2 reveals true name; M8 identity battle active {"zone":"first_campus_1f","time":"03:30","loop":1,"erosion":4}
+SCREENSHOT {"file":"m9-dual-identity-form.png","anchorName":"DutyPhone_316_Handset","rect":{"left":729.0949852321926,"top":417.5509027403301,"width":16.63067332159403,"height":37.9101739864808},"bytes":200334}
+SCREENSHOT {"file":"m9-successful-dawn-ending.png","anchorName":"DutyPhone_316_Handset","rect":{"left":729.0949852321926,"top":417.5509027403301,"width":16.63067332159403,"height":37.9101739864808},"bytes":186839}
+M9 TRUE NAME handoff accepted {"zone":"first_campus_3f","time":"04:05","loop":1,"erosion":4}
+AssertionError [ERR_ASSERTION]: [
+  "console: Failed to load resource: net::ERR_HTTP2_PROTOCOL_ERROR",
+  "console: THREE.GLTFLoader: Couldn't load texture textures/fern_02_diff_2k.jpg",
+  "console: Failed to load resource: net::ERR_HTTP2_PROTOCOL_ERROR",
+  "console: THREE.GLTFLoader: Couldn't load texture textures/fern_02_nor_gl_2k.jpg",
+  "console: Failed to load resource: net::ERR_HTTP2_PROTOCOL_ERROR",
+  "console: Failed to load resource: net::ERR_HTTP2_PROTOCOL_ERROR",
+  "console: THREE.GLTFLoader: Couldn't load texture textures/shrub_02_diff_2k.jpg",
+  "console: Failed to load resource: net::ERR_HTTP2_PROTOCOL_ERROR",
+  "console: THREE.GLTFLoader: Couldn't load texture textures/shrub_02_arm_2k.jpg",
+  "console: Failed to load resource: net::ERR_HTTP2_PROTOCOL_ERROR",
+  "console: THREE.GLTFLoader: Couldn't load texture textures/shrub_02_nor_gl_2k.jpg",
+  "console: Failed to load resource: net::ERR_HTTP2_PROTOCOL_ERROR",
+  "console: Failed to load resource: net::ERR_HTTP2_PROTOCOL_ERROR",
+  "console: Failed to load resource: net::ERR_HTTP2_PROTOCOL_ERROR",
+  "console: Failed to load resource: net::ERR_HTTP2_PROTOCOL_ERROR",
+  "console: Failed to load resource: net::ERR_HTTP2_PROTOCOL_ERROR",
+  "console: Failed to load resource: net::ERR_HTTP2_PROTOCOL_ERROR"
+]
+
+17 !== 0
+
+    at file:///C:/Users/Asher/Documents/game/DutyNight-visual-closeout/prototype/scripts/test-story-playthrough.mjs:502:10

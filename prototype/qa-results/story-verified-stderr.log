@@ -1,0 +1,5 @@
+AssertionError [ERR_ASSERTION]: M7 must include real guard-post and B-Panel interaction screenshots
+
+3 !== 2
+
+    at file:///C:/Users/Asher/Documents/game/DutyNight-visual-closeout/prototype/scripts/test-story-playthrough.mjs:492:10

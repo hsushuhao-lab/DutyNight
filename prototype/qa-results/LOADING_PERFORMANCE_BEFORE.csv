@@ -1,0 +1,13 @@
+fromZone,toZone,coldOrWarm,essentialBytes,optionalBytes,elevatorAnimationMs,extraWaitMs,totalTransitionMs,transitionStart,essentialReady,zoneBuilt,transitionEnd,status
+BOOT,first_campus_3f,cold,563212,0,0,0,11090,,,,,
+first_campus_3f,first_campus_4f,cold,0,0,1700,,10014.899999976158,13406.800000071526,,,23421.700000047684,TIMEOUT
+BOOT,first_campus_3f,warm,0,0,0,0,290,,,,,
+first_campus_3f,first_campus_4f,warm,0,0,1700,,10025.5,570,,,10595.5,TIMEOUT
+first_campus_4f,first_campus_2f,cold,0,0,1700,,10018.700000047684,9241,,,19259.700000047684,TIMEOUT
+first_campus_4f,first_campus_2f,warm,0,0,1700,,10008.699999928474,480,,,10488.699999928474,TIMEOUT
+first_campus_2f,first_campus_3f,cold,0,0,1700,,10019.700000047684,5001.799999952316,,,15021.5,TIMEOUT
+first_campus_2f,first_campus_3f,warm,0,0,1700,,10012.599999904633,2051.9000000953674,,,12064.5,TIMEOUT
+first_campus_3f,first_campus_1f,cold,0,0,1700,,10012.5,2560.600000023842,,,12573.100000023842,TIMEOUT
+first_campus_3f,first_campus_1f,warm,0,0,1700,,10028.799999952316,529.3000000715256,,,10558.100000023842,TIMEOUT
+second_campus_5f,second_campus_2f,cold,0,0,1700,,10009.100000023842,3016.600000023842,,,13025.700000047684,TIMEOUT
+second_campus_5f,second_campus_2f,warm,0,0,1700,,10010.100000023842,434,,,10444.100000023842,TIMEOUT

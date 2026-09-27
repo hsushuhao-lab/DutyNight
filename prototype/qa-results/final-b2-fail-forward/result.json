@@ -1,0 +1,48 @@
+{
+  "verdict": "PASS",
+  "checkpoints": [
+    {
+      "id": "ONE_ATTEMPT_ONLY",
+      "used": true,
+      "resolved": false,
+      "disabled": true,
+      "status": "CONTRADICTION｜02:17 李承禮位於 1F B-Panel；你的記憶卻包含 409-A 四點約束與第一線臨床決策。\n建立身分的機會已用盡。"
+    },
+    {
+      "id": "RETRY_BLOCKED",
+      "modalActive": false,
+      "used": true,
+      "subtitle": "「身分建立嘗試已用盡。B2 封存程序永久鎖閉，請由單向出口離開。」"
+    },
+    {
+      "id": "PERMANENT_EXIT_TO_HISTORY",
+      "zone": "first_campus_1f",
+      "flags": {
+        "B2_EXITED_PERMANENTLY": true,
+        "B2_HISTORY_FALLBACK_ACTIVE": true,
+        "ARCHIVE_PERSONNEL_OBJECTIVE": true,
+        "HIDDEN_SERVICE_DOOR_DISCOVERED": false,
+        "M7_B2_OPEN": false
+      }
+    },
+    {
+      "id": "316_BLOCKED_BEFORE_HISTORY",
+      "finalModalActive": false
+    },
+    {
+      "id": "HISTORY_REQUIRED_AND_REVIEWED",
+      "reviewed": true,
+      "battle": true
+    },
+    {
+      "id": "FINAL_316_AFTER_HISTORY",
+      "complete": true,
+      "resolvedAt316": true,
+      "trueName": "張守恆",
+      "gameComplete": true,
+      "endingCgActive": true
+    }
+  ],
+  "errors": [],
+  "finished": "2026-09-27T05:39:14.318Z"
+}

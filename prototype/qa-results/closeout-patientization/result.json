@@ -1,0 +1,81 @@
+{
+  "sourceSha": "working-tree",
+  "verdict": "PASS",
+  "errors": [],
+  "runs": [
+    {
+      "skip": false,
+      "scene": {
+        "canvas": true,
+        "meshes": [
+          "409 tiled floor",
+          "409 rear wall",
+          "409 side wall",
+          "409 side wall",
+          "409 ceiling",
+          "409 locked door",
+          "409 bed frame",
+          "409 green mattress",
+          "409 metal rail",
+          "409 rail post",
+          "409 rail post",
+          "409 metal rail",
+          "409 rail post",
+          "409 rail post",
+          "Restrained forearm",
+          "Leather wrist restraint",
+          "Leather ankle restraint",
+          "Restrained forearm",
+          "Leather wrist restraint",
+          "Leather ankle restraint",
+          "409 patient wristband",
+          "409 fluorescent"
+        ],
+        "enabled": false
+      },
+      "after": {
+        "loop": 1,
+        "zone": "first_campus_3f",
+        "enabled": true,
+        "canvas": false
+      }
+    },
+    {
+      "skip": true,
+      "scene": {
+        "canvas": true,
+        "meshes": [
+          "409 tiled floor",
+          "409 rear wall",
+          "409 side wall",
+          "409 side wall",
+          "409 ceiling",
+          "409 locked door",
+          "409 bed frame",
+          "409 green mattress",
+          "409 metal rail",
+          "409 rail post",
+          "409 rail post",
+          "409 metal rail",
+          "409 rail post",
+          "409 rail post",
+          "Restrained forearm",
+          "Leather wrist restraint",
+          "Leather ankle restraint",
+          "Restrained forearm",
+          "Leather wrist restraint",
+          "Leather ankle restraint",
+          "409 patient wristband",
+          "409 fluorescent"
+        ],
+        "enabled": false
+      },
+      "after": {
+        "loop": 2,
+        "zone": "first_campus_3f",
+        "enabled": true,
+        "canvas": false
+      }
+    }
+  ]
+}

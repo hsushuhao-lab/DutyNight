@@ -1,0 +1,436 @@
+{
+  "events": [
+    {
+      "seconds": 2.478,
+      "url": "https://hsushuhao-lab.github.io/DutyNight/assets/textures/Plastic010_2K-JPG_Color.jpg"
+    },
+    {
+      "seconds": 2.878,
+      "url": "https://hsushuhao-lab.github.io/DutyNight/assets/textures/Plastic010_2K-JPG_NormalGL.jpg"
+    },
+    {
+      "seconds": 5.276,
+      "url": "https://hsushuhao-lab.github.io/DutyNight/assets/textures/Plastic010_2K-JPG_Roughness.jpg"
+    },
+    {
+      "seconds": 12.78,
+      "url": "https://hsushuhao-lab.github.io/DutyNight/assets/textures/Terrazzo001_2K-JPG_Color.jpg"
+    },
+    {
+      "seconds": 20.128,
+      "url": "https://hsushuhao-lab.github.io/DutyNight/assets/textures/Terrazzo001_2K-JPG_NormalGL.jpg"
+    },
+    {
+      "seconds": 22.359,
+      "url": "https://hsushuhao-lab.github.io/DutyNight/assets/textures/Terrazzo001_2K-JPG_Roughness.jpg"
+    },
+    {
+      "seconds": 25.882,
+      "url": "https://hsushuhao-lab.github.io/DutyNight/assets/textures/Wood051_2K-JPG_Color.jpg"
+    },
+    {
+      "seconds": 41.386,
+      "url": "https://hsushuhao-lab.github.io/DutyNight/assets/textures/Wood051_2K-JPG_NormalGL.jpg"
+    }
+  ],
+  "audit": {
+    "zoneId": "first_campus_3f",
+    "texturedMeshCount": 392,
+    "flatMeshCount": 803,
+    "pbrMeshCount": 370,
+    "materials": [
+      {
+        "materialName": "(unnamed)",
+        "meshCount": 182,
+        "flatMeshCount": 160,
+        "pbrMeshCount": 0,
+        "hasMap": true,
+        "hasNormalMap": false,
+        "hasRoughnessMap": false,
+        "mapImageWidth": 512,
+        "mapImageHeight": 192,
+        "repeatX": 1,
+        "repeatY": 1,
+        "colorSpace": "srgb"
+      },
+      {
+        "materialName": "Annie_Mat_Coat",
+        "meshCount": 5,
+        "flatMeshCount": 5,
+        "pbrMeshCount": 0,
+        "hasMap": false,
+        "hasNormalMap": false,
+        "hasRoughnessMap": false,
+        "mapImageWidth": 0,
+        "mapImageHeight": 0,
+        "repeatX": null,
+        "repeatY": null,
+        "colorSpace": null
+      },
+      {
+        "materialName": "Annie_Mat_Scrubs",
+        "meshCount": 5,
+        "flatMeshCount": 5,
+        "pbrMeshCount": 0,
+        "hasMap": false,
+        "hasNormalMap": false,
+        "hasRoughnessMap": false,
+        "mapImageWidth": 0,
+        "mapImageHeight": 0,
+        "repeatX": null,
+        "repeatY": null,
+        "colorSpace": null
+      },
+      {
+        "materialName": "Annie_Mat_Vinyl",
+        "meshCount": 15,
+        "flatMeshCount": 15,
+        "pbrMeshCount": 0,
+        "hasMap": false,
+        "hasNormalMap": false,
+        "hasRoughnessMap": false,
+        "mapImageWidth": 0,
+        "mapImageHeight": 0,
+        "repeatX": null,
+        "repeatY": null,
+        "colorSpace": null
+      },
+      {
+        "materialName": "dark",
+        "meshCount": 83,
+        "flatMeshCount": 83,
+        "pbrMeshCount": 0,
+        "hasMap": false,
+        "hasNormalMap": false,
+        "hasRoughnessMap": false,
+        "mapImageWidth": 0,
+        "mapImageHeight": 0,
+        "repeatX": null,
+        "repeatY": null,
+        "colorSpace": null
+      },
+      {
+        "materialName": "fabric",
+        "meshCount": 24,
+        "flatMeshCount": 24,
+        "pbrMeshCount": 0,
+        "hasMap": false,
+        "hasNormalMap": false,
+        "hasRoughnessMap": false,
+        "mapImageWidth": 0,
+        "mapImageHeight": 0,
+        "repeatX": null,
+        "repeatY": null,
+        "colorSpace": null
+      },
+      {
+        "materialName": "hospital/ceiling",
+        "meshCount": 200,
+        "flatMeshCount": 0,
+        "pbrMeshCount": 200,
+        "hasMap": true,
+        "hasNormalMap": true,
+        "hasRoughnessMap": true,
+        "mapImageWidth": 2048,
+        "mapImageHeight": 2048,
+        "repeatX": 1,
+        "repeatY": 1,
+        "colorSpace": "srgb"
+      },
+      {
+        "materialName": "hospital/doorWood",
+        "meshCount": 46,
+        "flatMeshCount": 46,
+        "pbrMeshCount": 0,
+        "hasMap": false,
+        "hasNormalMap": false,
+        "hasRoughnessMap": false,
+        "mapImageWidth": 0,
+        "mapImageHeight": 0,
+        "repeatX": null,
+        "repeatY": null,
+        "colorSpace": null
+      },
+      {
+        "materialName": "hospital/floor",
+        "meshCount": 7,
+        "flatMeshCount": 0,
+        "pbrMeshCount": 7,
+        "hasMap": true,
+        "hasNormalMap": true,
+        "hasRoughnessMap": true,
+        "mapImageWidth": 2048,
+        "mapImageHeight": 2048,
+        "repeatX": 21.142857142857146,
+        "repeatY": 15.42857142857143,
+        "colorSpace": "srgb"
+      },
+      {
+        "materialName": "hospital/floorTile",
+        "meshCount": 1,
+        "flatMeshCount": 0,
+        "pbrMeshCount": 1,
+        "hasMap": true,
+        "hasNormalMap": true,
+        "hasRoughnessMap": true,
+        "mapImageWidth": 2048,
+        "mapImageHeight": 2048,
+        "repeatX": 8,
+        "repeatY": 4,
+        "colorSpace": "srgb"
+      },
+      {
+        "materialName": "hospital/floorWood",
+        "meshCount": 50,
+        "flatMeshCount": 50,
+        "pbrMeshCount": 0,
+        "hasMap": false,
+        "hasNormalMap": false,
+        "hasRoughnessMap": false,
+        "mapImageWidth": 0,
+        "mapImageHeight": 0,
+        "repeatX": null,
+        "repeatY": null,
+        "colorSpace": null
+      },
+      {
+        "materialName": "hospital/glass",
+        "meshCount": 7,
+        "flatMeshCount": 7,
+        "pbrMeshCount": 0,
+        "hasMap": false,
+        "hasNormalMap": false,
+        "hasRoughnessMap": false,
+        "mapImageWidth": 0,
+        "mapImageHeight": 0,
+        "repeatX": null,
+        "repeatY": null,
+        "colorSpace": null
+      },
+      {
+        "materialName": "hospital/handrail",
+        "meshCount": 2,
+        "flatMeshCount": 2,
+        "pbrMeshCount": 0,
+        "hasMap": false,
+        "hasNormalMap": false,
+        "hasRoughnessMap": false,
+        "mapImageWidth": 0,
+        "mapImageHeight": 0,
+        "repeatX": null,
+        "repeatY": null,
+        "colorSpace": null
+      },
+      {
+        "materialName": "hospital/lightWarm",
+        "meshCount": 12,
+        "flatMeshCount": 12,
+        "pbrMeshCount": 0,
+        "hasMap": false,
+        "hasNormalMap": false,
+        "hasRoughnessMap": false,
+        "mapImageWidth": 0,
+        "mapImageHeight": 0,
+        "repeatX": null,
+        "repeatY": null,
+        "colorSpace": null
+      },
+      {
+        "materialName": "hospital/metal",
+        "meshCount": 116,
+        "flatMeshCount": 116,
+        "pbrMeshCount": 0,
+        "hasMap": false,
+        "hasNormalMap": false,
+        "hasRoughnessMap": false,
+        "mapImageWidth": 0,
+        "mapImageHeight": 0,
+        "repeatX": null,
+        "repeatY": null,
+        "colorSpace": null
+      },
+      {
+        "materialName": "hospital/pathGravel",
+        "meshCount": 1,
+        "flatMeshCount": 1,
+        "pbrMeshCount": 0,
+        "hasMap": false,
+        "hasNormalMap": false,
+        "hasRoughnessMap": false,
+        "mapImageWidth": 0,
+        "mapImageHeight": 0,
+        "repeatX": null,
+        "repeatY": null,
+        "colorSpace": null
+      },
+      {
+        "materialName": "hospital/stainless",
+        "meshCount": 92,
+        "flatMeshCount": 92,
+        "pbrMeshCount": 0,
+        "hasMap": false,
+        "hasNormalMap": false,
+        "hasRoughnessMap": false,
+        "mapImageWidth": 0,
+        "mapImageHeight": 0,
+        "repeatX": null,
+        "repeatY": null,
+        "colorSpace": null
+      },
+      {
+        "materialName": "hospital/terrainGrass",
+        "meshCount": 4,
+        "flatMeshCount": 4,
+        "pbrMeshCount": 0,
+        "hasMap": false,
+        "hasNormalMap": false,
+        "hasRoughnessMap": false,
+        "mapImageWidth": 0,
+        "mapImageHeight": 0,
+        "repeatX": null,
+        "repeatY": null,
+        "colorSpace": null
+      },
+      {
+        "materialName": "hospital/wall",
+        "meshCount": 65,
+        "flatMeshCount": 0,
+        "pbrMeshCount": 65,
+        "hasMap": true,
+        "hasNormalMap": true,
+        "hasRoughnessMap": true,
+        "mapImageWidth": 2048,
+        "mapImageHeight": 2048,
+        "repeatX": 0.44,
+        "repeatY": 6.4,
+        "colorSpace": "srgb"
+      },
+      {
+        "materialName": "hospital/wallBumper",
+        "meshCount": 53,
+        "flatMeshCount": 53,
+        "pbrMeshCount": 0,
+        "hasMap": false,
+        "hasNormalMap": false,
+        "hasRoughnessMap": false,
+        "mapImageWidth": 0,
+        "mapImageHeight": 0,
+        "repeatX": null,
+        "repeatY": null,
+        "colorSpace": null
+      },
+      {
+        "materialName": "hospital/wallDark",
+        "meshCount": 97,
+        "flatMeshCount": 0,
+        "pbrMeshCount": 97,
+        "hasMap": true,
+        "hasNormalMap": true,
+        "hasRoughnessMap": true,
+        "mapImageWidth": 2048,
+        "mapImageHeight": 2048,
+        "repeatX": 1,
+        "repeatY": 1,
+        "colorSpace": "srgb"
+      },
+      {
+        "materialName": "ivory",
+        "meshCount": 22,
+        "flatMeshCount": 22,
+        "pbrMeshCount": 0,
+        "hasMap": false,
+        "hasNormalMap": false,
+        "hasRoughnessMap": false,
+        "mapImageWidth": 0,
+        "mapImageHeight": 0,
+        "repeatX": null,
+        "repeatY": null,
+        "colorSpace": null
+      },
+      {
+        "materialName": "leaf",
+        "meshCount": 100,
+        "flatMeshCount": 100,
+        "pbrMeshCount": 0,
+        "hasMap": false,
+        "hasNormalMap": false,
+        "hasRoughnessMap": false,
+        "mapImageWidth": 0,
+        "mapImageHeight": 0,
+        "repeatX": null,
+        "repeatY": null,
+        "colorSpace": null
+      },
+      {
+        "materialName": "paper",
+        "meshCount": 1,
+        "flatMeshCount": 1,
+        "pbrMeshCount": 0,
+        "hasMap": false,
+        "hasNormalMap": false,
+        "hasRoughnessMap": false,
+        "mapImageWidth": 0,
+        "mapImageHeight": 0,
+        "repeatX": null,
+        "repeatY": null,
+        "colorSpace": null
+      },
+      {
+        "materialName": "soil",
+        "meshCount": 5,
+        "flatMeshCount": 5,
+        "pbrMeshCount": 0,
+        "hasMap": false,
+        "hasNormalMap": false,
+        "hasRoughnessMap": false,
+        "mapImageWidth": 0,
+        "mapImageHeight": 0,
+        "repeatX": null,
+        "repeatY": null,
+        "colorSpace": null
+      }
+    ]
+  },
+  "resources": [
+    {
+      "name": "https://hsushuhao-lab.github.io/DutyNight/assets/textures/Plastic010_2K-JPG_Color.jpg",
+      "duration": 113.29999995231628,
+      "bytes": 41659
+    },
+    {
+      "name": "https://hsushuhao-lab.github.io/DutyNight/assets/textures/Plastic010_2K-JPG_NormalGL.jpg",
+      "duration": 513.2999999523163,
+      "bytes": 193880
+    },
+    {
+      "name": "https://hsushuhao-lab.github.io/DutyNight/assets/textures/Plastic010_2K-JPG_Roughness.jpg",
+      "duration": 2910.399999976158,
+      "bytes": 504358
+    },
+    {
+      "name": "https://hsushuhao-lab.github.io/DutyNight/assets/textures/Terrazzo001_2K-JPG_Color.jpg",
+      "duration": 10413.899999976158,
+      "bytes": 1353201
+    },
+    {
+      "name": "https://hsushuhao-lab.github.io/DutyNight/assets/textures/Terrazzo001_2K-JPG_NormalGL.jpg",
+      "duration": 17761.299999952316,
+      "bytes": 1230447
+    },
+    {
+      "name": "https://hsushuhao-lab.github.io/DutyNight/assets/textures/Terrazzo001_2K-JPG_Roughness.jpg",
+      "duration": 19993.399999976158,
+      "bytes": 476711
+    },
+    {
+      "name": "https://hsushuhao-lab.github.io/DutyNight/assets/textures/Wood051_2K-JPG_Color.jpg",
+      "duration": 23513.899999976158,
+      "bytes": 603972
+    },
+    {
+      "name": "https://hsushuhao-lab.github.io/DutyNight/assets/textures/Wood051_2K-JPG_NormalGL.jpg",
+      "duration": 39019.5,
+      "bytes": 1921609
+    }
+  ]
+}

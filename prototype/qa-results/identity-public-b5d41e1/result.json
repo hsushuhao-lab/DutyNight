@@ -1,0 +1,89 @@
+{
+  "verdict": "PASS",
+  "checks": [
+    {
+      "id": "PRE_6F_GUARD_BLOCKED",
+      "interactable": false,
+      "source": false,
+      "door": false
+    },
+    {
+      "id": "408C_ASSESSMENT_WITHOUT_KNOCK",
+      "lines": [
+        "「隔壁有人敲牆，固定四下，停一下，再九下。」  [E] 繼續",
+        "「只有敲擊聲嗎？有聽到人說話嗎？」  [E] 繼續",
+        "「只有敲牆，沒有人說話。」  [E] 繼續",
+        "「其他人也聽到了嗎？會不會是水管、推車或整修的聲音？」  [E] 繼續",
+        "「我問過了，他們說沒聽到。我也不知道是不是水管。」  [E] 繼續",
+        "「409 明明封閉整修。是環境聲音，還是知覺異常？先確認現場，現在還不能下結論。」  [E] 繼續"
+      ]
+    },
+    {
+      "id": "KNOCK_ONLY_AFTER_409_SEAL"
+    },
+    {
+      "id": "ER_CANONICAL_IDENTITY",
+      "lines": [
+        "劉志遠／ENG-860214／工務機電技師  [E] 繼續",
+        "「這名字好熟悉，在哪裡看過？」  [E] 繼續",
+        "「不要……不要拉三個……六樓……紫色的燈……B-Panel 在一樓警衛台後面……王世榮有鑰匙……」  [E] 繼續"
+      ]
+    },
+    {
+      "id": "SEVEN_PERSONNEL_PAGES",
+      "count": 7
+    },
+    {
+      "id": "ANNIE_storage",
+      "location": [
+        "STORAGE"
+      ]
+    },
+    {
+      "id": "ANNIE_patrol",
+      "location": [
+        "HISTORY_ENTRANCE"
+      ]
+    },
+    {
+      "id": "ANNIE_history",
+      "location": [
+        "HISTORY_INSIDE"
+      ]
+    },
+    {
+      "id": "ANNIE_final",
+      "location": [
+        "316"
+      ]
+    },
+    {
+      "id": "POST_6F_GUARD_AVAILABLE"
+    },
+    {
+      "id": "RECAP_BEFORE_TIME_AND_PHONE"
+    },
+    {
+      "id": "REPEAT_LOOP_REPORT_ONLY"
+    },
+    {
+      "id": "FLOOR6_LIFT_RETURN",
+      "zone": "first_campus_1f",
+      "position": [
+        -8,
+        1.6999999999999997,
+        13.5
+      ]
+    },
+    {
+      "id": "FINAL_REJECTS_MISSING_LEADING_ZERO"
+    }
+  ],
+  "errors": [],
+  "url": "https://hsushuhao-lab.github.io/DutyNight/?qa=story",
+  "build": {
+    "commit": "b5d41e1ae5d9657af1266a9f020f417ba03099ab",
+    "scope": "floorplan-access-20260920",
+    "builtAt": "2026-09-27T10:33:46.720Z"
+  }
+}

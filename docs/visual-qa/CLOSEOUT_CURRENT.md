@@ -57,3 +57,17 @@ Publication may proceed for user playtesting as authorized, but release status r
 
 -00:33 capture review confirmed the old arrival camera faced a wall. The cinematic now starts automatically inside the diagnostic room, displays real terminal fields in stages and restores control. `prototype/qa-results/registration-visible-trigger/result.json` PASS; its1440x900 active screenshot was inspected and shows the terminal. Remaining: full narrative-state screenshot and printer staging.
 -Loading audit now persists IN_PROGRESS/FAIL checkpoints and partial samples. Previous public corrected run ended without output; no pass inferred. Replacement logged audit: `prototype/qa-results/public-loading-diagnostic.*`.
+
+## Revision8e1be87 public checkpoint
+
+-Pages workflow36306345103 SUCCESS; public build-info commit `8e1be8710b407a55b66dbc2a1f341abfdf0051f2` verified2026-09-27T08:32:44Z.
+-Full local story run `story-8e1be87-local` failed because the old assertion checked restored controls when ringing began, before the approved3.8-second cinematic finished. The assertion is retained after explicitly waiting for its PLAYED flag (10-second bound). New run `story-8e1be87-timing` remains in progress.
+-Public loading `public-8e1be87-loading` records each sample's build fingerprint and production module hash. Partial timings:3F→4F cold8222ms/warm3298ms;4F→2F cold4349ms/warm2450ms. Source preparation64190ms and40087ms remains unacceptable for claiming overall performance completion. Remaining routes pending; no full PASS claimed.
+
+## Local archive handoff — 2026-09-27
+
+- User requested uploading local files before removing this checkout. Commit `1a159b0dedf5922038cd47276b34e0c84f63a1a7` is the published master snapshot; Pages deployment workflow36318074693 succeeded for that SHA.
+- This archive adds local visual comparison captures, all retained `prototype/qa-results` outputs (including ignored files), `.omo/evidence` reviews, and this handoff record. See `LOCAL_ARCHIVE_MANIFEST_20260927.csv` for SHA-256 and byte size per archived file.
+- Build output (`prototype/dist`), dependencies (`prototype/node_modules`), and transient Vite work (`prototype/.visual-work`) are generated/recreatable and not archived.
+- QA outputs cover multiple earlier revisions. Their embedded build fingerprints and per-run verdict remain authoritative; archival does not imply every run passed or that all evidence belongs to latest master.
+- The active closeout goal remains incomplete: M1–M9, full current material runtime audit, cold/warm route matrix, fixed before/after, cinematic review, and current public Pages visual verification have not all passed on one revision.

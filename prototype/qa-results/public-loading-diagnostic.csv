@@ -1,0 +1,5 @@
+fromZone,toZone,coldOrWarm,sourcePreparationMs,essentialBytes,optionalBytes,elevatorAnimationMs,extraWaitMs,totalTransitionMs,transitionStart,essentialReady,zoneBuilt,transitionEnd,status
+BOOT,first_campus_3f,cold,,588112,0,0,0,21897,,,,,
+first_campus_3f,first_campus_4f,cold,196373,27228,0,1700,2016.8000000715256,7504.600000023842,218363.19999992847,222080,222228.89999997616,225867.79999995232,
+BOOT,first_campus_3f,warm,,0,0,0,0,1139,,,,,
+first_campus_3f,first_campus_4f,warm,273,0,0,1700,3.799999952316284,2399.399999976158,1500.1000000238419,3203.899999976158,3324.7999999523163,3899.5,

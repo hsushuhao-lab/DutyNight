@@ -1,0 +1,918 @@
+{
+  "browser": "154.0.8037.57",
+  "captures": [
+    {
+      "id": "m0_3f_corridor",
+      "zone": "first_campus_3f",
+      "view": "entrance",
+      "filename": "m0_3f_corridor_entrance.png",
+      "variation": {
+        "mean": 167.79768880208363,
+        "variance": 1458.91615568224
+      }
+    },
+    {
+      "id": "m0_3f_corridor",
+      "zone": "first_campus_3f",
+      "view": "mid",
+      "filename": "m0_3f_corridor_mid.png",
+      "variation": {
+        "mean": 167.30444335937563,
+        "variance": 1216.9914885026774
+      }
+    },
+    {
+      "id": "m0_3f_corridor",
+      "zone": "first_campus_3f",
+      "view": "detail",
+      "filename": "m0_3f_corridor_detail.png",
+      "variation": {
+        "mean": 148.05777994791583,
+        "variance": 478.7556133006765
+      }
+    },
+    {
+      "id": "m0_3f_corridor",
+      "zone": "first_campus_3f",
+      "view": "junction",
+      "filename": "m0_3f_corridor_junction.png",
+      "variation": {
+        "mean": 136.31746419270885,
+        "variance": 1308.803811755297
+      }
+    },
+    {
+      "id": "m0_316_entrance",
+      "zone": "first_campus_3f",
+      "view": "entrance",
+      "filename": "m0_316_entrance_entrance.png",
+      "variation": {
+        "mean": 95.32080078125037,
+        "variance": 3370.524745278939
+      }
+    },
+    {
+      "id": "m0_316_entrance",
+      "zone": "first_campus_3f",
+      "view": "mid",
+      "filename": "m0_316_entrance_mid.png",
+      "variation": {
+        "mean": 127.07983398437449,
+        "variance": 3727.3079982798026
+      }
+    },
+    {
+      "id": "m0_316_entrance",
+      "zone": "first_campus_3f",
+      "view": "detail",
+      "filename": "m0_316_entrance_detail.png",
+      "variation": {
+        "mean": 63.60017903645876,
+        "variance": 1999.0047753584927
+      }
+    },
+    {
+      "id": "m0_316_entrance",
+      "zone": "first_campus_3f",
+      "view": "junction",
+      "filename": "m0_316_entrance_junction.png",
+      "variation": {
+        "mean": 142.12491861979086,
+        "variance": 1554.7404988542403
+      }
+    },
+    {
+      "id": "m0_316_office",
+      "zone": "first_campus_3f",
+      "view": "entrance",
+      "filename": "m0_316_office_entrance.png",
+      "variation": {
+        "mean": 165.7186686197922,
+        "variance": 1357.6788007876821
+      }
+    },
+    {
+      "id": "m0_316_office",
+      "zone": "first_campus_3f",
+      "view": "mid",
+      "filename": "m0_316_office_mid.png",
+      "variation": {
+        "mean": 140.8452148437497,
+        "variance": 2758.9673067463627
+      }
+    },
+    {
+      "id": "m0_316_office",
+      "zone": "first_campus_3f",
+      "view": "detail",
+      "filename": "m0_316_office_detail.png",
+      "variation": {
+        "mean": 155.22273763020536,
+        "variance": 539.7025852146398
+      }
+    },
+    {
+      "id": "m0_316_office",
+      "zone": "first_campus_3f",
+      "view": "junction",
+      "filename": "m0_316_office_junction.png",
+      "variation": {
+        "mean": 158.6006673177103,
+        "variance": 1906.3005214721707
+      }
+    },
+    {
+      "id": "m1_4f_lobby",
+      "zone": "first_campus_4f",
+      "view": "entrance",
+      "filename": "m1_4f_lobby_entrance.png",
+      "variation": {
+        "mean": 129.9074707031245,
+        "variance": 717.24189948407
+      }
+    },
+    {
+      "id": "m1_4f_lobby",
+      "zone": "first_campus_4f",
+      "view": "mid",
+      "filename": "m1_4f_lobby_mid.png",
+      "variation": {
+        "mean": 145.02425130208343,
+        "variance": 1516.4406011102292
+      }
+    },
+    {
+      "id": "m1_4f_lobby",
+      "zone": "first_campus_4f",
+      "view": "detail",
+      "filename": "m1_4f_lobby_detail.png",
+      "variation": {
+        "mean": 126.75838216145749,
+        "variance": 1113.6940893535266
+      }
+    },
+    {
+      "id": "m1_4f_lobby",
+      "zone": "first_campus_4f",
+      "view": "junction",
+      "filename": "m1_4f_lobby_junction.png",
+      "variation": {
+        "mean": 137.89339192708107,
+        "variance": 27.311171612062026
+      }
+    },
+    {
+      "id": "m2_4f_duty_room",
+      "zone": "first_campus_4f",
+      "view": "entrance",
+      "filename": "m2_4f_duty_room_entrance.png",
+      "variation": {
+        "mean": 176.64493815104132,
+        "variance": 461.4054794769436
+      }
+    },
+    {
+      "id": "m2_4f_duty_room",
+      "zone": "first_campus_4f",
+      "view": "mid",
+      "filename": "m2_4f_duty_room_mid.png",
+      "variation": {
+        "mean": 165.01318359374912,
+        "variance": 825.4038518001398
+      }
+    },
+    {
+      "id": "m2_4f_duty_room",
+      "zone": "first_campus_4f",
+      "view": "detail",
+      "filename": "m2_4f_duty_room_detail.png",
+      "variation": {
+        "mean": 188.00325520833454,
+        "variance": 2.771365270993556
+      }
+    },
+    {
+      "id": "m2_4f_duty_room",
+      "zone": "first_campus_4f",
+      "view": "junction",
+      "filename": "m2_4f_duty_room_junction.png",
+      "variation": {
+        "mean": 162.68424479166768,
+        "variance": 297.0905655748502
+      }
+    },
+    {
+      "id": "m3_4f_nursing_station",
+      "zone": "first_campus_4f",
+      "view": "entrance",
+      "filename": "m3_4f_nursing_station_entrance.png",
+      "variation": {
+        "mean": 138.48291015624955,
+        "variance": 771.5705087187343
+      }
+    },
+    {
+      "id": "m3_4f_nursing_station",
+      "zone": "first_campus_4f",
+      "view": "mid",
+      "filename": "m3_4f_nursing_station_mid.png",
+      "variation": {
+        "mean": 136.92960611979132,
+        "variance": 654.2742059430384
+      }
+    },
+    {
+      "id": "m3_4f_nursing_station",
+      "zone": "first_campus_4f",
+      "view": "detail",
+      "filename": "m3_4f_nursing_station_detail.png",
+      "variation": {
+        "mean": 147.64168294270866,
+        "variance": 1354.3618703879656
+      }
+    },
+    {
+      "id": "m3_4f_nursing_station",
+      "zone": "first_campus_4f",
+      "view": "junction",
+      "filename": "m3_4f_nursing_station_junction.png",
+      "variation": {
+        "mean": 130.34195963541623,
+        "variance": 556.7926230698577
+      }
+    },
+    {
+      "id": "m3_4f_ward_gate",
+      "zone": "first_campus_4f",
+      "view": "entrance",
+      "filename": "m3_4f_ward_gate_entrance.png",
+      "variation": {
+        "mean": 137.76529947916717,
+        "variance": 1013.0166930092237
+      }
+    },
+    {
+      "id": "m3_4f_ward_gate",
+      "zone": "first_campus_4f",
+      "view": "mid",
+      "filename": "m3_4f_ward_gate_mid.png",
+      "variation": {
+        "mean": 112.95532226562409,
+        "variance": 2063.8678769473445
+      }
+    },
+    {
+      "id": "m3_4f_ward_gate",
+      "zone": "first_campus_4f",
+      "view": "detail",
+      "filename": "m3_4f_ward_gate_detail.png",
+      "variation": {
+        "mean": 144.36629231770803,
+        "variance": 439.62583970359265
+      }
+    },
+    {
+      "id": "m3_4f_ward_gate",
+      "zone": "first_campus_4f",
+      "view": "junction",
+      "filename": "m3_4f_ward_gate_junction.png",
+      "variation": {
+        "mean": 94.73079427083407,
+        "variance": 1841.1188260183135
+      }
+    },
+    {
+      "id": "m2_4f_409",
+      "zone": "first_campus_4f",
+      "view": "entrance",
+      "filename": "m2_4f_409_entrance.png",
+      "variation": {
+        "mean": 25.72721354166669,
+        "variance": 519.5987103780009
+      }
+    },
+    {
+      "id": "m2_4f_409",
+      "zone": "first_campus_4f",
+      "view": "mid",
+      "filename": "m2_4f_409_mid.png",
+      "variation": {
+        "mean": 87.42789713541706,
+        "variance": 5169.741437461809
+      }
+    },
+    {
+      "id": "m2_4f_409",
+      "zone": "first_campus_4f",
+      "view": "detail",
+      "filename": "m2_4f_409_detail.png",
+      "variation": {
+        "mean": 28.419108072916757,
+        "variance": 259.44083062807306
+      }
+    },
+    {
+      "id": "m2_4f_409",
+      "zone": "first_campus_4f",
+      "view": "junction",
+      "filename": "m2_4f_409_junction.png",
+      "variation": {
+        "mean": 52.198323567708435,
+        "variance": 1257.1030560003783
+      }
+    },
+    {
+      "id": "m4_2f_er_arrival",
+      "zone": "first_campus_2f",
+      "view": "entrance",
+      "filename": "m4_2f_er_arrival_entrance.png",
+      "variation": {
+        "mean": 89.45540364583331,
+        "variance": 954.3925424151339
+      }
+    },
+    {
+      "id": "m4_2f_er_arrival",
+      "zone": "first_campus_2f",
+      "view": "mid",
+      "filename": "m4_2f_er_arrival_mid.png",
+      "variation": {
+        "mean": 100.2801106770838,
+        "variance": 748.2421217759274
+      }
+    },
+    {
+      "id": "m4_2f_er_arrival",
+      "zone": "first_campus_2f",
+      "view": "detail",
+      "filename": "m4_2f_er_arrival_detail.png",
+      "variation": {
+        "mean": 108.96443684895834,
+        "variance": 1055.7577142121645
+      }
+    },
+    {
+      "id": "m4_2f_er_arrival",
+      "zone": "first_campus_2f",
+      "view": "junction",
+      "filename": "m4_2f_er_arrival_junction.png",
+      "variation": {
+        "mean": 86.2150065104168,
+        "variance": 567.9019601343771
+      }
+    },
+    {
+      "id": "m4_2f_er_triage",
+      "zone": "first_campus_2f",
+      "view": "entrance",
+      "filename": "m4_2f_er_triage_entrance.png",
+      "variation": {
+        "mean": 146.26578776041762,
+        "variance": 796.3049536543112
+      }
+    },
+    {
+      "id": "m4_2f_er_triage",
+      "zone": "first_campus_2f",
+      "view": "mid",
+      "filename": "m4_2f_er_triage_mid.png",
+      "variation": {
+        "mean": 130.71915690104177,
+        "variance": 1719.1044767632193
+      }
+    },
+    {
+      "id": "m4_2f_er_triage",
+      "zone": "first_campus_2f",
+      "view": "detail",
+      "filename": "m4_2f_er_triage_detail.png",
+      "variation": {
+        "mean": 137.19824218750017,
+        "variance": 504.80965836830364
+      }
+    },
+    {
+      "id": "m4_2f_er_triage",
+      "zone": "first_campus_2f",
+      "view": "junction",
+      "filename": "m4_2f_er_triage_junction.png",
+      "variation": {
+        "mean": 89.39241536458366,
+        "variance": 2197.4368304940563
+      }
+    },
+    {
+      "id": "m4_2f_er_bays",
+      "zone": "first_campus_2f",
+      "view": "entrance",
+      "filename": "m4_2f_er_bays_entrance.png",
+      "variation": {
+        "mean": 121.67057291666748,
+        "variance": 895.1596527100173
+      }
+    },
+    {
+      "id": "m4_2f_er_bays",
+      "zone": "first_campus_2f",
+      "view": "mid",
+      "filename": "m4_2f_er_bays_mid.png",
+      "variation": {
+        "mean": 133.4969889322927,
+        "variance": 721.7730486589498
+      }
+    },
+    {
+      "id": "m4_2f_er_bays",
+      "zone": "first_campus_2f",
+      "view": "detail",
+      "filename": "m4_2f_er_bays_detail.png",
+      "variation": {
+        "mean": 105.5625000000002,
+        "variance": 1024.3307291666424
+      }
+    },
+    {
+      "id": "m4_2f_er_bays",
+      "zone": "first_campus_2f",
+      "view": "junction",
+      "filename": "m4_2f_er_bays_junction.png",
+      "variation": {
+        "mean": 104.85066731770958,
+        "variance": 385.28572383840947
+      }
+    },
+    {
+      "id": "m4_2f_er_treatment",
+      "zone": "first_campus_2f",
+      "view": "entrance",
+      "filename": "m4_2f_er_treatment_entrance.png",
+      "variation": {
+        "mean": 106.70491536458188,
+        "variance": 802.3658872979813
+      }
+    },
+    {
+      "id": "m4_2f_er_treatment",
+      "zone": "first_campus_2f",
+      "view": "mid",
+      "filename": "m4_2f_er_treatment_mid.png",
+      "variation": {
+        "mean": 132.54166666666686,
+        "variance": 2655.544704861055
+      }
+    },
+    {
+      "id": "m4_2f_er_treatment",
+      "zone": "first_campus_2f",
+      "view": "detail",
+      "filename": "m4_2f_er_treatment_detail.png",
+      "variation": {
+        "mean": 113.09635416666636,
+        "variance": 234.5042249893304
+      }
+    },
+    {
+      "id": "m4_2f_er_treatment",
+      "zone": "first_campus_2f",
+      "view": "junction",
+      "filename": "m4_2f_er_treatment_junction.png",
+      "variation": {
+        "mean": 82.21305338541687,
+        "variance": 338.62002709168974
+      }
+    },
+    {
+      "id": "m4_2f_er_exterior",
+      "zone": "first_campus_2f",
+      "view": "entrance",
+      "filename": "m4_2f_er_exterior_entrance.png",
+      "variation": {
+        "mean": 61.44425455729184,
+        "variance": 35.99792326162651
+      }
+    },
+    {
+      "id": "m4_2f_er_exterior",
+      "zone": "first_campus_2f",
+      "view": "mid",
+      "filename": "m4_2f_er_exterior_mid.png",
+      "variation": {
+        "mean": 71.51928710937514,
+        "variance": 251.9629526601384
+      }
+    },
+    {
+      "id": "m4_2f_er_exterior",
+      "zone": "first_campus_2f",
+      "view": "detail",
+      "filename": "m4_2f_er_exterior_detail.png",
+      "variation": {
+        "mean": 69.18131510416629,
+        "variance": 27.296714676805095
+      }
+    },
+    {
+      "id": "m4_2f_er_exterior",
+      "zone": "first_campus_2f",
+      "view": "junction",
+      "filename": "m4_2f_er_exterior_junction.png",
+      "variation": {
+        "mean": 75.36580403645819,
+        "variance": 193.26714769331193
+      }
+    },
+    {
+      "id": "m5_1f_lobby_entrance",
+      "zone": "first_campus_1f",
+      "view": "entrance",
+      "filename": "m5_1f_lobby_entrance_entrance.png",
+      "variation": {
+        "mean": 89.54890950520812,
+        "variance": 2760.653640846517
+      }
+    },
+    {
+      "id": "m5_1f_lobby_entrance",
+      "zone": "first_campus_1f",
+      "view": "mid",
+      "filename": "m5_1f_lobby_entrance_mid.png",
+      "variation": {
+        "mean": 82.20068359374966,
+        "variance": 2648.9061779182157
+      }
+    },
+    {
+      "id": "m5_1f_lobby_entrance",
+      "zone": "first_campus_1f",
+      "view": "detail",
+      "filename": "m5_1f_lobby_entrance_detail.png",
+      "variation": {
+        "mean": 71.00040690104161,
+        "variance": 1001.7803546521145
+      }
+    },
+    {
+      "id": "m5_1f_lobby_entrance",
+      "zone": "first_campus_1f",
+      "view": "junction",
+      "filename": "m5_1f_lobby_entrance_junction.png",
+      "variation": {
+        "mean": 79.51228841145816,
+        "variance": 145.2178394462453
+      }
+    },
+    {
+      "id": "m5_1f_reception",
+      "zone": "first_campus_1f",
+      "view": "entrance",
+      "filename": "m5_1f_reception_entrance.png",
+      "variation": {
+        "mean": 131.73697916666688,
+        "variance": 4563.007208930088
+      }
+    },
+    {
+      "id": "m5_1f_reception",
+      "zone": "first_campus_1f",
+      "view": "mid",
+      "filename": "m5_1f_reception_mid.png",
+      "variation": {
+        "mean": 117.18513997395839,
+        "variance": 4684.1324712369715
+      }
+    },
+    {
+      "id": "m5_1f_reception",
+      "zone": "first_campus_1f",
+      "view": "detail",
+      "filename": "m5_1f_reception_detail.png",
+      "variation": {
+        "mean": 90.15234374999942,
+        "variance": 613.3021494547829
+      }
+    },
+    {
+      "id": "m5_1f_reception",
+      "zone": "first_campus_1f",
+      "view": "junction",
+      "filename": "m5_1f_reception_junction.png",
+      "variation": {
+        "mean": 83.45377604166688,
+        "variance": 3222.826530880363
+      }
+    },
+    {
+      "id": "m6_8f_bridge_entry",
+      "zone": "first_campus_8f",
+      "view": "entrance",
+      "filename": "m6_8f_bridge_entry_entrance.png",
+      "variation": {
+        "mean": 94.28059895833381,
+        "variance": 1185.3662512037208
+      }
+    },
+    {
+      "id": "m6_8f_bridge_entry",
+      "zone": "first_campus_8f",
+      "view": "mid",
+      "filename": "m6_8f_bridge_entry_mid.png",
+      "variation": {
+        "mean": 108.48356119791676,
+        "variance": 2383.4186750784374
+      }
+    },
+    {
+      "id": "m6_8f_bridge_entry",
+      "zone": "first_campus_8f",
+      "view": "detail",
+      "filename": "m6_8f_bridge_entry_detail.png",
+      "variation": {
+        "mean": 109.42862955729157,
+        "variance": 1714.5286519198235
+      }
+    },
+    {
+      "id": "m6_8f_bridge_entry",
+      "zone": "first_campus_8f",
+      "view": "junction",
+      "filename": "m6_8f_bridge_entry_junction.png",
+      "variation": {
+        "mean": 94.33536783854119,
+        "variance": 1464.0355590119525
+      }
+    },
+    {
+      "id": "m7_skybridge_start",
+      "zone": "skybridge",
+      "view": "entrance",
+      "filename": "m7_skybridge_start_entrance.png",
+      "variation": {
+        "mean": 117.5664062499999,
+        "variance": 1690.5373111302943
+      }
+    },
+    {
+      "id": "m7_skybridge_start",
+      "zone": "skybridge",
+      "view": "mid",
+      "filename": "m7_skybridge_start_mid.png",
+      "variation": {
+        "mean": 126.0100097656246,
+        "variance": 1864.946107487236
+      }
+    },
+    {
+      "id": "m7_skybridge_start",
+      "zone": "skybridge",
+      "view": "detail",
+      "filename": "m7_skybridge_start_detail.png",
+      "variation": {
+        "mean": 95.56778971354143,
+        "variance": 1225.7237031659097
+      }
+    },
+    {
+      "id": "m7_skybridge_start",
+      "zone": "skybridge",
+      "view": "junction",
+      "filename": "m7_skybridge_start_junction.png",
+      "variation": {
+        "mean": 97.0809733072913,
+        "variance": 1703.3176349468577
+      }
+    },
+    {
+      "id": "m7_skybridge_mid",
+      "zone": "skybridge",
+      "view": "entrance",
+      "filename": "m7_skybridge_mid_entrance.png",
+      "variation": {
+        "mean": 109.34334309895868,
+        "variance": 1763.5253175563794
+      }
+    },
+    {
+      "id": "m7_skybridge_mid",
+      "zone": "skybridge",
+      "view": "mid",
+      "filename": "m7_skybridge_mid_mid.png",
+      "variation": {
+        "mean": 133.0386555989578,
+        "variance": 1928.0088410311182
+      }
+    },
+    {
+      "id": "m7_skybridge_mid",
+      "zone": "skybridge",
+      "view": "detail",
+      "filename": "m7_skybridge_mid_detail.png",
+      "variation": {
+        "mean": 91.63199869791669,
+        "variance": 995.4620142777712
+      }
+    },
+    {
+      "id": "m7_skybridge_mid",
+      "zone": "skybridge",
+      "view": "junction",
+      "filename": "m7_skybridge_mid_junction.png",
+      "variation": {
+        "mean": 101.93351236979152,
+        "variance": 1490.3157020080016
+      }
+    },
+    {
+      "id": "m7_skybridge_end",
+      "zone": "skybridge",
+      "view": "entrance",
+      "filename": "m7_skybridge_end_entrance.png",
+      "variation": {
+        "mean": 68.49682617187511,
+        "variance": 174.628136628211
+      }
+    },
+    {
+      "id": "m7_skybridge_end",
+      "zone": "skybridge",
+      "view": "mid",
+      "filename": "m7_skybridge_end_mid.png",
+      "variation": {
+        "mean": 112.40608723958341,
+        "variance": 2593.263261556822
+      }
+    },
+    {
+      "id": "m7_skybridge_end",
+      "zone": "skybridge",
+      "view": "detail",
+      "filename": "m7_skybridge_end_detail.png",
+      "variation": {
+        "mean": 76.33382161458256,
+        "variance": 93.88433135885953
+      }
+    },
+    {
+      "id": "m7_skybridge_end",
+      "zone": "skybridge",
+      "view": "junction",
+      "filename": "m7_skybridge_end_junction.png",
+      "variation": {
+        "mean": 95.32120768229136,
+        "variance": 1239.7821066578945
+      }
+    },
+    {
+      "id": "m9_second_campus_2f",
+      "zone": "second_campus_2f",
+      "view": "entrance",
+      "filename": "m9_second_campus_2f_entrance.png",
+      "variation": {
+        "mean": 106.51814778645863,
+        "variance": 1760.5288047723898
+      }
+    },
+    {
+      "id": "m9_second_campus_2f",
+      "zone": "second_campus_2f",
+      "view": "mid",
+      "filename": "m9_second_campus_2f_mid.png",
+      "variation": {
+        "mean": 93.9248860677084,
+        "variance": 2216.453803426688
+      }
+    },
+    {
+      "id": "m9_second_campus_2f",
+      "zone": "second_campus_2f",
+      "view": "detail",
+      "filename": "m9_second_campus_2f_detail.png",
+      "variation": {
+        "mean": 85.48974609375024,
+        "variance": 68.0122646489217
+      }
+    },
+    {
+      "id": "m9_second_campus_2f",
+      "zone": "second_campus_2f",
+      "view": "junction",
+      "filename": "m9_second_campus_2f_junction.png",
+      "variation": {
+        "mean": 82.51969401041654,
+        "variance": 317.34428445488084
+      }
+    },
+    {
+      "id": "m8_second_campus_std",
+      "zone": "second_campus_5f",
+      "view": "entrance",
+      "filename": "m8_second_campus_std_entrance.png",
+      "variation": {
+        "mean": 65.34171549479122,
+        "variance": 66.5838327342608
+      }
+    },
+    {
+      "id": "m8_second_campus_std",
+      "zone": "second_campus_5f",
+      "view": "mid",
+      "filename": "m8_second_campus_std_mid.png",
+      "variation": {
+        "mean": 73.37125651041629,
+        "variance": 103.0321447319684
+      }
+    },
+    {
+      "id": "m8_second_campus_std",
+      "zone": "second_campus_5f",
+      "view": "detail",
+      "filename": "m8_second_campus_std_detail.png",
+      "variation": {
+        "mean": 75.55867513020908,
+        "variance": 23.767282055328906
+      }
+    },
+    {
+      "id": "m8_second_campus_std",
+      "zone": "second_campus_5f",
+      "view": "junction",
+      "filename": "m8_second_campus_std_junction.png",
+      "variation": {
+        "mean": 78.68505859375009,
+        "variance": 747.5544577438222
+      }
+    },
+    {
+      "id": "m10_second_campus_1f",
+      "zone": "second_campus_1f",
+      "view": "entrance",
+      "filename": "m10_second_campus_1f_entrance.png",
+      "variation": {
+        "mean": 108.88492838541812,
+        "variance": 820.4464481935465
+      }
+    },
+    {
+      "id": "m10_second_campus_1f",
+      "zone": "second_campus_1f",
+      "view": "mid",
+      "filename": "m10_second_campus_1f_mid.png",
+      "variation": {
+        "mean": 107.9156087239592,
+        "variance": 375.70422251348464
+      }
+    },
+    {
+      "id": "m10_second_campus_1f",
+      "zone": "second_campus_1f",
+      "view": "detail",
+      "filename": "m10_second_campus_1f_detail.png",
+      "variation": {
+        "mean": 117.70011393229005,
+        "variance": 1832.4914756821327
+      }
+    },
+    {
+      "id": "m10_second_campus_1f",
+      "zone": "second_campus_1f",
+      "view": "junction",
+      "filename": "m10_second_campus_1f_junction.png",
+      "variation": {
+        "mean": 99.42342122395864,
+        "variance": 859.7090336945603
+      }
+    }
+  ],
+  "skipped": [
+    {
+      "id": "m11_hillside_main",
+      "zone": "hillside_route",
+      "reason": "not registered in WorldRouter"
+    },
+    {
+      "id": "m11_hillside_branch",
+      "zone": "hillside_route",
+      "reason": "not registered in WorldRouter"
+    },
+    {
+      "id": "m12_pond_approach",
+      "zone": "ecology_pond",
+      "reason": "not registered in WorldRouter"
+    },
+    {
+      "id": "m12_pond_deck",
+      "zone": "ecology_pond",
+      "reason": "not registered in WorldRouter"
+    },
+    {
+      "id": "m12_pond_waterside",
+      "zone": "ecology_pond",
+      "reason": "not registered in WorldRouter"
+    }
+  ],
+  "errors": [
+    "Blank or severely underexposed render: m2_4f_duty_room_detail.png"
+  ],
+  "productionDebugHidden": true,
+  "explicitDebugAvailable": true,
+  "note": "Detail is narrower FOV at identical standing position; junction is rotated camera, not a new collision probe."
+}

@@ -1,0 +1,85 @@
+{
+  "totalRuntimeAssetBytes": 64876664,
+  "top20": [
+    {
+      "path": "models/campusTree.glb",
+      "size": 16433736
+    },
+    {
+      "path": "textures/Ground037_2K-JPG_NormalGL.jpg",
+      "size": 4579158
+    },
+    {
+      "path": "textures/Asphalt033_2K-JPG_NormalGL.jpg",
+      "size": 3941267
+    },
+    {
+      "path": "textures/Ground037_2K-JPG_Color.jpg",
+      "size": 3251213
+    },
+    {
+      "path": "A03_1730_NURSING_STATION_WARM.png",
+      "size": 1923484
+    },
+    {
+      "path": "textures/Wood051_2K-JPG_NormalGL.jpg",
+      "size": 1921309
+    },
+    {
+      "path": "A07_1900_NURSING_STATION_DOCTOR_DESK.png",
+      "size": 1893958
+    },
+    {
+      "path": "A08_COMPUTER_UI_REFERENCE.png",
+      "size": 1875037
+    },
+    {
+      "path": "A04_1830_WORKSTATION_WARM.png",
+      "size": 1751118
+    },
+    {
+      "path": "A02_1715_DUTY_ROOM_WARM.png",
+      "size": 1697166
+    },
+    {
+      "path": "A01_1700_WARD_CORRIDOR_WARM.png",
+      "size": 1696890
+    },
+    {
+      "path": "A05_2000_ER_WARM.png",
+      "size": 1679125
+    },
+    {
+      "path": "models/shrub_02/textures/shrub_02_nor_gl_2k.jpg",
+      "size": 1667532
+    },
+    {
+      "path": "A06_2058_FIRST_ANOMALY_HOOK.png",
+      "size": 1572944
+    },
+    {
+      "path": "models/fern_02/textures/fern_02_nor_gl_2k.jpg",
+      "size": 1365615
+    },
+    {
+      "path": "textures/Terrazzo001_2K-JPG_Color.jpg",
+      "size": 1352901
+    },
+    {
+      "path": "models/shrub_02/textures/shrub_02_diff_2k.jpg",
+      "size": 1319985
+    },
+    {
+      "path": "textures/Terrazzo001_2K-JPG_NormalGL.jpg",
+      "size": 1230147
+    },
+    {
+      "path": "textures/Asphalt033_2K-JPG_Color.jpg",
+      "size": 1195209
+    },
+    {
+      "path": "textures/Ground037_2K-JPG_Roughness.jpg",
+      "size": 1189976
+    }
+  ]
+}

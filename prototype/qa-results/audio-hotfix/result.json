@@ -1,0 +1,16 @@
+{
+  "verdict": "PASS",
+  "checks": [
+    {
+      "id": "missed-unlock-recovery-and-repeat",
+      "state": "running",
+      "bursts": 2,
+      "timer": 4
+    },
+    {
+      "id": "idempotence-answer-cancellation-resume",
+      "pass": true
+    }
+  ],
+  "errors": []
+}

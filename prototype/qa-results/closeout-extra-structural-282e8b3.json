@@ -1,0 +1,17 @@
+[
+  {
+    "test": "test_pond_waterfront_qa.js",
+    "exit": 0,
+    "output": "POND WATERFRONT PASS: entrance -> upper deck -> descending ramp -> lower water edge -> return, safety railing retained\n"
+  },
+  {
+    "test": "test_hillside_surface_qa.js",
+    "exit": 0,
+    "output": "main segment 1: axis_error=0.0000deg, centerline_misses=0/31\nmain segment 2: axis_error=0.0000deg, centerline_misses=0/42\nmain segment 3: axis_error=0.0000deg, centerline_misses=0/55\nmain segment 4: axis_error=0.0000deg, centerline_misses=0/51\nmain segment 5: axis_error=0.0000deg, centerline_misses=0/45\nmain segment 6: axis_error=0.0000deg, centerline_misses=0/43\nbranch segment 1: axis_error=0.0000deg, centerline_misses=0/27\nbranch segment 2: axis_error=0.0000deg, centerline_misses=0/27\nHILLSIDE_SURFACE_QA = PASS: eight aligned segments; 321 raycast samples; original widths, nodes, elevations and boundary boxes retained\n"
+  },
+  {
+    "test": "test_art_resources_qa.js",
+    "exit": 0,
+    "output": "PASS shadow targets released across three 3F/4F cycles\nPASS instance buffers and unique resources released; shared cache retained\nPASS actual pond reflection render target cleanup\nART_RESOURCE_QA = PASS (CPU disposal contracts; browser GPU behavior remains separate)\n"
+  }
+]
