@@ -21,9 +21,8 @@ try{
     const scene=await page.evaluate(()=>({canvas:!!document.querySelector('.patientization-canvas'),meshes:window.__storyQA.uiManager.patientizationScene.scene.children.filter(o=>o.isMesh).map(o=>o.name),enabled:window.__storyQA.controller.enabled}));
     assert(scene.canvas&&scene.meshes.includes('409 patient wristband')&&scene.meshes.includes('Leather wrist restraint'));
     assert.equal(scene.enabled,false);
-    await page.screenshot({path:`${output}/${skip?'skip':'natural'}-patientization.png`});
     if(skip){
-      await page.waitForTimeout(3200);
+      await page.waitForFunction(()=>document.getElementById('loop-stage-title')?.textContent==='MEMORY ANCHOR',null,{timeout:7000});
       const rewind=await page.evaluate(()=>({
         title:document.getElementById('loop-stage-title')?.textContent||'',
         body:document.getElementById('loop-stage-body')?.textContent||''
@@ -32,6 +31,8 @@ try{
       assert.match(rewind.body,/17:00[\s\S]*19:30/);
       assert.match(rewind.body,/這些我已經記得/);
       await page.locator('#btn-loop-skip').click();
+    }else{
+      await page.screenshot({path:`${output}/natural-patientization.png`,timeout:10000});
     }
     await page.waitForFunction(()=>!document.querySelector('#loop-cutscene').classList.contains('active'),null,{timeout:20000});
     await page.waitForTimeout(800);
