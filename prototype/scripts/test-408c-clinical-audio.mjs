@@ -27,7 +27,7 @@ assert.equal(knocks.length,0,'clinical assessment must not confirm the reported 
 assert.equal(lines.length,6);
 for(const text of ['人說話','其他人','水管','環境聲音','不能下結論'])assert(lines.some(line=>line.text.includes(text)));
 run(seal);for(const timer of timers.splice(0))timer();
-assert.deepEqual(knocks,[.035],'only post-assessment sealed 409 produces the faint pattern');
+assert.deepEqual(knocks,[.13],'only post-assessment sealed 409 produces the audible pattern');
 run(seal);for(const timer of timers.splice(0))timer();
 assert.equal(knocks.length,1,'repeat inspection must not replay the reveal');
-console.log('PASS: 408C assessment stays ambiguous; faint knock follows sealed 409 once');
+console.log('PASS: 408C assessment stays ambiguous; audible knock follows sealed 409 once');

@@ -11,15 +11,13 @@ const zoneAssets=readFileSync('./src/art/ZoneAssetManifest.js','utf8');
 const b2=readFileSync('./src/world/zones/B2Archive.js','utf8');
 const routes=readFileSync('./src/world/shared/WorldRoutes.js','utf8');
 
-const modelPreload=main.indexOf('await preloadAssetNames(openingAssets.models)');
-const surfacePreload=main.indexOf('void preloadMaterialSurfaces(openingAssets.surfaces)');
+const essentialPreload=main.indexOf('await preloadZoneEssential(openingZoneId)');
 const sceneSetup=main.indexOf('// Setup Three.js Scene & Renderer');
-assert(modelPreload>=0&&modelPreload<sceneSetup,'opening GLTF art must be ready before scene construction');
-assert(surfacePreload>=0&&surfacePreload<sceneSetup,'opening PBR preload must start before scene construction without blocking first render');
-assert(!main.includes('await preloadZoneEssential(openingZoneId)'),'opening scene must not wait for all PBR texture channels');
+assert(essentialPreload>=0&&essentialPreload<sceneSetup,'opening essential models and PBR must be ready before scene construction');
+assert(zoneAssets.includes('preloadAssetNames(entries.models')&&zoneAssets.includes('preloadMaterialSurfaces(entries.surfaces'),'essential contract must load models and PBR together');
 for(const asset of ['officeChair','storageCabinet','workDesk','printer','bench','plant'])assert(zoneAssets.includes(`'${asset}'`),'opening critical asset missing: '+asset);
 assert(!main.includes('deferredHospitalAssets'),'first paint must not start a whole-world download storm');
-assert(main.includes("prepareLoopReset:()=>preloadZoneEssential('first_campus_3f')"),'loop reset must prepare 3F art and materials');
+assert(main.includes("prepareLoopReset:()=>prepareZoneWithRetry('first_campus_3f')"),'loop reset must prepare 3F art and materials');
 const loopManager=readFileSync('./src/core/LoopManager.js','utf8');
 assert(loopManager.includes('await this.loopResetPreparation'),'loop reset must await art/material readiness before loadZone');
 assert(ui.includes('async finishLoopCutscene()')&&ui.includes("body.textContent='場景重建中……'")&&ui.includes('await result'),'patientization cutscene must remain active while loop art finishes loading');
@@ -51,7 +49,7 @@ assert(ui.includes('const preloadPromise=Promise.resolve(onPrefetch?.(destinatio
 assert(ui.includes('await preloadPromise'),'arrival must wait for destination essentials before zone construction');
 assert(!ui.includes('preloadDeadline'),'required indoor art must never be bypassed by an arbitrary timeout');
 assert(main.includes('prefetchDestinationAssets'),'main travel flow must provide destination prefetch');
-assert(main.includes('await preloadZoneEssential(zoneId)'),'travel transition must await only destination essentials');
+assert(main.includes('await prepareZoneWithRetry(zoneId)'),'travel transition must await only destination essentials');
 assert(main.includes('void preloadZoneOptional(zoneId)'),'decorative assets must not block arrival');
 assert(!main.includes('preloadAssets()')&&!main.includes('preloadCampusBackdropAssets()'),'travel must not block on full hospital or campus vegetation');
 for(const zone of ['first_campus_3f','first_campus_4f','first_campus_2f','first_campus_1f','first_campus_8f','skybridge','second_campus_2f','second_campus_5f','phantom_6f','b2_archive'])assert(zoneAssets.includes(`${zone}:`),'zone manifest missing '+zone);
