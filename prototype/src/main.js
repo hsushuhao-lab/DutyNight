@@ -349,7 +349,7 @@ function completeFinalIdentityAt316(name,employeeId,{deferred=false}={}) {
   gameState.setFlag('GAME_COMPLETE',true);
   gameState.setFlag('M8_IDENTITY_BATTLE_ACTIVE',false);
   persistentMemory.resolveLegend('lastCall');
-  persistentMemory.completeGame();
+  persistentMemory.beginSuccessfulEndingReview();
   uiManager.updateTasks();
   controller.enabled=false;
 
