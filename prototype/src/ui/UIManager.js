@@ -764,7 +764,7 @@ export class UIManager {
     this.memoryModal?.classList.remove('active');const cb=this.memoryCloseHandler;this.memoryCloseHandler=null;this.memorySequence=null;cb?.();if(resume)this.onTerminalClose?.();
   }
 
-  openIdentityMatrix({candidates=[],onSelect}={}){
+  openIdentityMatrix({candidates=[],onSelect,onAttemptComplete=null}={}){
     document.exitPointerLock();this.identityMatrixHandler=onSelect;let attemptUsed=false;
     const grid=document.getElementById('identity-candidate-grid');grid.replaceChildren();
     for(const candidate of candidates){
@@ -776,7 +776,22 @@ export class UIManager {
       cue.textContent=profile?`人物記憶：「${profile.signatureQuote}」｜${profile.hobby}`:'';
       cue.style.display='block';cue.style.marginTop='4px';cue.style.opacity='.78';
       button.append(strong,meta,cue);
-      button.addEventListener('click',()=>{if(attemptUsed)return;attemptUsed=true;grid.querySelectorAll('button').forEach(item=>item.disabled=true);soundManager.playComputerBeep();const result=this.identityMatrixHandler?.(candidate)||{};this.setIdentityMatrixStatus(result.message||'',result.resolved?'match':'error');if(result.resolved)setTimeout(()=>this.closeIdentityMatrix(),1500);});
+      button.addEventListener('click',()=>{
+        if(attemptUsed)return;
+        attemptUsed=true;
+        grid.querySelectorAll('button').forEach(item=>item.disabled=true);
+        soundManager.playComputerBeep();
+        const result=this.identityMatrixHandler?.(candidate)||{};
+        this.setIdentityMatrixStatus(result.message||'',result.resolved?'match':'error');
+        if(onAttemptComplete){
+          setTimeout(()=>{
+            this.closeIdentityMatrix(false);
+            onAttemptComplete(result,candidate);
+          },result.resolved?1500:1900);
+        }else if(result.resolved){
+          setTimeout(()=>this.closeIdentityMatrix(),1500);
+        }
+      });
       grid.appendChild(button);
     }
     this.setIdentityMatrixStatus('等待候選身分比對。','');this.identityMatrixModal?.classList.add('active');
