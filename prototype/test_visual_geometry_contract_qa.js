@@ -3,6 +3,8 @@ import * as THREE from 'three';
 import {readFileSync} from 'node:fs';
 import {WorldRouter} from './src/world/WorldRouter.js';
 import {gameState} from './src/core/GameState.js';
+import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js';
+import {preloadAssetNames} from './src/art/AssetRegistry.js';
 
 const context=new Proxy({measureText:t=>({width:t.length*20})},{get:(o,k)=>o[k]||(()=>({addColorStop(){}}))});
 global.document={
@@ -10,6 +12,15 @@ global.document={
   addEventListener(){},
   createElement:(tag)=>tag==='canvas'?{width:0,height:0,getContext:()=>context}:{getContext:()=>context}
 };
+
+// Mirror production's essential-model readiness before measuring workstation bounds.
+const originalLoad=GLTFLoader.prototype.loadAsync;
+GLTFLoader.prototype.loadAsync=async function(url){
+  const bytes=readFileSync(new URL('./public'+url,import.meta.url));
+  return this.parseAsync(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength),'');
+};
+try{await preloadAssetNames(['officeChair','workDesk','storageCabinet','hospitalBed','bench','printer','plant']);}
+finally{GLTFLoader.prototype.loadAsync=originalLoad;}
 
 const router=new WorldRouter(new THREE.Scene(),new THREE.PerspectiveCamera(),null);
 
