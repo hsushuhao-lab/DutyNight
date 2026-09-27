@@ -57,6 +57,7 @@ import { getMemorySequence, IDENTITY_CANDIDATES } from './story/NarrativeV22.js'
 import { CinematicDirector } from './story/CinematicDirector.js';
 import { ActPresentationDirector } from './story/ActPresentationDirector.js';
 import { FinalPatientizationDirector } from './story/FinalPatientizationDirector.js';
+import { FinalSuccessDirector } from './story/FinalSuccessDirector.js';
 
 // Setup Three.js Scene & Renderer
 const container = document.getElementById('canvas-container');
@@ -152,6 +153,10 @@ const finalPatientizationDirector=new FinalPatientizationDirector({
   soundManager
 });
 
+const finalSuccessDirector=new FinalSuccessDirector({
+  soundManager
+});
+
 const loopManager=new LoopManager({
   gameState,worldRouter,controller,uiManager,
   prepareLoopReset:()=>prepareZoneWithRetry('first_campus_3f')
@@ -175,6 +180,29 @@ function registerBed33Clue(clueId){
     uiManager.showSubtitle('值班醫師','「04:09……不是時間。是 409？」',3600);
   }
   return state;
+}
+
+function trigger409PostSealKnock(){
+  if(!gameState.isTaskComplete('P1_NORMAL_EVENT_DONE'))return false;
+  if(gameState.getFlag('KNOCK_408C_POST_SEAL_PLAYED'))return false;
+
+  gameState.setFlag('KNOCK_408C_POST_SEAL_PLAYED',true);
+  const expectedZone='first_campus_4f';
+
+  setTimeout(async()=>{
+    if(worldRouter.activeZoneId!==expectedZone)return;
+    await soundManager.ensureRunning();
+    if(worldRouter.activeZoneId!==expectedZone)return;
+
+    soundManager.playBed33KnockPattern(.16);
+    uiManager.showSubtitle(
+      '值班醫師',
+      '「409 確實封鎖了……剛才那個敲擊聲，我也聽到了。」',
+      4200
+    );
+  },520);
+
+  return true;
 }
 
 uiManager.setBed33Handlers({
@@ -298,18 +326,48 @@ function establishCanonicalIdentity({at316=false}={}) {
   return persistentMemory.data.trueNameResolved===true;
 }
 
+function restartFreshExperience(){
+  persistentMemory.reset();
+  try{
+    for(const key of [
+      'DutyNight_OpeningPresentationSeen',
+      'DutyNight_Act2CardSeen',
+      'DutyNight_Act3CardSeen',
+      'DutyNight_SuccessOutroSeen'
+    ])sessionStorage.removeItem(key);
+  }catch{}
+  location.reload();
+}
+
 function completeFinalIdentityAt316(name,employeeId,{deferred=false}={}) {
   const sourceVerified=gameState.getFlag('M7_B2_RESOLVED')||gameState.getFlag('HISTORY_PERSONNEL_PROFILES_REVIEWED');
   if(name!==TRUE_NAME_CANON||employeeId!=='0409'||!sourceVerified)return false;
   establishCanonicalIdentity({at316:deferred});
   gameState.setFlag('LAST_CALL_SEEN',true);
   gameState.setFlag('M8_CODE_BLACK_ANNOUNCED',true);
+  gameState.setFlag('FINAL_SUCCESS_RECAP_MANAGED',true);
   gameState.setFlag('GAME_COMPLETE',true);
   gameState.setFlag('M8_IDENTITY_BATTLE_ACTIVE',false);
   persistentMemory.resolveLegend('lastCall');
   persistentMemory.completeGame();
   uiManager.updateTasks();
   controller.enabled=false;
+
+  const playPerfectRecap=()=>finalSuccessDirector.play({
+    onPerfect:()=>{
+      gameState.setFlag('FINAL_PERFECT_END',true);
+      persistentMemory.completePerfectEnding();
+      uiManager.showFinalSuccess(TRUE_NAME_CANON);
+      controller.enabled=false;
+    },
+    onReplay:()=>restartFreshExperience()
+  }).catch(error=>{
+    console.error('[cinematic] perfect-ending recap failed',error);
+    persistentMemory.completePerfectEnding();
+    uiManager.showFinalSuccess(TRUE_NAME_CANON);
+    controller.enabled=false;
+  });
+
   void cinematicDirector.play({
     id:'FINAL_SHIFT_COMPLETION_CG',
     durationMs:5200,
@@ -317,11 +375,11 @@ function completeFinalIdentityAt316(name,employeeId,{deferred=false}={}) {
     cues:[
       {at:.18,run:()=>uiManager.showEndingCG(TRUE_NAME_CANON)},
       {at:.56,run:()=>soundManager.playDoorLockClack()},
-      {at:.78,run:()=>uiManager.showSubtitle('錄音帶','「張醫師……如果你還聽得到，天亮了。辛苦了。這一班，你可以交了。」',5200)}
+      {at:.78,run:()=>uiManager.showSubtitle('316 舊終端','「RECORD WRITE COMPLETE｜原始夜班紀錄已恢復。」',4200)}
     ],
-    onComplete:()=>uiManager.showFinalSuccess(TRUE_NAME_CANON)
-  }).then(played=>{if(!played)uiManager.showFinalSuccess(TRUE_NAME_CANON);})
-    .catch(error=>{console.error('[cinematic] final shift completion failed',error);uiManager.showFinalSuccess(TRUE_NAME_CANON);});
+    onComplete:()=>void playPerfectRecap()
+  }).then(played=>{if(!played)void playPerfectRecap();})
+    .catch(error=>{console.error('[cinematic] final shift completion failed',error);void playPerfectRecap();});
   return true;
 }
 
@@ -566,12 +624,9 @@ controller.onInteract = async (interactable) => {
   } else if (interactable.type === 'duty_door') {
     if(interactable.doorId==='room_409'){
       if(gameState.isTaskComplete('P1_NORMAL_EVENT_DONE')){
-      gameState.setFlag('FOURF_409_SEAL_CHECKED_AFTER_408C',true);
-      if(!gameState.getFlag('KNOCK_408C_POST_SEAL_PLAYED')){
-        gameState.setFlag('KNOCK_408C_POST_SEAL_PLAYED',true);
-        setTimeout(()=>{soundManager.playBed33KnockPattern(.13);uiManager.showSubtitle('值班醫師','「409 確實封鎖了……剛才那個敲擊聲，我也聽到了。」',4200);},850);
+        gameState.setFlag('FOURF_409_SEAL_CHECKED_AFTER_408C',true);
+        trigger409PostSealKnock();
       }
-    }
       registerBed33Clue('DOOR_409_SEALED');
       soundManager.playDoorLockClack();
       uiManager.showSubtitle('值班醫師','「409 整修封閉中……可護理站那張舊床位卡卻還寫著 409A。」',3400);
@@ -793,7 +848,6 @@ controller.onInteract = async (interactable) => {
         setTimeout(()=>{practical.intensity=brightness;},180);
       }
       if(roomLights[1])roomLights[1].intensity*=.4;
-      soundManager.playBed33KnockPattern();
       uiManager.showSubtitle('急診護理師','「值班醫師，不好意思。系統裡突然多了一筆掛號資料，可是我們這邊找不到病人。你對這筆資料有印象嗎？」\\n值班醫師：「我沒有印象。我下去看看病歷紀錄。」',6200);
     }else return;
     worldRouter.activeZoneInstance?.syncStoryState?.();
@@ -908,10 +962,7 @@ controller.onInteract = async (interactable) => {
   } else if (interactable.type === 'bed33_409_sealed') {
     if(gameState.isTaskComplete('P1_NORMAL_EVENT_DONE')){
       gameState.setFlag('FOURF_409_SEAL_CHECKED_AFTER_408C',true);
-      if(!gameState.getFlag('KNOCK_408C_POST_SEAL_PLAYED')){
-        gameState.setFlag('KNOCK_408C_POST_SEAL_PLAYED',true);
-        setTimeout(()=>{soundManager.playBed33KnockPattern(.13);uiManager.showSubtitle('值班醫師','「409 確實封鎖了……剛才那個敲擊聲，我也聽到了。」',4200);},850);
-      }
+      trigger409PostSealKnock();
     }
     registerBed33Clue('DOOR_409_SEALED');
     uiManager.updateTasks();
