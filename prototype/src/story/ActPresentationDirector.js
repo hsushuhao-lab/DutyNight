@@ -298,7 +298,7 @@ export class ActPresentationDirector {
     if(this.destroyed||this.qaMode)return;
 
     if(this.gameState?.getFlag('GAME_COMPLETE')){
-      this.scheduleSuccessOutro();
+      if(!this.gameState?.getFlag('FINAL_SUCCESS_RECAP_MANAGED'))this.scheduleSuccessOutro();
       return;
     }
 
