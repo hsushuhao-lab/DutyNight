@@ -107,6 +107,8 @@ export class GameState {
     this.flags.set('BRIDGE_REFLECTION_NOTICE_PENDING', false);
     this.flags.set('BRIDGE_REFLECTION_NOTICE_SEEN', false);
     this.flags.set('BRIDGE_OVERRIDE_PENDING', false);
+    this.flags.set('BRIDGE_NO_LOOKBACK_RULE_ACTIVE', false);
+    this.flags.set('BRIDGE_MANUAL_LOOKBACK_AFTER_SAFE_CHOICE', false);
     this.flags.set('SECOND_CAMPUS_PHONE_PENDING', false);
     this.flags.set('FLOOR6_AVAILABLE', false);
     this.flags.set('M6_FLOOR6_RESOLVED', false);
