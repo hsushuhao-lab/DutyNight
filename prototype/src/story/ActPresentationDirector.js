@@ -226,7 +226,7 @@ export class ActPresentationDirector {
     if(this.act3Seen||this.qaMode||this.active)return Promise.resolve(false);
     this.act3Seen=true;mark(KEYS.act3);
     return this.run([
-      {theme:'horror',kicker:'ACT III · 最後交班',title:'把自己的名字留下來',subtitle:'你現在要證明的，不是「今晚誰應該值班」。\n而是——你到底是誰。',glitch:true,duration:3600}
+      {theme:'horror',kicker:'ACT III · 紀錄覆寫',title:'把自己的名字留下來',subtitle:'你現在要證明的，不是「今晚誰應該值班」。\n而是——你到底是誰。',glitch:true,duration:3600}
     ]);
   }
 
@@ -312,7 +312,7 @@ export class ActPresentationDirector {
       return;
     }
 
-    if(!this.act2Seen&&this.gameState?.getFlag('BOOTSTRAP_2117_RESOLVED')){
+    if(!this.act2Seen&&this.gameState?.getFlag('CG_21_17_DUTY_ROOM_ACTIVATION_PLAYED')){
       if(!this.blocked())void this.playAct2();
     }
   }

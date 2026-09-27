@@ -229,7 +229,7 @@ export class SoundManager {
     } catch (e) {}
   }
 
-  playBed33KnockPattern() {
+  playBed33KnockPattern(volume=.13) {
     if(!this.ctx||this.isMuted)return;
     try{
       const now=this.ctx.currentTime;
@@ -237,7 +237,7 @@ export class SoundManager {
         const osc=this.ctx.createOscillator(),gain=this.ctx.createGain(),filter=this.ctx.createBiquadFilter();
         osc.type='triangle';osc.frequency.setValueAtTime(92,t);osc.frequency.exponentialRampToValueAtTime(42,t+.08);
         filter.type='lowpass';filter.frequency.value=280;
-        gain.gain.setValueAtTime(.13,t);gain.gain.exponentialRampToValueAtTime(.001,t+.11);
+        gain.gain.setValueAtTime(volume,t);gain.gain.exponentialRampToValueAtTime(.001,t+.11);
         osc.connect(filter);filter.connect(gain);gain.connect(this.ctx.destination);osc.start(t);osc.stop(t+.13);
       };
       let t=now;

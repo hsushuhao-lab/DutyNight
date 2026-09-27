@@ -24,6 +24,7 @@ try {
   });
   await page.goto(`${publicUrl || 'http://localhost:4173/'}?qa=story`);
   await page.waitForFunction(() => window.__storyQA?.worldRouter?.activeZoneInstance);
+  await page.waitForFunction(()=>window.__materialAudit().materials.filter(m=>['hospital/wall','hospital/floorTile','hospital/doorWood'].includes(m.materialName)).every(m=>m.hasMap&&m.hasNormalMap&&m.hasRoughnessMap),null,{timeout:300000});
 
   await page.evaluate(() => {
     const qa = window.__storyQA;
@@ -55,11 +56,14 @@ try {
   assert.match(retry.subtitle, /永久鎖閉|嘗試已用盡/);
   report.checkpoints.push({ id: 'RETRY_BLOCKED', ...retry, subtitle: retry.subtitle.slice(0, 180) });
 
+  await page.evaluate(() => window.__storyQA.captureView({position:[0,1.65,-1.5],target:[0,1.2,2],anchorName:'B2_OneWayExitDoor'}));
   await page.evaluate(() => window.__storyQA.interact({ type: 'b2_exit_door' }));
   await page.locator('#btn-story-primary').click();
   await page.waitForFunction(() => window.__storyQA.gameState.getFlag('CG_B2_PERMANENT_CLOSURE_ACTIVE'));
+  await page.waitForTimeout(650);
+  assert.equal(await page.evaluate(() => !!window.__storyQA.gameState.getFlag('CG_B2_PERMANENT_CLOSURE_ACTIVE')),true);
   await page.screenshot({ path: `${output}/02-b2-closure-active.png` });
-  await page.waitForFunction(() => window.__storyQA.worldRouter.activeZoneId === 'first_campus_1f', null, { timeout: 15000 });
+  await page.waitForFunction(() => window.__storyQA.worldRouter.activeZoneId === 'first_campus_3f', null, { timeout: 15000 });
   const afterExit = await page.evaluate(() => window.__storyQA.snapshot());
   assert.equal(afterExit.flags.B2_EXITED_PERMANENTLY, true);
   assert.equal(afterExit.flags.B2_HISTORY_FALLBACK_ACTIVE, true);
@@ -99,12 +103,27 @@ try {
     screen.updateWorldMatrix(true,false);
     const p=screen.matrixWorld.elements;
     q.controller.teleport(p[12]-1.6,1.7,p[14]);q.lookAt([p[12],p[13],p[14]]);
+    window.__recapInputAudit={frames:0,violations:0};
+    const audit=()=>{
+      if(q.gameState.getFlag('CG_316_TRUE_NAME_FINAL_HANDOFF_ACTIVE')){
+        window.__recapInputAudit.frames++;
+        if(document.querySelector('#final-handoff-modal')?.classList.contains('active'))window.__recapInputAudit.violations++;
+      }
+      if(!q.gameState.getFlag('CG_316_TRUE_NAME_FINAL_HANDOFF_PLAYED'))requestAnimationFrame(audit);
+    };
+    requestAnimationFrame(audit);
     q.interact({type:'workstation'});
   });
   await page.waitForFunction(() => window.__storyQA.gameState.getFlag('CG_316_TRUE_NAME_FINAL_HANDOFF_ACTIVE'));
-  await page.waitForTimeout(2400);
-  assert.equal(await page.locator('#final-employee-id').isVisible(),false,'identity input must wait until the recap finishes');
+  await page.waitForTimeout(1000);
+  assert.equal(await page.evaluate(()=>!!window.__storyQA.gameState.getFlag('CG_316_TRUE_NAME_FINAL_HANDOFF_ACTIVE')),true,'capture must occur during the recap');
   await page.screenshot({ path: `${output}/03-316-pre-input-cinematic.png` });
+  await page.waitForFunction(()=>window.__storyQA.gameState.getFlag('CG_316_TRUE_NAME_FINAL_HANDOFF_PLAYED'));
+  const recapAudit=await page.evaluate(()=>window.__recapInputAudit);
+  assert(recapAudit.frames>0,'recap must render active frames');
+  assert.equal(recapAudit.violations,0,'identity input must remain closed throughout the active recap');
+  report.checkpoints.push({id:'INPUT_LOCKED_DURING_RECAP',...recapAudit});
+  while(await page.evaluate(()=>!!window.__storyQA.uiManager.dialogueSequence))await page.keyboard.press('e');
   await page.locator('#final-employee-id').fill('0409');
   await page.locator('#btn-submit-final-handoff').click();
   await page.waitForFunction(() => window.__storyQA.gameState.getFlag('GAME_COMPLETE') === true, null, { timeout: 10000 });

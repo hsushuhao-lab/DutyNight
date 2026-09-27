@@ -218,6 +218,13 @@ export class UIManager {
       this.finalHandoffHandler?.({name:TRUE_NAME_CANON,employeeId});
     });
 
+    document.addEventListener('keydown', event => {
+      if (!this.dialogueSequence || event.code !== 'KeyE') return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      if (!event.repeat) this.advanceDialogue();
+    }, true);
+
     // Debug toggle with Backquote (~)
     document.addEventListener('keydown', (e) => {
       if(this.memoryModal?.classList.contains('active')&&(e.code==='KeyA'||e.code==='ArrowLeft'||e.code==='KeyD'||e.code==='ArrowRight')){
@@ -270,7 +277,29 @@ export class UIManager {
     }
   }
 
+  showDialogue(lines, onComplete = null) {
+    this.dialogueSequence = {lines, index:0, onComplete};
+    this.advanceDialogue();
+  }
+
+  advanceDialogue() {
+    const sequence = this.dialogueSequence;
+    if (!sequence) return;
+    clearTimeout(this.subtitleTimer);
+    const line = sequence.lines[sequence.index++];
+    if (!line) {
+      this.dialogueSequence = null;
+      this.subtitleEl.classList.remove('visible');
+      sequence.onComplete?.();
+      return;
+    }
+    this.subtitleSpeakerEl.textContent = line.speaker;
+    this.subtitleTextEl.textContent = line.text + '  [E] 繼續';
+    this.subtitleEl.classList.add('visible');
+  }
+
   showSubtitle(speaker, text, duration = 6500) {
+    if (this.dialogueSequence) return;
     this.subtitleSpeakerEl.textContent = speaker;
     this.subtitleTextEl.textContent = text;
     this.subtitleEl.classList.add('visible');
@@ -1090,7 +1119,7 @@ export class UIManager {
       }else if(this.gameState.getFlag('B2_EXITED_PERMANENTLY')&&!this.gameState.getFlag('M7_B2_RESOLVED')){
         const reviewed=this.gameState.getFlag('HISTORY_PERSONNEL_PROFILES_REVIEWED');
         this.renderTaskBoard(reviewed?'身份檔案核對完成｜返回 316':'B2 身分驗證失敗｜文史資料室',[
-          {id:'task-m7-deferred-316',text:reviewed?'回第一院區 3F 316，以員編末四碼完成最終交班驗證':'前往第一院區 3F 文史資料室，查閱夜班核心人員 4+3 檔案',state:'ready'}
+          {id:'task-m7-deferred-316',text:reviewed?'返回 316，輸入員編末四碼阻止紀錄覆寫':'前往第一院區 3F 文史資料室，查閱1998 夜班核心人員名錄',state:'ready'}
         ]);
       }else if(this.gameState.getFlag('M6_FLOOR6_RESOLVED')&&!this.gameState.getFlag('M7_B2_OPEN')&&!this.gameState.getFlag('M7_B2_RESOLVED')){
         this.renderTaskBoard('翌日 02:17 前｜門禁紀錄',[
@@ -1102,11 +1131,11 @@ export class UIManager {
         ]);
       }else if(this.gameState.getFlag('M7_B2_RESOLVED')&&!this.gameState.getFlag('LAST_CALL_SEEN')){
         this.renderTaskBoard('B2｜身分驗證完成',[
-          {id:'task-m8-b2-exit',text:'由單向出口門返回 1F 警衛台後方',state:'ready'}
+          {id:'task-m8-b2-exit',text:'由封存防火門返回 3F',state:'ready'}
         ]);
       }else if(this.gameState.getFlag('M8_IDENTITY_BATTLE_ACTIVE')&&!this.gameState.getFlag('GAME_COMPLETE')){
-        this.renderTaskBoard('CODE BLACK｜04:09 前',[
-          {id:'task-m9-final-handoff',text:'全院門禁正在收縮：立刻回第一院區 3F 316，在覆寫完成前宣告真正姓名與員編；這是最後一次機會',state:'ready'}
+        this.renderTaskBoard('RECORD OVERWRITE｜紀錄覆寫中',[
+          {id:'task-m9-final-handoff',text:'返回 316，輸入正確權限阻止紀錄覆寫',state:'ready'}
         ]);
       }else{
         document.getElementById('task-panel')?.classList.add('no-guidance');
@@ -1146,7 +1175,7 @@ export class UIManager {
 
     const dutySteps=[
       {id:'task-4f-report',complete:done('P1_4F_REPORT'),text:'17:15 向護理站報到並確認交班重點'},
-      {id:'task-408c-event',complete:done('P1_NORMAL_EVENT_DONE'),text:'19:30 查看 408C 反映的敲牆聲'},
+      {id:'task-408c-event',complete:done('P1_NORMAL_EVENT_DONE'),text:'19:30 前往 408C，評估敲牆聲是否可能為幻聽／知覺異常'},
       {id:'task-409-seal',complete:this.gameState.getFlag('FOURF_409_SEAL_CHECKED_AFTER_408C'),text:'確認 409 房門封條與整修狀態'},
       {id:'task-bed33-form',complete:this.gameState.getFlag('BED33_RESOLVED'),text:'回護理站核對 409A 臨時床位分配單'}
     ];

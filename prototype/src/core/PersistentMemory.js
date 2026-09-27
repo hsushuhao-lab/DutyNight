@@ -96,6 +96,9 @@ export class PersistentMemory {
         data.journalNotes=data.journalNotes.filter(n=>!['TRUE_NAME','B2_316'].includes(n.id));
       }
       if((parsed.version||1)<3)data.version=3;
+      const engineerNote=data.journalNotes.find(note=>note.id==='LIU_MAINTENANCE_TAG');
+      if(engineerNote)engineerNote.text='劉志遠／ENG-860214／工務機電技師。燒焦吊牌標示 6F SKILL LAB／B-PANEL；他提到紫色備援與王世榮保管的鑰匙。';
+      for(const note of data.journalNotes)note.text=note.text.replaceAll('4+3 夜班核心人員檔案','1998 夜班核心人員名錄');
       return data;
     }catch(e){
       return defaults();

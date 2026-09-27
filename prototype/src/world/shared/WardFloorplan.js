@@ -197,12 +197,10 @@ export class WardFloorplan {
     };
     w.build();this.gf.buildCeilingLight(this.zoneGroup,-11,3.15,6,.7,7,0xffebce);
     this.dutyRoom={door:[-8,1.7,6],inside:[-9.5,1.7,6],outside:[-6.5,1.7,6],bounds:[-14,2,-8,10]};
-    // V6 task flow: only the real nursing-station handoff remains as a free-standing target.
-    // 408C starts the sealed-409 check; the duty-room computer owns the later 21:00 rest interaction.
-    this.interactables.push({
-      position:new THREE.Vector3(-3.35,0,-2.35),radius:2.1,
-      interactable:true,id:'4F_NURSING_REPORT',type:'p1_action',action:'NURSE_REPORT',label:'向護理站報到'
-    });
+    const reportBoard=this.zoneGroup.getObjectByName('FourF_NursingHandoverBoard');
+    reportBoard.userData={...reportBoard.userData,interactable:true,id:'4F_NURSING_REPORT',type:'p1_action',action:'NURSE_REPORT',label:'查看值班資訊並向護理站報到'};
+    this.interactables.push(reportBoard);
+
   }
   buildBed33Legend(){
     const m=this.gf.materials;
@@ -290,7 +288,7 @@ export class WardFloorplan {
     const door=new KeyedKnobDoor(this,{id:'second_duty_room',x:o+8,z:6,yaw:Math.PI/2,width:1.4,title:'值班室',openDirection:1});
     door.keepOpen=true;door.setClosed(false);
     door.root.traverse(object=>{if(object.userData?.doorId==='second_duty_room')object.userData.interactable=false;});
-    SignAnchor.buildWallPlaque({scene:this.zoneGroup,x:o+8.115,y:2.62,z:6,rotationY:-Math.PI/2,width:1.18,height:.34,code:'5F',title:'醫師值班室',subtitle:'ON-CALL ROOM',header:''});
+    SignAnchor.buildWallPlaque({scene:this.zoneGroup,x:o+8.115,y:2.62,z:6,rotationY:-Math.PI/2,width:1.18,height:.34,code:'5F',title:'醫師值班室',subtitle:"DOCTORS' DUTY ROOM",header:''});
     const decor=new THREE.Group();decor.name='Second5F_DutyRoomDecor';this.zoneGroup.add(decor);
     asset(decor,'bench',[o+10,0,9.25],[.62,.62,.62],Math.PI);
     asset(decor,'plant',[o+13.15,0,9.1],[.55,.55,.55]);

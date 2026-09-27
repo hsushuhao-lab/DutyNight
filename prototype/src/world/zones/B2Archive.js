@@ -53,13 +53,17 @@ export class B2Archive {
     const terminal=workstation.hitbox;this.interactables.push(terminal);
 
     const exitDoor=new THREE.Group();exitDoor.name='B2_OneWayExitDoor';exitDoor.position.set(0,0,1.54);this.zoneGroup.add(exitDoor);
-    solid(exitDoor,m.wallDark,[-1.18,1.25,0],[.10,2.5,2.8]);solid(exitDoor,m.wallDark,[1.18,1.25,0],[.10,2.5,2.8]);
-    solid(exitDoor,m.doorWood,[0,1.15,.46],[1.72,2.30,.10]);
-    solid(exitDoor,m.metal,[.68,1.12,.38],[.08,.08,.08]);
-    SignAnchor.buildWallPlaque({scene:exitDoor,x:0,y:2.25,z:.66,rotationY:Math.PI,width:1.55,height:.38,code:'EXIT',title:'單向出口｜返回 1F 警衛台後方',subtitle:'ONE-WAY EXIT',header:'離開後無法返回 B2'});
+    solid(exitDoor,m.wallDark,[-.91,1.25,.16],[.10,2.5,.18]);solid(exitDoor,m.wallDark,[.91,1.25,.16],[.10,2.5,.18]);
+    solid(exitDoor,m.wallDark,[0,2.48,.16],[1.92,.12,.18]);
+    this.exitHinge=new THREE.Group();this.exitHinge.name='B2_FireDoor_Hinge';this.exitHinge.position.set(-.86,0,.10);exitDoor.add(this.exitHinge);
+    solid(this.exitHinge,m.metal,[.86,1.15,0],[1.72,2.30,.14]).name='B2_FireDoor_Leaf';
+    solid(this.exitHinge,m.stainless,[1.48,1.12,-.13],[.26,.05,.09]).name='B2_FireDoor_Handle';
+    solid(this.exitHinge,m.wallDark,[1.48,.96,-.085],[.10,.16,.035]).name='B2_FireDoor_Lock';
+    this.exitHinge.rotation.y=1.05;
+    SignAnchor.buildWallPlaque({scene:exitDoor,x:0,y:2.64,z:.10,rotationY:Math.PI,width:1.55,height:.38,code:'EXIT',title:'封存防火門｜返回 3F',subtitle:'ONE-WAY EXIT',header:'離開後無法返回 B2'});
     const returnHit=new THREE.Mesh(new THREE.BoxGeometry(1.78,2.30,.62),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
     returnHit.position.set(0,1.15,1.18);
-    returnHit.userData={interactable:true,id:'B2_ONE_WAY_EXIT',type:'b2_exit_door',label:'由單向門返回 1F 警衛台後方'};
+    returnHit.userData={interactable:true,id:'B2_ONE_WAY_EXIT',type:'b2_exit_door',label:'由封存防火門返回 3F'};
     this.zoneGroup.add(returnHit);this.interactables.push(returnHit);
 
     // Charred archive boxes: visual evidence only.
@@ -73,6 +77,15 @@ export class B2Archive {
 
     this.b2={id:'B2_ARCHIVE',archiveMirror:true,terminal:'B2_ARCHIVE_TERMINAL',exit:'B2_ONE_WAY_EXIT'};
     return this;
+  }
+
+  beginExitClosure(){this.exitClosureElapsed=0;}
+
+  update(camera,delta=0){
+    if(this.exitClosureElapsed===undefined)return;
+    this.exitClosureElapsed+=delta;
+    const progress=Math.min(1,this.exitClosureElapsed/1.4);
+    this.exitHinge.rotation.y=1.05*(1-progress*progress*(3-2*progress));
   }
 
   cleanup(){this.scene.remove(this.zoneGroup);disposeZoneArt(this.zoneGroup);this.colliders=[];this.walkables=[];this.interactables=[];}

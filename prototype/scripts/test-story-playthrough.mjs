@@ -113,7 +113,8 @@ async function assertCinematicPlayed(id){
   report.cinematicFlags.push({id,played:true});
 }
 async function task(id){await q(id=>window.__storyQA.task(id),id);}
-async function interact(query){await q(query=>window.__storyQA.interact(query),query);await page.waitForTimeout(100);}
+async function drainDialogue(){while(await q(()=>!!window.__storyQA.uiManager.dialogueSequence))await page.keyboard.press('e');}
+async function interact(query){await q(query=>window.__storyQA.interact(query),query);await page.waitForTimeout(100);await drainDialogue();}
 async function pressEAt(target,id){
   const aim=await q(point=>window.__storyQA.lookAt(point),target);
   assert.equal(aim.current,id,`crosshair raycast did not hit ${id}: ${JSON.stringify(aim)}`);
@@ -309,6 +310,8 @@ try{
   assert.equal(s.flags.GHOST_REGISTRATION_ARMED,false);
   assert.equal(s.flags.GHOST_REGISTRATION_AVAILABLE,false);
   assert.equal(s.flags.POST_2117_DUTY_CALL_DONE,false);
+  await waitForPageCondition(page,()=>window.__storyQA.gameState.getFlag('CG_21_17_DUTY_ROOM_ACTIVATION_PLAYED')===true,10000);
+  s=await snap();
   assert.equal(s.controllerEnabled,true,'movement must return after the forced phone beat');
   assert.equal(await q(()=>window.__storyQA.gameState.getDisplayTime()),'翌日 00:30');
   assert.equal((await taskText()).trim(),'','the 00:33 registration objective waits for the call answer');
@@ -475,18 +478,20 @@ try{
   await domClick('#identity-candidate-ZHANG_SHOUHENG');
   await waitForPageCondition(page,()=>window.__storyQA.gameState.getFlag('M7_B2_RESOLVED')===true,30000);
   s=await snap();assert.equal(s.flags.M7_B2_RESOLVED,true);assert.equal(s.flags.M8_IDENTITY_BATTLE_ACTIVE,true);assert.equal(s.memory.trueNameResolved,true);assert.equal(s.memory.trueName,'張守恆');assert.equal(s.memory.trueNameFragments.frag_employeeFull,'MED-870409');
-  assert.match(await taskText(),/單向出口門[\s\S]*1F 警衛台後方/,'B2 verification must explicitly tell the player to use the one-way exit door');
+  assert.match(await taskText(),/封存防火門[\s\S]*3F/,'B2 verification must explicitly tell the player to use the one-way exit door');
   await interact({id:'B2_ONE_WAY_EXIT'});
-  await waitForPageCondition(page,()=>window.__storyQA.worldRouter.activeZoneId==='first_campus_1f',30000);
+  await waitForPageCondition(page,()=>window.__storyQA.worldRouter.activeZoneId==='first_campus_3f',30000);
   s=await snap();assert.equal(s.flags.LAST_CALL_SEEN,true);assert.equal(s.time,'03:30');
-  assert.match(await taskText(),/3F[\s\S]*316/,'last call must push the player back to 3F 316 for the final handoff');
+  assert.match(await taskText(),/返回 316/,'last call must push the player back to 3F 316 for the final handoff');
   await mark('M7 B2 reveals true name; M8 identity battle active');
 
   // M9: return to 316 and complete the real handoff.
   await load('first_campus_3f');
   await flag('OPENED_316',true);
   await interact({id:'E_HANDOFF'});
-  await waitForPageCondition(page,()=>document.getElementById('final-handoff-modal')?.classList.contains('active'),60000);s=await snap();assert.equal(s.time,'04:05');
+  await waitForPageCondition(page,()=>!!window.__storyQA.uiManager.dialogueSequence,60000);
+  await drainDialogue();
+  await waitForPageCondition(page,()=>document.getElementById('final-handoff-modal')?.classList.contains('active'),60000);s=await snap();
   await shot('m9-dual-identity-form',null,null,'DutyPhone_316_Handset',[7.5,1.7,5.7],[5.45,.95,5.72]);
   await page.locator('#final-employee-id').fill('0409');
   await domClick('#btn-submit-final-handoff');

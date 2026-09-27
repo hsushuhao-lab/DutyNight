@@ -387,8 +387,9 @@ export class FirstCampus1F {
   }
 
   syncStoryState(){
-    const discovered=gameState.getFlag('HIDDEN_SERVICE_DOOR_DISCOVERED')===true&&!gameState.getFlag('B2_EXITED_PERMANENTLY');
-    if(this.guardPostObject)this.guardPostObject.userData.interactable=!discovered;
+    const unlocked=gameState.getFlag('M6_FLOOR6_RESOLVED')===true&&!gameState.getFlag('B2_EXITED_PERMANENTLY');
+    const discovered=unlocked&&gameState.getFlag('HIDDEN_SERVICE_DOOR_DISCOVERED')===true&&!gameState.getFlag('B2_EXITED_PERMANENTLY');
+    if(this.guardPostObject)this.guardPostObject.userData.interactable=unlocked&&!discovered;
     if(this.hiddenServiceHit)this.hiddenServiceHit.userData.interactable=discovered;
     if(this.hiddenServiceFrame)this.hiddenServiceFrame.visible=discovered;
     if(this.hiddenServiceKeyhole)this.hiddenServiceKeyhole.visible=discovered;

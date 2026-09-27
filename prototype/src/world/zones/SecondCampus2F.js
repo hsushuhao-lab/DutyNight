@@ -70,7 +70,7 @@ export class SecondCampus2F {
     // Keep the elevator-side opening unobstructed: no door leaf/frame in front of this passage.
     SignAnchor.buildWallPlaque({scene:this.zoneGroup,x:70.65,y:1.9,z:4.28,rotationY:0,code:'203',title:'醫師值班室',subtitle:'DUTY ROOM',header:'第二院區 2F'});
     buildDeskCluster(this.art,this.gf.materials,{x:70,z:8.8,chairs:1,name:'Second2F_DoctorDutyDesk'});
-    buildSupplyCabinet(this.art,this.gf.materials,{x:69,z:10,name:'Second2F_DoctorShelf'});
+    buildSupplyCabinet(this.art,this.gf.materials,{x:69,z:12.75,name:'Second2F_DoctorShelf'});
     asset(this.art,'hospitalBed',[73.5,0,8.7],[1,1,.9],Math.PI/2);
     this.gf.buildWall(this.zoneGroup,this.colliders,74.4,1.3,6.7,3,2.6,.18);
     this.gf.buildWall(this.zoneGroup,this.colliders,74.9,1.3,8.1,.18,2.6,3);
