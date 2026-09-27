@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { getMemorySequence } from './NarrativeV22.js';
+import { drawCharacterStrip } from '../art/CharacterPortraitArt.js';
 
 const P=(memoryId,x,y,z,rotationY,width=.74)=>Object.freeze({memoryId,x,y,z,rotationY,width});
 const PLACEMENTS=Object.freeze({
@@ -27,7 +28,13 @@ function drawFace(sequence){
   ctx.font='24px sans-serif';ctx.fillText(sequence.frames.length+' FRAMES',34,178);
   ctx.fillStyle=cctv?'#111814':'#b6a581';ctx.fillRect(75,225,750,285);
   ctx.strokeStyle=cctv?'#76957d':'#66543b';ctx.lineWidth=6;ctx.strokeRect(75,225,750,285);
-  for(let i=0;i<4;i++){const x=160+i*175;ctx.fillStyle=cctv?'#4b6150':'#74654e';ctx.beginPath();ctx.arc(x,330,34,0,Math.PI*2);ctx.fill();ctx.fillRect(x-42,365,84,90);}
+  const previewPeople=[];
+  for(const frame of sequence.frames||[])for(const person of frame.people||[]){
+    if(!previewPeople.includes(person)&&person!=='Annie')previewPeople.push(person);
+    if(previewPeople.length>=4)break;
+  }
+  if(previewPeople.length)drawCharacterStrip(ctx,previewPeople,{left:120,right:780,baseY:438,cctv,labels:false,maxScale:.68});
+  else for(let i=0;i<4;i++){const x=160+i*175;ctx.fillStyle=cctv?'#4b6150':'#74654e';ctx.beginPath();ctx.arc(x,330,34,0,Math.PI*2);ctx.fill();ctx.fillRect(x-42,365,84,90);}
   ctx.fillStyle=cctv?'#b6ddbd':'#4e4434';ctx.font='22px sans-serif';ctx.fillText('按 E 檢視逐幀內容',280,558);
   const texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;return texture;
 }

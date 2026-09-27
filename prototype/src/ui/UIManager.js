@@ -1,6 +1,8 @@
 // UIManager.js - Handles HUD, HIS computer terminal, Duty Log, and Elevator transition
 import { soundManager } from '../audio/SoundManager.js';
 import { persistentMemory } from '../core/PersistentMemory.js';
+import { drawCharacterStrip } from '../art/CharacterPortraitArt.js';
+import { getCharacterProfile } from '../story/CharacterBible.js';
 
 export class UIManager {
   constructor(gameState, onTerminalClose, onElevatorTransitionComplete) {
@@ -636,9 +638,12 @@ export class UIManager {
       ctx.moveTo(100,500);ctx.lineTo(1180,500);ctx.moveTo(210,230);ctx.lineTo(210,500);ctx.moveTo(1040,230);ctx.lineTo(1040,500);ctx.stroke();
     }
     ctx.restore();
-    const people=frame.people||[],count=Math.max(1,people.length),gap=(w-260)/count;
-    for(let i=0;i<people.length;i++){const x=130+gap*(i+.5);ctx.fillStyle=cctv?'#54685a':'#6a5942';ctx.beginPath();ctx.arc(x,270,46,0,Math.PI*2);ctx.fill();ctx.fillRect(x-55,318,110,162);if(people[i]==='Annie'){ctx.strokeStyle=cctv?'#9db5a1':'#4a4031';ctx.lineWidth=8;ctx.strokeRect(x-52,315,104,166);}ctx.fillStyle=cctv?'#d4ded5':'#30291f';ctx.font='22px sans-serif';ctx.textAlign='center';ctx.fillText(people[i],x,535);}
-    ctx.textAlign='left';if(people.length===0){ctx.fillStyle=cctv?'#405044':'#7a684c';ctx.fillRect(210,240,w-420,260);}
+    const people=frame.people||[];
+    if(people.length){
+      drawCharacterStrip(ctx,people,{left:105,right:w-105,baseY:455,cctv,labels:true,maxScale:.92});
+    }else{
+      ctx.fillStyle=cctv?'#405044':'#7a684c';ctx.fillRect(210,240,w-420,260);
+    }
     if(cctv){ctx.globalAlpha=.18;ctx.fillStyle='#d9f1df';for(let y=54;y<h-54;y+=8)ctx.fillRect(50,y,w-100,2);ctx.globalAlpha=1;ctx.fillStyle='#c6d9c8';ctx.font='23px ui-monospace,monospace';ctx.fillText('REC ●',w-170,92);}
     else{ctx.globalAlpha=.12;ctx.fillStyle='#3b2d1f';for(let i=0;i<55;i++){const x=(i*97)%w,y=(i*53)%h;ctx.fillRect(x,y,2+(i%3),2+(i%4));}ctx.globalAlpha=1;}
     document.getElementById('memory-stamp').textContent=frame.stamp||'';document.getElementById('memory-frame-title').textContent=frame.title||'';document.getElementById('memory-caption').textContent=frame.caption||'';document.getElementById('memory-narration').textContent=frame.narration||'';
@@ -657,7 +662,11 @@ export class UIManager {
       const button=document.createElement('button');button.className='identity-candidate';button.id='identity-candidate-'+candidate.id;
       const strong=document.createElement('strong');strong.textContent=candidate.name;
       const meta=document.createElement('span');meta.textContent=candidate.employeeId+' ｜ '+candidate.role;
-      button.append(strong,meta);
+      const profile=getCharacterProfile(candidate.id);
+      const cue=document.createElement('small');
+      cue.textContent=profile?`人物記憶：「${profile.signatureQuote}」｜${profile.hobby}`:'';
+      cue.style.display='block';cue.style.marginTop='4px';cue.style.opacity='.78';
+      button.append(strong,meta,cue);
       button.addEventListener('click',()=>{soundManager.playComputerBeep();const result=this.identityMatrixHandler?.(candidate)||{};this.setIdentityMatrixStatus(result.message||'',result.resolved?'match':'error');if(result.resolved)setTimeout(()=>this.closeIdentityMatrix(),1500);});
       grid.appendChild(button);
     }

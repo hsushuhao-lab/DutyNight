@@ -726,6 +726,14 @@ controller.onInteract = async (interactable) => {
     gameState.addEvidence(1);
     if(interactable.id?.startsWith('ADMIN_'))gameState.setFlag('B2_ADMIN_SOURCE',true);
     if(interactable.id?.startsWith('ARCHIVE_'))gameState.setFlag('B2_HISTORY_SOURCE',true);
+    if(interactable.id==='ARCHIVE_PERSONNEL_1998'&&!gameState.getFlag('HISTORY_PERSONNEL_PROFILES_REVIEWED')){
+      gameState.setFlag('HISTORY_PERSONNEL_PROFILES_REVIEWED',true);
+      persistentMemory.addJournalNote(
+        'HISTORY_PERSONNEL_PROFILES',
+        '3F 文史室的 1998 夜班核心人員名錄記下四位醫師與三位院內關係人；每個人都有不同的工作習慣、語氣與物件線索。'
+      );
+      uiManager.updateTasks();
+    }
     if(interactable.id==='ARCHIVE_UNINDEXED_HANDOFF'&&gameState.getFlag('ARCHIVE_OBJECTIVE')){
       gameState.markTaskComplete('ARCHIVE_CLUE_FOUND');
       gameState.setFlag('ARCHIVE_CLUE_FOUND',true);
