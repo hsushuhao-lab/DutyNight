@@ -13,6 +13,8 @@ add('bridge_from_second','skybridge',[58.4,1.7,0],Math.PI/2,'天橋第二院區�
 add('second_bridge_return','second_campus_2f',[61.6,1.7,0],-Math.PI/2,'第二院區 2F 連通口');
 add('phantom_6f_lift','phantom_6f',[0,1.7,1.0],0,'不存在的 6F 電梯口');
 add('b2_archive_entry','b2_archive',[0,1.7,1.0],Math.PI,'B2 封存隔離層入口');
+add('recovery_er0033','first_campus_2f',[13,1.7,-6.6],0,'00:33 異常掛號決策前');
+add('recovery_chest_transfer','second_campus_5f',[70.72,1.7,-.72],0,'第二院區轉院單決策前');
 add('first_3f_history_inside','first_campus_3f',[20.1,1.7,-5.55],-Math.PI/2,'3F 文史館・封存資料室內');
 add('first_1f_guard_back','first_campus_1f',[-12.55,1.7,4.55],Math.PI/2,'第一院區 1F 警衛台後方');
 
