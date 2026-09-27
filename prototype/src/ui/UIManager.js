@@ -1127,7 +1127,7 @@ export class UIManager {
         ]);
       }else if(this.gameState.getFlag('M7_B2_OPEN')&&!this.gameState.getFlag('M7_B2_RESOLVED')){
         this.renderTaskBoard('翌日 02:17｜B2',[
-          {id:'task-m7-b2-terminal',text:persistentMemory.data.b2IdentityAttemptUsed?'唯一一次身分建立嘗試已用盡；由單向出口離開 B2':'查閱來源後，只能進行一次封存身分建立嘗試',state:'ready'}
+          {id:'task-m7-b2-terminal',text:this.gameState.getFlag('B2_IDENTITY_ATTEMPT_USED')?'唯一一次身分建立嘗試已用盡；由單向出口離開 B2':'查閱來源後，只能進行一次封存身分建立嘗試',state:'ready'}
         ]);
       }else if(this.gameState.getFlag('M7_B2_RESOLVED')&&!this.gameState.getFlag('LAST_CALL_SEEN')){
         this.renderTaskBoard('B2｜身分驗證完成',[
