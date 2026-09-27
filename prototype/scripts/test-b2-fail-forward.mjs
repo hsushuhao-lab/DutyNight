@@ -66,8 +66,8 @@ try {
   }));
   assert.equal(retry.used, true);
   assert.equal(retry.modalActive, false);
-  assert.match(retry.subtitle, /UNKNOWN SESSION|返回 316|單向出口/);
-  report.checkpoints.push({ id: 'TERMINAL_AFTER_RECAP_REDIRECTS_TO_316', ...retry, subtitle: retry.subtitle.slice(0, 180) });
+  assert.match(retry.subtitle, /UNKNOWN SESSION|文史室|單向出口/);
+  report.checkpoints.push({ id: 'TERMINAL_AFTER_RECAP_REDIRECTS_TO_HISTORY', ...retry, subtitle: retry.subtitle.slice(0, 180) });
 
   await page.evaluate(() => window.__storyQA.captureView({position:[0,1.65,-1.5],target:[0,1.2,2],anchorName:'B2_OneWayExitDoor'}));
   await page.evaluate(() => window.__storyQA.interact({ type: 'b2_exit_door' }));
@@ -78,13 +78,13 @@ try {
   await page.waitForFunction(() => window.__storyQA.worldRouter.activeZoneId === 'first_campus_3f', null, { timeout: 15000 });
   const afterExit = await page.evaluate(() => window.__storyQA.snapshot());
   assert.equal(afterExit.flags.B2_EXITED_PERMANENTLY, true);
-  assert.equal(afterExit.flags.B2_HISTORY_FALLBACK_ACTIVE, false);
-  assert.equal(afterExit.flags.ARCHIVE_PERSONNEL_OBJECTIVE, false);
-  assert.equal(afterExit.flags.M8_IDENTITY_BATTLE_ACTIVE, true);
+  assert.equal(afterExit.flags.B2_HISTORY_FALLBACK_ACTIVE, true);
+  assert.equal(afterExit.flags.ARCHIVE_PERSONNEL_OBJECTIVE, true);
+  assert.equal(afterExit.flags.M8_IDENTITY_BATTLE_ACTIVE, false);
   assert.equal(afterExit.flags.RECORD_OVERWRITE_ACTIVE, true);
   assert.equal(afterExit.flags.HIDDEN_SERVICE_DOOR_DISCOVERED, false);
   assert.equal(afterExit.flags.M7_B2_OPEN, false);
-  report.checkpoints.push({ id: 'PERMANENT_EXIT_DIRECT_TO_316', zone: afterExit.zone, flags: {
+  report.checkpoints.push({ id: 'PERMANENT_EXIT_TO_MANDATORY_HISTORY', zone: afterExit.zone, flags: {
     B2_EXITED_PERMANENTLY: afterExit.flags.B2_EXITED_PERMANENTLY,
     B2_HISTORY_FALLBACK_ACTIVE: afterExit.flags.B2_HISTORY_FALLBACK_ACTIVE,
     M8_IDENTITY_BATTLE_ACTIVE: afterExit.flags.M8_IDENTITY_BATTLE_ACTIVE,
@@ -93,8 +93,23 @@ try {
     M7_B2_OPEN: afterExit.flags.M7_B2_OPEN
   }});
 
-  // Even with a failed B2 identity attempt, the completed fire recap unlocks
-  // the 316 final-authorization sequence. History review is optional.
+  // Even with a failed B2 identity attempt, the player must complete the
+  // post-B2 1998 personnel review before the 316 final authorization can open.
+  await page.evaluate(() => window.__storyQA.interact({ id: 'ARCHIVE_PERSONNEL_1998' }));
+  await page.waitForFunction(()=>document.getElementById('archive-modal')?.classList.contains('active'),null,{timeout:10000});
+  for(let i=0;i<6;i++)await page.locator('#btn-archive-next').click();
+  await page.waitForFunction(()=>window.__storyQA.gameState.getFlag('ARCHIVE_PERSONNEL_OBJECTIVE')===false,null,{timeout:10000});
+  await page.locator('#btn-close-archive').click();
+  const afterHistory=await page.evaluate(()=>window.__storyQA.snapshot());
+  assert.equal(afterHistory.flags.HISTORY_PERSONNEL_PROFILES_REVIEWED,true);
+  assert.equal(afterHistory.flags.B2_HISTORY_FALLBACK_ACTIVE,false);
+  assert.equal(afterHistory.flags.M8_IDENTITY_BATTLE_ACTIVE,true);
+  report.checkpoints.push({id:'MANDATORY_HISTORY_REVIEW_COMPLETE',flags:{
+    HISTORY_PERSONNEL_PROFILES_REVIEWED:afterHistory.flags.HISTORY_PERSONNEL_PROFILES_REVIEWED,
+    B2_HISTORY_FALLBACK_ACTIVE:afterHistory.flags.B2_HISTORY_FALLBACK_ACTIVE,
+    M8_IDENTITY_BATTLE_ACTIVE:afterHistory.flags.M8_IDENTITY_BATTLE_ACTIVE
+  }});
+
   await page.evaluate(() => {
     const q=window.__storyQA;
     const screen=q.worldRouter.activeZoneInstance.zoneGroup.getObjectByName('DutyTerminal_316_LegacyScreen');
