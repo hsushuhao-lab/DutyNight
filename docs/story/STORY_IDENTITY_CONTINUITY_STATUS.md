@@ -20,7 +20,7 @@ Verified at public revision ad132725eaa7ecba4f535ab050a8872a95971668:
 - All 17 deployment structural tests and production build PASS.
 - Missing-leading-zero code 409 rejected; loop2 report-only and 6F lift return checked.
 
-Follow-up visual corrections:
+Follow-up visual corrections (Pages e681ecad7002a8708acd73124cc7b3388035b069 verified; workflow 36310509672 SUCCESS):
 - Move 5F duty-room sign to the corridor-facing wall surface.
 - Remove the clinical sharps box that obscured the shared 4F/5F handover board.
 - Floorplan regression asserts both sign mounting side and absence of the blocking box. PASS.
@@ -28,3 +28,5 @@ Follow-up visual corrections:
 
 Status: DEPLOYED_WITH_VERIFICATION_PENDING, not DEPLOYED_AND_VISUALLY_VERIFIED.
 Full M1-M9, all cinematics and current loading/material audits still require verification. Previous public 8e1be87 material audit timed out on exterior surfaces; its visual batch flagged an underexposed 4F detail frame. Those failures must not be represented as PASS.
+
+Visual review: all 16 local scene/document captures inspected. Integrity pass approved within scope; CJK review requested fixes to three orphan lines and sign capture framing. text-wrap:pretty and corrected 5F camera coordinates applied; fresh review pending. These are local visual checks, not the full public release gate.

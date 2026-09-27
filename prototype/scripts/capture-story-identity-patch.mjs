@@ -25,6 +25,6 @@ try{
  await page.evaluate(()=>{const a=window.__storyQA;a.setFlag('P1_ER_CALL_ANSWERED');a.setFlag('ER_JANE_PRESENT');a.worldRouter.activeZoneInstance.syncStoryState();a.interact({action:'ER_ASSESS'});});await shot('liu-identity');while(await page.evaluate(()=>!!window.__storyQA.uiManager.dialogueSequence))await page.keyboard.press('e');
  await load('b2_archive');await view([0,1.65,-1.5],[0,1.2,2],'B2_OneWayExitDoor');await shot('b2-fire-door');
  await load('second_campus_2f');await view([72,1.65,6],[70,1,10],'Second2F_DoctorDutyDesk');await shot('second2f-desk');
- await load('second_campus_5f');await view([65,1.65,6],[67.885,2.3,6],'Plaque_5F_醫師值班室');await shot('second5f-sign');
+ await load('second_campus_5f');await view([77.3,1.65,6],[79.885,2.3,6],'Plaque_5F_醫師值班室');await shot('second5f-sign');
  await writeFile(out+'/result.json',JSON.stringify({captures,errors},null,2));
 }finally{await browser.close();await server?.httpServer.close();}

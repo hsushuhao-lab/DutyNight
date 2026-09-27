@@ -23,6 +23,11 @@ try{
   page.on('pageerror',e=>report.errors.push(e.message));
   await page.goto((process.argv[3]||'http://localhost:4185/')+'?qa=story');
   await page.waitForFunction(()=>window.__storyQA?.worldRouter.activeZoneInstance);
+  report.url=page.url();
+  if(process.argv[3]){
+    report.build=await (await page.request.get(new URL('build-info.json',process.argv[3]).href)).json();
+    if(process.env.GITHUB_SHA)assert.equal(report.build.commit,process.env.GITHUB_SHA);
+  }
   await q(()=>{const a=window.__storyQA;a.load('first_campus_1f');a.interact({type:'guard_post_inspection'});});
   const guard=await q(()=>{const a=window.__storyQA;return {interactable:a.worldRouter.activeZoneInstance.guardPostObject.userData.interactable,source:!!a.gameState.getFlag('B2_SECURITY_SOURCE'),door:!!a.gameState.getFlag('HIDDEN_SERVICE_DOOR_DISCOVERED')};});
   assert.deepEqual(guard,{interactable:false,source:false,door:false});check('PRE_6F_GUARD_BLOCKED',guard);
