@@ -184,16 +184,25 @@ function registerBed33Clue(clueId){
 
 function trigger409PostSealKnock(){
   if(!gameState.isTaskComplete('P1_NORMAL_EVENT_DONE'))return false;
-  if(gameState.getFlag('KNOCK_408C_POST_SEAL_PLAYED'))return false;
+  if(gameState.getFlag('KNOCK_408C_POST_SEAL_PLAYED')||gameState.getFlag('KNOCK_408C_POST_SEAL_PENDING'))return false;
 
-  gameState.setFlag('KNOCK_408C_POST_SEAL_PLAYED',true);
+  gameState.setFlag('KNOCK_408C_POST_SEAL_PENDING',true);
   const expectedZone='first_campus_4f';
 
   setTimeout(async()=>{
-    if(worldRouter.activeZoneId!==expectedZone)return;
-    await soundManager.ensureRunning();
-    if(worldRouter.activeZoneId!==expectedZone)return;
+    if(worldRouter.activeZoneId!==expectedZone){
+      gameState.setFlag('KNOCK_408C_POST_SEAL_PENDING',false);
+      return;
+    }
 
+    const ready=await soundManager.ensureRunning();
+    if(!ready||worldRouter.activeZoneId!==expectedZone){
+      gameState.setFlag('KNOCK_408C_POST_SEAL_PENDING',false);
+      return;
+    }
+
+    gameState.setFlag('KNOCK_408C_POST_SEAL_PENDING',false);
+    gameState.setFlag('KNOCK_408C_POST_SEAL_PLAYED',true);
     soundManager.playBed33KnockPattern(.16);
     uiManager.showSubtitle(
       '值班醫師',
