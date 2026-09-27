@@ -494,12 +494,25 @@ try{
   assert.equal(s.memory.trueNameResolved,true);
   assert.equal(s.memory.trueName,'張守恆');
   assert.equal(s.memory.trueNameFragments.frag_employeeFull,'MED-870409');
-  assert.match(await taskText(),/UNKNOWN SESSION[\s\S]*封存防火門|封存防火門[\s\S]*316/,'B2 identity success must converge into the fire recap and then the 316 route');
+  assert.match(await taskText(),/UNKNOWN SESSION[\s\S]*封存防火門|封存防火門[\s\S]*文史/,'B2 identity success must converge into the fire recap and then the mandatory history route');
   await interact({id:'B2_ONE_WAY_EXIT'});
   await waitForPageCondition(page,()=>window.__storyQA.worldRouter.activeZoneId==='first_campus_3f',30000);
   s=await snap();assert.equal(s.flags.LAST_CALL_SEEN,true);assert.equal(s.time,'03:30');
-  assert.match(await taskText(),/返回 316/,'last call must push the player back to 3F 316 for the final handoff');
-  await mark('M7 B2 reveals true name; M8 identity battle active');
+  assert.equal(s.flags.B2_HISTORY_FALLBACK_ACTIVE,true);
+  assert.equal(s.flags.ARCHIVE_PERSONNEL_OBJECTIVE,true);
+  assert.equal(s.flags.M8_IDENTITY_BATTLE_ACTIVE,false);
+  assert.match(await taskText(),/文史室[\s\S]*1998 夜班核心人員名錄/,'post-B2 route must force the history room even after successful identity reconstruction');
+  await interact({id:'ARCHIVE_PERSONNEL_1998'});
+  await waitForPageCondition(page,()=>document.getElementById('archive-modal')?.classList.contains('active'),30000);
+  for(let i=0;i<6;i++)await domClick('#btn-archive-next');
+  await waitForPageCondition(page,()=>window.__storyQA.gameState.getFlag('ARCHIVE_PERSONNEL_OBJECTIVE')===false,10000);
+  await closeArchive();
+  s=await snap();
+  assert.equal(s.flags.HISTORY_PERSONNEL_PROFILES_REVIEWED,true);
+  assert.equal(s.flags.B2_HISTORY_FALLBACK_ACTIVE,false);
+  assert.equal(s.flags.M8_IDENTITY_BATTLE_ACTIVE,true);
+  assert.match(await taskText(),/316/,'only the completed history review may unlock the final 316 route');
+  await mark('M7 B2 reveals true name; mandatory history review completed; M8 identity battle active');
 
   // M9: return to 316 and complete the real handoff.
   await load('first_campus_3f');
