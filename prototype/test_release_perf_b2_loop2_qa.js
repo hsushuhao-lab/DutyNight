@@ -54,12 +54,14 @@ assert(main.includes('void preloadZoneOptional(zoneId)'),'decorative assets must
 assert(!main.includes('preloadAssets()')&&!main.includes('preloadCampusBackdropAssets()'),'travel must not block on full hospital or campus vegetation');
 for(const zone of ['first_campus_3f','first_campus_4f','first_campus_2f','first_campus_1f','first_campus_8f','skybridge','second_campus_2f','second_campus_5f','phantom_6f','b2_archive'])assert(zoneAssets.includes(`${zone}:`),'zone manifest missing '+zone);
 
-// B2: terminal + one-way door, no staircase, exit lands behind 1F guard post and cannot be re-entered.
+// B2: terminal + one-way door, no staircase, exit lands inside the mandatory 3F history review and cannot be re-entered.
 assert(b2.includes("type:'b2_exit_door'")&&!b2.includes('B2_EscapeStairwell'),'B2 must have a door exit and no stairwell');
-assert(main.includes("worldRouter.loadZone('first_campus_3f','first_3f_316')"),'B2 must return directly to 3F');
+assert(main.includes("worldRouter.loadZone('first_campus_3f','first_3f_history_inside')"),'B2 must return directly into the 3F history room');
+assert(routes.includes("add('first_3f_history_inside','first_campus_3f'"),'named post-B2 history-room spawn missing');
 assert(main.includes("B2_EXITED_PERMANENTLY"),'B2 one-way exit lockout missing');
 assert(main.includes("M7_IDENTITY_RESOLVED_AT_316"),'final 316 path may still mark deferred identity resolution');
 assert(main.includes("B2_FIRE_RECAP_SEEN"),'B2 terminal fire recap gate missing');
+assert(main.includes("ARCHIVE_PERSONNEL_OBJECTIVE")&&main.includes("B2_HISTORY_FALLBACK_ACTIVE"),'post-B2 mandatory history checkpoint missing');
 assert(main.includes("先啟動 B2 封存終端"),'one-way exit must remain locked until the fire recap is viewed');
 assert(main.includes("有人嘗試覆寫模板已在 316 登入｜請輸入真正員編末四碼｜最後一次機會"),'final 316 warning must stay anonymous and explicit');
 assert(!main.includes("trueNameResolved&&persistentMemory.hasAllProofs()"),'final 316 identity declaration must not hard-block on the full proof bundle');
