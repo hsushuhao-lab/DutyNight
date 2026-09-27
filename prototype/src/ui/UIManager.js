@@ -1200,9 +1200,13 @@ export class UIManager {
         this.renderTaskBoard('翌日 02:00｜返回第一院區',[
           {id:'task-m6-elevator',text:currentZone==='phantom_6f'?(this.gameState.getFlag('FLOOR6_STETHOSCOPE_FOUND')?'檢視反光的老舊聽診器，翻面或擦去刻字上的灰塵':'查看焦黑器材旁反光的物件'):'搭乘一般電梯返回第一院區',state:'ready'}
         ]);
+      }else if(this.gameState.getFlag('B2_EXITED_PERMANENTLY')&&this.gameState.getFlag('ARCHIVE_PERSONNEL_OBJECTIVE')){
+        this.renderTaskBoard('03:30｜3F 文史室｜必要核對',[
+          {id:'task-post-b2-history',text:'留在文史室內，重新查閱「1998 夜班核心人員名錄」七頁；完成前 316 最終驗證不會開啟',state:'ready'}
+        ]);
       }else if(this.gameState.getFlag('B2_EXITED_PERMANENTLY')&&this.gameState.getFlag('B2_FIRE_RECAP_SEEN')&&this.gameState.getFlag('M8_IDENTITY_BATTLE_ACTIVE')){
         this.renderTaskBoard('RECORD OVERWRITE｜紀錄覆寫中',[
-          {id:'task-m9-final-handoff',text:'立即返回 316，輸入正確權限阻止事故與身分紀錄被再次覆蓋',state:'ready'}
+          {id:'task-m9-final-handoff',text:'文史核對完成；立即返回 316，輸入正確權限阻止事故與身分紀錄被再次覆蓋',state:'ready'}
         ]);
       }else if(this.gameState.getFlag('M6_FLOOR6_RESOLVED')&&!this.gameState.getFlag('M7_B2_OPEN')&&!this.gameState.getFlag('M7_B2_RESOLVED')){
         this.renderTaskBoard('翌日 02:17 前｜門禁紀錄',[
@@ -1214,7 +1218,7 @@ export class UIManager {
         ]);
       }else if(this.gameState.getFlag('M7_B2_OPEN')&&this.gameState.getFlag('B2_FIRE_RECAP_SEEN')){
         this.renderTaskBoard('B2｜UNKNOWN SESSION 正在覆寫',[
-          {id:'task-m8-b2-exit',text:'由單向封存防火門返回 3F；前往 316 阻止紀錄覆寫',state:'ready'}
+          {id:'task-m8-b2-exit',text:'由單向封存防火門返回 3F；離開後先進文史室核對 1998 夜班核心人員名錄',state:'ready'}
         ]);
       }else if(this.gameState.getFlag('M8_IDENTITY_BATTLE_ACTIVE')&&!this.gameState.getFlag('GAME_COMPLETE')){
         this.renderTaskBoard('RECORD OVERWRITE｜紀錄覆寫中',[
