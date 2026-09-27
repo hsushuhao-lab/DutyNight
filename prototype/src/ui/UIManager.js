@@ -2,6 +2,7 @@
 import { soundManager } from '../audio/SoundManager.js';
 import { persistentMemory } from '../core/PersistentMemory.js';
 import { drawCharacterStrip } from '../art/CharacterPortraitArt.js';
+import { getCharacterProfile } from '../story/CharacterBible.js';
 
 export class UIManager {
   constructor(gameState, onTerminalClose, onElevatorTransitionComplete) {
@@ -661,7 +662,11 @@ export class UIManager {
       const button=document.createElement('button');button.className='identity-candidate';button.id='identity-candidate-'+candidate.id;
       const strong=document.createElement('strong');strong.textContent=candidate.name;
       const meta=document.createElement('span');meta.textContent=candidate.employeeId+' ｜ '+candidate.role;
-      button.append(strong,meta);
+      const profile=getCharacterProfile(candidate.id);
+      const cue=document.createElement('small');
+      cue.textContent=profile?`人物記憶：「${profile.signatureQuote}」｜${profile.hobby}`:'';
+      cue.style.display='block';cue.style.marginTop='4px';cue.style.opacity='.78';
+      button.append(strong,meta,cue);
       button.addEventListener('click',()=>{soundManager.playComputerBeep();const result=this.identityMatrixHandler?.(candidate)||{};this.setIdentityMatrixStatus(result.message||'',result.resolved?'match':'error');if(result.resolved)setTimeout(()=>this.closeIdentityMatrix(),1500);});
       grid.appendChild(button);
     }
