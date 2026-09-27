@@ -472,8 +472,9 @@ export class FirstCampus3F {
 
   syncStoryState() {
     const moved=gameState.getFlag('NIGHT_PATROL_RETURN_3F')||gameState.getFlag('B2_EXITED_PERMANENTLY');
-    const finalOffice=gameState.getFlag('B2_EXITED_PERMANENTLY')&&(gameState.getFlag('M7_B2_RESOLVED')||gameState.getFlag('HISTORY_PERSONNEL_PROFILES_REVIEWED'));
-    const insideHistory=gameState.getFlag('B2_HISTORY_FALLBACK_ACTIVE')&&!finalOffice;
+    const postB2HistoryPending=gameState.getFlag('B2_EXITED_PERMANENTLY')&&gameState.getFlag('ARCHIVE_PERSONNEL_OBJECTIVE');
+    const finalOffice=gameState.getFlag('B2_EXITED_PERMANENTLY')&&!postB2HistoryPending&&gameState.getFlag('HISTORY_PERSONNEL_PROFILES_REVIEWED');
+    const insideHistory=gameState.getFlag('B2_HISTORY_FALLBACK_ACTIVE')&&postB2HistoryPending;
     if(this.levelInstance?.anneGroup)this.levelInstance.anneGroup.visible=!moved;
     if(this.levelInstance?.anneHit){
       this.levelInstance.anneHit.visible=!moved;
