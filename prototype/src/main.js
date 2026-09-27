@@ -56,6 +56,7 @@ import { canAccess } from './core/AccessGraph.js';
 import { getMemorySequence, IDENTITY_CANDIDATES } from './story/NarrativeV22.js';
 import { CinematicDirector } from './story/CinematicDirector.js';
 import { ActPresentationDirector } from './story/ActPresentationDirector.js';
+import { FinalPatientizationDirector } from './story/FinalPatientizationDirector.js';
 
 // Setup Three.js Scene & Renderer
 const container = document.getElementById('canvas-container');
@@ -145,6 +146,10 @@ const actPresentationDirector=new ActPresentationDirector({
   controller,
   pointerElement:renderer.domElement,
   getZoneId:()=>worldRouter.activeZoneId
+});
+
+const finalPatientizationDirector=new FinalPatientizationDirector({
+  soundManager
 });
 
 const loopManager=new LoopManager({
@@ -320,6 +325,49 @@ function completeFinalIdentityAt316(name,employeeId,{deferred=false}={}) {
   return true;
 }
 
+function triggerFinalPatientizationFailure(onEscape){
+  if(gameState.getFlag('FINAL_PATIENTIZATION_ACTIVE'))return;
+  gameState.setFlag('FINAL_PATIENTIZATION_ACTIVE',true);
+  gameState.setFlag('M8_IDENTITY_BATTLE_ACTIVE',false);
+  gameState.setFlag('RECORD_OVERWRITE_ACTIVE',false);
+  persistentMemory.recordOverride('FINAL');
+  const fullRecap=persistentMemory.claimOnce('finalHistoryRecap');
+
+  uiManager.playLegendOverride({
+    legend:'最終覆寫 — 409 PATIENTIZATION',
+    reason:'權限核對失敗；值班醫師身分已被覆寫成 409-A 病人紀錄。'
+  },()=>{
+    void finalPatientizationDirector.play({
+      fullRecap,
+      onAccept:()=>{
+        gameState.setFlag('FINAL_PATIENTIZATION_ACTIVE',false);
+        gameState.setFlag('FINAL_HOSPITALIZED_END',true);
+        gameState.setFlag('RECORD_OVERWRITE_COMPLETE',true);
+        gameState.setFlag('M8_IDENTITY_BATTLE_ACTIVE',false);
+        persistentMemory.completeHospitalizedEnding();
+        persistentMemory.addJournalNote('FINAL_HOSPITALIZED_END','最終權限核對失敗後，409-A 病人紀錄被正式封存；張守恆的值班身分未能恢復。');
+        uiManager.updateTasks();
+        controller.enabled=false;
+      },
+      onEscape:()=>{
+        persistentMemory.beginFinalEscapeAttempt();
+        gameState.setFlag('FINAL_PATIENTIZATION_ACTIVE',false);
+        gameState.setFlag('FINAL_HOSPITALIZED_END',false);
+        gameState.setFlag('FINAL_ESCAPE_RETRY',true);
+        gameState.setFlag('RECORD_OVERWRITE_ACTIVE',true);
+        gameState.setFlag('M8_IDENTITY_BATTLE_ACTIVE',true);
+        controller.enabled=false;
+        onEscape?.();
+      }
+    }).catch(error=>{
+      console.error('[cinematic] final Patientization history failed',error);
+      gameState.setFlag('FINAL_PATIENTIZATION_ACTIVE',false);
+      gameState.setFlag('M8_IDENTITY_BATTLE_ACTIVE',true);
+      onEscape?.();
+    });
+  });
+}
+
 function revealFinal316Handoff({deferred=false}={}) {
   const openForm=()=>{
     controller.enabled=false;
@@ -330,7 +378,10 @@ function revealFinal316Handoff({deferred=false}={}) {
       if(hasInput){
         setTimeout(()=>{
           uiManager.closeFinalHandoff(false);
-          loopManager.triggerLegendOverride('FINAL',{legend:'最終覆寫 — RECORD OVERWRITE',reason:'今日值班醫師已確認；你已被收治。'});
+          triggerFinalPatientizationFailure(()=>{
+            openForm();
+            uiManager.setFinalHandoffStatus('409-A 臨時病歷已暫時改回「身分待核」｜316 權限視窗重新開啟｜請再次輸入員編末四碼');
+          });
         },650);
       }
     });
@@ -387,7 +438,7 @@ if(new URLSearchParams(location.search).get('qa')==='story'){
     });
   };
   window.__storyQA={
-    gameState,persistentMemory,legendState,worldRouter,uiManager,loopManager,dutyEvents,GamePhase,floorStateManager,controller,cinematicDirector,actPresentationDirector,soundManager,
+    gameState,persistentMemory,legendState,worldRouter,uiManager,loopManager,dutyEvents,GamePhase,floorStateManager,controller,cinematicDirector,actPresentationDirector,soundManager,finalPatientizationDirector,
     prefetch:prefetchDestinationAssets,
     load:(zone,spawn)=>{worldRouter.loadZone(zone,spawn);worldRouter.activeZoneInstance?.syncStoryState?.();},
     enter:(zone,spawn)=>{

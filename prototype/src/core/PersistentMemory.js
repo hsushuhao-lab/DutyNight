@@ -2,7 +2,7 @@ export const TRUE_NAME_CANON='張守恆';
 const STORAGE_KEY='DutyNight_PersistentData';
 
 const defaults=()=>({
-  version:3,
+  version:4,
   loopCount:0,
   hasSeenHandoffAcknowledgement:false,
   seenOnce:{hotCoffee:false,unregisteredMessage3F:false},
@@ -16,6 +16,7 @@ const defaults=()=>({
   trueNameResolved:false,
   trueName:null,
   gameComplete:false,
+  finalDisposition:null,
   knownCodes:{
     pass_1700:false,
     pass_3082:false,
@@ -96,6 +97,7 @@ export class PersistentMemory {
         data.journalNotes=data.journalNotes.filter(n=>!['TRUE_NAME','B2_316'].includes(n.id));
       }
       if((parsed.version||1)<3)data.version=3;
+      if((parsed.version||1)<4)data.version=4;
       const engineerNote=data.journalNotes.find(note=>note.id==='LIU_MAINTENANCE_TAG');
       if(engineerNote)engineerNote.text='劉志遠／ENG-860214／工務機電技師。燒焦吊牌標示 6F SKILL LAB／B-PANEL；他提到紫色備援與王世榮保管的鑰匙。';
       for(const note of data.journalNotes)note.text=note.text.replaceAll('4+3 夜班核心人員檔案','1998 夜班核心人員名錄');
@@ -200,7 +202,20 @@ export class PersistentMemory {
 
   completeGame(){
     this.data.gameComplete=true;
+    this.data.finalDisposition='escaped';
     this.data.legends.lastCall=true;
+    this.save();
+  }
+
+  completeHospitalizedEnding(){
+    this.data.gameComplete=false;
+    this.data.finalDisposition='hospitalized';
+    this.save();
+  }
+
+  beginFinalEscapeAttempt(){
+    this.data.gameComplete=false;
+    this.data.finalDisposition='escape_attempt';
     this.save();
   }
 
@@ -219,7 +234,7 @@ export class PersistentMemory {
       BRIDGE:{legend:'bridge',rule:'neverLookBackOnBridge',notes:[['RULE_BRIDGE','天橋過中線後，不要回頭。']]},
       POND:{legend:'pond',rule:'ignorePondReflection',notes:[['RULE_POND','生態池的倒影如果沒有跟著我停下，就離開水邊。']]},
       TIMELOOP:{legend:null,rule:null,notes:[['RULE_0217','02:17 的舊紀錄不是操作說明；完全照著做只會重演事故。']]},
-      FINAL:{legend:'lastCall',rule:null,notes:[['RULE_FINAL','316 只接受真正的姓名。錯的名字會把我重新送回第33床。']]}
+      FINAL:{legend:'lastCall',rule:null,notes:[['RULE_FINAL','316 權限核對錯誤會把值班身分覆寫成 409-A 病人紀錄。']]}
     };
     const cfg=configs[id];
     if(id==='BED33'){this.data.hasSeenOverride_Bed33=true;this.data.knownCodes.code_0409=true;}
