@@ -12,7 +12,7 @@ const url = publicUrl || 'http://localhost:4173/';
 const browser = await chromium.launch({ channel: 'chrome', headless: true });
 const zones = [
   'first_campus_3f', 'first_campus_4f', 'first_campus_2f', 'first_campus_1f',
-  'first_campus_8f', 'skybridge', 'second_campus_2f', 'second_campus_5f',
+  'first_campus_8f', 'skybridge', 'second_campus_1f', 'second_campus_2f', 'second_campus_5f',
   'phantom_6f', 'b2_archive'
 ];
 const results=[];const errors=[];const started=Date.now();let page;
