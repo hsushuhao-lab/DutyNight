@@ -477,11 +477,22 @@ try{
   await waitForPageCondition(page,()=>document.getElementById('memory-modal')?.classList.contains('active'),30000);
   await domClick('#btn-close-memory');
   await interact({id:'B2_ARCHIVE_TERMINAL'});
+  await waitForPageCondition(page,()=>document.getElementById('b2-fire-recap')?.classList.contains('active'),30000);
+  for(let i=0;i<6;i++){
+    await page.waitForTimeout(360);
+    await page.keyboard.press('E');
+  }
+  await waitForPageCondition(page,()=>window.__storyQA.gameState.getFlag('B2_FIRE_RECAP_SEEN')===true,30000);
+  s=await snap();assert.equal(s.flags.B2_FIRE_RECAP_SEEN,true);assert.equal(s.flags.RECORD_OVERWRITE_ACTIVE,true);assert.equal(s.flags.M8_IDENTITY_BATTLE_ACTIVE,true);
+  assert.match(await taskText(),/UNKNOWN SESSION[\s\S]*封存防火門|封存防火門[\s\S]*316/,'B2 fire recap must push the player toward the one-way exit and 316');
+
+  // Identity reconstruction remains available on a second terminal interaction,
+  // but it is no longer a hard gate for reaching the final 316 authorization.
+  await interact({id:'B2_ARCHIVE_TERMINAL'});
   await waitForPageCondition(page,()=>document.getElementById('identity-matrix-modal')?.classList.contains('active'),30000);
   await domClick('#identity-candidate-ZHANG_SHOUHENG');
   await waitForPageCondition(page,()=>window.__storyQA.gameState.getFlag('M7_B2_RESOLVED')===true,30000);
-  s=await snap();assert.equal(s.flags.M7_B2_RESOLVED,true);assert.equal(s.flags.M8_IDENTITY_BATTLE_ACTIVE,true);assert.equal(s.memory.trueNameResolved,true);assert.equal(s.memory.trueName,'張守恆');assert.equal(s.memory.trueNameFragments.frag_employeeFull,'MED-870409');
-  assert.match(await taskText(),/封存防火門[\s\S]*3F/,'B2 verification must explicitly tell the player to use the one-way exit door');
+  s=await snap();assert.equal(s.flags.M7_B2_RESOLVED,true);assert.equal(s.memory.trueNameResolved,true);assert.equal(s.memory.trueName,'張守恆');assert.equal(s.memory.trueNameFragments.frag_employeeFull,'MED-870409');
   await interact({id:'B2_ONE_WAY_EXIT'});
   await waitForPageCondition(page,()=>window.__storyQA.worldRouter.activeZoneId==='first_campus_3f',30000);
   s=await snap();assert.equal(s.flags.LAST_CALL_SEEN,true);assert.equal(s.time,'03:30');
