@@ -17,7 +17,7 @@ assert(essentialPreload>=0&&essentialPreload<sceneSetup,'opening essential model
 assert(zoneAssets.includes('preloadAssetNames(entries.models')&&zoneAssets.includes('preloadMaterialSurfaces(entries.surfaces'),'essential contract must load models and PBR together');
 for(const asset of ['officeChair','storageCabinet','workDesk','printer','bench','plant'])assert(zoneAssets.includes(`'${asset}'`),'opening critical asset missing: '+asset);
 assert(!main.includes('deferredHospitalAssets'),'first paint must not start a whole-world download storm');
-assert(main.includes("prepareLoopReset:()=>prepareZoneWithRetry('first_campus_3f')"),'loop reset must prepare 3F art and materials');
+assert(main.includes("prepareLoopReset:(zoneId='first_campus_3f')=>prepareZoneWithRetry(zoneId)"),'loop reset must prepare the authored recovery destination before rebuilding the scene');
 const loopManager=readFileSync('./src/core/LoopManager.js','utf8');
 assert(loopManager.includes('await this.loopResetPreparation'),'loop reset must await art/material readiness before loadZone');
 assert(ui.includes('async finishLoopCutscene()')&&ui.includes("body.textContent='場景重建中……'")&&ui.includes('await result'),'patientization cutscene must remain active while loop art finishes loading');
