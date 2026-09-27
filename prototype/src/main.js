@@ -1183,20 +1183,24 @@ controller.onInteract = async (interactable) => {
       }
     });
   } else if (interactable.type === 'b2_archive_terminal') {
-    // First contact with the B2 terminal always plays the historical fire recap,
-    // regardless of whether identity reconstruction will later succeed or fail.
-    if(!gameState.getFlag('B2_FIRE_RECAP_SEEN')){
+    gameState.setFlag('B2_TERMINAL_CONTACTED',true);
+
+    // The terminal interaction always converges into the historical fire recap.
+    // If the one-shot identity comparison is still available, run it first so
+    // both success and failure naturally lead into the same story revelation.
+    if(gameState.getFlag('B2_FIRE_RECAP_SEEN')){
+      uiManager.showSubtitle(
+        '封存終端',
+        '「UNKNOWN SESSION / OVERWRITE ACTIVE。火災紀錄已讀取；不要再停留，從單向出口返回 316。」',
+        4200
+      );
+      return;
+    }
+    if(gameState.getFlag('M7_B2_RESOLVED')||gameState.getFlag('B2_IDENTITY_ATTEMPT_USED')){
       playB2FireRecap();
       return;
     }
-    if(gameState.getFlag('M7_B2_RESOLVED')){
-      uiManager.showSubtitle('封存終端','IDENTITY RECONSTRUCTED：'+TRUE_NAME_CANON+'｜MED-870409｜第一線住院醫師',3600);
-      return;
-    }
-    if(gameState.getFlag('B2_IDENTITY_ATTEMPT_USED')){
-      uiManager.showSubtitle('封存終端','「身分建立嘗試已用盡。B2 封存程序永久鎖閉，請由單向出口離開。」',4200);
-      return;
-    }
+
     const missing=[];
     if(!gameState.getFlag('B2_ADMIN_SOURCE'))missing.push('3F 行政辦公室');
     if(!gameState.getFlag('B2_HISTORY_SOURCE'))missing.push('文史封存');
@@ -1211,25 +1215,31 @@ controller.onInteract = async (interactable) => {
     uiManager.openIdentityMatrix({
       candidates:IDENTITY_CANDIDATES,
       onSelect:candidate=>{
-        if(gameState.getFlag('B2_IDENTITY_ATTEMPT_USED'))return {resolved:false,message:'身分建立嘗試已用盡。B2 封存程序永久鎖閉。'};
+        if(gameState.getFlag('B2_IDENTITY_ATTEMPT_USED'))return {resolved:false,message:'身分建立嘗試已用盡。'};
         gameState.setFlag('B2_IDENTITY_ATTEMPT_USED',true);
-        if(candidate.id!=='ZHANG_SHOUHENG'||missing.length)return {resolved:false,message:candidate.id==='ZHANG_SHOUHENG'?'來源資料不足，候選身分比對失敗。建立身分的機會已用盡。':candidate.contradiction+'\n建立身分的機會已用盡。'};
+        if(candidate.id!=='ZHANG_SHOUHENG'||missing.length){
+          return {
+            resolved:false,
+            message:candidate.id==='ZHANG_SHOUHENG'
+              ?'來源資料不足，候選身分比對未完成。封存終端正在載入事故紀錄……'
+              :candidate.contradiction+'\n候選身分比對失敗。封存終端正在載入事故紀錄……'
+          };
+        }
         establishCanonicalIdentity();
-        gameState.setFlag('M8_IDENTITY_BATTLE_ACTIVE',true);
         persistentMemory.addJournalNote(
           'B2_ARCHIVE_VERIFY',
           'B2 身分矩陣排除其他候選；時間、病歷、門禁與院史人員資料一致指向張守恆 MED-870409。'
         );
-        uiManager.updateTasks();
         return {
           resolved:true,
-          message:'>>> IDENTITY RECONSTRUCTED\n>>> 張守恆 / MED-870409'
+          message:'>>> IDENTITY RECONSTRUCTED\n>>> 張守恆 / MED-870409\n>>> 載入 1998 火災封存紀錄……'
         };
-      }
+      },
+      onAttemptComplete:()=>playB2FireRecap()
     });
     if(missing.length){
       uiManager.setIdentityMatrixStatus(
-        '資料不完整：'+missing.join('、')+'。可先嘗試比對；額外線索可能在 3F 行政辦公室與文史封存。',
+        '資料不完整：'+missing.join('、')+'。仍可進行一次比對；無論結果如何，終端都會繼續播放火災封存紀錄。',
         'error'
       );
     }
