@@ -148,6 +148,19 @@ function drawProp(ctx,profile,x,topY,s,p){
 }
 
 export function drawCharacterFigure(ctx,name,x,baseY,scale=1,{cctv=false,label=false,obscure=false,showProp=true}={}){
+  if(name==='Annie'){
+    const p=cctv?palette.cctv:palette.photo,s=scale;
+    // Old CPR mannequin: blank vinyl face, wig, yellowed coat, rigid teaching-joint silhouette.
+    roundRect(ctx,x-38*s,baseY-141*s,76*s,136*s,10*s,cctv?'#89958a':'#c4baa0',cctv?'#5b6a5e':'#8e846f');
+    ellipse(ctx,x,baseY-181*s,31*s,38*s,cctv?'#849487':'#c8bea7');
+    ctx.fillStyle=cctv?'#263129':'#39342d';ctx.beginPath();ctx.ellipse(x,baseY-204*s,35*s,23*s,0,Math.PI,Math.PI*2);ctx.fill();
+    ellipse(ctx,x,baseY-180*s,5*s,8*s,cctv?'#6e7d72':'#a69b86');
+    line(ctx,x-27*s,baseY-89*s,x-48*s,baseY-38*s,13*s,cctv?'#657267':'#9e957f');
+    line(ctx,x+27*s,baseY-89*s,x+48*s,baseY-38*s,13*s,cctv?'#657267':'#9e957f');
+    for(const [jx,jy] of [[-48,-38],[48,-38],[-22,4],[22,4]])ellipse(ctx,x+jx*s,baseY+jy*s,6*s,6*s,cctv?'#4e5e52':'#827866');
+    if(label){ctx.fillStyle=cctv?'#d4ded5':'#30291f';ctx.font=`${Math.max(14,20*s)}px sans-serif`;ctx.textAlign='center';ctx.fillText(name,x,baseY+82*s);ctx.textAlign='left';}
+    return null;
+  }
   const profile=getCharacterProfile(name);
   const p=cctv?palette.cctv:palette.photo;
   const s=scale*(profile?.visual?.height||1);
