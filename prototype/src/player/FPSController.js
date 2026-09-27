@@ -318,8 +318,11 @@ export class FPSController {
 
     let foundInteractable = null;
 
-    if (hits.length > 0) {
-      let cur = hits[0].object;
+    // A disabled mesh can overlap an active story hotspot (for example the
+    // 3F patrol board reuses the same physical location at 17:00 and 21:17).
+    // Do not let the nearest inactive hit mask an interactable behind it.
+    for (const hit of hits) {
+      let cur = hit.object;
 
       while (cur) {
         if (cur.userData?.interactable) {
@@ -328,6 +331,8 @@ export class FPSController {
         }
         cur = cur.parent;
       }
+
+      if (foundInteractable) break;
     }
 
     // P1 normal-duty actions intentionally use proximity anchors rather than
