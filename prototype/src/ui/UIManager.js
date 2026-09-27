@@ -5,7 +5,7 @@ import { soundManager } from '../audio/SoundManager.js';
 import { persistentMemory, TRUE_NAME_CANON } from '../core/PersistentMemory.js';
 import { drawCharacterStrip } from '../art/CharacterPortraitArt.js';
 import { getCharacterProfile } from '../story/CharacterBible.js';
-import {drawMemoryFragment,preloadArtPass2Image} from '../art/ArtPass2Assets.js';
+import {drawMemoryFragment,drawPersonnelRosterBackdrop,preloadArtPass2Image} from '../art/ArtPass2Assets.js';
 
 export class UIManager {
   constructor(gameState, onTerminalClose, onElevatorTransitionComplete) {
@@ -474,6 +474,11 @@ export class UIManager {
     this.archiveTitleEl.textContent = documentData.title || '院內文件';
     this.archiveModal.classList.add('active');
     this.renderArchivePage();
+    if(documentData.title==='1998 夜班核心人員名錄'){
+      void preloadArtPass2Image('personnelRoster').then(()=>this.renderArchivePage()).catch(error=>{
+        console.warn('[art] personnel roster backdrop unavailable',error);
+      });
+    }
     soundManager.playPaperSign();
   }
 
@@ -488,11 +493,19 @@ export class UIManager {
       const portrait=document.createElement('div');portrait.className='personnel-dossier-portrait';
       const canvas=document.createElement('canvas');canvas.width=420;canvas.height=520;
       const ctx=canvas.getContext('2d');
-      const bg=ctx.createLinearGradient(0,0,420,520);bg.addColorStop(0,'#8d7a5a');bg.addColorStop(1,'#32291f');
+      const bg=ctx.createLinearGradient(0,0,420,520);bg.addColorStop(0,'#8d7a5a');bg.addColorStop(1,'#211a14');
       ctx.fillStyle=bg;ctx.fillRect(0,0,420,520);
-      ctx.fillStyle='rgba(230,215,185,.08)';for(let i=0;i<36;i++){ctx.fillRect((i*79)%420,(i*47)%520,2+(i%3),4+(i%5));}
+      const hasBackdrop=drawPersonnelRosterBackdrop(ctx,0,0,420,520,{alpha:.34});
+      if(!hasBackdrop){
+        ctx.fillStyle='rgba(230,215,185,.08)';
+        for(let i=0;i<36;i++)ctx.fillRect((i*79)%420,(i*47)%520,2+(i%3),4+(i%5));
+      }
+      ctx.fillStyle='rgba(20,14,10,.52)';ctx.fillRect(40,84,340,340);
       drawCharacterStrip(ctx,[page.name],{left:65,right:355,baseY:405,cctv:false,labels:false,maxScale:1.12});
       ctx.strokeStyle='#d0b98e';ctx.lineWidth=6;ctx.strokeRect(12,12,396,496);
+      ctx.strokeStyle='rgba(224,203,163,.25)';ctx.lineWidth=1;
+      for(let y=36;y<500;y+=42){ctx.beginPath();ctx.moveTo(28,y);ctx.lineTo(392,y);ctx.stroke();}
+      ctx.fillStyle='rgba(218,191,146,.74)';ctx.font='bold 18px monospace';ctx.fillText('ARCHIVE / 1998',28,42);
       const index=document.createElement('div');index.className='personnel-dossier-index';index.textContent=`ARCHIVE PERSONNEL FILE ${String(this.archivePageIndex+1).padStart(2,'0')}`;
       portrait.append(canvas,index);
 

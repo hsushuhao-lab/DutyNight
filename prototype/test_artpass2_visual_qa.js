@@ -12,7 +12,8 @@ const assets=readFileSync('./src/art/ArtPass2Assets.js','utf8');
 const artFiles=[
   './public/assets/artpass2/opening-night-campus.webp',
   './public/assets/artpass2/archive-gallery.webp',
-  './public/assets/artpass2/memory-fragments.webp'
+  './public/assets/artpass2/memory-fragments.webp',
+  './public/assets/artpass2/personnel-roster.webp'
 ];
 let total=0;
 for(const file of artFiles){
@@ -29,6 +30,9 @@ assert(act.includes('act-art-backdrop')&&act.includes('act-kenburns'),'opening a
 assert(memory.includes('drawMemoryFragment')&&memory.includes("preloadArtPass2Image('memoryFragments')"),'world memory photos must use refined archival crops');
 assert(ui.includes('drawMemoryFragment'),'full memory viewer must use refined archival imagery');
 assert(ui.includes("page.kind==='personnel'")&&ui.includes('personnel-dossier-card'),'seven-person archive must render polished dossier pages');
+assert(assets.includes('personnelRoster')&&assets.includes('drawPersonnelRosterBackdrop'),'Art Pass 3 personnel roster backdrop must be registered');
+assert(ui.includes("preloadArtPass2Image('personnelRoster')")&&ui.includes('drawPersonnelRosterBackdrop'),'seven-person archive must use the refined roster backdrop while keeping canonical text overlays');
+assert(assets.includes('scaleSourceRect'),'refined Art Pass 3 crops must scale to production image resolution');
 
 assert(floor3.includes('buildArchiveGalleryTexture'),'3F archive must use the refined historical photo wall');
 assert(floor3.includes("title:'1998 夜班核心人員名錄'"),'canonical seven-person archive title missing');
@@ -57,4 +61,4 @@ for(const [name,id] of [
   assert.equal(p.employeeId,id,name+' employee ID drifted');
 }
 
-console.log('ART PASS 2 OPENING / MEMORY / ARCHIVE QA PASS');
+console.log('ART PASS 3 OPENING / MEMORY / ARCHIVE / PERSONNEL QA PASS');
