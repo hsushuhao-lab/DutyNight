@@ -1008,7 +1008,7 @@ controller.onInteract = async (interactable) => {
       candidates:IDENTITY_CANDIDATES,
       onSelect:candidate=>{
         if(gameState.getFlag('B2_IDENTITY_ATTEMPT_USED'))return {resolved:false,message:'身分建立嘗試已用盡。B2 封存程序永久鎖閉。'};
-        gameState.getFlag('B2_IDENTITY_ATTEMPT_USED')=true;persistentMemory.save();
+        gameState.setFlag('B2_IDENTITY_ATTEMPT_USED',true);
         if(candidate.id!=='ZHANG_SHOUHENG'||missing.length)return {resolved:false,message:candidate.id==='ZHANG_SHOUHENG'?'來源資料不足，候選身分比對失敗。建立身分的機會已用盡。':candidate.contradiction+'\n建立身分的機會已用盡。'};
         establishCanonicalIdentity();
         gameState.setFlag('M8_IDENTITY_BATTLE_ACTIVE',true);
