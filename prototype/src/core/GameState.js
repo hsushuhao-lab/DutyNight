@@ -73,6 +73,7 @@ export class GameState {
     this.flags.set('HIDDEN_SERVICE_DOOR_DISCOVERED', false);
     this.flags.set('B_PANEL_CLUE_KNOWN', false);
     this.flags.set('B_PANEL_KEY', false);
+    this.flags.set('B2_IDENTITY_ATTEMPT_USED', false);
     this.flags.set('CLUE_403_0409', false);
     this.flags.set('ADMIN_ROSTER_CHECKED', false);
     this.flags.set('ADMIN_PRINTER_DOC_CHECKED', false);
