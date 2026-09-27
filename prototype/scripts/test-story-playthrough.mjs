@@ -498,12 +498,21 @@ try{
   await shot('m9-dual-identity-form',null,null,'DutyPhone_316_Handset',[7.5,1.7,5.7],[5.45,.95,5.72]);
   await page.locator('#final-employee-id').fill('0409');
   await domClick('#btn-submit-final-handoff');
-  await waitForPageCondition(page,()=>document.getElementById('final-success-modal')?.classList.contains('active'),60000);
+  await waitForPageCondition(page,()=>document.getElementById('final-success-recap')?.classList.contains('active'),60000);
 
-  s=await snap();assert.equal(s.flags.GAME_COMPLETE,true);assert.equal(s.memory.gameComplete,true);
+  s=await snap();assert.equal(s.flags.GAME_COMPLETE,true);assert.equal(s.memory.gameComplete,true);assert.equal(s.memory.finalDisposition,'success_pending');
+  for(let i=0;i<8;i++){
+    await page.waitForTimeout(160);
+    await page.keyboard.press('E');
+  }
+  await waitForPageCondition(page,()=>document.querySelector('#final-success-recap .fsr-choice.visible'),30000);
+  await domClick('#final-success-recap .fsr-buttons .perfect');
+  await waitForPageCondition(page,()=>document.getElementById('final-success-modal')?.classList.contains('active'),30000);
+
+  s=await snap();assert.equal(s.flags.GAME_COMPLETE,true);assert.equal(s.memory.gameComplete,true);assert.equal(s.memory.finalDisposition,'perfect');
   await shot('m9-successful-dawn-ending',null,null,'DutyPhone_316_Handset',[7.5,1.7,5.7],[5.45,.95,5.72]);
-  assert.match(await taskText(),/交班完成/,'completed game must close the task chain instead of dropping guidance');
-  await mark('M9 TRUE NAME handoff accepted');
+  assert.match(await taskText(),/紀錄覆寫完成[\s\S]*原始夜班紀錄已恢復/,'completed game must close the task chain as restored records');
+  await mark('M9 TRUE NAME authorization accepted; perfect ending recap completed');
 
   assert.equal(report.errors.length,0,JSON.stringify(report.errors,null,2));
   assert.deepEqual(report.screenshots.map(shot=>shot.file),requiredShots,'Story QA must produce the exact ordered 27-image manifest');
