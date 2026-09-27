@@ -62,6 +62,7 @@ jobs:
           node test_v2_annie_identity_qa.js
           node test_v2_bridge_lookback_qa.js
           node test_character_identity_pass_qa.js
+          node test_artpass2_visual_qa.js
           node test_three_act_presentation_qa.js
           node test_visual_geometry_contract_qa.js
           node test_user_floorplan_qa.js
