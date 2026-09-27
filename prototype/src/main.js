@@ -977,6 +977,7 @@ controller.onInteract = async (interactable) => {
       onSecondary:()=>{
         gameState.setFlag('M7_B2_OPEN',true);
         gameState.setFlag('B2_DOOR_READY',true);
+        gameState.setFlag('B2_IDENTITY_ATTEMPT_USED',false);
         persistentMemory.setProof('time',true);
         persistentMemory.addJournalNote('B2_OPEN','02:17 的 1→3→4 是歷史錯誤。我改用王世榮保管的十字鑰匙啟動紫色備援排煙；隱藏服務門因此鬆開。');
         worldRouter.loadZone('b2_archive','b2_archive_entry');
@@ -988,7 +989,7 @@ controller.onInteract = async (interactable) => {
       uiManager.showSubtitle('封存終端','IDENTITY RECONSTRUCTED：'+TRUE_NAME_CANON+'｜MED-870409｜第一線住院醫師',3600);
       return;
     }
-    if(persistentMemory.data.b2IdentityAttemptUsed){
+    if(gameState.getFlag('B2_IDENTITY_ATTEMPT_USED')){
       uiManager.showSubtitle('封存終端','「身分建立嘗試已用盡。B2 封存程序永久鎖閉，請由單向出口離開。」',4200);
       return;
     }
@@ -1006,8 +1007,8 @@ controller.onInteract = async (interactable) => {
     uiManager.openIdentityMatrix({
       candidates:IDENTITY_CANDIDATES,
       onSelect:candidate=>{
-        if(persistentMemory.data.b2IdentityAttemptUsed)return {resolved:false,message:'身分建立嘗試已用盡。B2 封存程序永久鎖閉。'};
-        persistentMemory.data.b2IdentityAttemptUsed=true;persistentMemory.save();
+        if(gameState.getFlag('B2_IDENTITY_ATTEMPT_USED'))return {resolved:false,message:'身分建立嘗試已用盡。B2 封存程序永久鎖閉。'};
+        gameState.setFlag('B2_IDENTITY_ATTEMPT_USED',true);
         if(candidate.id!=='ZHANG_SHOUHENG'||missing.length)return {resolved:false,message:candidate.id==='ZHANG_SHOUHENG'?'來源資料不足，候選身分比對失敗。建立身分的機會已用盡。':candidate.contradiction+'\n建立身分的機會已用盡。'};
         establishCanonicalIdentity();
         gameState.setFlag('M8_IDENTITY_BATTLE_ACTIVE',true);
