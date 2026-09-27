@@ -1,0 +1,32 @@
+import assert from 'node:assert/strict';
+import {chromium} from 'playwright';
+import {preview} from 'vite';
+import {mkdir,writeFile} from 'node:fs/promises';
+const output=process.argv[2]||'qa-results/316-phone-browser';
+const base=process.argv[3]||'http://localhost:4186/';
+const server=process.argv[3]?null:await preview({preview:{port:4186,strictPort:true}});
+const browser=await chromium.launch({channel:'chrome',headless:true});
+const report={verdict:'FAIL',url:base,errors:[],lines:[]};
+try{
+ await mkdir(output,{recursive:true});
+ const page=await browser.newPage({viewport:{width:1440,height:900}});
+ page.on('pageerror',e=>report.errors.push(e.message));
+ await page.goto(base+'?qa=story');
+ await page.waitForFunction(()=>window.__storyQA?.worldRouter?.activeZoneInstance);
+ await page.evaluate(()=>{const q=window.__storyQA;for(const task of ['KEY_PICKUP','DUTY_LOG','E_HANDOFF','WARD_ENTRY'])q.task(task);for(const flag of ['BOOTSTRAP_2117_RESOLVED','POST_2117_DUTY_CALL_DONE','ER0033_SLIP_COLLECTED','M3_316_DECODED'])q.setFlag(flag,true);q.uiManager.dialogueSequence=null;q.setFlag('SECOND_CAMPUS_ACCESS',false);q.setFlag('SECOND_CAMPUS_PHONE_PENDING',true);q.interact({id:'316_PHONE'});});
+ const text=()=>page.locator('#subtitle-text').innerText();
+ report.lines.push(await text());assert.match(report.lines[0],/怎麼知道我在 316 辦公室/);
+ await page.waitForTimeout(2200);
+ assert.equal(await text(),report.lines[0],'unread thought must remain visible past the old timer');
+ assert.equal(await page.evaluate(()=>window.__storyQA.gameState.getFlag('SECOND_CAMPUS_ACCESS')),false);
+ await page.screenshot({path:output+'/unread-thought.png'});
+ await page.keyboard.press('e');report.lines.push(await text());assert.match(report.lines[1],/病人需要精神科評估/);
+ await page.keyboard.press('e');report.lines.push(await text());assert.match(report.lines[2],/八樓天橋的門禁權限已開放/);
+ await page.screenshot({path:output+'/eighth-floor-call.png'});
+ await page.keyboard.press('e');
+ assert.equal(await page.evaluate(()=>!!window.__storyQA.uiManager.dialogueSequence),false);
+ assert.equal(await page.evaluate(()=>window.__storyQA.gameState.getFlag('SECOND_CAMPUS_ACCESS')),true);
+ assert.match(await page.locator('#task-panel').innerText(),/第二院區 5F/);
+ assert.deepEqual(report.errors,[]);report.verdict='PASS';
+}catch(e){report.error=e.stack;process.exitCode=1;}finally{await writeFile(output+'/result.json',JSON.stringify(report,null,2));await browser.close();await server?.close();}
+console.log(JSON.stringify(report));

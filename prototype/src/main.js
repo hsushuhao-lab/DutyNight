@@ -662,8 +662,7 @@ controller.onInteract = async (interactable) => {
       gameState.setFlag('SECOND_CAMPUS_PHONE_PENDING',false);
       gameState.setFlag('PHONE_ANSWERED',true);
       soundManager.playClick();
-      uiManager.showSubtitle('值班醫師','「……怎麼知道我在 316 辦公室？」',2600);
-      setTimeout(()=>unlockSecondCampusAccess(),1800);
+      uiManager.showDialogue([{speaker:'值班醫師',text:'「……怎麼知道我在 316 辦公室？」'}],unlockSecondCampusAccess);
     }else if(gameState.getFlag('PHONE_RING_ACTIVE')&&!gameState.getFlag('PHONE_ANSWERED')){
       gameState.setFlag('PHONE_ANSWERED',true);
       gameState.setFlag('PHONE_RING_ACTIVE',false);

@@ -349,8 +349,11 @@ try{
   await shot('m3-316-legacy-terminal-phone',null,null,'DutyTerminal_316_LegacyScreen',[3.4,1.65,5.72],[9.55,1.25,5.5]);
   assert.match(await page.locator('#subtitle-text').innerText(),/終端機停止後，桌上的院內電話立刻響起/);
   assert.doesNotMatch(await page.locator('#subtitle-text').innerText(),/\\n/,'316 terminal subtitle must use real line breaks');
-  await interact({id:'316_PHONE'});
+  await q(()=>window.__storyQA.interact({id:'316_PHONE'}));
   assert.match(await page.locator('#subtitle-text').innerText(),/怎麼知道我在 316 辦公室/);
+  await page.waitForTimeout(2000);
+  assert.equal((await snap()).flags.SECOND_CAMPUS_ACCESS,false,'the unread call must not unlock the next task on a timer');
+  await drainDialogue();
   await waitForPageCondition(page,()=>window.__storyQA.gameState.getFlag('SECOND_CAMPUS_ACCESS')===true);
   s=await snap();assert.equal(s.flags.SECOND_CAMPUS_ACCESS,true);
   assert.equal(s.time,'01:15');
