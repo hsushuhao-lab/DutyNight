@@ -97,10 +97,10 @@ export class PersistentMemory {
       }
       if((parsed.version||1)<3)data.version=3;
       if((parsed.version||1)<4)data.version=4;
-      if((parsed.version||1)<5){
-        delete data.b2IdentityAttemptUsed;
-        data.version=5;
-      }
+      if((parsed.version||1)<5)data.version=5;
+      // B2 identity attempts are per-run transient state. Never resurrect the
+      // obsolete persistent lock from older localStorage payloads.
+      delete data.b2IdentityAttemptUsed;
       const engineerNote=data.journalNotes.find(note=>note.id==='LIU_MAINTENANCE_TAG');
       if(engineerNote)engineerNote.text='劉志遠／ENG-860214／工務機電技師。燒焦吊牌標示 6F SKILL LAB／B-PANEL；他提到紫色備援與王世榮保管的鑰匙。';
       for(const note of data.journalNotes)note.text=note.text.replaceAll('4+3 夜班核心人員檔案','1998 夜班核心人員名錄');
