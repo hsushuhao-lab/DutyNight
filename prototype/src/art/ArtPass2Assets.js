@@ -13,6 +13,9 @@ const imagePromises=new Map();
 
 export function preloadArtPass2Image(key){
   const url=ART_PASS2[key]||key;
+  // Node-based structural QA has no browser Image constructor. The procedural
+  // fallback remains valid there; production browsers still preload the WebP art.
+  if(typeof Image==='undefined')return Promise.resolve(null);
   if(imageCache.has(url))return Promise.resolve(imageCache.get(url));
   if(imagePromises.has(url))return imagePromises.get(url);
   const promise=new Promise((resolve,reject)=>{
