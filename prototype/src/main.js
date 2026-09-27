@@ -1382,9 +1382,13 @@ controller.onInteract = async (interactable) => {
         gameState.setFlag('M5_BRIDGE_RESOLVED',true);
         gameState.setFlag('M5_BRIDGE_COMMITTED',true);
         gameState.setFlag('M5_ROUTE_CHOICE_RESOLVED',true);
+        gameState.setFlag('BRIDGE_NO_LOOKBACK_RULE_ACTIVE',true);
+        gameState.setFlag('BRIDGE_MANUAL_LOOKBACK_AFTER_SAFE_CHOICE',false);
+        worldRouter.activeZoneInstance?.armManualNoLookbackRule?.();
         persistentMemory.resolveLegend('bridge');
-        persistentMemory.addJournalNote('BRIDGE_SAFE','越過天橋中線後不要回頭；保持前進，直到返回第一院區。');
+        persistentMemory.addJournalNote('BRIDGE_SAFE','越過天橋中線後不要回頭；選擇忍住只代表沒有在倒影事件轉身，離開天橋以前仍不能自己回頭。');
         completeM5IfReady();
+        uiManager.showSubtitle('值班醫師','「忍住……不要回頭。走出天橋以前，都不要看後面。」',3600);
         controller.enabled=true;
       }
     });
@@ -1637,8 +1641,16 @@ function animate() {
     }
   }
   if(gameState.getFlag('BRIDGE_OVERRIDE_PENDING')){
+    const manualLookback=gameState.getFlag('BRIDGE_MANUAL_LOOKBACK_AFTER_SAFE_CHOICE');
     gameState.setFlag('BRIDGE_OVERRIDE_PENDING',false);
-    loopManager.triggerLegendOverride('BRIDGE',{legend:'LEGEND 04 — 不能回頭的天橋',reason:'你已經回頭三次。'});
+    gameState.setFlag('BRIDGE_NO_LOOKBACK_RULE_ACTIVE',false);
+    gameState.setFlag('BRIDGE_MANUAL_LOOKBACK_AFTER_SAFE_CHOICE',false);
+    loopManager.triggerLegendOverride('BRIDGE',{
+      legend:'LEGEND 04 — 不能回頭的天橋',
+      reason:manualLookback
+        ?'你明明選擇了忍住不回頭，卻在回程親自轉身看向身後。'
+        :'你已經回頭三次。'
+    });
   }
 
   // After the 21:17 bootstrap the player is explicitly sent back to the 4F duty room.
