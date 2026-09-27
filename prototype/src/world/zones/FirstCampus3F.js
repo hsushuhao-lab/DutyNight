@@ -318,8 +318,19 @@ export class FirstCampus3F {
     ];
     for(const d of documents){
       const personnel=d.id==='ARCHIVE_PERSONNEL_1998';
-      const folder=solid(d.shelf,personnel?new THREE.MeshStandardMaterial({color:0xa84224,emissive:0x301008,emissiveIntensity:.25}):this.gf.materials.lightWarm,[d.x,d.y,.25],personnel?[.40,.42,.07]:[.28,.36,.05]);
+      const folder=solid(d.shelf,personnel?new THREE.MeshStandardMaterial({color:0x8f2f20,emissive:0x3b1009,emissiveIntensity:.38,roughness:.62}):this.gf.materials.lightWarm,[d.x,d.y,.25],personnel?[.40,.42,.07]:[.28,.36,.05]);
       folder.name=d.id;folder.userData={interactable:true,id:d.id,type:'archive_document',label:`翻閱：${d.title}`,documentTitle:d.title,pages:d.pages};
+      if(personnel){
+        const labelCanvas=document.createElement('canvas');labelCanvas.width=520;labelCanvas.height=150;const lctx=labelCanvas.getContext('2d');
+        const paper=lctx.createLinearGradient(0,0,520,150);paper.addColorStop(0,'#e2d2ad');paper.addColorStop(1,'#bca57b');lctx.fillStyle=paper;lctx.fillRect(0,0,520,150);
+        lctx.strokeStyle='#6c4b32';lctx.lineWidth=9;lctx.strokeRect(8,8,504,134);
+        lctx.fillStyle='#3b2d22';lctx.font='bold 33px sans-serif';lctx.fillText('1998 夜班核心人員名錄',28,63);
+        lctx.fillStyle='#76513a';lctx.font='21px ui-monospace,monospace';lctx.fillText('7 PERSONNEL FILES｜SOURCE VERIFIED',29,108);
+        const labelTexture=new THREE.CanvasTexture(labelCanvas);labelTexture.colorSpace=THREE.SRGBColorSpace;
+        const label=new THREE.Mesh(new THREE.PlaneGeometry(.36,.105),new THREE.MeshStandardMaterial({map:labelTexture,roughness:.86,side:THREE.DoubleSide}));
+        label.position.set(0,0,.041);label.name='Archive_PersonnelFolder_Label';folder.add(label);
+        const glow=new THREE.PointLight(0xffc77f,.24,1.6,2);glow.position.set(0,.28,.38);folder.add(glow);
+      }
       this.interactables.push(folder);
     }
 
