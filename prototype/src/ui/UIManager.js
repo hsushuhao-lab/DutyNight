@@ -1016,8 +1016,8 @@ export class UIManager {
     const currentZone=window.worldRouter?.activeZoneId || '';
 
     if(this.gameState.getFlag('GAME_COMPLETE')){
-      this.renderTaskBoard('翌日 04:05｜交班完成',[
-        {id:'task-game-complete',text:'張守恆已完成真正的晨間交班',state:'completed'}
+      this.renderTaskBoard('RECORD RESTORED｜紀錄覆寫完成',[
+        {id:'task-game-complete',text:'張守恆與八名罹難者的原始夜班紀錄已恢復',state:'completed'}
       ]);
       return;
     }
