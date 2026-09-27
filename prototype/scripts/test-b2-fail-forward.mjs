@@ -93,8 +93,17 @@ try {
   assert.deepEqual(history, { reviewed: true, battle: true });
   report.checkpoints.push({ id: 'HISTORY_REQUIRED_AND_REVIEWED', ...history });
 
-  await page.evaluate(() => window.__storyQA.interact({ type: 'workstation' }));
+  await page.evaluate(() => {
+    const q=window.__storyQA;
+    const screen=q.worldRouter.activeZoneInstance.zoneGroup.getObjectByName('DutyTerminal_316_LegacyScreen');
+    screen.updateWorldMatrix(true,false);
+    const p=screen.matrixWorld.elements;
+    q.controller.teleport(p[12]-1.6,1.7,p[14]);q.lookAt([p[12],p[13],p[14]]);
+    q.interact({type:'workstation'});
+  });
   await page.waitForFunction(() => window.__storyQA.gameState.getFlag('CG_316_TRUE_NAME_FINAL_HANDOFF_ACTIVE'));
+  await page.waitForTimeout(2400);
+  assert.equal(await page.locator('#final-employee-id').isVisible(),false,'identity input must wait until the recap finishes');
   await page.screenshot({ path: `${output}/03-316-pre-input-cinematic.png` });
   await page.locator('#final-employee-id').fill('0409');
   await page.locator('#btn-submit-final-handoff').click();

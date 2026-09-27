@@ -299,14 +299,27 @@ function revealFinal316Handoff({deferred=false}={}) {
     );
   };
   const reveal=()=>uiManager.showSubtitle('316 舊終端','姓名、員編與夜班記憶正在重新排列。只有完成真正交班的人，才能留下自己的名字。',3600);
+  const screen=worldRouter.activeZoneInstance.zoneGroup.getObjectByName('DutyTerminal_316_LegacyScreen');
+  const originalScreenMaterial=screen?.material;
+  const recapCanvas=document.createElement('canvas');recapCanvas.width=1024;recapCanvas.height=640;
+  const recapTexture=new THREE.CanvasTexture(recapCanvas);recapTexture.colorSpace=THREE.SRGBColorSpace;
+  const recapMaterial=new THREE.MeshBasicMaterial({map:recapTexture});
+  const drawRecap=(conflict)=>{
+    const ctx=recapCanvas.getContext('2d');ctx.fillStyle=conflict?'#190f0e':'#071b15';ctx.fillRect(0,0,1024,640);
+    ctx.fillStyle=conflict?'#df8c72':'#a8cfb4';ctx.font='32px monospace';
+    const lines=conflict?['316 / IDENTITY TEMPLATE','LI CHENGLI — OVERWRITE PENDING','姓名欄位衝突｜交班尚未完成']:['316 / EVIDENCE RECOVERED','文史資料｜姓名與事故紀錄','員工資料｜MED-87••••','舊聽診器｜1997 執業誌慶','請以留下的證據確認自己的身分'];
+    lines.forEach((line,i)=>ctx.fillText(line,48,90+i*92));recapTexture.needsUpdate=true;
+    if(screen)screen.material=recapMaterial;
+  };
+  const restoreScreen=()=>{if(screen)screen.material=originalScreenMaterial;recapMaterial.dispose();recapTexture.dispose();};
   void cinematicDirector.play({
     id:'316_TRUE_NAME_FINAL_HANDOFF',
-    durationMs:1700,
+    durationMs:5000,
     keyframes:[{at:.28,yaw:-.045,pitch:-.01},{at:.72,yaw:.025,pitch:0},{at:1,yaw:0,pitch:0}],
-    cues:[{at:.18,run:reveal},{at:.56,run:()=>soundManager.playComputerBeep()}],
-    onComplete:openForm
-  }).then(played=>{if(!played)openForm();})
-    .catch(error=>{console.error('[cinematic] final identity reveal failed',error);openForm();});
+    cues:[{at:0,run:()=>drawRecap(true)},{at:.18,run:reveal},{at:.40,run:()=>drawRecap(false)},{at:.56,run:()=>soundManager.playComputerBeep()}],
+    onComplete:()=>{restoreScreen();openForm();}
+  }).then(played=>{if(!played){restoreScreen();openForm();}})
+    .catch(error=>{restoreScreen();console.error('[cinematic] final identity reveal failed',error);openForm();});
 }
 
 function resolveAdminIdentityPuzzleIfReady() {
