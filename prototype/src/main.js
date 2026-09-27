@@ -35,6 +35,7 @@ import { LoopManager } from './core/LoopManager.js';
 import { canAccess } from './core/AccessGraph.js';
 import { getMemorySequence, IDENTITY_CANDIDATES } from './story/NarrativeV22.js';
 import { CinematicDirector } from './story/CinematicDirector.js';
+import { ActPresentationDirector } from './story/ActPresentationDirector.js';
 
 // Setup Three.js Scene & Renderer
 const container = document.getElementById('canvas-container');
@@ -117,6 +118,14 @@ uiManager = new UIManager(
     renderer.domElement.requestPointerLock();
   }
 );
+
+const actPresentationDirector=new ActPresentationDirector({
+  gameState,
+  persistentMemory,
+  controller,
+  pointerElement:renderer.domElement,
+  getZoneId:()=>worldRouter.activeZoneId
+});
 
 const loopManager=new LoopManager({
   gameState,worldRouter,controller,uiManager,
@@ -311,7 +320,7 @@ if(new URLSearchParams(location.search).get('qa')==='story'){
     });
   };
   window.__storyQA={
-    gameState,persistentMemory,legendState,worldRouter,uiManager,loopManager,dutyEvents,GamePhase,floorStateManager,controller,cinematicDirector,
+    gameState,persistentMemory,legendState,worldRouter,uiManager,loopManager,dutyEvents,GamePhase,floorStateManager,controller,cinematicDirector,actPresentationDirector,
     prefetch:prefetchDestinationAssets,
     load:(zone,spawn)=>{worldRouter.loadZone(zone,spawn);worldRouter.activeZoneInstance?.syncStoryState?.();},
     enter:(zone,spawn)=>{
@@ -1372,6 +1381,7 @@ function animate() {
 
   controller.update(delta);
   worldRouter.update(delta);
+  actPresentationDirector.update();
   if(gameState.getFlag('BRIDGE_REFLECTION_NOTICE_PENDING')){
     gameState.setFlag('BRIDGE_REFLECTION_NOTICE_PENDING',false);
     gameState.setFlag('BRIDGE_REFLECTION_NOTICE_SEEN',true);
