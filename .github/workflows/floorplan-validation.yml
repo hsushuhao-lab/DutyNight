@@ -1,7 +1,5 @@
 name: Floorplan validation
 on:
-  push:
-    branches: [fix/floorplan-access-20260920]
   workflow_dispatch:
 permissions:
   contents: read
