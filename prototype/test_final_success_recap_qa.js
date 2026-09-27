@@ -32,8 +32,9 @@ assert(ui.includes('PERFECT ENDING — RECORD RESTORED'),'final success modal mu
 const backing=new Map();
 const storage={getItem:k=>backing.get(k)||null,setItem:(k,v)=>backing.set(k,v),removeItem:k=>backing.delete(k)};
 const memory=new PersistentMemory(storage);
-memory.completeGame();
-assert.equal(memory.data.finalDisposition,'escaped');
+memory.beginSuccessfulEndingReview();
+assert.equal(memory.data.finalDisposition,'success_pending');
+assert.equal(memory.data.gameComplete,true);
 memory.completePerfectEnding();
 assert.equal(memory.data.finalDisposition,'perfect');
 assert.equal(memory.data.gameComplete,true);
