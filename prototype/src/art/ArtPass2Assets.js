@@ -4,7 +4,8 @@ const base=import.meta.env?.BASE_URL||'/';
 export const ART_PASS2=Object.freeze({
   opening: base+'assets/artpass2/opening-night-campus.webp',
   archiveGallery: base+'assets/artpass2/archive-gallery.webp',
-  memoryFragments: base+'assets/artpass2/memory-fragments.webp'
+  memoryFragments: base+'assets/artpass2/memory-fragments.webp',
+  personnelRoster: base+'assets/artpass2/personnel-roster.webp'
 });
 
 const imageCache=new Map();
@@ -48,6 +49,12 @@ function cropForMemoryIndex(index){
   ][Math.abs(index)%6];
 }
 
+function scaleSourceRect(image,rect,baseWidth=1200,baseHeight=675){
+  const sx=image?.width?image.width/baseWidth:1;
+  const sy=image?.height?image.height/baseHeight:1;
+  return [rect[0]*sx,rect[1]*sy,rect[2]*sx,rect[3]*sy];
+}
+
 export function drawCoverCrop(ctx,image,sourceRect,dx,dy,dw,dh){
   if(!image)return false;
   const [sx,sy,ex,ey]=sourceRect;
@@ -62,7 +69,7 @@ export function drawCoverCrop(ctx,image,sourceRect,dx,dy,dw,dh){
 export function drawMemoryFragment(ctx,index,dx,dy,dw,dh){
   const image=getArtPass2Image('memoryFragments');
   if(!image)return false;
-  return drawCoverCrop(ctx,image,cropForMemoryIndex(index),dx,dy,dw,dh);
+  return drawCoverCrop(ctx,image,scaleSourceRect(image,cropForMemoryIndex(index)),dx,dy,dw,dh);
 }
 
 export async function buildArchiveGalleryTexture(){
@@ -94,7 +101,7 @@ export async function buildArchiveGalleryTexture(){
   for(let i=0;i<source.length;i++){
     const [x1,y1,x2,y2]=dest[i];
     ctx.fillStyle='#59422f';ctx.fillRect(x1-10,y1-10,x2-x1+20,y2-y1+44);
-    drawCoverCrop(ctx,image,source[i],x1,y1,x2-x1,y2-y1);
+    drawCoverCrop(ctx,image,scaleSourceRect(image,source[i]),x1,y1,x2-x1,y2-y1);
     ctx.fillStyle='#211a14';ctx.fillRect(x1,y2,x2-x1,30);
     ctx.fillStyle='#d5c3a0';ctx.font='20px sans-serif';ctx.fillText(labels[i],x1+10,y2+22);
   }
@@ -102,4 +109,22 @@ export async function buildArchiveGalleryTexture(){
   texture.colorSpace=THREE.SRGBColorSpace;
   texture.needsUpdate=true;
   return texture;
+}
+
+export function drawPersonnelRosterBackdrop(ctx,dx,dy,dw,dh,{alpha=.32}={}){
+  const image=getArtPass2Image('personnelRoster');
+  if(!image)return false;
+  ctx.save();
+  ctx.globalAlpha=alpha;
+  ctx.filter='sepia(.28) contrast(1.08) brightness(.72)';
+  drawCoverCrop(ctx,image,[0,0,image.width,image.height],dx,dy,dw,dh);
+  ctx.filter='none';
+  const vignette=ctx.createRadialGradient(dx+dw*.5,dy+dh*.42,Math.min(dw,dh)*.08,dx+dw*.5,dy+dh*.42,Math.max(dw,dh)*.65);
+  vignette.addColorStop(0,'rgba(0,0,0,0)');
+  vignette.addColorStop(1,'rgba(13,9,6,.78)');
+  ctx.globalAlpha=1;
+  ctx.fillStyle=vignette;
+  ctx.fillRect(dx,dy,dw,dh);
+  ctx.restore();
+  return true;
 }
