@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-const base=import.meta.env.BASE_URL||'/';
+const base=import.meta.env?.BASE_URL||'/';
 export const ART_PASS2=Object.freeze({
   opening: base+'assets/artpass2/opening-night-campus.webp',
   archiveGallery: base+'assets/artpass2/archive-gallery.webp',
