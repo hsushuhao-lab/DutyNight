@@ -58,16 +58,16 @@ for(const zone of ['first_campus_3f','first_campus_4f','first_campus_2f','first_
 assert(b2.includes("type:'b2_exit_door'")&&!b2.includes('B2_EscapeStairwell'),'B2 must have a door exit and no stairwell');
 assert(main.includes("worldRouter.loadZone('first_campus_3f','first_3f_316')"),'B2 must return directly to 3F');
 assert(main.includes("B2_EXITED_PERMANENTLY"),'B2 one-way exit lockout missing');
-assert(main.includes("M7_IDENTITY_RESOLVED_AT_316"),'B2 fail-forward must allow direct identity declaration at 316');
-assert(main.includes("getDeferred316IdentityHints"),'316 advisory evidence hints missing');
-assert(main.includes("尚未完成身分驗證。離開後 B2 將永久鎖閉，確定離開？"),'unresolved B2 exit must require irreversible confirmation');
+assert(main.includes("M7_IDENTITY_RESOLVED_AT_316"),'final 316 path may still mark deferred identity resolution');
+assert(main.includes("B2_FIRE_RECAP_SEEN"),'B2 terminal fire recap gate missing');
+assert(main.includes("先啟動 B2 封存終端"),'one-way exit must remain locked until the fire recap is viewed');
 assert(main.includes("有人嘗試覆寫模板已在 316 登入｜請輸入真正員編末四碼｜最後一次機會"),'final 316 warning must stay anonymous and explicit');
 assert(!main.includes("trueNameResolved&&persistentMemory.hasAllProofs()"),'final 316 identity declaration must not hard-block on the full proof bundle');
 assert(!ui.includes('沿 B2 逃生梯返回'),'B2 task board must not tell the player to use a removed staircase');
 assert(!ui.includes('沿逃生梯離開封存層'),'B2 completion task must use the one-way door, not a staircase');
-const b2FailForward=ui.indexOf("this.gameState.getFlag('B2_EXITED_PERMANENTLY')&&!this.gameState.getFlag('M7_B2_RESOLVED')");
+const b2FailForward=ui.indexOf("this.gameState.getFlag('B2_EXITED_PERMANENTLY')&&this.gameState.getFlag('B2_FIRE_RECAP_SEEN')");
 const b2ReopenPrompt=ui.indexOf("this.gameState.getFlag('M6_FLOOR6_RESOLVED')&&!this.gameState.getFlag('M7_B2_OPEN')");
-assert(b2FailForward>=0&&b2ReopenPrompt>=0&&b2FailForward<b2ReopenPrompt,'permanent B2 exit must take precedence over the service-door objective');
+assert(b2FailForward>=0&&b2ReopenPrompt>=0&&b2FailForward<b2ReopenPrompt,'post-recap permanent B2 exit must take precedence over the service-door objective');
 
 // Loop 2: fast path can skip chores but cannot hide the admin evidence.
 const adminBranch=main.slice(main.indexOf("['admin_roster_3f','admin_printer_doc_3f','admin_drawer_manual_3f']"),main.indexOf("} else if (interactable.type === 'spare_key_316')"));
