@@ -1,6 +1,6 @@
 // UIManager.js - Handles HUD, HIS computer terminal, Duty Log, and Elevator transition
 import { soundManager } from '../audio/SoundManager.js';
-import { persistentMemory } from '../core/PersistentMemory.js';
+import { persistentMemory, TRUE_NAME_CANON } from '../core/PersistentMemory.js';
 
 export class UIManager {
   constructor(gameState, onTerminalClose, onElevatorTransitionComplete) {
@@ -51,6 +51,8 @@ export class UIManager {
     this.archiveIndicatorEl = document.getElementById('archive-page-indicator');
     this.archivePages = [];
     this.archivePageIndex = 0;
+    this.archiveCompletionHandler = null;
+    this.archiveCompleted = false;
     this.elevatorCutscene = document.getElementById('elevator-cutscene');
     this.debugPanel = document.getElementById('debug-panel');
     this.timeEl = document.querySelector('.hud-time');
@@ -149,7 +151,7 @@ export class UIManager {
       if(this.archivePageIndex>0){this.archivePageIndex--;this.renderArchivePage();soundManager.playClick();}
     });
     document.getElementById('btn-archive-next')?.addEventListener('click',()=>{
-      if(this.archivePageIndex<this.archivePages.length-1){this.archivePageIndex++;this.renderArchivePage();soundManager.playPaperSign();}
+      if(this.archivePageIndex<this.archivePages.length-1){this.archivePageIndex++;this.renderArchivePage();soundManager.playPaperSign();if(this.archivePageIndex===this.archivePages.length-1&&!this.archiveCompleted){this.archiveCompleted=true;this.archiveCompletionHandler?.();}}
     });
 
     document.getElementById('btn-close-locker')?.addEventListener('click',()=>this.closeLocker());
@@ -208,9 +210,8 @@ export class UIManager {
     });
     document.getElementById('btn-close-final-handoff')?.addEventListener('click',()=>this.closeFinalHandoff());
     document.getElementById('btn-submit-final-handoff')?.addEventListener('click',()=>{
-      const name=document.getElementById('final-true-name')?.value.trim()||'';
       const employeeId=document.getElementById('final-employee-id')?.value.trim()||'';
-      this.finalHandoffHandler?.({name,employeeId});
+      this.finalHandoffHandler?.({name:TRUE_NAME_CANON,employeeId});
     });
 
     // Debug toggle with Backquote (~)
@@ -434,6 +435,8 @@ export class UIManager {
     document.exitPointerLock();
     this.archivePages = documentData.pages || [''];
     this.archivePageIndex = 0;
+    this.archiveCompletionHandler=documentData.onComplete||null;
+    this.archiveCompleted=false;
     this.archiveTitleEl.textContent = documentData.title || '院內文件';
     this.archiveModal.classList.add('active');
     this.renderArchivePage();
@@ -450,6 +453,7 @@ export class UIManager {
 
   closeArchiveDocument() {
     this.archiveModal?.classList.remove('active');
+    this.archiveCompletionHandler=null;
     if(this.onTerminalClose)this.onTerminalClose();
   }
 
@@ -651,14 +655,14 @@ export class UIManager {
   }
 
   openIdentityMatrix({candidates=[],onSelect}={}){
-    document.exitPointerLock();this.identityMatrixHandler=onSelect;
+    document.exitPointerLock();this.identityMatrixHandler=onSelect;let attemptUsed=false;
     const grid=document.getElementById('identity-candidate-grid');grid.replaceChildren();
     for(const candidate of candidates){
       const button=document.createElement('button');button.className='identity-candidate';button.id='identity-candidate-'+candidate.id;
       const strong=document.createElement('strong');strong.textContent=candidate.name;
       const meta=document.createElement('span');meta.textContent=candidate.employeeId+' ｜ '+candidate.role;
       button.append(strong,meta);
-      button.addEventListener('click',()=>{soundManager.playComputerBeep();const result=this.identityMatrixHandler?.(candidate)||{};this.setIdentityMatrixStatus(result.message||'',result.resolved?'match':'error');if(result.resolved)setTimeout(()=>this.closeIdentityMatrix(),1500);});
+      button.addEventListener('click',()=>{if(attemptUsed)return;attemptUsed=true;grid.querySelectorAll('button').forEach(item=>item.disabled=true);soundManager.playComputerBeep();const result=this.identityMatrixHandler?.(candidate)||{};this.setIdentityMatrixStatus(result.message||'',result.resolved?'match':'error');if(result.resolved)setTimeout(()=>this.closeIdentityMatrix(),1500);});
       grid.appendChild(button);
     }
     this.setIdentityMatrixStatus('等待候選身分比對。','');this.identityMatrixModal?.classList.add('active');
@@ -670,7 +674,6 @@ export class UIManager {
   openFinalHandoff(handler){
     document.exitPointerLock();
     this.finalHandoffHandler=handler;
-    const input=document.getElementById('final-true-name');if(input)input.value='';
     const employeeId=document.getElementById('final-employee-id');if(employeeId)employeeId.value='';
     document.getElementById('final-handoff-status').textContent='IDENTITY VERIFICATION REQUIRED';
     this.finalHandoffModal?.classList.add('active');
@@ -697,7 +700,10 @@ export class UIManager {
     this.finalHandoffModal?.classList.remove('active');this.finalHandoffHandler=null;if(resume)this.onTerminalClose?.();
   }
 
+  showEndingCG(name){const overlay=document.getElementById('ending-cg-screen');if(!overlay)return;overlay.querySelector('[data-ending-name]')?.replaceChildren(document.createTextNode(name));overlay.classList.add('active');setTimeout(()=>overlay.classList.remove('active'),5000);}
+
   showFinalSuccess(name){
+    document.getElementById('ending-cg-screen')?.classList.remove('active');
     this.finalHandoffModal?.classList.remove('active');
     const win=this.finalSuccessModal?.querySelector('.anomaly-window');
     const title=win?.querySelector('h2');if(title)title.textContent='OFFICIAL SHIFT COMPLETED';
@@ -1063,14 +1069,9 @@ export class UIManager {
           {id:'task-m6-elevator',text:currentZone==='phantom_6f'?(this.gameState.getFlag('FLOOR6_STETHOSCOPE_FOUND')?'檢視反光的老舊聽診器，翻面或擦去刻字上的灰塵':'查看焦黑器材旁反光的物件'):'搭乘一般電梯返回第一院區',state:'ready'}
         ]);
       }else if(this.gameState.getFlag('B2_EXITED_PERMANENTLY')&&!this.gameState.getFlag('M7_B2_RESOLVED')){
-        this.renderTaskBoard('B2 已永久封閉｜最後身分宣告',[
-          {
-            id:'task-m7-deferred-316',
-            text:currentZone==='first_campus_3f'
-              ?'回 316 宣告真正姓名與員編；若仍想補線索，可先查看行政辦公室與文史封存'
-              :'回第一院區 3F 316 進行最後身分宣告；行政辦公室與文史封存可能仍有額外線索',
-            state:'ready'
-          }
+        const reviewed=this.gameState.getFlag('HISTORY_PERSONNEL_PROFILES_REVIEWED');
+        this.renderTaskBoard(reviewed?'身份檔案核對完成｜返回 316':'B2 身分驗證失敗｜文史資料室',[
+          {id:'task-m7-deferred-316',text:reviewed?'回第一院區 3F 316，以員編末四碼完成最終交班驗證':'前往第一院區 3F 文史資料室，查閱夜班核心人員 4+3 檔案',state:'ready'}
         ]);
       }else if(this.gameState.getFlag('M6_FLOOR6_RESOLVED')&&!this.gameState.getFlag('M7_B2_OPEN')&&!this.gameState.getFlag('M7_B2_RESOLVED')){
         this.renderTaskBoard('翌日 02:17 前｜門禁紀錄',[
@@ -1078,7 +1079,7 @@ export class UIManager {
         ]);
       }else if(this.gameState.getFlag('M7_B2_OPEN')&&!this.gameState.getFlag('M7_B2_RESOLVED')){
         this.renderTaskBoard('翌日 02:17｜B2',[
-          {id:'task-m7-b2-terminal',text:this.gameState.getFlag('B2_IDENTITY_INCOMPLETE')?'資料不完整仍可嘗試封存身分比對；也可由單向出口離開，但 B2 將永久封閉':'查看封存驗證終端，嘗試身分驗證',state:'ready'}
+          {id:'task-m7-b2-terminal',text:persistentMemory.data.b2IdentityAttemptUsed?'唯一一次身分建立嘗試已用盡；由單向出口離開 B2':'查閱來源後，只能進行一次封存身分建立嘗試',state:'ready'}
         ]);
       }else if(this.gameState.getFlag('M7_B2_RESOLVED')&&!this.gameState.getFlag('LAST_CALL_SEEN')){
         this.renderTaskBoard('B2｜身分驗證完成',[

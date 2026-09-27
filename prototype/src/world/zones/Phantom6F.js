@@ -62,8 +62,8 @@ export class Phantom6F {
       face.position.set(x+(rotationY>0?.026:rotationY<0?-.026:0),y,z+(rotationY===0?.026:0));
       face.rotation.y=rotationY;this.zoneGroup.add(face);
     };
-    poster(-3.82,1.72,-4.0,Math.PI/2,'CPR / AED 教學',['確認反應與呼吸','立即胸外按壓','AED 到位後依指示操作','每兩分鐘重新評估']);
-    poster(3.82,1.72,-4.0,-Math.PI/2,'臨床技能訓練',['靜脈注射與點滴','急救藥物核對','生命徵象監測','團隊急救分工']);
+    poster(-1.15,1.72,-13.76,0,'CPR / AED 教學',['確認反應與呼吸','立即胸外按壓','AED 到位後依指示操作','每兩分鐘重新評估']);
+    poster(1.15,1.72,-13.76,0,'臨床技能訓練',['靜脈注射與點滴','急救藥物核對','生命徵象監測','團隊急救分工']);
 
     // Medication cart.
     const medCart=new THREE.Group();medCart.name='Floor6_MedicationCart';medCart.position.set(-2.75,0,-5.2);this.zoneGroup.add(medCart);

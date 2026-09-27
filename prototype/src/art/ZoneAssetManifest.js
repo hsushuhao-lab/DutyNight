@@ -13,7 +13,8 @@ export const zoneAssetManifest = Object.freeze({
   first_campus_2f: withExterior([...clinicalFurniture, 'hospitalBed']),
   first_campus_1f: withExterior(clinicalFurniture),
   first_campus_8f: withExterior(clinicalFurniture),
-  skybridge: withExterior(clinicalFurniture),
+  // Skybridge scenery uses procedural distant silhouettes; campusTree is not on the entry path.
+  skybridge: { essential: { models: clinicalFurniture, surfaces: [...clinicalSurfaces, 'ground', 'asphalt'] }, optional: { models: ['shrub', 'fern'], surfaces: [] } },
   second_campus_1f: indoor(clinicalFurniture),
   second_campus_2f: indoor([...clinicalFurniture, 'hospitalBed']),
   second_campus_4f_story: indoor([...clinicalFurniture, 'hospitalBed']),

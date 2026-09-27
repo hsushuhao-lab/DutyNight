@@ -134,6 +134,72 @@ function mergeStaticArt(root) {
   }
 }
 
+/** Lightweight, decorative exterior visible through hospital windows. It intentionally has no gameplay metadata. */
+export function buildDistantNightLandscape(parent, { position = [0, 0, 0], rotationY = 0 } = {}) {
+  const root = new THREE.Group();
+  root.name = 'DistantNightLandscape';
+  root.userData.sceneRole = 'DistantEnvironment';
+  root.position.set(...position);
+  root.rotation.y = rotationY;
+  const mat = (color, roughness = 1, extra = {}) => new THREE.MeshStandardMaterial({ color, roughness, ...extra });
+  const ground = mat(0x202923), shore = mat(0x586151), hillFar = mat(0x16221c), hillNear = mat(0x19241e);
+  const waterMat = mat(0x142a24, .2, { metalness: .18, emissive: 0x31594d, emissiveIntensity: .48 });
+  const wood = mat(0x675640), pathMat = mat(0x7d7868), lampMat = mat(0xb39a6e, .5, { emissive: 0x6b512a, emissiveIntensity: .42 });
+  const mesh = (name, geometry, material, x, y, z, sx = 1, sy = 1, sz = 1) => {
+    const object = new THREE.Mesh(geometry, material);
+    object.name = name; object.position.set(x, y, z); object.scale.set(sx, sy, sz);
+    object.userData.sceneRole = 'DistantEnvironment'; root.add(object); return object;
+  };
+  mesh('Distant landscape ground', new THREE.PlaneGeometry(110, 78), ground, 0, -2.2, -2).rotation.x = -Math.PI / 2;
+  mesh('Distant pond shoreline', new THREE.CircleGeometry(1, 48), shore, 0, -.78, 1, 15.8, 7.2, 1).rotation.x = -Math.PI / 2;
+  mesh('Distant pond water', new THREE.CircleGeometry(1, 48), waterMat, 0, -.755, 1, 13.6, 5.5, 1).rotation.x = -Math.PI / 2;
+  mesh('Distant pond shoreline edge', new THREE.TorusGeometry(1, .028, 4, 64), mat(0x858574), 0, -.765, 1, 15.8, 7.2, 1).rotation.x = -Math.PI / 2;
+  for (const [z, width] of [[-2.6, 8.4], [-.8, 6.2], [1.1, 9.5]]) {
+    const glint = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([
+      new THREE.Vector3(-width * .48, -.725, z), new THREE.Vector3(-width * .16, -.715, z + .10),
+      new THREE.Vector3(width * .12, -.725, z - .04), new THREE.Vector3(width * .48, -.715, z + .08)
+    ]), 16, .025, 5, false), mat(0x829889, .34, { emissive: 0x465c50, emissiveIntensity: .48 }));
+    glint.name = 'Distant pond water glint'; glint.userData.sceneRole = 'DistantEnvironment'; root.add(glint);
+  }
+  mesh('Distant pond boardwalk', new THREE.BoxGeometry(3.0, .16, 8.8), wood, 0, -.50, 11.6);
+  for (let i = 0; i < 13; i++) mesh('Distant boardwalk plank', new THREE.BoxGeometry(3.04, .045, .14), pathMat, 0, -.395, 7.4 + i * .68);
+  for (const x of [-1.36, 1.36]) {
+    mesh('Distant boardwalk rail post', new THREE.CylinderGeometry(.035, .045, .8, 6), wood, x, -.57, 10.2);
+    mesh('Distant boardwalk rail', new THREE.CylinderGeometry(.035, .035, 5.1, 6), wood, x, -.32, 12.7).rotation.x = Math.PI / 2;
+  }
+  const trail = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([
+    new THREE.Vector3(0, -.88, 8), new THREE.Vector3(4, -.82, 3), new THREE.Vector3(11, -.60, -3),
+    new THREE.Vector3(18, -.18, -11), new THREE.Vector3(25, .55, -20), new THREE.Vector3(31, 1.5, -29)
+  ]), 24, .13, 6, false), pathMat);
+  trail.name = 'Distant hillside trail'; trail.userData.sceneRole = 'DistantEnvironment'; root.add(trail);
+  const ridge = new THREE.Shape();
+  ridge.moveTo(-56, -1); ridge.lineTo(-47, 1); ridge.lineTo(-36, 5); ridge.lineTo(-28, 3);
+  ridge.lineTo(-15, 9); ridge.lineTo(-4, 6); ridge.lineTo(8, 11); ridge.lineTo(21, 6);
+  ridge.lineTo(34, 8); ridge.lineTo(45, 3); ridge.lineTo(56, -1); ridge.lineTo(56, -8); ridge.lineTo(-56, -8); ridge.closePath();
+  const ridgeGeometry = new THREE.ExtrudeGeometry(ridge, { depth: 4, bevelEnabled: false, curveSegments: 4 });
+  mesh('Distant hillside silhouette', ridgeGeometry, hillFar, 0, -1, -29, 1, .24, 1);
+  mesh('Distant hillside slope', new THREE.SphereGeometry(1, 18, 10), hillNear, -20, -1.5, -20, 35, 1.5, 8);
+  for (const [x, z, height] of [[-39, -14, 3.2], [-31, -22, 4.1], [-19, -27, 3.5], [18, -30, 4.3], [31, -21, 3.2], [40, -17, 3.8]])
+    mesh('Distant tree silhouette', new THREE.ConeGeometry(1.2, height, 7), hillFar, x, -.4 + height / 2, z);
+  for (const [x, z] of [[-8, 10], [8, 10], [22, 17], [30, 26]]) {
+    mesh('Distant pathway light', new THREE.CylinderGeometry(.035, .05, 1.25, 6), wood, x, -.38, z);
+    mesh('Distant pathway light glow', new THREE.SphereGeometry(.12, 8, 6), lampMat, x, .29, z, 1.4, .75, 1.4);
+  }
+  const starPositions=[];const random=seeded(19981012);
+  for(let i=0;i<110;i++)starPositions.push(-48+random()*96,-1.2+random()*2.1,-66+random()*2);
+  const starGeometry=new THREE.BufferGeometry();starGeometry.setAttribute('position',new THREE.Float32BufferAttribute(starPositions,3));
+  const starMaterial=new THREE.PointsMaterial({color:0xd9e1da,size:2.2,sizeAttenuation:false,transparent:true,opacity:.82,depthWrite:false});
+  const stars=new THREE.Points(starGeometry,starMaterial);stars.name='Distant exterior starfield';stars.userData.sceneRole='DistantEnvironment';root.add(stars);
+  parent.add(root);
+  root.userData.setExteriorPhase = phase => {
+    waterMat.color.setHex(phase === 'DAWN' ? 0x314943 : phase === 'DUSK' ? 0x25463b : 0x142a24);
+    waterMat.emissiveIntensity = phase === 'DEEP_NIGHT' ? .72 : .24;
+    lampMat.emissiveIntensity = phase === 'DEEP_NIGHT' ? .62 : phase === 'DAWN' ? .06 : .24;
+    starMaterial.opacity = phase === 'DEEP_NIGHT' ? .82 : phase === 'DAWN' ? .08 : 0;
+  };
+  return root;
+}
+
 export function applyHillsideArt(zone) {
   const original=[...zone.zoneGroup.children],root=rootFor(zone,'ArtRoot/Hillside'),mats=landscapeMaterials();
   for(const mesh of original) {

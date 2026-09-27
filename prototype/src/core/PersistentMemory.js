@@ -7,6 +7,7 @@ const defaults=()=>({
   hasSeenHandoffAcknowledgement:false,
   seenOnce:{hotCoffee:false,unregisteredMessage3F:false},
   hasSeenOverride_Bed33:false,
+  b2IdentityAttemptUsed:false,
   identityErosionLevel:0,
   proofs:{space:false,identity:false,time:false},
   legends:{

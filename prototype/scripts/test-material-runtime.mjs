@@ -26,6 +26,13 @@ try {
   const results = [];
   for (const zone of [...zones, 'first_campus_3f']) {
     await page.evaluate(zoneId => window.worldRouter.loadZone(zoneId), zone);
+    await page.waitForFunction(zoneId => {
+      const audit = window.__materialAudit();
+      if (audit.zoneId !== zoneId) return false;
+      return audit.materials
+        .filter(item => ['wall', 'wallDark', 'floor', 'floorTile', 'floorWood', 'doorWood', 'ceiling', 'handrail', 'terrainGrass', 'pathGravel'].includes(item.materialName.slice(9)))
+        .every(item => item.hasMap && item.hasNormalMap && item.hasRoughnessMap && item.mapImageWidth > 0 && item.mapImageHeight > 0);
+    }, zone, { timeout: 120000 });
     const audit = await page.evaluate(() => window.__materialAudit());
     assert.equal(audit.zoneId, zone);
     assert(audit.texturedMeshCount > 0, `${zone}: no textured meshes`);

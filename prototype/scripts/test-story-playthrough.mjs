@@ -56,16 +56,20 @@ async function motionShot(name,anchorName,position,target,motionValue){
   let frozen=false;
   if(motionValue?.capture==='cpr'){
     const phase=motionValue.phase;
-    const sample=await page.waitForFunction(phase=>{
+    const sample=await q(phase=>{
       const zone=window.__storyQA.worldRouter.activeZoneInstance;
-      const value=zone.annie.userData.rig.compression;
-      if(phase==='press'?value<=.85:value>=.15)return false;
-      zone.__storyQaMotionUpdate={own:Object.hasOwn(zone,'update'),update:zone.update};
+      const rig=zone.annie.userData.rig;
+      zone.__storyQaMotionUpdate={own:Object.hasOwn(zone,'update'),update:zone.update,elapsed:rig.elapsed,cprElapsed:zone.cprElapsed,nextCprSound:zone.nextCprSound};
+      rig.elapsed=0;
+      zone.cprElapsed=0;
+      zone.nextCprSound=10;
+      zone.update(null,(60/110)*(phase==='press'?.25:.75));
+      const value=rig.compression;
       zone.update=()=>{};
       return {value};
-    },phase,{polling:50,timeout:10000});
+    },phase);
     frozen=true;
-    motionValue=(await sample.jsonValue()).value;
+    motionValue=sample.value;
   }
   try{
     const buffer=await page.screenshot({path:out+'/'+file,fullPage:false,timeout:90000});
@@ -81,6 +85,9 @@ async function motionShot(name,anchorName,position,target,motionValue){
     if(frozen)await q(()=>{
       const zone=window.__storyQA.worldRouter.activeZoneInstance;
       const previous=zone.__storyQaMotionUpdate;
+      zone.annie.userData.rig.elapsed=previous.elapsed;
+      zone.cprElapsed=previous.cprElapsed;
+      zone.nextCprSound=previous.nextCprSound;
       if(previous.own)zone.update=previous.update;else delete zone.update;
       delete zone.__storyQaMotionUpdate;
     });
@@ -102,7 +109,7 @@ async function enter(zone,spawn){await q(({zone,spawn})=>window.__storyQA.enter(
 async function flag(k,v=true){await q(({k,v})=>window.__storyQA.setFlag(k,v),{k,v});}
 async function assertCinematicPlayed(id){
   const flag=`CG_${id}_PLAYED`;
-  await page.waitForFunction(flag=>window.__storyQA.gameState.getFlag(flag)===true,flag,{timeout:10000});
+  assert.equal(await q(flag=>window.__storyQA.gameState.getFlag(flag)===true,flag),true,`cinematic did not complete: ${id}`);
   report.cinematicFlags.push({id,played:true});
 }
 async function task(id){await q(id=>window.__storyQA.task(id),id);}
@@ -481,8 +488,7 @@ try{
   await interact({id:'E_HANDOFF'});
   await waitForPageCondition(page,()=>document.getElementById('final-handoff-modal')?.classList.contains('active'),60000);s=await snap();assert.equal(s.time,'04:05');
   await shot('m9-dual-identity-form',null,null,'DutyPhone_316_Handset',[7.5,1.7,5.7],[5.45,.95,5.72]);
-  await page.locator('#final-true-name').fill('張守恆');
-  await page.locator('#final-employee-id').fill('MED-870409');
+  await page.locator('#final-employee-id').fill('0409');
   await domClick('#btn-submit-final-handoff');
   await waitForPageCondition(page,()=>document.getElementById('final-success-modal')?.classList.contains('active'),60000);
 

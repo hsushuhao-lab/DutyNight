@@ -45,7 +45,16 @@ export class WardFloorplan {
     room(9,[7,-6,12,0],'west',-3,'ward','409 整修封閉');
 
     // Entrance vestibule storage room on the left, plant bay on the right.
-    ordinaryRoom(this,walls,{id:'STORE_ENTRY',label:'儲藏室',rect:[o-12,0,o-7,2],side:'east',door:1,kind:'storage',protectedArea:false,storageLock:second?'card':'knob'});
+    ordinaryRoom(this,walls,{id:'STORE_ENTRY',label:'儲藏室',rect:[o-12,0,o-7,2],side:'east',door:1,kind:'storage',protectedArea:false,storageLock:'knob'});
+    if(second&&this.floor===5){
+      const shelf=new THREE.Group();shelf.name='Second5F_WardStorage_Bookcase';shelf.position.set(o-10.8,0,.28);this.zoneGroup.add(shelf);
+      solid(shelf,this.gf.materials.doorWood,[-.72,.88,0],[.08,1.76,.46]);solid(shelf,this.gf.materials.doorWood,[.72,.88,0],[.08,1.76,.46]);
+      for(const y of [.12,.53,.94,1.35,1.73])solid(shelf,this.gf.materials.doorWood,[0,y,0],[1.52,.07,.48]);
+      for(let row=0;row<4;row++)for(let col=0;col<5;col++){
+        const book=solid(shelf,(row+col)%2?this.gf.materials.wallDark:this.gf.materials.wallBumper,[-.53+col*.26,.30+row*.41,-.05],[.18,.25,.30]);
+        book.rotation.z=(col%2?-.035:.025);
+      }
+    }
     if(!second&&this.floor===4&&persistentMemory.data.loopCount>=1){
       createAnnieMannequin(this.zoneGroup,{materials:this.gf.materials,state:'STORAGE_STATIC',position:[-9.2,0,.7],rotationY:0});
     }
@@ -281,12 +290,10 @@ export class WardFloorplan {
     const door=new KeyedKnobDoor(this,{id:'second_duty_room',x:o+8,z:6,yaw:Math.PI/2,width:1.4,title:'值班室',openDirection:1});
     door.keepOpen=true;door.setClosed(false);
     door.root.traverse(object=>{if(object.userData?.doorId==='second_duty_room')object.userData.interactable=false;});
-    SignAnchor.buildWallPlaque({scene:this.zoneGroup,x:o+8.115,y:2.62,z:6,rotationY:-Math.PI/2,width:1.18,height:.34,code:'5F',title:'值班室',subtitle:'ON-CALL ROOM',header:''});
+    SignAnchor.buildWallPlaque({scene:this.zoneGroup,x:o+8.115,y:2.62,z:6,rotationY:-Math.PI/2,width:1.18,height:.34,code:'5F',title:'醫師值班室',subtitle:'ON-CALL ROOM',header:''});
     const decor=new THREE.Group();decor.name='Second5F_DutyRoomDecor';this.zoneGroup.add(decor);
-    asset(decor,'bench',[o+10,0,8.85],[.72,.72,.72],Math.PI);
-    asset(decor,'plant',[o+13.15,0,8.85],[.62,.62,.62]);
-    solid(decor,this.gf.materials.metal,[o+9.2,.64,8.9],[.05,1.28,.05]);
-    solid(decor,this.gf.materials.wallBumper,[o+9.2,1.10,8.9],[.82,.52,.06]);
+    asset(decor,'bench',[o+10,0,9.25],[.62,.62,.62],Math.PI);
+    asset(decor,'plant',[o+13.15,0,9.1],[.55,.55,.55]);
 
     const dutyPhoto=(x,y,z,title,subtitle,people=4)=>{
       const canvas=document.createElement('canvas');canvas.width=960;canvas.height=620;
@@ -311,10 +318,8 @@ export class WardFloorplan {
     };
     dutyPhoto(o+10.25,1.72,9.78,'1998 夜班合照','第二院區 5F 值班室',4);
     dutyPhoto(o+12.15,1.72,9.78,'臨床教學留影','病房急救演練',3);
-    asset(this.zoneGroup,'hospitalBed',[o+12.3,0,7.7],[1.1,.95,.97]);CollisionFactory.addBox(this.colliders,o+12.3,.45,7.7,1.3,.9,2.1);
-    asset(this.zoneGroup,'storageCabinet',[o+9.4,0,8.7],[1,1,1],Math.PI);
-    solid(this.zoneGroup,this.gf.materials.doorWood,[o+10.75,.28,8.1],[.5,.56,.5]);
-    solid(this.zoneGroup,this.gf.materials.lightWarm,[o+10.75,.76,8.1],[.19,.24,.19]);
+    asset(this.zoneGroup,'hospitalBed',[o+12.3,0,7.15],[.9,.85,.85]);CollisionFactory.addBox(this.colliders,o+12.3,.4,7.15,1.15,.8,1.8);
+    asset(this.zoneGroup,'storageCabinet',[o+9.45,0,7.15],[.8,.82,.8],Math.PI);
     const phone=new THREE.Group();phone.name='SecondDutyRoom_ExtensionPhone';phone.position.set(o+12.55,.84,3.34);this.zoneGroup.add(phone);
     solid(phone,this.gf.materials.wallDark,[0,0,0],[.28,.07,.20]);
     solid(phone,this.gf.materials.bedSheet,[0,.08,-.055],[.25,.035,.055]);

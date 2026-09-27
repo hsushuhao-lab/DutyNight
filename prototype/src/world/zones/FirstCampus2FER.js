@@ -162,7 +162,6 @@ export class FirstCampus2FER {
     buildSupplyCabinet(this.art,this.gf.materials,{x:5.9,z:8.1,name:'ER_RecordCabinet_B'});
     buildClinicalCart(this.art,this.gf.materials,{x:6.15,z:7.2,yaw:Math.PI/2,name:'ER_MedicationCart'});
     asset(this.art,'officeChair',[3.55,0,7.75],[.92,.92,.92],0);
-    const printer=solid(this.art,this.gf.materials.metal,[3.55,.86,6.72],[.52,.20,.38]);printer.name='ER_NursePrinter';
     const slipCanvas=document.createElement('canvas');slipCanvas.width=512;slipCanvas.height=720;
     const slipContext=slipCanvas.getContext('2d');
     slipContext.fillStyle='#e7e2d3';slipContext.fillRect(0,0,512,720);

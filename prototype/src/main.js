@@ -14,7 +14,7 @@ const requestedOpeningZone = new URLSearchParams(location.search).get('zone');
 const openingZoneId = zoneAssetManifest[requestedOpeningZone] ? requestedOpeningZone : 'first_campus_3f';
 const openingAssets = zoneAssetManifest[openingZoneId].essential;
 await preloadAssetNames(openingAssets.models);
-void preloadMaterialSurfaces(openingAssets.surfaces).catch(error => console.warn('[art] opening material surface preload failed', error));
+await preloadMaterialSurfaces(openingAssets.surfaces);
 const prefetchDestinationAssets = async destination => {
   const zoneId=destination?.zoneId;
   await preloadZoneEssential(zoneId);
@@ -243,7 +243,8 @@ function establishCanonicalIdentity({at316=false}={}) {
 }
 
 function completeFinalIdentityAt316(name,employeeId,{deferred=false}={}) {
-  if(name!==TRUE_NAME_CANON||employeeId!=='MED-870409')return false;
+  const sourceVerified=gameState.getFlag('M7_B2_RESOLVED')||gameState.getFlag('HISTORY_PERSONNEL_PROFILES_REVIEWED');
+  if(name!==TRUE_NAME_CANON||employeeId!=='0409'||!sourceVerified)return false;
   establishCanonicalIdentity({at316:deferred});
   gameState.setFlag('LAST_CALL_SEEN',true);
   gameState.setFlag('M8_CODE_BLACK_ANNOUNCED',true);
@@ -252,8 +253,19 @@ function completeFinalIdentityAt316(name,employeeId,{deferred=false}={}) {
   persistentMemory.resolveLegend('lastCall');
   persistentMemory.completeGame();
   uiManager.updateTasks();
-  uiManager.showFinalSuccess(TRUE_NAME_CANON);
   controller.enabled=false;
+  void cinematicDirector.play({
+    id:'FINAL_SHIFT_COMPLETION_CG',
+    durationMs:5200,
+    keyframes:[{at:.22,yaw:-.22,pitch:-.035},{at:.58,yaw:.12,pitch:-.01},{at:.86,yaw:.035,pitch:.015},{at:1,yaw:0,pitch:0}],
+    cues:[
+      {at:.18,run:()=>uiManager.showEndingCG(TRUE_NAME_CANON)},
+      {at:.56,run:()=>soundManager.playDoorLockClack()},
+      {at:.78,run:()=>uiManager.showSubtitle('錄音帶','「張醫師……如果你還聽得到，天亮了。辛苦了。這一班，你可以交了。」',5200)}
+    ],
+    onComplete:()=>uiManager.showFinalSuccess(TRUE_NAME_CANON)
+  }).then(played=>{if(!played)uiManager.showFinalSuccess(TRUE_NAME_CANON);})
+    .catch(error=>{console.error('[cinematic] final shift completion failed',error);uiManager.showFinalSuccess(TRUE_NAME_CANON);});
   return true;
 }
 
@@ -262,8 +274,8 @@ function revealFinal316Handoff({deferred=false}={}) {
     controller.enabled=false;
     uiManager.openFinalHandoff(({name,employeeId})=>{
       if(completeFinalIdentityAt316(name,employeeId,{deferred}))return;
-      const hasInput=name||employeeId;
-      uiManager.setFinalHandoffStatus(hasInput?'姓名或員編不符｜覆寫模板正在接管交班':'請輸入姓名與員編');
+      const hasInput=employeeId;
+      uiManager.setFinalHandoffStatus(hasInput?'員編末四碼不符｜覆寫模板正在接管交班':'請輸入員編末四碼');
       if(hasInput){
         setTimeout(()=>{
           uiManager.closeFinalHandoff(false);
@@ -274,7 +286,7 @@ function revealFinal316Handoff({deferred=false}={}) {
     const hints=deferred?getDeferred316IdentityHints():[];
     uiManager.setFinalHandoffStatus(
       (hints.length?'線索可能仍在'+hints.join('與')+'。':'')+
-      '有人嘗試覆寫模板已在 316 登入｜請宣告真正姓名與員編｜最後一次機會'
+      '有人嘗試覆寫模板已在 316 登入｜請輸入真正員編末四碼｜最後一次機會'
     );
   };
   const reveal=()=>uiManager.showSubtitle('316 舊終端','姓名、員編與夜班記憶正在重新排列。只有完成真正交班的人，才能留下自己的名字。',3600);
@@ -435,7 +447,13 @@ controller.onInteract = async (interactable) => {
     controller.currentInteractable=null;uiManager.showPrompt(null);
   } else if (interactable.type === 'duty_door') {
     if(interactable.doorId==='room_409'){
-      if(gameState.isTaskComplete('P1_NORMAL_EVENT_DONE'))gameState.setFlag('FOURF_409_SEAL_CHECKED_AFTER_408C',true);
+      if(gameState.isTaskComplete('P1_NORMAL_EVENT_DONE')){
+      gameState.setFlag('FOURF_409_SEAL_CHECKED_AFTER_408C',true);
+      if(!gameState.getFlag('KNOCK_408C_POST_SEAL_PLAYED')){
+        gameState.setFlag('KNOCK_408C_POST_SEAL_PLAYED',true);
+        setTimeout(()=>soundManager.playBed33KnockPattern(),850);
+      }
+    }
       registerBed33Clue('DOOR_409_SEALED');
       soundManager.playDoorLockClack();
       uiManager.showSubtitle('值班醫師','「409 整修封閉中……可護理站那張舊床位卡卻還寫著 409A。」',3400);
@@ -691,13 +709,13 @@ controller.onInteract = async (interactable) => {
     soundManager.playPhoneRingPattern();
     uiManager.showSubtitle('316 舊資料終端','「1998-ER-0217｜責任醫師：張○○｜員編前綴：MED-87。」\n\n終端機停止後，桌上的院內電話立刻響起。',5200);
   } else if (interactable.type === 'workstation') {
-    if(gameState.getFlag('B2_EXITED_PERMANENTLY')&&!gameState.getFlag('M7_B2_RESOLVED')&&worldRouter.activeZoneId==='first_campus_3f'){
-      revealFinal316Handoff({deferred:true});
+    if(gameState.getFlag('B2_EXITED_PERMANENTLY')&&!gameState.getFlag('M7_B2_RESOLVED')&&worldRouter.activeZoneId==='first_campus_3f'&&!gameState.getFlag('HISTORY_PERSONNEL_PROFILES_REVIEWED')){
+      uiManager.showSubtitle('316 舊終端','「身分檔案尚未完成來源核對。先去三樓文史資料室查閱夜班核心人員檔案。」',4000);
       return;
     }
     if(gameState.getFlag('M8_IDENTITY_BATTLE_ACTIVE')&&worldRouter.activeZoneId==='first_campus_3f'){
       gameState.setGameTime('04:05');
-      revealFinal316Handoff();
+      revealFinal316Handoff({deferred:gameState.getFlag('B2_HISTORY_FALLBACK_ACTIVE')});
       return;
     }
     controller.enabled = false;
@@ -722,7 +740,13 @@ controller.onInteract = async (interactable) => {
     uiManager.showSubtitle('值班醫師','「這個電腦是護理師專用，請醫師用醫師診療室專用電腦。」',3600);
   } else if (interactable.type === 'archive_document') {
     controller.enabled = false;
-    uiManager.openArchiveDocument({title:interactable.documentTitle,pages:interactable.pages});
+    uiManager.openArchiveDocument({title:interactable.documentTitle,pages:interactable.pages,onComplete:interactable.id==='ARCHIVE_PERSONNEL_4_PLUS_3'?()=>{
+      gameState.setFlag('HISTORY_PERSONNEL_PROFILES_REVIEWED',true);
+      gameState.setFlag('ARCHIVE_PERSONNEL_OBJECTIVE',false);
+      gameState.setFlag('M8_IDENTITY_BATTLE_ACTIVE',true);
+      persistentMemory.addJournalNote('ARCHIVE_PERSONNEL_REVIEWED','完成 4+3 夜班核心人員檔案核對。員編、職務與門禁資料支持返回 316 進行最終交班驗證。');
+      uiManager.updateTasks();
+    }:null});
     gameState.addEvidence(1);
     if(interactable.id?.startsWith('ADMIN_'))gameState.setFlag('B2_ADMIN_SOURCE',true);
     if(interactable.id?.startsWith('ARCHIVE_'))gameState.setFlag('B2_HISTORY_SOURCE',true);
@@ -751,7 +775,13 @@ controller.onInteract = async (interactable) => {
     controller.enabled=false;
     uiManager.openArchiveDocument({title:interactable.documentTitle,pages:interactable.pages});
   } else if (interactable.type === 'bed33_409_sealed') {
-    if(gameState.isTaskComplete('P1_NORMAL_EVENT_DONE'))gameState.setFlag('FOURF_409_SEAL_CHECKED_AFTER_408C',true);
+    if(gameState.isTaskComplete('P1_NORMAL_EVENT_DONE')){
+      gameState.setFlag('FOURF_409_SEAL_CHECKED_AFTER_408C',true);
+      if(!gameState.getFlag('KNOCK_408C_POST_SEAL_PLAYED')){
+        gameState.setFlag('KNOCK_408C_POST_SEAL_PLAYED',true);
+        setTimeout(()=>soundManager.playBed33KnockPattern(),850);
+      }
+    }
     registerBed33Clue('DOOR_409_SEALED');
     uiManager.updateTasks();
     controller.enabled=false;
@@ -783,7 +813,6 @@ controller.onInteract = async (interactable) => {
           document.body.classList.add('his-flicker');
           setTimeout(()=>document.body.classList.remove('his-flicker'),460);
         }},
-        {at:.2,run:()=>soundManager.playBed33KnockPattern()},
         {at:.4,run:()=>uiManager.showSubtitle('值班醫師','「今日滿床只有 32 床……為什麼這張寫著第 33 床，位置卻是 409A？」',3400)}
       ],
       onComplete:openAssignment
@@ -852,6 +881,10 @@ controller.onInteract = async (interactable) => {
       uiManager.showSubtitle('封存終端','IDENTITY RECONSTRUCTED：'+TRUE_NAME_CANON+'｜MED-870409｜第一線住院醫師',3600);
       return;
     }
+    if(persistentMemory.data.b2IdentityAttemptUsed){
+      uiManager.showSubtitle('封存終端','「身分建立嘗試已用盡。B2 封存程序永久鎖閉，請由單向出口離開。」',4200);
+      return;
+    }
     const missing=[];
     if(!gameState.getFlag('B2_ADMIN_SOURCE'))missing.push('3F 行政辦公室');
     if(!gameState.getFlag('B2_HISTORY_SOURCE'))missing.push('文史封存');
@@ -866,22 +899,19 @@ controller.onInteract = async (interactable) => {
     uiManager.openIdentityMatrix({
       candidates:IDENTITY_CANDIDATES,
       onSelect:candidate=>{
-        if(candidate.id!=='ZHANG_SHOUHENG')return {resolved:false,message:candidate.contradiction};
+        if(persistentMemory.data.b2IdentityAttemptUsed)return {resolved:false,message:'身分建立嘗試已用盡。B2 封存程序永久鎖閉。'};
+        persistentMemory.data.b2IdentityAttemptUsed=true;persistentMemory.save();
+        if(candidate.id!=='ZHANG_SHOUHENG'||missing.length)return {resolved:false,message:candidate.id==='ZHANG_SHOUHENG'?'來源資料不足，候選身分比對失敗。建立身分的機會已用盡。':candidate.contradiction+'\n建立身分的機會已用盡。'};
         establishCanonicalIdentity();
         gameState.setFlag('M8_IDENTITY_BATTLE_ACTIVE',true);
         persistentMemory.addJournalNote(
           'B2_ARCHIVE_VERIFY',
-          missing.length
-            ? 'B2 封存終端仍有資料缺口，但候選身分與現有時間、病歷、門禁線索一致，重建為張守恆 MED-870409。缺失資料可回查 3F 行政辦公室與文史封存。'
-            : 'B2 身分矩陣排除其他候選；時間、病歷與物證一致指向張守恆 MED-870409。'
+          'B2 身分矩陣排除其他候選；時間、病歷、門禁與院史人員資料一致指向張守恆 MED-870409。'
         );
         uiManager.updateTasks();
         return {
           resolved:true,
-          message:(missing.length
-            ? '[WARNING] 尚有未讀資料：'+missing.join('、')+'\n仍可完成候選身分比對。\n\n'
-            : ''
-          )+'>>> IDENTITY RECONSTRUCTED\n>>> 張守恆 / MED-870409'
+          message:'>>> IDENTITY RECONSTRUCTED\n>>> 張守恆 / MED-870409'
         };
       }
     });
@@ -911,13 +941,14 @@ controller.onInteract = async (interactable) => {
           setTimeout(()=>uiManager.showSubtitle('全院廣播','「CODE BLACK。偵測到已除籍死亡人員重新登入。門禁完整性程序啟動。04:09 前，夜班紀錄將被覆寫封存。」',7200),700);
         }else{
           gameState.setFlag('B2_IDENTITY_INCOMPLETE',true);
-          gameState.setFlag('M8_IDENTITY_BATTLE_ACTIVE',true);
-          gameState.setFlag('LAST_CALL_SEEN',true);
-          gameState.setFlag('M8_CODE_BLACK_ANNOUNCED',true);
+          gameState.setFlag('B2_HISTORY_FALLBACK_ACTIVE',true);
+          gameState.setFlag('M8_IDENTITY_BATTLE_ACTIVE',false);
+          gameState.setFlag('LAST_CALL_SEEN',false);
           gameState.setGameTime('03:10');
-          persistentMemory.addJournalNote('B2_EXIT_INCOMPLETE','身分驗證尚未完成就離開 B2；B2 永久鎖閉。缺失線索可能仍在 3F 行政辦公室與文史封存，但 316 仍可進行最後身分宣告。');
+          persistentMemory.addJournalNote('B2_EXIT_INCOMPLETE','B2 身分建立失敗後永久鎖閉。需回 3F 文史資料室查閱夜班核心人員檔案，再回 316 完成最終員編核對。');
+          gameState.setFlag('ARCHIVE_PERSONNEL_OBJECTIVE',true);
           soundManager.playDoorLockClack();
-          setTimeout(()=>uiManager.showSubtitle('值班醫師','「回不去 B2 了。若還缺線索，也許在 3F 行政辦公室或文史封存；但我還可以直接回 316 宣告身分。」',5600),700);
+          setTimeout(()=>uiManager.showSubtitle('值班醫師','「還有哪裡有資料？我記得 3 樓有文史資料室內，會有解答嗎？」',5200),700);
         }
         uiManager.updateTasks();
         controller.enabled=true;
@@ -1287,14 +1318,22 @@ controller.onInteract = async (interactable) => {
       if(gameState.isTaskComplete('P1_4F_REPORT')) return;
       dutyEvents.complete('P1_4F_REPORT','17:15');
       interactable.interactable=false;
-      uiManager.showSubtitle('晚班護理師','「值班醫師，今晚四樓滿床 32 床。408C 的老先生一直說隔壁有人敲牆；409 仍封閉整修。19:30 麻煩你去 408C 看一下。」',5600);
+      if(gameState.getFlag('FAST_PATH_3F')){
+        dutyEvents.complete('P1_NORMAL_EVENT_DONE','19:30');
+        gameState.setFlag('FOURF_409_SEAL_CHECKED_AFTER_408C',true);
+        gameState.setFlag('BED33_RESOLVED',true);
+        gameState.markTaskComplete('LEGEND_BED33_RESOLVED');
+        persistentMemory.addJournalNote('BED33_FAST_PATH','上一輪已確認 408C 的敲擊與 409 封閉狀態；這次保留報到交班，直接前往值班室接下一通電話。');
+        uiManager.showSubtitle('晚班護理師','「值班醫師，今晚四樓仍是滿床 32 床。照上一輪的交班紀錄，408C 與 409 的狀況你已經確認過了。」',4300);
+      }else{
+        uiManager.showSubtitle('晚班護理師','「值班醫師，今晚四樓滿床 32 床。408C 的老先生一直說隔壁有人敲牆；409 仍封閉整修。19:30 麻煩你去 408C 看一下。」',5600);
+      }
       uiManager.updateTasks();
     } else if(action==='NORMAL_EVENT'){
       if(!gameState.isTaskComplete('P1_4F_REPORT')) return uiManager.showSubtitle('值班醫師','「先去護理站報到。」',2500);
       if(gameState.isTaskComplete('P1_NORMAL_EVENT_DONE')) return;
       dutyEvents.complete('P1_NORMAL_EVENT_DONE','19:30');
       interactable.interactable=false;
-      soundManager.playBed33KnockPattern();
       registerBed33Clue('KNOCK_408C_49');
       worldRouter.activeZoneInstance?.setDutyDoorClosed?.(true);
       uiManager.showSubtitle('408C 老先生','「醫師！隔壁又在敲了！每次都敲四下，停一下，又敲九下……」',5600);

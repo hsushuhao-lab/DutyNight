@@ -364,13 +364,15 @@
       </div>
       <div class="locker-body">
         <p>請核對本夜真正完成值班之醫師姓名與員編。</p>
-        <input id="final-true-name" autocomplete="off" placeholder="完整姓名" />
-        <input id="final-employee-id" autocomplete="off" placeholder="員編" />
+        <label for="final-employee-id">員編末四碼</label>
+        <input id="final-employee-id" type="text" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" autocomplete="off" placeholder="四位數字" />
         <button id="btn-submit-final-handoff" class="btn-primary">完成交班</button>
         <div id="final-handoff-status">IDENTITY VERIFICATION REQUIRED</div>
       </div>
     </div>
   </div>
+
+  <div id="ending-cg-screen" aria-hidden="true"><div class="ending-cg-window"><div class="ending-cg-sunrise"></div><div class="ending-cg-distant-roof"></div></div><div class="ending-cg-curtain ending-cg-curtain-left"></div><div class="ending-cg-curtain ending-cg-curtain-right"></div><div class="ending-cg-copy"><small>SHIFT RESTORED</small><strong data-ending-name>張守恆</strong><span>天快亮了，這一班終於交完。</span></div></div>
 
   <div id="final-success-modal" class="modal-overlay">
     <div class="anomaly-window">

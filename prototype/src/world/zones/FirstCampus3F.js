@@ -42,6 +42,8 @@ export class FirstCampus3F {
       officeAnnie.name='Annie_316_SecondLoop';this.officeAnnie=officeAnnie;
       // v2.2: Annie may echo here, but the engraved stethoscope clue exists only on hidden 6F.
     }
+    this.patrolAnnie=createAnnieArt(this.zoneGroup,{materials:m,state:'STORAGE_STATIC',position:[20.25,0,-1.35],rotationY:Math.PI});
+    this.patrolAnnie.name='Annie_2117_GuardCheckpoint';
 
     // 3F office mirrors the 4F duty-room position relative to the shared elevator core.
     // 4F duty room bounds [-14,2,-8,10] relative to core origin [0,6] become
@@ -299,6 +301,19 @@ export class FirstCampus3F {
         ]
       }
     ];
+    documents.push({
+      id:'ARCHIVE_PERSONNEL_4_PLUS_3',shelf:shelves[3],x:.26,y:1.20,
+      title:'夜班核心人員檔案｜4+3 對照',
+      pages:[
+        '【人事封存｜第一線】張守恆｜MED-870409｜住院醫師。1998 年夜班責任醫師。事故後姓名欄遭覆寫，交班記錄仍保留其員編。',
+        '【人事封存｜第一線】李承禮｜MED-820316｜總醫師。316 夜間封鎖決策紀錄的簽核人，值勤表上的日期與門禁時間不一致。',
+        '【人事封存｜第一線】周啟文｜MED-880217｜住院醫師。曾負責 02:17 急診掛號索引，調職後該筆資料仍顯示已建立。',
+        '【人事封存｜第一線】陳柏勳｜MED-890605｜住院醫師。1998 年火災夜間留守人員，簽到時間晚於門禁離院紀錄。',
+        '【人事封存｜協勤】林婉真｜NUR-900033｜護理師。負責急診與病房交接，保存過未完成的轉院單副本。',
+        '【人事封存｜協勤】王世榮｜SEC-760117｜警衛。保管 B-Panel 十字鑰匙，02:17 後的巡查簽名筆跡有異。',
+        '【人事封存｜協勤】謝玉琴｜ADM-851104｜行政人員。整理院史與人事名冊；曾註記「員編比姓名更早被覆寫」。\n\n4+3 核心名冊核對完成。'
+      ]
+    });
     for(const d of documents){
       const folder=solid(d.shelf,this.gf.materials.lightWarm,[d.x,d.y,.25],[.28,.36,.05]);
       folder.name=d.id;folder.userData={interactable:true,id:d.id,type:'archive_document',label:`翻閱：${d.title}`,documentTitle:d.title,pages:d.pages};
@@ -363,6 +378,7 @@ export class FirstCampus3F {
     if(storageVisits>0)this.levelInstance.setAnneStage(Math.min(storageVisits-1,2));
     if(gameState.getFlag('GUARD_FUTURE_ENTRY'))this.setPatrolFutureEntry();
     this.updateElevatorLight(gameState.areRequiredTasksComplete());
+    this.syncStoryState();
 
     // Phase-driven environmental layers are authored once and toggled by applyGamePhase().
     this.phaseRedLight=new THREE.PointLight(0x7a1616,0,14,2);
@@ -423,6 +439,10 @@ export class FirstCampus3F {
 
   unlock302() {
     return this.levelInstance?.unlock302?.() || false;
+  }
+
+  syncStoryState() {
+    if(this.patrolAnnie)this.patrolAnnie.visible=gameState.getFlag('NIGHT_PATROL_RETURN_3F')&&!gameState.getFlag('BOOTSTRAP_2117_RESOLVED');
   }
 
   setPatrolFutureEntry() {

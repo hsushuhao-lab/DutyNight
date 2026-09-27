@@ -118,6 +118,10 @@ export class GameState {
     this.flags.set('SECOND_2F_CCTV_LURE_SEEN', false);
     this.flags.set('M7_B2_OPEN', false);
     this.flags.set('M7_B2_RESOLVED', false);
+    this.flags.set('HISTORY_PERSONNEL_PROFILES_REVIEWED', false);
+    this.flags.set('B2_HISTORY_FALLBACK_ACTIVE', false);
+    this.flags.set('ARCHIVE_PERSONNEL_OBJECTIVE', false);
+    this.flags.set('ER_LIU_NAME_RECOGNIZED', false);
     this.flags.set('M8_IDENTITY_BATTLE_ACTIVE', false);
     this.flags.set('M8_CODE_BLACK_ANNOUNCED', false);
     this.flags.set('LAST_CALL_SEEN', false);

@@ -1,6 +1,8 @@
 import {readFile,mkdir,writeFile} from 'node:fs/promises';
 import {chromium} from 'playwright';
-const before='.visual-work/before', after='.visual-work/final', output='docs/visual-qa/comparison';
+const before=process.argv[2]||'qa-results/visual-before-corrected';
+const after=process.argv[3]||'../docs/visual-qa/evidence/20260927/visual-after-current';
+const output=process.argv[4]||'../docs/visual-qa/comparison-current';
 await mkdir(output,{recursive:true});
 const manifest=JSON.parse(await readFile(`${after}/capture-manifest.json`,'utf8'));
 const browser=await chromium.launch({channel:'chrome',headless:true});
@@ -8,7 +10,7 @@ const page=await browser.newPage({viewport:{width:1440,height:1000}});
 const shots=manifest.captures.filter(s=>s.view==='entrance');
 const entries=[];
 for(const shot of shots){
-  const paths=[`${before}/${shot.id}.png`,`${after}/${shot.filename}`];
+  const paths=[`${before}/${shot.id}_entrance.png`,`${after}/${shot.filename}`];
   for(let i=0;i<2;i++){
     const data=(await readFile(paths[i])).toString('base64');
     const webp=await page.evaluate(async data=>{const img=new Image();img.src='data:image/png;base64,'+data;await img.decode();const c=document.createElement('canvas');c.width=1440;c.height=900;c.getContext('2d').drawImage(img,0,0);return c.toDataURL('image/webp',.86).split(',')[1];},data);
@@ -20,6 +22,6 @@ await writeFile(`${output}/index.html`,`<!doctype html><html lang="zh-Hant"><met
 for(let start=0;start<shots.length;start+=9){
  const tiles=await Promise.all(shots.slice(start,start+9).map(async s=>`<figure><img src="data:image/webp;base64,${(await readFile(`${output}/${s.id}-after.webp`)).toString('base64')}"><figcaption>${s.id}</figcaption></figure>`));
  await page.setContent(`<style>body{margin:0;background:#fff}main{display:grid;grid-template-columns:repeat(3,480px)}figure{margin:0}img{width:480px;display:block}figcaption{font:16px sans-serif;padding:8px}</style><main>${tiles.join('')}</main>`);
- await page.screenshot({path:`.visual-work/contact-${start/9}.png`,fullPage:true});
+ await page.screenshot({path:`${output}/contact-${start/9}.png`,fullPage:true});
 }
 await browser.close();console.log(`Comparison: ${shots.length} matched before/after views`);

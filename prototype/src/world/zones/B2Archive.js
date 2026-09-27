@@ -52,7 +52,7 @@ export class B2Archive {
     solid(phone,m.metal,[0,.12,0],[.42,.08,.09],.025);
     const terminal=workstation.hitbox;this.interactables.push(terminal);
 
-    const exitDoor=new THREE.Group();exitDoor.name='B2_OneWayExitDoor';exitDoor.position.set(0,0,.72);this.zoneGroup.add(exitDoor);
+    const exitDoor=new THREE.Group();exitDoor.name='B2_OneWayExitDoor';exitDoor.position.set(0,0,1.54);this.zoneGroup.add(exitDoor);
     solid(exitDoor,m.wallDark,[-1.18,1.25,0],[.10,2.5,2.8]);solid(exitDoor,m.wallDark,[1.18,1.25,0],[.10,2.5,2.8]);
     solid(exitDoor,m.doorWood,[0,1.15,.46],[1.72,2.30,.10]);
     solid(exitDoor,m.metal,[.68,1.12,.38],[.08,.08,.08]);

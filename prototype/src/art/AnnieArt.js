@@ -253,7 +253,7 @@ export function createAnnieArt(parent, {materials, state, position, rotationY = 
   coat.scale.set(1, torsoHeight / 0.8, 0.72);
   torso.add(coat);
 
-  const shirt = ellipsoid(torso, 'Annie_Scrubs', [0, shoulderY - hipY - 0.19, 0.154], [0.105, 0.205, 0.028], scrubMaterial);
+  const shirt = ellipsoid(torso, 'Annie_Scrubs', [0, shoulderY - hipY - 0.19, 0.122], [0.095, 0.16, 0.014], scrubMaterial);
   for (const side of [-1, 1]) {
     const lapel = new THREE.Mesh(new THREE.CapsuleGeometry(0.037, 0.19, 6, 20), coatEdgeMaterial);
     lapel.name = `Annie_CoatLapel_${side}`;

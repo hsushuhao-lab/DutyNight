@@ -3,6 +3,7 @@ import { AccessDoor } from '../shared/AccessDoor.js';
 import * as THREE from 'three';
 import { artRoot, solid, wallTrim } from '../../art/ArtDetails.js';
 import { buildCampusBackdrop } from '../../art/CampusBackdrop.js';
+import { buildDistantNightLandscape } from '../../art/LandscapeArt.js';
 import { disposeZoneArt } from '../../art/ArtResources.js';
 import { CollisionFactory } from '../shared/CollisionFactory.js';
 import { SignAnchor } from '../shared/SignAnchor.js';
@@ -230,6 +231,10 @@ export class Skybridge {
 
     const art=artRoot(this.zoneGroup,'Bridge');
     buildCampusBackdrop(art);
+    this.distantLandscapes = [
+      buildDistantNightLandscape(art, { position: [30, -1.2, -21] }),
+      buildDistantNightLandscape(art, { position: [30, -1.2, 21], rotationY: Math.PI })
+    ];
     // Adjacent vestibules remain visible until the existing portal changes zones.
     for (const [x, end] of [[-4,-8],[64,68]]) {
       solid(art,this.gf.materials.floorTile,[x,-.08,0],[8,.16,4]);
@@ -265,6 +270,8 @@ export class Skybridge {
 
   update(camera,delta=0){
     this.horrorClock+=delta;
+    const phase = gameState.gameTime >= '03:30' && gameState.gameTime < '17:00' ? 'DAWN' : (gameState.gameTime >= '21:17' || gameState.gameTime < '03:30') ? 'DEEP_NIGHT' : 'DUSK';
+    for (const landscape of this.distantLandscapes || []) landscape.userData.setExteriorPhase?.(phase);
     if(camera.position.x>=55&&gameState.getFlag('M4_CHEST_RESOLVED'))this.returnBridgeActive=true;
     const returnMode=this.returnBridgeActive||gameState.getFlag('M5_BRIDGE_COMMITTED')||gameState.getFlag('M5_BRIDGE_RESOLVED');
     const stage=returnMode?Math.min(3,1+this.lookbackCount):0;
