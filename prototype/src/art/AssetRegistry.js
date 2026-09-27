@@ -152,8 +152,14 @@ export function instantiateAsset(name) {
     if (!pendingInstances.has(name)) pendingInstances.set(name, new Set());
     pendingInstances.get(name).add(instance);
     const sourceName=name.replace(/_[a-d]$/,'');
-    void preloadAssetNames([sourceName],{optional:outdoorAssets.has(sourceName)})
-      .catch(error=>console.warn('[art] deferred asset failed',name,error));
+    // Auto-deferred loading is a browser runtime behavior. Node structural QA
+    // builds zones with DOM stubs; attempting "/assets/..." through undici there
+    // creates invalid-URL storms and can stall/cancel the deployment runner.
+    // Explicit preloadAssetNames() calls used by QA still work with their loader mock.
+    if(typeof window!=='undefined'){
+      void preloadAssetNames([sourceName],{optional:outdoorAssets.has(sourceName)})
+        .catch(error=>console.warn('[art] deferred asset failed',name,error));
+    }
     return instance;
   }
   const clone = source.clone(true);
