@@ -199,8 +199,12 @@ export class WardFloorplan {
     w.build();this.gf.buildCeilingLight(this.zoneGroup,-11,3.15,6,.7,7,0xffebce);
     this.dutyRoom={door:[-8,1.7,6],inside:[-9.5,1.7,6],outside:[-6.5,1.7,6],bounds:[-14,2,-8,10]};
     const reportBoard=this.zoneGroup.getObjectByName('FourF_NursingHandoverBoard');
-    reportBoard.userData={...reportBoard.userData,interactable:true,id:'4F_NURSING_REPORT',type:'p1_action',action:'NURSE_REPORT',label:'查看值班資訊並向護理站報到'};
-    this.interactables.push(reportBoard);
+    if(reportBoard){
+      // Reporting is now implicit when the physician opens the ward access door.
+      // Keep the board readable as scenery; do not require a second hidden/board interaction.
+      reportBoard.userData={...reportBoard.userData,interactable:false,id:'4F_NURSING_REPORT_BOARD',type:'decorative',label:''};
+      this.fourFNursingReportBoard=reportBoard;
+    }
 
   }
   buildBed33Legend(){
@@ -349,11 +353,12 @@ export class WardFloorplan {
     const m=this.gf.materials;
     const chestBed=this.bedAreas.find(item=>item.id==='504B');
     const [bx,,bz]=chestBed.position;
-    const report={
+    // No separate nursing-station report hotspot: opening the 5F ward access
+    // door is the report action. Keep metadata only for diagnostics/QA.
+    this.secondCampusNursingReport={
       position:new THREE.Vector3(o-2.35,0,-2.35),radius:4.8,
-      interactable:true,id:'SECOND_5F_NURSING_REPORT',type:'second_campus_nursing_report',label:'向第二院區 5F 護理站報到'
+      interactable:false,id:'SECOND_5F_NURSING_REPORT',type:'decorative',label:''
     };
-    this.interactables.push(report);this.secondCampusNursingReport=report;
     const patient=new THREE.Group();patient.name='SecondCampus_ChestPainPatient';patient.position.set(bx,.80,bz);this.zoneGroup.add(patient);
     const gown=new THREE.MeshStandardMaterial({color:0xd3ddd5,roughness:.96});
     const skin=new THREE.MeshStandardMaterial({color:0xc7b5a4,roughness:.94});
@@ -406,8 +411,7 @@ export class WardFloorplan {
       this.dutyPhone.userData.label=ringing?'接聽值班電話':'查看值班電話';
     }
     if(this.secondCampusNursingReport){
-      const reported=gameState.getFlag('SECOND_CAMPUS_5F_REPORTED')===true;
-      this.secondCampusNursingReport.interactable=!reported;
+      this.secondCampusNursingReport.interactable=false;
     }
     if(this.secondCampusTreatmentOrder){
       const seen=gameState.getFlag('SECOND_CHEST_PATIENT_SEEN')===true;

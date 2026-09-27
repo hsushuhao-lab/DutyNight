@@ -581,6 +581,57 @@ controller.onHoverChange = (interactable) => {
   }
 };
 
+function completeFirstCampus4FWardReport(){
+  if(worldRouter.activeZoneId!=='first_campus_4f')return false;
+  if(!gameState.isTaskComplete('WARD_ENTRY')||gameState.isTaskComplete('P1_4F_REPORT'))return false;
+
+  dutyEvents.complete('P1_4F_REPORT','17:15');
+
+  if(gameState.getFlag('FAST_PATH_3F')){
+    dutyEvents.complete('P1_NORMAL_EVENT_DONE','19:30');
+    gameState.setFlag('FOURF_409_SEAL_CHECKED_AFTER_408C',true);
+    gameState.setFlag('BED33_RESOLVED',true);
+    gameState.markTaskComplete('LEGEND_BED33_RESOLVED');
+    persistentMemory.addJournalNote(
+      'BED33_FAST_PATH',
+      '上一輪已確認 408C 的敲擊與 409 封閉狀態；這次打開 4F 感應門即完成報到，直接前往值班室接下一通電話。'
+    );
+    uiManager.showSubtitle(
+      '晚班護理師',
+      '「張醫師，感應門已刷開，算你報到了。今晚仍是滿床 32 床；照上一輪的紀錄，408C 與 409 不用再重查。」',
+      4300
+    );
+  }else{
+    uiManager.showSubtitle(
+      '晚班護理師',
+      '「張醫師，門禁有你的刷卡紀錄，算你報到了。今晚四樓滿床 32 床。408C 的老先生一直說隔壁有人敲牆；409 仍封閉整修。19:30 麻煩你去評估是否可能是幻聽或知覺異常。」',
+      5600
+    );
+  }
+
+  uiManager.updateTasks();
+  return true;
+}
+
+function completeSecondCampus5FWardReport(){
+  if(worldRouter.activeZoneId!=='second_campus_5f')return false;
+  if(!gameState.getFlag('SECOND_CAMPUS_ACCESS')||gameState.getFlag('SECOND_CAMPUS_5F_REPORTED'))return false;
+
+  gameState.setFlag('SECOND_CAMPUS_5F_REPORTED',true);
+  persistentMemory.addJournalNote(
+    'SECOND_5F_REPORT',
+    '第二院區 5F：以醫師感應卡開啟病房門即完成到站報到。陳怡君，504B；李承禮總醫師已預開醫囑並預蓋章，只等值班醫師查核。'
+  );
+  worldRouter.activeZoneInstance?.syncStoryState?.();
+  uiManager.showSubtitle(
+    '第二院區護理師',
+    '「門禁看到你的刷卡紀錄了，算報到完成。504B 陳怡君在等你，先去看病人。」',
+    3900
+  );
+  uiManager.updateTasks();
+  return true;
+}
+
 controller.onInteract = async (interactable) => {
   console.log('Interacting with:', interactable);
 
@@ -625,6 +676,7 @@ controller.onInteract = async (interactable) => {
         controller.currentInteractable=null;uiManager.showPrompt(null);
         return;
       }
+      const wasClosed=door.closed;
       const changed=door.toggle(controller.position);
       if(changed)soundManager.playClick();
       else uiManager.showSubtitle('門禁','請離開門幅後再關門。',2500);
@@ -632,6 +684,17 @@ controller.onInteract = async (interactable) => {
       if(door===zone.wardDoor)zone.wardGateClosed=door.closed;
       if(door===zone.dutyDoor)zone.dutyDoorClosed=door.closed;
       if(door===zone.acuteGateDoor)zone.acuteGateClosed=door.closed;
+
+      const openedNow=changed&&wasClosed&&!door.closed;
+      const isWardArrivalDoor=openedNow&&(
+        door===zone.wardDoor ||
+        door===zone.innerWardDoor ||
+        door===zone.glassBypassDoor
+      );
+      if(isWardArrivalDoor){
+        if(worldRouter.activeZoneId==='first_campus_4f')completeFirstCampus4FWardReport();
+        if(worldRouter.activeZoneId==='second_campus_5f')completeSecondCampus5FWardReport();
+      }
     }
     controller.currentInteractable=null;uiManager.showPrompt(null);
   } else if (interactable.type === 'duty_door') {
@@ -1267,16 +1330,8 @@ controller.onInteract = async (interactable) => {
       controller.enabled = true;
     }, interactable.kind, prefetchDestinationAssets);
   } else if (interactable.type === 'second_campus_nursing_report') {
-    if(!gameState.getFlag('SECOND_CAMPUS_ACCESS')){
-      uiManager.showSubtitle('值班醫師','「我現在沒有第二院區權限。」',2200);
-      return;
-    }
-    if(!gameState.getFlag('SECOND_CAMPUS_5F_REPORTED')){
-      gameState.setFlag('SECOND_CAMPUS_5F_REPORTED',true);
-      persistentMemory.addJournalNote('SECOND_5F_REPORT','第二院區 5F 護理站交班：陳怡君，504B。李承禮總醫師已預開醫囑並預蓋章，只等值班醫師簽名。');
-      worldRouter.activeZoneInstance?.syncStoryState?.();
-      uiManager.showSubtitle('第二院區護理師','「醫師你剛剛開好了，現在簽名就好。」',3600);
-    }
+    // Legacy QA compatibility only; production UI no longer exposes this hotspot.
+    completeSecondCampus5FWardReport();
   } else if (interactable.type === 'second_chest_patient') {
     if(!gameState.getFlag('SECOND_CAMPUS_ACCESS')){
       uiManager.showSubtitle('值班醫師','「我現在沒有第二院區權限。」',2200);
@@ -1499,21 +1554,9 @@ controller.onInteract = async (interactable) => {
   } else if (interactable.type === 'p1_action') {
     const action=interactable.action;
     if(action==='NURSE_REPORT'){
-      if(!gameState.isTaskComplete('WARD_ENTRY')) return uiManager.showSubtitle('值班醫師','「先正式抵達 4F 再報到。」',2500);
-      if(gameState.isTaskComplete('P1_4F_REPORT')) return;
-      dutyEvents.complete('P1_4F_REPORT','17:15');
-      interactable.interactable=false;
-      if(gameState.getFlag('FAST_PATH_3F')){
-        dutyEvents.complete('P1_NORMAL_EVENT_DONE','19:30');
-        gameState.setFlag('FOURF_409_SEAL_CHECKED_AFTER_408C',true);
-        gameState.setFlag('BED33_RESOLVED',true);
-        gameState.markTaskComplete('LEGEND_BED33_RESOLVED');
-        persistentMemory.addJournalNote('BED33_FAST_PATH','上一輪已確認 408C 的敲擊與 409 封閉狀態；這次保留報到交班，直接前往值班室接下一通電話。');
-        uiManager.showSubtitle('晚班護理師','「值班醫師，今晚四樓仍是滿床 32 床。照上一輪的交班紀錄，408C 與 409 的狀況你已經確認過了。」',4300);
-      }else{
-        uiManager.showSubtitle('晚班護理師','「值班醫師，今晚四樓滿床 32 床。408C 的老先生一直說隔壁有人敲牆；409 仍封閉整修。19:30 麻煩你到 408C，評估是否可能是幻聽或知覺異常。」',5600);
-      }
-      uiManager.updateTasks();
+      // Legacy compatibility only. Production reporting is completed by opening
+      // a ward access door; no separate nursing-board interaction is required.
+      completeFirstCampus4FWardReport();
     } else if(action==='NORMAL_EVENT'){
       if(!gameState.isTaskComplete('P1_4F_REPORT')) return uiManager.showSubtitle('值班醫師','「先去護理站報到。」',2500);
       if(gameState.isTaskComplete('P1_NORMAL_EVENT_DONE')) return;
