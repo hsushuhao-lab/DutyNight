@@ -52,4 +52,26 @@ bridge.update(camera,.46);
 assert.equal(bridge.lookbackCount,3);
 assert.equal(gameState.getFlag('BRIDGE_OVERRIDE_PENDING'),true,'the third sustained lookback must trigger the institutional loop');
 
+// Safe choice does not make the bridge harmless. Once the player explicitly
+// chooses "忍住，不要回頭", a later manual camera turn must trigger the
+// Patientization path immediately on the first sustained lookback.
+gameState.resetForLoop();
+gameState.setFlag('M4_CHEST_RESOLVED',true);
+gameState.setFlag('M5_BRIDGE_RESOLVED',true);
+gameState.setFlag('M5_ROUTE_CHOICE_RESOLVED',true);
+gameState.setFlag('BRIDGE_REFLECTION_NOTICE_SEEN',true);
+gameState.setFlag('BRIDGE_NO_LOOKBACK_RULE_ACTIVE',true);
+const safeBridge=new Skybridge(new THREE.Scene(),new GeometryFactory()).build();
+const safeCamera=new THREE.PerspectiveCamera();
+safeCamera.position.set(58,1.7,0);
+safeCamera.rotation.y=Math.PI/2;
+safeBridge.update(safeCamera,.01);
+assert.equal(safeBridge.returnBridgeActive,true,'safe-choice QA must still be on the return crossing');
+safeBridge.armManualNoLookbackRule();
+safeCamera.rotation.y=-Math.PI/2;
+safeBridge.update(safeCamera,.46);
+assert.equal(safeBridge.lookbackCount,1,'manual lookback after safe choice should be detected immediately');
+assert.equal(gameState.getFlag('BRIDGE_MANUAL_LOOKBACK_AFTER_SAFE_CHOICE'),true,'manual violation must be distinguished from pre-choice escalation');
+assert.equal(gameState.getFlag('BRIDGE_OVERRIDE_PENDING'),true,'one manual lookback after choosing not to turn must trigger Patientization');
+
 console.log('DUTYNIGHT V2 BRIDGE LOOKBACK QA PASS');
