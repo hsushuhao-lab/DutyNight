@@ -1185,19 +1185,24 @@ controller.onInteract = async (interactable) => {
   } else if (interactable.type === 'b2_archive_terminal') {
     gameState.setFlag('B2_TERMINAL_CONTACTED',true);
 
-    // The terminal interaction always converges into the historical fire recap.
-    // If the one-shot identity comparison is still available, run it first so
-    // both success and failure naturally lead into the same story revelation.
-    if(gameState.getFlag('B2_FIRE_RECAP_SEEN')){
-      uiManager.showSubtitle(
-        '封存終端',
-        '「UNKNOWN SESSION / OVERWRITE ACTIVE。火災紀錄已讀取；不要再停留，從單向出口返回 316。」',
-        4200
-      );
+    // FIRST CONTACT CONTRACT:
+    // No matter whether B2 identity evidence is complete, incomplete, resolved,
+    // or already consumed, the first terminal interaction always plays the
+    // 1998 fire-history recap. The recap itself is the mandatory bridge to 316.
+    if(!gameState.getFlag('B2_FIRE_RECAP_SEEN')){
+      playB2FireRecap();
       return;
     }
+
+    // After the fire recap, the player is already allowed to leave B2 and
+    // return to 316. Keep the old one-shot identity matrix as an OPTIONAL
+    // second interaction for players who still want to compare the candidates.
     if(gameState.getFlag('M7_B2_RESOLVED')||gameState.getFlag('B2_IDENTITY_ATTEMPT_USED')){
-      playB2FireRecap();
+      uiManager.showSubtitle(
+        '封存終端',
+        '「UNKNOWN SESSION / OVERWRITE ACTIVE。火災紀錄已讀取；有人正在再次覆蓋人員與事故資料。立即離開 B2，回到 316，用正確權限阻止這一切。」',
+        5200
+      );
       return;
     }
 
@@ -1221,8 +1226,8 @@ controller.onInteract = async (interactable) => {
           return {
             resolved:false,
             message:candidate.id==='ZHANG_SHOUHENG'
-              ?'來源資料不足，候選身分比對未完成。封存終端正在載入事故紀錄……'
-              :candidate.contradiction+'\n候選身分比對失敗。封存終端正在載入事故紀錄……'
+              ?'來源資料不足，候選身分比對未完成。火災回放已完成；可直接返回 316 進行最後權限驗證。'
+              :candidate.contradiction+'\n候選身分比對失敗。火災回放已完成；可直接返回 316。'
           };
         }
         establishCanonicalIdentity();
@@ -1232,14 +1237,13 @@ controller.onInteract = async (interactable) => {
         );
         return {
           resolved:true,
-          message:'>>> IDENTITY RECONSTRUCTED\n>>> 張守恆 / MED-870409\n>>> 載入 1998 火災封存紀錄……'
+          message:'>>> IDENTITY RECONSTRUCTED\n>>> 張守恆 / MED-870409\n>>> 火災封存紀錄已讀取｜請返回 316 阻止覆寫'
         };
-      },
-      onAttemptComplete:()=>playB2FireRecap()
+      }
     });
     if(missing.length){
       uiManager.setIdentityMatrixStatus(
-        '資料不完整：'+missing.join('、')+'。仍可進行一次比對；無論結果如何，終端都會繼續播放火災封存紀錄。',
+        '火災封存紀錄已播放。資料仍不完整：'+missing.join('、')+'。身分矩陣為選擇性比對；可直接離開 B2 返回 316。',
         'error'
       );
     }
