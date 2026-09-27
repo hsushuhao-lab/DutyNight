@@ -14,6 +14,9 @@ const browser = await chromium.launch({ headless: true });
 try {
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
   page.on('pageerror', error => report.errors.push(error.message));
+  page.on('response', response => {if(response.status()>=400)report.errors.push(`${response.status()} ${response.url()}`);});
+  report.build=await (await page.request.get(new URL('build-info.json',base).href)).json();
+  if(process.env.GITHUB_SHA)assert.equal(report.build.commit,process.env.GITHUB_SHA);
   await page.goto(`${base}?qa=story`, { waitUntil: 'load', timeout: 120000 });
   await page.waitForFunction(() => window.__storyQA?.worldRouter?.activeZoneInstance, null, { timeout: 120000 });
   await page.evaluate(async () => {
@@ -43,13 +46,21 @@ try {
     assert.equal(state.forbidden.length,0);
     assert(!state.registeredZones.includes('ecology_pond')&&!state.registeredZones.includes('hillside_route'));
     report.states.push(state);
+    await page.waitForFunction(()=>{
+      const surfaces=window.__materialAudit().materials.filter(item=>['wall','wallDark','floor','floorTile','floorWood','doorWood','ceiling','handrail','terrainGrass','pathGravel'].includes(item.materialName.slice(9)));
+      return surfaces.length>0&&surfaces.every(item=>item.flatMeshCount===0&&item.pbrMeshCount===item.meshCount&&item.mapImageWidth>0);
+    },null,{timeout:300000});
+    state.materials=await page.evaluate(()=>window.__materialAudit());
     await page.waitForTimeout(250);
     await page.screenshot({ path: `${output}/${file}` });
   }
   assert.deepEqual(report.errors,[]);
   report.verdict='PASS';
   await writeFile(`${output}/result.json`,JSON.stringify(report,null,2));
+} catch(error) {
+  report.verdict='FAIL';report.errors.push(error.message);throw error;
 } finally {
+  await writeFile(`${output}/result.json`,JSON.stringify(report,null,2));
   await browser.close();
   if(server)await new Promise(resolve=>server.httpServer.close(resolve));
 }

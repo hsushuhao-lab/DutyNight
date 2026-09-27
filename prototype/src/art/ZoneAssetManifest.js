@@ -24,21 +24,27 @@ export const zoneAssetManifest = Object.freeze({
   b2_archive: indoor(clinicalFurniture)
 });
 
-function preloadEntries(entries) {
+function preloadEntries(entries,optional=false) {
   return Promise.all([
-    preloadAssetNames(entries.models),
-    preloadMaterialSurfaces(entries.surfaces)
+    preloadAssetNames(entries.models,{optional}),
+    preloadMaterialSurfaces(entries.surfaces,{optional})
   ]);
 }
 
-export function preloadZoneEssential(zoneId) {
+export async function preloadZoneEssential(zoneId) {
   const manifest = zoneAssetManifest[zoneId];
   if (!manifest) throw new Error(`Missing zone asset manifest: ${zoneId}`);
-  return preloadEntries(manifest.essential);
+  for(let attempt=0;attempt<3;attempt++) {
+    try {return await preloadEntries(manifest.essential);}
+    catch(error) {
+      if(attempt===2)throw error;
+      await new Promise(resolve=>setTimeout(resolve,250*(attempt+1)));
+    }
+  }
 }
 
 export function preloadZoneOptional(zoneId) {
   const manifest = zoneAssetManifest[zoneId];
   if (!manifest) throw new Error(`Missing zone asset manifest: ${zoneId}`);
-  return preloadEntries(manifest.optional);
+  return preloadEntries(manifest.optional,true);
 }

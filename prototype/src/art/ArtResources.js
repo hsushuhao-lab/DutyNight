@@ -1,5 +1,7 @@
+import { unregisterPendingAssetInstances } from './AssetRegistry.js';
 /** Release zone-owned resources once; registries retain shared GLTF/PBR resources. */
 export function disposeZoneArt(root) {
+  unregisterPendingAssetInstances(root);
   const geometries = new Set();
   const materials = new Set();
   const textures = new Set();

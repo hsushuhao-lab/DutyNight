@@ -15,9 +15,7 @@ export class LoopManager {
     persistentMemory.recordOverride(id);
     if(id==='BED33')legendState.override('LEGEND_BED33');
     this.controller.enabled=false;
-    this.loopResetPreparation=Promise.resolve(this.prepareLoopReset?.()).catch(error=>{
-      console.warn('[loop] scene asset preparation failed; rebuilding with available assets',error);
-    });
+    this.loopResetPreparation=Promise.resolve(this.prepareLoopReset?.());
     this.uiManager.playLegendOverride({legend,reason},()=>this.softResetTo1700());
   }
 

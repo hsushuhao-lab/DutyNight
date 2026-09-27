@@ -1,3 +1,4 @@
+import { assetLoadQueue } from './AssetLoadQueue.js';
 import { Box3, CylinderGeometry, DoubleSide, Group, Mesh, MeshStandardMaterial, SphereGeometry, TextureLoader, Vector3 } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { getMaterials } from './MaterialRegistry.js';
@@ -75,6 +76,7 @@ async function loadAssetEntries(entries) {
       assets.set(name, tree);
       resolveInstances(name);
     } else {
+      gltf.scene.userData.dimensions = new Box3().setFromObject(gltf.scene).getSize(new Vector3()).toArray();
       assets.set(name, gltf.scene);
       resolveInstances(name);
     }
@@ -102,11 +104,15 @@ export function preloadOutdoorAssets() {
   return outdoorPreload;
 }
 
-export function preloadAssetNames(names) {
+export function preloadAssetNames(names,{optional=false}={}) {
   return Promise.all(names.map(name => {
     if (assets.has(name)) return Promise.resolve();
     if (!assetManifest[name]) throw new Error(`Unknown art asset: ${name}`);
-    if (!pendingAssets.has(name)) pendingAssets.set(name, loadAssetEntries([[name, assetManifest[name]]]));
+    if (!pendingAssets.has(name)) {
+      const request=assetLoadQueue.enqueue(()=>loadAssetEntries([[name, assetManifest[name]]]),{optional})
+        .finally(()=>pendingAssets.delete(name));
+      pendingAssets.set(name,request);
+    }
     return pendingAssets.get(name);
   }));
 }
@@ -117,10 +123,12 @@ export function isAssetReady(name) { return assets.has(name); }
 function resolveInstances(name) {
   const source = assets.get(name);
   for (const instance of pendingInstances.get(name) || []) {
+    if(instance.userData.pendingDisposed)continue;
     instance.clear();
     instance.add(source.clone(true));
     instance.userData.dimensions = source.userData.dimensions;
-    if (instance.userData.targetHeight) instance.scale.setScalar(instance.userData.targetHeight / source.userData.dimensions[1]);
+    if (instance.userData.targetHeight && source.userData.dimensions?.[1]) instance.scale.setScalar(instance.userData.targetHeight / source.userData.dimensions[1]);
+    delete instance.userData.pendingAsset;
   }
   pendingInstances.delete(name);
 }
@@ -128,7 +136,7 @@ function resolveInstances(name) {
 export function instantiateAsset(name) {
   const source = assets.get(name);
   if (!source) {
-    if (!/^(shrub|fern)_[a-d]$/.test(name) && !outdoorAssets.has(name)) return null;
+    if (!assetManifest[name] && !/^(shrub|fern)_[a-d]$/.test(name)) {console.warn('[art] unknown asset',name);return null;}
     const instance = new Group();
     instance.name = `ArtAsset/${name}`;
     instance.userData = { pendingAsset: name, dimensions: name === 'campusTree' ? [2.3, 4, 2.3] : [1, 1, 1] };
@@ -137,16 +145,33 @@ export function instantiateAsset(name) {
       const crown = new Mesh(treeCanopy, leafMaterial); crown.position.y = 3;
       crown.scale.set(1, 1.2, 1);
       instance.add(trunk, crown);
-    } else {
+    } else if (/^(shrub|fern)/.test(name)) {
       const crown = new Mesh(shrubCanopy, leafMaterial); crown.position.y = .5;
       instance.add(crown);
     }
     if (!pendingInstances.has(name)) pendingInstances.set(name, new Set());
     pendingInstances.get(name).add(instance);
+    const sourceName=name.replace(/_[a-d]$/,'');
+    void preloadAssetNames([sourceName],{optional:outdoorAssets.has(sourceName)})
+      .catch(error=>console.warn('[art] deferred asset failed',name,error));
     return instance;
   }
   const clone = source.clone(true);
   clone.name = `ArtAsset/${name}`;
   clone.userData.sharedAsset = true;
   return clone;
+}
+
+export function unregisterPendingAssetInstances(root) {
+  root?.traverse(object=>{
+    const name=object.userData?.pendingAsset;
+    if(!name)return;
+    pendingInstances.get(name)?.delete(object);
+    object.userData.pendingDisposed=true;
+    if(pendingInstances.get(name)?.size===0)pendingInstances.delete(name);
+  });
+}
+
+export function getAssetReadiness(names) {
+  return names.map(name=>({name,ready:assets.has(name),pending:pendingAssets.has(name),pendingInstanceCount:pendingInstances.get(name)?.size??0}));
 }

@@ -1,0 +1,16 @@
+import assert from 'node:assert/strict';
+import {AssetLoadQueue} from '../src/art/AssetLoadQueue.js';
+const q=new AssetLoadQueue(),started=[],release=new Map();
+const add=(id,optional=false)=>q.enqueue(()=>{started.push(id);return new Promise(resolve=>release.set(id,resolve));},{optional});
+const tick=()=>new Promise(resolve=>setImmediate(resolve));
+const jobs=[add('background-a',true),add('background-b',true),add('essential-a'),add('essential-b'),add('essential-c')];
+await tick();
+assert.deepEqual(started,['essential-a','essential-b','essential-c']);
+release.get('essential-a')();await tick();assert.equal(started.at(-1),'background-a');
+release.get('essential-b')();await tick();assert(!started.includes('background-b'),'only one background group may consume bandwidth');
+const urgent=add('urgent');await tick();assert.equal(started.at(-1),'urgent');
+release.get('essential-c')();release.get('urgent')();release.get('background-a')();await tick();
+assert.equal(started.at(-1),'background-b');release.get('background-b')();await Promise.all([...jobs,urgent]);
+await assert.rejects(q.enqueue(()=>Promise.reject(new Error('network unavailable'))),/network unavailable/);
+assert.equal(await q.enqueue(()=>42),42,'a failed group must release its slot');
+console.log('PASS: three groups maximum, essential priority, one optional group, failure releases capacity');

@@ -1,3 +1,4 @@
+import { WORLD_SPAWNS } from './world/shared/WorldRoutes.js';
 // main.js - Night Corridor Act 1
 import * as THREE from 'three';
 import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUniformsLib.js';
@@ -6,20 +7,37 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { auditSceneMaterials, preloadMaterialSurfaces } from './art/MaterialRegistry.js';
+import { prepareZoneWithRetry } from './art/ZoneReadiness.js';
 import { zoneAssetManifest, preloadZoneEssential, preloadZoneOptional } from './art/ZoneAssetManifest.js';
 import { preloadAssetNames } from './art/AssetRegistry.js';
 
+soundManager.installUnlockHandlers();
+gameState.addListener((event,data)=>{
+  if(event==='flag_changed'&&data.flag==='PHONE_RING_ACTIVE'){
+    if(data.val)soundManager.startPhoneRing();else soundManager.stopPhoneRing();
+  }
+  if(event==='loop_reset')soundManager.stopPhoneRing();
+});
 RectAreaLightUniformsLib.init();
 const requestedOpeningZone = new URLSearchParams(location.search).get('zone');
 const openingZoneId = zoneAssetManifest[requestedOpeningZone] ? requestedOpeningZone : 'first_campus_3f';
-const openingAssets = zoneAssetManifest[openingZoneId].essential;
-await preloadAssetNames(openingAssets.models);
-void preloadMaterialSurfaces(openingAssets.surfaces)
-  .then(() => preloadMaterialSurfaces(zoneAssetManifest[openingZoneId].optional.surfaces))
-  .catch(error => console.warn('[art] opening material surface preload failed', error));
+const loadingMask=document.getElementById('asset-loading-mask');
+const loadingMessage=document.getElementById('asset-loading-message');
+const loadingRetry=document.getElementById('asset-loading-retry');
+while(true){
+  try{await preloadZoneEssential(openingZoneId);break;}
+  catch(error){
+    console.error('[art] opening essential load failed',error);
+    loadingMessage.textContent='必要資料載入失敗，請重試。';
+    loadingRetry.hidden=false;
+    await new Promise(resolve=>{loadingRetry.onclick=resolve;});
+    loadingRetry.onclick=null;loadingRetry.hidden=true;
+    loadingMessage.textContent='夜間系統載入中…';
+  }
+}
 const prefetchDestinationAssets = async destination => {
   const zoneId=destination?.zoneId;
-  await preloadZoneEssential(zoneId);
+  await prepareZoneWithRetry(zoneId);
   void preloadZoneOptional(zoneId).catch(error => console.warn('[art] optional zone asset preload failed', error));
 };
 let fastPathWorldPreload=Promise.resolve();
@@ -131,7 +149,7 @@ const actPresentationDirector=new ActPresentationDirector({
 
 const loopManager=new LoopManager({
   gameState,worldRouter,controller,uiManager,
-  prepareLoopReset:()=>preloadZoneEssential('first_campus_3f')
+  prepareLoopReset:()=>prepareZoneWithRetry('first_campus_3f')
 });
 uiManager.setHandoffDecisionHandler(choice=>{
   if(choice==='default'){
@@ -210,7 +228,9 @@ function triggerPost2117DutyRoomSequence(){
     ],
     onComplete:()=>{
       gameState.setGameTime('00:30');
-      startStoryPhoneCall('ER_GHOST_0033');
+      void actPresentationDirector.playAct2().then(()=>{
+        startStoryPhoneCall('ER_GHOST_0033');
+      }).catch(error=>console.error('[presentation] ACT II before phone failed',error));
     }
   }).catch(error=>console.error('[cinematic] 21:17 activation failed',error));
   return true;
@@ -221,7 +241,7 @@ function startStoryPhoneCall(kind){
   gameState.setFlag('PHONE_CALL_KIND',kind);
   gameState.setFlag('PHONE_ANSWERED',false);
   gameState.setFlag('PHONE_RING_ACTIVE',true);
-  soundManager.playPhoneRingPattern();
+  soundManager.startPhoneRing();
   worldRouter.activeZoneInstance?.syncStoryState?.();
   uiManager.updateTasks();
 }
@@ -367,7 +387,7 @@ if(new URLSearchParams(location.search).get('qa')==='story'){
     });
   };
   window.__storyQA={
-    gameState,persistentMemory,legendState,worldRouter,uiManager,loopManager,dutyEvents,GamePhase,floorStateManager,controller,cinematicDirector,actPresentationDirector,
+    gameState,persistentMemory,legendState,worldRouter,uiManager,loopManager,dutyEvents,GamePhase,floorStateManager,controller,cinematicDirector,actPresentationDirector,soundManager,
     prefetch:prefetchDestinationAssets,
     load:(zone,spawn)=>{worldRouter.loadZone(zone,spawn);worldRouter.activeZoneInstance?.syncStoryState?.();},
     enter:(zone,spawn)=>{
@@ -462,7 +482,10 @@ controller.onInteract = async (interactable) => {
         return;
       }
       controller.enabled=false;controller.cancelAutoMove();
-      uiManager.runDoorTransition(()=>worldRouter.teleportToSpawn(door.portal));
+      uiManager.runDoorTransition(async()=>{
+        await prepareZoneWithRetry(WORLD_SPAWNS[door.portal].zoneId);
+        worldRouter.teleportToSpawn(door.portal);
+      });
     }else{
       if(interactable.doorId==='ER_HILLSIDE'){
         soundManager.playDoorLockClack();
@@ -495,7 +518,7 @@ controller.onInteract = async (interactable) => {
       gameState.setFlag('FOURF_409_SEAL_CHECKED_AFTER_408C',true);
       if(!gameState.getFlag('KNOCK_408C_POST_SEAL_PLAYED')){
         gameState.setFlag('KNOCK_408C_POST_SEAL_PLAYED',true);
-        setTimeout(()=>{soundManager.playBed33KnockPattern(.035);uiManager.showSubtitle('值班醫師','「409 確實封鎖了……剛才那個敲擊聲，我也聽到了。」',4200);},850);
+        setTimeout(()=>{soundManager.playBed33KnockPattern(.13);uiManager.showSubtitle('值班醫師','「409 確實封鎖了……剛才那個敲擊聲，我也聽到了。」',4200);},850);
       }
     }
       registerBed33Clue('DOOR_409_SEALED');
@@ -660,6 +683,7 @@ controller.onInteract = async (interactable) => {
       uiManager.updateTasks();
     }else if(gameState.getFlag('SECOND_CAMPUS_PHONE_PENDING')){
       gameState.setFlag('SECOND_CAMPUS_PHONE_PENDING',false);
+      gameState.setFlag('PHONE_RING_ACTIVE',false);
       gameState.setFlag('PHONE_ANSWERED',true);
       soundManager.playClick();
       uiManager.showDialogue([{speaker:'值班醫師',text:'「……怎麼知道我在 316 辦公室？」'}],unlockSecondCampusAccess);
@@ -760,8 +784,10 @@ controller.onInteract = async (interactable) => {
       persistentMemory.setProof('time',true);
     }
     gameState.setFlag('SECOND_CAMPUS_PHONE_PENDING',true);
+    gameState.setFlag('PHONE_ANSWERED',false);
+    gameState.setFlag('PHONE_RING_ACTIVE',true);
     gameState.setFlag('B2_LEGACY_SOURCE',true);
-    soundManager.playPhoneRingPattern();
+    soundManager.startPhoneRing();
     uiManager.showSubtitle('316 舊資料終端','「1998-ER-0217｜病人：劉志遠／ENG-860214｜責任醫師：張○○｜員編前綴：MED-87。」\n\n終端機停止後，桌上的院內電話立刻響起。',5200);
   } else if (interactable.type === 'workstation') {
     if(gameState.getFlag('B2_EXITED_PERMANENTLY')&&!gameState.getFlag('M7_B2_RESOLVED')&&worldRouter.activeZoneId==='first_campus_3f'&&!gameState.getFlag('HISTORY_PERSONNEL_PROFILES_REVIEWED')){
@@ -833,7 +859,7 @@ controller.onInteract = async (interactable) => {
       gameState.setFlag('FOURF_409_SEAL_CHECKED_AFTER_408C',true);
       if(!gameState.getFlag('KNOCK_408C_POST_SEAL_PLAYED')){
         gameState.setFlag('KNOCK_408C_POST_SEAL_PLAYED',true);
-        setTimeout(()=>{soundManager.playBed33KnockPattern(.035);uiManager.showSubtitle('值班醫師','「409 確實封鎖了……剛才那個敲擊聲，我也聽到了。」',4200);},850);
+        setTimeout(()=>{soundManager.playBed33KnockPattern(.13);uiManager.showSubtitle('值班醫師','「409 確實封鎖了……剛才那個敲擊聲，我也聽到了。」',4200);},850);
       }
     }
     registerBed33Clue('DOOR_409_SEALED');
@@ -914,7 +940,7 @@ controller.onInteract = async (interactable) => {
       uiManager.showSubtitle('值班醫師','「門已經從 B2 那一側永久鎖死。沒有第二次機會。」',3400);
       return;
     }
-    if(gameState.getFlag('M7_B2_OPEN')){worldRouter.loadZone('b2_archive','b2_archive_entry');return;}
+    if(gameState.getFlag('M7_B2_OPEN')){controller.enabled=false;await prepareZoneWithRetry('b2_archive');worldRouter.loadZone('b2_archive','b2_archive_entry');controller.enabled=true;return;}
     gameState.setGameTime('02:17');
     controller.enabled=false;
     uiManager.openStoryChoice({
@@ -923,7 +949,9 @@ controller.onInteract = async (interactable) => {
       primaryText:'照舊手冊拉下 1 → 3 → 4',
       secondaryText:'用十字鑰匙啟動紫色備援排煙',
       onPrimary:()=>loopManager.triggerLegendOverride('TIMELOOP',{legend:'02:17 — 重演',reason:'你成了事故紀錄裡的人。'}),
-      onSecondary:()=>{
+      onSecondary:async()=>{
+        controller.enabled=false;
+        await prepareZoneWithRetry('b2_archive');
         gameState.setFlag('M7_B2_OPEN',true);
         gameState.setFlag('B2_DOOR_READY',true);
         persistentMemory.setProof('time',true);
@@ -986,7 +1014,8 @@ controller.onInteract = async (interactable) => {
       gameState.setFlag('SECURITY_RECORD_OBJECTIVE',false);
       controller.enabled=false;
       worldRouter.activeZoneInstance?.beginExitClosure?.();
-      const finishLeavingB2=()=>{
+      const finishLeavingB2=async()=>{
+        await prepareZoneWithRetry('first_campus_3f');
         worldRouter.loadZone('first_campus_3f','first_3f_316');
         if(resolved){
           gameState.setGameTime('03:30');
@@ -1080,11 +1109,11 @@ controller.onInteract = async (interactable) => {
     }
     controller.enabled = false;
     const travelFrom=worldRouter.activeZoneId;
-    uiManager.openTravelSelector(worldRouter.floorDestinations(interactable.kind), travelFrom, destination => {
+    uiManager.openTravelSelector(worldRouter.floorDestinations(interactable.kind), travelFrom, async destination => {
       if(interactable.kind==='elevator'&&destination.zoneId.startsWith('first_campus_')&&gameState.getFlag('FLOOR6_AVAILABLE')&&!gameState.getFlag('M6_FLOOR6_RESOLVED')){
         const returnZone=destination.zoneId;
-        void Promise.all([
-          preloadZoneEssential('phantom_6f'),
+        return Promise.all([
+          prepareZoneWithRetry('phantom_6f'),
           cinematicDirector.play({
             id:'ELEVATOR_STOP_AT_ERASED_6F',
             durationMs:1650,
@@ -1092,13 +1121,6 @@ controller.onInteract = async (interactable) => {
             cues:[{at:.42,run:()=>uiManager.showSubtitle('電梯樓層顯示器','6',1600)},{at:.62,run:()=>soundManager.playDoorLockClack()}]
           })
         ]).then(()=>{
-          gameState.setFlag('PHANTOM6_RETURN_ZONE',returnZone);
-          gameState.setFlag('FLOOR6_AVAILABLE',false);
-          floorStateManager.setPhase(GamePhase.ELEVATOR_GLITCH);
-          worldRouter.loadZone('phantom_6f','phantom_6f_lift');
-          controller.enabled=true;
-        }).catch(error=>{
-          console.error('[cinematic] 6F elevator stop failed',error);
           gameState.setFlag('PHANTOM6_RETURN_ZONE',returnZone);
           gameState.setFlag('FLOOR6_AVAILABLE',false);
           floorStateManager.setPhase(GamePhase.ELEVATOR_GLITCH);
@@ -1113,6 +1135,7 @@ controller.onInteract = async (interactable) => {
         gameState.setFlag('STAIR_SHORTCUT_3F_4F',true);
         floorStateManager.setPhase(GamePhase.ELEVATOR_GLITCH);
         gameState.setGameTime('20:40');
+        await prepareZoneWithRetry('first_campus_3f');
         worldRouter.loadZone('first_campus_3f','first_3f_lift');
         uiManager.showSubtitle('值班醫師','「……不是 4F。電梯怎麼停在三樓？」',3200);
         controller.enabled=true;
@@ -1123,7 +1146,6 @@ controller.onInteract = async (interactable) => {
       const dutyLine=dutyEvents.onZoneEntered(destination.zoneId);
       worldRouter.activeZoneInstance?.syncStoryState?.();
       if(dutyLine){
-        if(destination.zoneId==='first_campus_2f'&&gameState.gameTime==='20:05')soundManager.playPhoneRingPattern();
         uiManager.showSubtitle(dutyLine.speaker,dutyLine.text);
       }
       controller.enabled = true;
@@ -1290,6 +1312,8 @@ controller.onInteract = async (interactable) => {
       persistentMemory.raiseErosion(1);
     }
     gameState.setFlag('SECURITY_RECORD_OBJECTIVE',true);
+    controller.enabled=false;
+    await prepareZoneWithRetry('first_campus_1f');
     worldRouter.loadZone('first_campus_1f','first_1f_lift');
     controller.enabled=true;
     uiManager.showSubtitle('值班醫師','「如果這個樓層真的不存在，電梯系統不一定會留下正常紀錄……但夜間門禁和監視系統一定會記錄有人經過。去一樓警衛台。」',5400);
@@ -1579,8 +1603,8 @@ if (import.meta.env.DEV || urlParams.get('debug') === '1') {
 }
 
 animate();
+loadingMask.remove();
 requestAnimationFrame(() => setTimeout(() => {
-  if (worldRouter.activeZoneId !== 'first_campus_3f')
-    void preloadZoneOptional(worldRouter.activeZoneId).catch(error => console.warn('[art] optional opening zone assets failed', error));
+  void preloadZoneOptional(worldRouter.activeZoneId).catch(error => console.warn('[art] optional opening zone assets failed', error));
 }, 1000));
 console.log('Night Corridor - Full World Modeling System Initialized.');

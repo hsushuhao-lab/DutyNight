@@ -11,8 +11,12 @@ const base=publicUrl||'http://localhost:4173/';
 const server = publicUrl?null:await preview({ root: fileURLToPath(new URL('..', import.meta.url)), preview: { port: 4173, strictPort: true } });
 const browser = await chromium.launch({ channel: 'chrome', headless: true });
 const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
-const report = {};
+const report = {errors:[],sourceSha:process.env.GITHUB_SHA||'working-tree'};
 try {
+  page.on('pageerror',error=>report.errors.push(error.message));
+  page.on('response',response=>{if(response.status()>=400)report.errors.push(`${response.status()} ${response.url()}`);});
+  report.build=await (await page.request.get(new URL('build-info.json',base).href)).json();
+  if(process.env.GITHUB_SHA)assert.equal(report.build.commit,process.env.GITHUB_SHA);
   await page.goto(base+'?qa=story');
   await page.waitForFunction(() => !!window.__storyQA);
   await page.evaluate(() => window.__storyQA.prefetch({ zoneId: 'skybridge' }));
@@ -35,6 +39,11 @@ try {
         starOpacity: sky.material.uniforms.starOpacity.value
       };
     }, { returnTrip, looks });
+    await page.waitForFunction(()=>{
+      const surfaces=window.__materialAudit().materials.filter(item=>['wall','wallDark','floor','floorTile','floorWood','doorWood','ceiling','handrail','terrainGrass','pathGravel'].includes(item.materialName.slice(9)));
+      return surfaces.length>0&&surfaces.every(item=>item.flatMeshCount===0&&item.pbrMeshCount===item.meshCount&&item.mapImageWidth>0);
+    },null,{timeout:300000});
+    report[name].materials=await page.evaluate(()=>window.__materialAudit());
     await page.waitForTimeout(300);
     await page.screenshot({ path: `${out}/${name}.png` });
   }
@@ -44,6 +53,7 @@ try {
   assert(report['return-stage-3'].fogDensity > report['return-stage-1'].fogDensity);
   assert(report['return-stage-3'].tiltedFixtures >= 3);
   assert(report.outbound.starOpacity > .5);
+  assert.deepEqual(report.errors,[]);
   report.verdict = 'PASS';
 } catch (error) {
   report.verdict = 'FAIL';

@@ -5,17 +5,55 @@ export class SoundManager {
     this.ambientGain = null;
     this.ambientPlaying = false;
     this.isMuted = false;
+    this.userUnlocked = false;
+    this.phoneRingTimer = null;
+    this.phoneOscillators = new Set();
+    this.phoneRingActive = false;
+    this.debugCounters = {phoneBurst:0};
   }
 
-  init() {
-    if (!this.ctx) {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      this.ctx = new AudioCtx();
-      this.startAmbient();
-    }
-    if (this.ctx.state === 'suspended') {
-      this.ctx.resume();
-    }
+  init() { return this.ensureRunning(); }
+
+  async ensureRunning() {
+    if(this.resumePromise)return this.resumePromise;
+    this.resumePromise=(async()=>{
+      try {
+        if(!this.ctx||this.ctx.state==='closed'){
+          const AudioCtx=window.AudioContext||window.webkitAudioContext;
+          this.ctx=new AudioCtx();this.ambientPlaying=false;this.ambientGain=null;
+        }
+        const recovering=!this.userUnlocked||this.ctx.state!=='running';
+        if(this.ctx.state!=='running')await this.ctx.resume();
+        if(this.ctx.state!=='running')return false;
+        this.userUnlocked=true;this.startAmbient();
+        if(recovering&&this.phoneRingActive)this.playPhoneRingPattern();
+        return true;
+      }catch(error){console.warn('[audio] unlock failed',error);return false;}
+    })();
+    try{return await this.resumePromise;}finally{this.resumePromise=null;}
+  }
+
+  installUnlockHandlers() {
+    if(this.unlockHandler)return;
+    this.unlockHandler=event=>{if(event.isTrusted)void this.ensureRunning();};
+    for(const type of ['pointerdown','keydown','touchstart'])document.addEventListener(type,this.unlockHandler,true);
+    document.addEventListener('visibilitychange',()=>{
+      if(document.visibilityState==='visible'&&this.userUnlocked)void this.ensureRunning();
+    });
+  }
+
+  startPhoneRing() {
+    if(this.phoneRingActive)return;
+    this.phoneRingActive=true;
+    this.playPhoneRingPattern();
+    this.phoneRingTimer=setInterval(()=>this.playPhoneRingPattern(),4200);
+  }
+
+  stopPhoneRing() {
+    this.phoneRingActive=false;
+    clearInterval(this.phoneRingTimer);this.phoneRingTimer=null;
+    for(const oscillator of this.phoneOscillators){try{oscillator.stop();}catch{}}
+    this.phoneOscillators.clear();
   }
 
   startAmbient() {
@@ -211,11 +249,12 @@ export class SoundManager {
   }
 
   playPhoneRingPattern() {
-    if (!this.ctx || this.isMuted) return;
+    if (!this.ctx || this.ctx.state!=='running' || this.isMuted) return;
     try {
       const ringAt=(t)=>{
         for(const [freq,offset] of [[930,0],[1380,.055],[1040,.11]]){
           const osc=this.ctx.createOscillator();const gain=this.ctx.createGain();
+          this.phoneOscillators.add(osc);osc.onended=()=>this.phoneOscillators.delete(osc);
           osc.type='square';osc.frequency.setValueAtTime(freq,t+offset);
           gain.gain.setValueAtTime(.001,t+offset);
           gain.gain.linearRampToValueAtTime(.13,t+offset+.012);
@@ -226,6 +265,7 @@ export class SoundManager {
       };
       const now=this.ctx.currentTime;
       ringAt(now);ringAt(now+.48);ringAt(now+2.35);ringAt(now+2.83);
+      this.debugCounters.phoneBurst++;
     } catch (e) {}
   }
 

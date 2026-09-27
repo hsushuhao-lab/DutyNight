@@ -214,12 +214,14 @@ export class ActPresentationDirector {
   }
 
   playAct2(){
+    if(this.act2Promise)return this.act2Promise;
     if(this.act2Seen||this.qaMode||this.active)return Promise.resolve(false);
     this.act2Seen=true;mark(KEYS.act2);
-    return this.run([
+    this.act2Promise=this.run([
       {theme:'horror',kicker:'ACT II · 21:17 之後',title:'記錄開始對不上',subtitle:'同一個時間，留下不同的紀錄。\n同一個空間，開始出現不該存在的痕跡。',glitch:true,duration:3300},
       {theme:'horror',kicker:'夜班仍在繼續',title:'不要急著相信答案',subtitle:'21:17、316、409、00:33。\n線索會彼此矛盾，但每一個矛盾都在指向同一件事。',duration:2900}
     ]);
+    return this.act2Promise;
   }
 
   playAct3(){

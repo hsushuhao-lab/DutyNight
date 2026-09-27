@@ -56,15 +56,15 @@ export class FPSController {
 
   initEvents() {
     this.domElement.addEventListener('click', () => {
+      void soundManager.ensureRunning();
       if (this.enabled && !this.isLocked) {
         this.domElement.requestPointerLock();
-        soundManager.init();
       }
     });
 
     this.domElement.addEventListener('dblclick', (e) => {
+      void soundManager.ensureRunning();
       if (!this.enabled) return;
-      soundManager.init();
       this.handleDoubleClick(e);
     });
 

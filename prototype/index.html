@@ -8,6 +8,11 @@
   <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
+  <div id="asset-loading-mask" role="status" style="position:fixed;inset:0;z-index:50000;background:#101813;color:#e0e6df;display:grid;place-content:center;text-align:center">
+    <h1>青嶺醫療中心</h1>
+    <p id="asset-loading-message">夜間系統載入中…</p>
+    <button id="asset-loading-retry" hidden>重新載入</button>
+  </div>
   <!-- 3D Canvas Viewport -->
   <div id="canvas-container"></div>
 

@@ -406,7 +406,7 @@ export class UIManager {
     if(!this.gameState.getFlag('PHONE_ANSWERED')&&!this.gameState.getFlag('PHONE_RING_ACTIVE')){
       setTimeout(()=>{
         this.gameState.setFlag('PHONE_RING_ACTIVE',true);
-        soundManager.playPhoneRingPattern();
+        soundManager.startPhoneRing();
       },2000);
     }
   }
@@ -893,9 +893,7 @@ export class UIManager {
     const statusEl=document.getElementById('elevator-status-text');
     statusEl.textContent=`${kind==='stairs'?'安全梯':'電梯'} ${fromFloor}F → ${destination.floorNum}F`;
     if(kind==='stairs')soundManager.playClick();else soundManager.playElevatorMotor();
-    const preloadPromise=Promise.resolve(onPrefetch?.(destination)).catch(error=>{
-      console.warn('[perf] destination prefetch failed',destination.zoneId,error);
-    });
+    const preloadPromise=Promise.resolve(onPrefetch?.(destination));
     const glitch=kind!=='stairs'&&fromFloor===3&&destination.floorNum===4&&this.gameState.isTaskComplete('ARCHIVE_CLUE_FOUND');
     if(glitch){
       const digit=this.elevatorCutscene.querySelector('.floor-digit');
@@ -911,7 +909,7 @@ export class UIManager {
           try{await Promise.all([preloadPromise,playElevatorGlimpse(this.elevatorCutscene)]);this.gameState.setFlag('CG_ELEVATOR_6F_PREVIEW_PLAYED',true);}
           finally{this.gameState.setFlag('CG_ELEVATOR_6F_PREVIEW_ACTIVE',false);}
         }else await preloadPromise;
-        onSelect(destination);
+        await onSelect(destination);
         soundManager.playElevatorChime();
       } finally {
         this.elevatorCutscene.dataset.travelling='false';
@@ -929,8 +927,8 @@ export class UIManager {
     this.elevatorCutscene.querySelector('.floor-digit').textContent='感應通過';
     document.getElementById('elevator-status-text').textContent='門禁確認中';
     soundManager.playClick();
-    this.travelTimer=setTimeout(()=>{
-      try {onArrival();}
+    this.travelTimer=setTimeout(async()=>{
+      try {await onArrival();}
       finally {this.elevatorCutscene.dataset.travelling='false';this.closeTravelSelector();}
     },650);
   }

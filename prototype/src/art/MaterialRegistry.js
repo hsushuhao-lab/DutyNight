@@ -1,3 +1,4 @@
+import { assetLoadQueue } from './AssetLoadQueue.js';
 import * as THREE from 'three';
 
 const textureRoot = `${import.meta.env?.BASE_URL ?? '/'}assets/textures/`;
@@ -111,10 +112,15 @@ export function materialForSurface(name, width = 1, height = 1) {
   return material;
 }
 
-export function preloadMaterialSurfaces(names) {
+export function preloadMaterialSurfaces(names,{optional=false}={}) {
   return Promise.all(names.map(name => {
     if (!sources[name]) throw new Error(`Unknown PBR surface: ${name}`);
-    if (!pendingSurfaces.has(name)) pendingSurfaces.set(name, loadMaterialEntries([[name, sources[name]]]));
+    if(isMaterialSurfaceReady(name))return Promise.resolve();
+    if (!pendingSurfaces.has(name)) {
+      const request=assetLoadQueue.enqueue(()=>loadMaterialEntries([[name, sources[name]]]),{optional})
+        .finally(()=>pendingSurfaces.delete(name));
+      pendingSurfaces.set(name,request);
+    }
     return pendingSurfaces.get(name);
   }));
 }
@@ -153,4 +159,8 @@ export function auditSceneMaterials(root) {
     }
   });
   return { ...totals, materials: [...byMaterial.values()].sort((a, b) => a.materialName.localeCompare(b.materialName)) };
+}
+
+export function isMaterialSurfaceReady(name) {
+  return Object.values(materials).some(material=>material.userData.surface===name&&material.map&&material.normalMap&&material.roughnessMap);
 }
