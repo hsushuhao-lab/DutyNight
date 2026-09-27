@@ -20,7 +20,7 @@ assert(!ward.includes("this.interactables.push(report);this.secondCampusNursingR
 
 // 3F guard checkpoint sensors must sit directly on the visible board.
 assert(floor3.includes("patrolFace.position.set(19,1.38,1.625)"),'visible 3F patrol board anchor drifted');
-assert(floor3.includes("new THREE.BoxGeometry(.66,.58,.18)"),'checkpoint board sensor should be compact and board-sized');
+assert(floor3.includes("new THREE.BoxGeometry(1.55,1.30,.18)"),'checkpoint board sensor should remain forgiving for first-person aim while staying board-centered');
 assert(floor3.includes("patrolHit.position.set(19,1.38,1.58)"),'initial checkpoint interaction must be on the board');
 assert(floor3.includes("futureSignHit.position.set(19,1.38,1.58)"),'21:17 checkpoint interaction must reuse the board position');
 assert(floor3.includes("guardPatrolPoint={id:'3F_GUARD_PATROL_POINT',position:[19,1.38,1.625]"),'patrol metadata must match the visible board');
