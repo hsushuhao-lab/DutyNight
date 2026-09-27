@@ -168,7 +168,7 @@ const b2FireRecapDirector=new B2FireRecapDirector({
 
 const loopManager=new LoopManager({
   gameState,worldRouter,controller,uiManager,
-  prepareLoopReset:()=>prepareZoneWithRetry('first_campus_3f')
+  prepareLoopReset:(zoneId='first_campus_3f')=>prepareZoneWithRetry(zoneId)
 });
 uiManager.setHandoffDecisionHandler(choice=>{
   if(choice==='default'){
