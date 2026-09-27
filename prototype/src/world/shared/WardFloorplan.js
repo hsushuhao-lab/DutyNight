@@ -9,6 +9,7 @@ import { SignAnchor } from './SignAnchor.js';
 import {createAnnieMannequin} from './AnnieMannequin.js';
 import { persistentMemory } from '../../core/PersistentMemory.js';
 import { gameState } from '../../core/GameState.js';
+import {drawMemoryFragment,preloadArtPass2Image} from '../../art/ArtPass2Assets.js';
 
 /** September 22 V5 user floorplan. Units are gameplay metres, not a real hospital survey. */
 export class WardFloorplan {
@@ -293,29 +294,49 @@ export class WardFloorplan {
     asset(decor,'bench',[o+10,0,9.25],[.62,.62,.62],Math.PI);
     asset(decor,'plant',[o+13.15,0,9.1],[.55,.55,.55]);
 
-    const dutyPhoto=(x,y,z,title,subtitle,people=4)=>{
+    const dutyPhoto=(x,y,z,title,subtitle,people=4,artIndex=0)=>{
       const canvas=document.createElement('canvas');canvas.width=960;canvas.height=620;
-      const ctx=canvas.getContext('2d');
-      ctx.fillStyle='#c9b998';ctx.fillRect(0,0,960,620);
-      const grad=ctx.createLinearGradient(0,0,960,620);grad.addColorStop(0,'#dfd0ae');grad.addColorStop(1,'#75634d');ctx.fillStyle=grad;ctx.fillRect(28,28,904,564);
-      ctx.fillStyle='#2d332f';ctx.font='bold 36px sans-serif';ctx.fillText(title,52,78);
-      ctx.font='22px sans-serif';ctx.fillText(subtitle,52,116);
-      for(let i=0;i<people;i++){
-        const px=170+i*(620/Math.max(1,people-1));
-        ctx.fillStyle=i%2?'#59645e':'#4b514d';
-        ctx.beginPath();ctx.arc(px,260,44,0,Math.PI*2);ctx.fill();
-        ctx.fillRect(px-52,304,104,150);
-      }
-      ctx.fillStyle='rgba(245,238,215,.72)';ctx.fillRect(70,485,820,70);
-      ctx.fillStyle='#413a31';ctx.font='20px sans-serif';ctx.fillText('青嶺醫療中心｜第二院區留影',95,528);
+      const render=()=>{
+        const ctx=canvas.getContext('2d');
+        ctx.fillStyle='#bca988';ctx.fillRect(0,0,960,620);
+        const paper=ctx.createLinearGradient(0,0,960,620);paper.addColorStop(0,'#dfd0ae');paper.addColorStop(1,'#75634d');ctx.fillStyle=paper;ctx.fillRect(24,24,912,572);
+
+        ctx.fillStyle='#30281f';ctx.font='bold 36px sans-serif';ctx.fillText(title,52,72);
+        ctx.fillStyle='#60513f';ctx.font='21px sans-serif';ctx.fillText(subtitle,52,108);
+
+        const hasArt=drawMemoryFragment(ctx,artIndex,62,136,836,340);
+        if(!hasArt){
+          const photoBg=ctx.createLinearGradient(62,136,898,476);photoBg.addColorStop(0,'#5f625b');photoBg.addColorStop(1,'#252a27');
+          ctx.fillStyle=photoBg;ctx.fillRect(62,136,836,340);
+          for(let i=0;i<people;i++){
+            const px=170+i*(620/Math.max(1,people-1));
+            ctx.fillStyle=i%2?'#66716a':'#505953';
+            ctx.beginPath();ctx.arc(px,250,42,0,Math.PI*2);ctx.fill();
+            ctx.fillRect(px-50,292,100,145);
+          }
+        }else{
+          const wash=ctx.createLinearGradient(0,136,0,476);
+          wash.addColorStop(0,'rgba(55,43,29,.12)');wash.addColorStop(1,'rgba(30,23,17,.36)');
+          ctx.fillStyle=wash;ctx.fillRect(62,136,836,340);
+        }
+
+        ctx.strokeStyle='#4f3d2c';ctx.lineWidth=9;ctx.strokeRect(57,131,846,350);
+        ctx.fillStyle='rgba(235,222,190,.94)';ctx.fillRect(62,487,836,72);
+        ctx.fillStyle='#3e352b';ctx.font='20px sans-serif';ctx.fillText('青嶺醫療中心｜第二院區留影',88,525);
+        ctx.fillStyle='#76624a';ctx.font='15px ui-monospace,monospace';ctx.fillText('ARCHIVE PRINT / SOURCE VERIFIED',88,550);
+        tex.needsUpdate=true;
+      };
+
       const tex=new THREE.CanvasTexture(canvas);tex.colorSpace=THREE.SRGBColorSpace;
+      render();
       const frame=solid(decor,this.gf.materials.doorWood,[x,y,z],[1.52,1.02,.07]);
       frame.name='Second5F_DutyPhoto_Frame_'+title;
-      const photo=new THREE.Mesh(new THREE.PlaneGeometry(1.38,.88),new THREE.MeshStandardMaterial({map:tex,roughness:.88}));
+      const photo=new THREE.Mesh(new THREE.PlaneGeometry(1.38,.88),new THREE.MeshStandardMaterial({map:tex,roughness:.88,metalness:0}));
       photo.position.set(x,y,z-.041);photo.name='Second5F_DutyPhoto_'+title;decor.add(photo);
+      void preloadArtPass2Image('memoryFragments').then(()=>{if(photo.parent)render();}).catch(()=>{});
     };
-    dutyPhoto(o+10.25,1.72,9.78,'1998 夜班合照','第二院區 5F 值班室',4);
-    dutyPhoto(o+12.15,1.72,9.78,'臨床教學留影','病房急救演練',3);
+    dutyPhoto(o+10.25,1.72,9.78,'1998 夜班合照','第二院區 5F 值班室',4,0);
+    dutyPhoto(o+12.15,1.72,9.78,'臨床教學留影','病房急救演練',3,4);
     asset(this.zoneGroup,'hospitalBed',[o+12.3,0,7.15],[.9,.85,.85]);CollisionFactory.addBox(this.colliders,o+12.3,.4,7.15,1.15,.8,1.8);
     asset(this.zoneGroup,'storageCabinet',[o+9.45,0,7.15],[.8,.82,.8],Math.PI);
     const phone=new THREE.Group();phone.name='SecondDutyRoom_ExtensionPhone';phone.position.set(o+12.55,.84,3.34);this.zoneGroup.add(phone);

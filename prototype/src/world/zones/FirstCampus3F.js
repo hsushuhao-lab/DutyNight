@@ -10,6 +10,7 @@ import { applyAct1CollisionHotfix } from '../CollisionHotfix.js';
 import { KeyedKnobDoor } from '../shared/KeyedKnobDoor.js';
 import { asset, solid } from '../../art/ArtDetails.js';
 import { getCorePersonnelProfiles } from '../../story/CharacterBible.js';
+import { buildArchiveGalleryTexture } from '../../art/ArtPass2Assets.js';
 
 export class FirstCampus3F {
   constructor(scene, geometryFactory) {
@@ -259,18 +260,18 @@ export class FirstCampus3F {
       buildShelf('E2',23.22,-5.55,-Math.PI/2)
     ];
 
-    const personnelPages=getCorePersonnelProfiles().map(profile=>
-      `姓名：${profile.name}
-員編：${profile.employeeId}
-職位：${profile.role}
-
-簡介：${profile.introduction}
-
-個性：${profile.personality}
-嗜好：${profile.hobby}
-辨識習慣：「${profile.signatureQuote}」
-關係備註：${profile.relationship}`
-    );
+    const personnelPages=getCorePersonnelProfiles().map((profile,index)=>({
+      kind:'personnel',
+      rosterIndex:index,
+      name:profile.name,
+      employeeId:profile.employeeId,
+      role:profile.role,
+      introduction:profile.introduction,
+      personality:profile.personality,
+      hobby:profile.hobby,
+      signatureQuote:profile.signatureQuote,
+      relationship:profile.relationship
+    }));
 
     const documents=[
       {
@@ -317,16 +318,39 @@ export class FirstCampus3F {
     ];
     for(const d of documents){
       const personnel=d.id==='ARCHIVE_PERSONNEL_1998';
-      const folder=solid(d.shelf,personnel?new THREE.MeshStandardMaterial({color:0xa84224,emissive:0x301008,emissiveIntensity:.25}):this.gf.materials.lightWarm,[d.x,d.y,.25],personnel?[.40,.42,.07]:[.28,.36,.05]);
+      const folder=solid(d.shelf,personnel?new THREE.MeshStandardMaterial({color:0x8f2f20,emissive:0x3b1009,emissiveIntensity:.38,roughness:.62}):this.gf.materials.lightWarm,[d.x,d.y,.25],personnel?[.40,.42,.07]:[.28,.36,.05]);
       folder.name=d.id;folder.userData={interactable:true,id:d.id,type:'archive_document',label:`翻閱：${d.title}`,documentTitle:d.title,pages:d.pages};
+      if(personnel){
+        const labelCanvas=document.createElement('canvas');labelCanvas.width=520;labelCanvas.height=150;const lctx=labelCanvas.getContext('2d');
+        const paper=lctx.createLinearGradient(0,0,520,150);paper.addColorStop(0,'#e2d2ad');paper.addColorStop(1,'#bca57b');lctx.fillStyle=paper;lctx.fillRect(0,0,520,150);
+        lctx.strokeStyle='#6c4b32';lctx.lineWidth=9;lctx.strokeRect(8,8,504,134);
+        lctx.fillStyle='#3b2d22';lctx.font='bold 33px sans-serif';lctx.fillText('1998 夜班核心人員名錄',28,63);
+        lctx.fillStyle='#76513a';lctx.font='21px ui-monospace,monospace';lctx.fillText('7 PERSONNEL FILES｜SOURCE VERIFIED',29,108);
+        const labelTexture=new THREE.CanvasTexture(labelCanvas);labelTexture.colorSpace=THREE.SRGBColorSpace;
+        const label=new THREE.Mesh(new THREE.PlaneGeometry(.36,.105),new THREE.MeshStandardMaterial({map:labelTexture,roughness:.86,side:THREE.DoubleSide}));
+        label.position.set(0,0,.041);label.name='Archive_PersonnelFolder_Label';folder.add(label);
+        const glow=new THREE.PointLight(0xffc77f,.24,1.6,2);glow.position.set(0,.28,.38);folder.add(glow);
+      }
       this.interactables.push(folder);
     }
 
-    const lore=document.createElement('canvas');lore.width=760;lore.height=300;const ctx=lore.getContext('2d');
-    ctx.fillStyle='#d8d0bc';ctx.fillRect(0,0,760,300);ctx.fillStyle='#4a2f28';ctx.font='bold 34px sans-serif';ctx.fillText('文史館｜封存索引',28,50);
-    ctx.font='23px sans-serif';ctx.fillStyle='#302b27';['資料保密・禁止外洩','工程紀錄／夜間紀錄／照片封存','調閱後請依原位置歸檔'].forEach((t,i)=>ctx.fillText('• '+t,42,112+i*55));
-    const tex=new THREE.CanvasTexture(lore);tex.colorSpace=THREE.SRGBColorSpace;
-    const board=new THREE.Mesh(new THREE.PlaneGeometry(2.8,1.05),new THREE.MeshStandardMaterial({map:tex,roughness:.95}));board.position.set(20,1.62,-7.08);this.zoneGroup.add(board);
+    // Art Pass 2: replace the flat archive index board with a curated historical
+    // photo wall. The generated source image is used only for photographic crops;
+    // all facility names and labels are redrawn from current game canon.
+    const galleryRoot=new THREE.Group();galleryRoot.name='Archive_RefinedPhotoWall';galleryRoot.position.set(20,1.66,-7.06);this.zoneGroup.add(galleryRoot);
+    solid(galleryRoot,m.floorWood,[0,0,-.035],[4.05,1.92,.10]);
+    const galleryMaterial=new THREE.MeshStandardMaterial({color:0x3d3126,roughness:.74,metalness:0,emissive:0x100b07,emissiveIntensity:.18});
+    const galleryFace=new THREE.Mesh(new THREE.PlaneGeometry(3.85,1.74),galleryMaterial);galleryFace.position.z=.025;galleryFace.name='Archive_HistoryPhotoWall_Face';galleryRoot.add(galleryFace);
+    void buildArchiveGalleryTexture().then(texture=>{
+      if(!galleryFace.parent){texture.dispose();return;}
+      galleryMaterial.map=texture;galleryMaterial.color.setHex(0xffffff);galleryMaterial.needsUpdate=true;
+    }).catch(error=>console.warn('[artpass2] archive photo wall failed',error));
+    for(const x of [-1.45,1.45]){
+      const lamp=new THREE.PointLight(0xffd99a,.32,3.8,2);lamp.position.set(x,.93,.58);galleryRoot.add(lamp);
+      const shade=solid(galleryRoot,new THREE.MeshStandardMaterial({color:0x392b20,roughness:.7}),[x,.91,.05],[.48,.08,.12]);
+      shade.rotation.z=x<0?.035:-.035;
+    }
+
     this.secretArchive={id:'3F_ARCHIVE',label:'文史館・封存資料室',doorId:'3F_ARCHIVE_DOOR',requires:'ARCHIVE_ACCESS_KEY',bookshelfCount:4,documentIds:documents.map(d=>d.id),lore:['night_anomaly_records','missing_floorplans','unlabelled_photos','unindexed_handoff']};
 
     // Two optional secrets inside 316. They are discoverable but not required for the duty workflow.

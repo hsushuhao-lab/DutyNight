@@ -210,6 +210,20 @@ export class PersistentMemory {
     this.save();
   }
 
+  beginSuccessfulEndingReview(){
+    this.data.gameComplete=true;
+    this.data.finalDisposition='success_pending';
+    this.data.legends.lastCall=true;
+    this.save();
+  }
+
+  completePerfectEnding(){
+    this.data.gameComplete=true;
+    this.data.finalDisposition='perfect';
+    this.data.legends.lastCall=true;
+    this.save();
+  }
+
   completeHospitalizedEnding(){
     this.data.gameComplete=false;
     this.data.finalDisposition='hospitalized';

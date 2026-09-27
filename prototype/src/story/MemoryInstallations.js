@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { getMemorySequence } from './NarrativeV22.js';
 import { drawCharacterStrip } from '../art/CharacterPortraitArt.js';
+import {drawMemoryFragment,preloadArtPass2Image} from '../art/ArtPass2Assets.js';
 
 const P=(memoryId,x,y,z,rotationY,width=.74)=>Object.freeze({memoryId,x,y,z,rotationY,width});
 const PLACEMENTS=Object.freeze({
@@ -17,25 +18,55 @@ const PLACEMENTS=Object.freeze({
   b2_archive:Object.freeze([P('B2_VICTIM_MAP',-4.82,1.55,-9.55,Math.PI/2,.82)])
 });
 
+function memoryArtIndex(sequence){
+  const id=sequence?.id||sequence?.title||'memory';
+  let hash=0;for(let i=0;i<id.length;i++)hash=(hash*31+id.charCodeAt(i))>>>0;
+  return hash%6;
+}
+
 function drawFace(sequence){
   const canvas=document.createElement('canvas');canvas.width=900;canvas.height=600;
   const ctx=canvas.getContext('2d');const cctv=sequence.mode==='CCTV';
-  ctx.fillStyle=cctv?'#202620':'#d8ccb0';ctx.fillRect(0,0,900,600);
-  ctx.fillStyle=cctv?'#0a130e':'#766247';ctx.fillRect(0,0,900,76);
-  ctx.fillStyle=cctv?'#b6ddbd':'#fff9e8';ctx.font='bold 31px sans-serif';ctx.fillText(cctv?'ARCHIVE PLAYBACK':'院內舊照片／相簿',34,49);
-  ctx.fillStyle=cctv?'#76957d':'#4e4434';ctx.font='bold 32px sans-serif';
-  const title=sequence.title.length>24?sequence.title.slice(0,24)+'…':sequence.title;ctx.fillText(title,34,135);
-  ctx.font='24px sans-serif';ctx.fillText(sequence.frames.length+' FRAMES',34,178);
-  ctx.fillStyle=cctv?'#111814':'#b6a581';ctx.fillRect(75,225,750,285);
-  ctx.strokeStyle=cctv?'#76957d':'#66543b';ctx.lineWidth=6;ctx.strokeRect(75,225,750,285);
+  ctx.fillStyle=cctv?'#111612':'#c9ba98';ctx.fillRect(0,0,900,600);
+  const header=ctx.createLinearGradient(0,0,900,90);
+  header.addColorStop(0,cctv?'#07100b':'#544331');header.addColorStop(1,cctv?'#18251c':'#7d6748');
+  ctx.fillStyle=header;ctx.fillRect(0,0,900,82);
+  ctx.fillStyle=cctv?'#b9d7bf':'#f1e7d1';ctx.font='bold 30px sans-serif';ctx.fillText(cctv?'ARCHIVE PLAYBACK':'封存影像／記憶照片',34,51);
+  ctx.fillStyle=cctv?'#7fa58a':'#4e4434';ctx.font='bold 31px sans-serif';
+  const title=sequence.title.length>24?sequence.title.slice(0,24)+'…':sequence.title;ctx.fillText(title,34,133);
+  ctx.font='21px ui-monospace,monospace';ctx.fillText(String(sequence.frames.length).padStart(2,'0')+' FRAMES',34,174);
+
+  ctx.fillStyle=cctv?'#07100c':'#574a38';ctx.fillRect(68,205,764,326);
+  const usedArt=drawMemoryFragment(ctx,memoryArtIndex(sequence),78,215,744,286);
+  if(usedArt){
+    const shade=ctx.createLinearGradient(0,215,0,501);
+    shade.addColorStop(0,'rgba(4,9,8,.08)');
+    shade.addColorStop(.62,'rgba(4,8,7,.13)');
+    shade.addColorStop(1,'rgba(4,7,6,.72)');
+    ctx.fillStyle=shade;ctx.fillRect(78,215,744,286);
+  }else{
+    const bg=ctx.createLinearGradient(78,215,822,501);
+    bg.addColorStop(0,cctv?'#26362b':'#9d8965');bg.addColorStop(1,cctv?'#0b120d':'#65523b');
+    ctx.fillStyle=bg;ctx.fillRect(78,215,744,286);
+  }
+  ctx.strokeStyle=cctv?'#78977e':'#5c4933';ctx.lineWidth=7;ctx.strokeRect(74,211,752,294);
+
   const previewPeople=[];
   for(const frame of sequence.frames||[])for(const person of frame.people||[]){
     if(!previewPeople.includes(person)&&person!=='Annie')previewPeople.push(person);
     if(previewPeople.length>=4)break;
   }
-  if(previewPeople.length)drawCharacterStrip(ctx,previewPeople,{left:120,right:780,baseY:438,cctv,labels:false,maxScale:.68});
-  else for(let i=0;i<4;i++){const x=160+i*175;ctx.fillStyle=cctv?'#4b6150':'#74654e';ctx.beginPath();ctx.arc(x,330,34,0,Math.PI*2);ctx.fill();ctx.fillRect(x-42,365,84,90);}
-  ctx.fillStyle=cctv?'#b6ddbd':'#4e4434';ctx.font='22px sans-serif';ctx.fillText('按 E 檢視逐幀內容',280,558);
+  if(previewPeople.length){
+    ctx.save();ctx.globalAlpha=usedArt?.84:1;
+    drawCharacterStrip(ctx,previewPeople,{left:125,right:775,baseY:445,cctv,labels:false,maxScale:.58});
+    ctx.restore();
+  }
+
+  ctx.fillStyle=cctv?'rgba(4,11,7,.78)':'rgba(229,216,184,.92)';ctx.fillRect(78,503,744,48);
+  ctx.fillStyle=cctv?'#bdd8c2':'#40362a';ctx.font='20px sans-serif';ctx.fillText('E｜檢視逐幀記憶與原始註記',278,534);
+  if(cctv){ctx.globalAlpha=.16;ctx.fillStyle='#d9f1df';for(let y=215;y<500;y+=7)ctx.fillRect(78,y,744,1);ctx.globalAlpha=1;}
+  else{ctx.globalAlpha=.10;ctx.fillStyle='#3b2d1f';for(let i=0;i<44;i++){const x=70+(i*101)%760,y=205+(i*59)%330;ctx.fillRect(x,y,2+(i%3),2+(i%4));}ctx.globalAlpha=1;}
+
   const texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;return texture;
 }
 
@@ -48,7 +79,18 @@ export function createMemoryEvidence(zone,placement){
   const face=new THREE.Mesh(new THREE.PlaneGeometry(width,height),new THREE.MeshStandardMaterial({map:drawFace(sequence),roughness:.88,side:THREE.DoubleSide}));
   face.position.z=.005;face.name='MemoryEvidenceFace/'+placement.memoryId;
   face.userData={interactable:true,id:'MEMORY_'+placement.memoryId,type:'memory_evidence',memoryId:placement.memoryId,label:'查看「'+sequence.title+'」'};
-  root.add(face);zone.zoneGroup.add(root);zone.interactables.push(face);return root;
+  root.add(face);zone.zoneGroup.add(root);zone.interactables.push(face);
+
+  // Refine the wall photo once the lightweight generated memory atlas has decoded.
+  // The atlas is visual-only; all names, timestamps and captions remain canonical data.
+  void preloadArtPass2Image('memoryFragments').then(()=>{
+    if(!face.parent)return;
+    const previous=face.material.map;
+    face.material.map=drawFace(sequence);
+    face.material.needsUpdate=true;
+    previous?.dispose?.();
+  }).catch(error=>console.warn('[artpass2] memory photo refinement failed',placement.memoryId,error));
+  return root;
 }
 export function installMemoryEvidence(zone,zoneId){
   const created=[];for(const placement of PLACEMENTS[zoneId]||[]){const item=createMemoryEvidence(zone,placement);if(item)created.push(item);}

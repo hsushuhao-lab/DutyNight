@@ -5,6 +5,7 @@ import { soundManager } from '../audio/SoundManager.js';
 import { persistentMemory, TRUE_NAME_CANON } from '../core/PersistentMemory.js';
 import { drawCharacterStrip } from '../art/CharacterPortraitArt.js';
 import { getCharacterProfile } from '../story/CharacterBible.js';
+import {drawMemoryFragment,preloadArtPass2Image} from '../art/ArtPass2Assets.js';
 
 export class UIManager {
   constructor(gameState, onTerminalClose, onElevatorTransitionComplete) {
@@ -478,7 +479,46 @@ export class UIManager {
 
   renderArchivePage() {
     if(!this.archivePageEl)return;
-    this.archivePageEl.textContent = this.archivePages[this.archivePageIndex] || '';
+    const page=this.archivePages[this.archivePageIndex] ?? '';
+    this.archivePageEl.classList.toggle('personnel-dossier',Boolean(page&&typeof page==='object'&&page.kind==='personnel'));
+    this.archivePageEl.replaceChildren();
+
+    if(page&&typeof page==='object'&&page.kind==='personnel'){
+      const card=document.createElement('div');card.className='personnel-dossier-card';
+      const portrait=document.createElement('div');portrait.className='personnel-dossier-portrait';
+      const canvas=document.createElement('canvas');canvas.width=420;canvas.height=520;
+      const ctx=canvas.getContext('2d');
+      const bg=ctx.createLinearGradient(0,0,420,520);bg.addColorStop(0,'#8d7a5a');bg.addColorStop(1,'#32291f');
+      ctx.fillStyle=bg;ctx.fillRect(0,0,420,520);
+      ctx.fillStyle='rgba(230,215,185,.08)';for(let i=0;i<36;i++){ctx.fillRect((i*79)%420,(i*47)%520,2+(i%3),4+(i%5));}
+      drawCharacterStrip(ctx,[page.name],{left:65,right:355,baseY:405,cctv:false,labels:false,maxScale:1.12});
+      ctx.strokeStyle='#d0b98e';ctx.lineWidth=6;ctx.strokeRect(12,12,396,496);
+      const index=document.createElement('div');index.className='personnel-dossier-index';index.textContent=`ARCHIVE PERSONNEL FILE ${String(this.archivePageIndex+1).padStart(2,'0')}`;
+      portrait.append(canvas,index);
+
+      const copy=document.createElement('div');copy.className='personnel-dossier-copy';
+      const classification=document.createElement('small');classification.textContent='1998 NIGHT DUTY PERSONNEL / VERIFIED SOURCE';
+      const name=document.createElement('h3');name.textContent=page.name;
+      const role=document.createElement('div');role.className='personnel-dossier-role';role.textContent=`${page.employeeId}｜${page.role}`;
+      const grid=document.createElement('div');grid.className='personnel-dossier-grid';
+      for(const [label,value] of [
+        ['個人介紹',page.introduction],
+        ['個性',page.personality],
+        ['嗜好',page.hobby],
+        ['關係備註',page.relationship]
+      ]){
+        const field=document.createElement('div');field.className='personnel-dossier-field';
+        const strong=document.createElement('b');strong.textContent=label;
+        const span=document.createElement('span');span.textContent=value||'—';
+        field.append(strong,span);grid.appendChild(field);
+      }
+      const quote=document.createElement('div');quote.className='personnel-dossier-quote';quote.textContent='「'+(page.signatureQuote||'')+'」';
+      copy.append(classification,name,role,grid,quote);
+      card.append(portrait,copy);this.archivePageEl.appendChild(card);
+    }else{
+      this.archivePageEl.textContent=String(page||'');
+    }
+
     this.archiveIndicatorEl.textContent = `${this.archivePageIndex+1} / ${Math.max(1,this.archivePages.length)}`;
     document.getElementById('btn-archive-prev').disabled=this.archivePageIndex===0;
     document.getElementById('btn-archive-next').disabled=this.archivePageIndex>=this.archivePages.length-1;
@@ -625,6 +665,9 @@ export class UIManager {
     document.getElementById('memory-mode').textContent=sequence.mode==='CCTV'?'FRAME PLAYBACK / CCTV':'FRAME ALBUM';
     document.getElementById('memory-source').textContent=sequence.source||'';
     this.memoryModal?.classList.add('active');this.renderMemoryFrame();
+    void preloadArtPass2Image('memoryFragments').then(()=>{
+      if(this.memorySequence===sequence)this.renderMemoryFrame();
+    }).catch(error=>console.warn('[artpass2] memory viewer art preload failed',error));
   }
 
   stepMemory(delta){
@@ -643,6 +686,21 @@ export class UIManager {
     ctx.strokeStyle=cctv?'#708c76':'#5d4b35';ctx.lineWidth=8;ctx.strokeRect(42,42,w-84,h-84);
     ctx.fillStyle=cctv?'#b6cfb9':'#3d3427';ctx.font='bold 30px ui-monospace, monospace';ctx.fillText(frame.stamp||'',70,92);
     ctx.font='bold 44px sans-serif';ctx.fillText(frame.title||'',70,150);
+
+    const sequenceHash=[...(sequence.id||sequence.title||'memory')].reduce((sum,ch)=>(sum*31+ch.charCodeAt(0))>>>0,0);
+    const artIndex=(sequenceHash+this.memoryFrameIndex)%6;
+    ctx.save();
+    ctx.globalAlpha=cctv?.48:.62;
+    const hasArt=drawMemoryFragment(ctx,artIndex,72,178,w-144,h-245);
+    ctx.restore();
+    if(hasArt){
+      const artShade=ctx.createLinearGradient(0,178,0,h-67);
+      artShade.addColorStop(0,cctv?'rgba(4,12,8,.34)':'rgba(48,37,25,.12)');
+      artShade.addColorStop(.65,cctv?'rgba(2,7,5,.42)':'rgba(41,30,20,.18)');
+      artShade.addColorStop(1,cctv?'rgba(2,6,4,.82)':'rgba(40,28,18,.64)');
+      ctx.fillStyle=artShade;ctx.fillRect(72,178,w-144,h-245);
+    }
+
     const sceneKind=frame.scene||'corridor';
     ctx.save();
     ctx.globalAlpha=cctv?.34:.28;
@@ -749,12 +807,12 @@ export class UIManager {
     document.getElementById('ending-cg-screen')?.classList.remove('active');
     this.finalHandoffModal?.classList.remove('active');
     const win=this.finalSuccessModal?.querySelector('.anomaly-window');
-    const title=win?.querySelector('h2');if(title)title.textContent='OFFICIAL SHIFT COMPLETED';
+    const title=win?.querySelector('h2');if(title)title.textContent='PERFECT ENDING — RECORD RESTORED';
     const paragraphs=win?.querySelectorAll('p');
-    if(paragraphs?.[0])paragraphs[0].textContent='DUTY R1：'+name+'（MED-870409）｜COMPLETED & RESTORED';
-    if(paragraphs?.[1])paragraphs[1].textContent='409-A PATIENTIZATION ORDER：INVALIDATED｜歷史覆寫：REVOKED｜八名罹難者姓名已永久寫回紀念紀錄。';
+    if(paragraphs?.[0])paragraphs[0].textContent=name+'（MED-870409）｜IDENTITY RESTORED｜原始夜班紀錄已恢復';
+    if(paragraphs?.[1])paragraphs[1].textContent='409-A 錯誤病人紀錄：INVALIDATED｜身分覆寫：REVOKED｜八名罹難者姓名：RESTORED';
     const last=this.finalSuccessModal?.querySelector('.anomaly-last');
-    if(last)last.textContent='答錄磁帶最後留下林婉真的聲音：「張醫師……如果你還聽得到，天亮了。辛苦了。這一班，你可以交了。」';
+    if(last)last.textContent='316 舊終端最後留下：「RECORD WRITE COMPLETE｜這一次，所有名字都回到正確的位置。」';
     this.finalSuccessModal?.classList.add('active');
   }
 
@@ -1016,8 +1074,8 @@ export class UIManager {
     const currentZone=window.worldRouter?.activeZoneId || '';
 
     if(this.gameState.getFlag('GAME_COMPLETE')){
-      this.renderTaskBoard('翌日 04:05｜交班完成',[
-        {id:'task-game-complete',text:'張守恆已完成真正的晨間交班',state:'completed'}
+      this.renderTaskBoard('RECORD RESTORED｜紀錄覆寫完成',[
+        {id:'task-game-complete',text:'張守恆與八名罹難者的原始夜班紀錄已恢復',state:'completed'}
       ]);
       return;
     }
