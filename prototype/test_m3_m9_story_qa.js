@@ -41,12 +41,12 @@ assert(er.includes("type:'er_ghost_registration'"),'M3 ghost registration termin
 assert(er.includes("type:'er_exit_notice'")&&er.includes('此門只進不出'),'M3 ER entry-only exit warning missing');
 assert(main.includes("LEGEND 02 — 00:33 急診掛號")&&main.includes("ER0033_SLIP_COLLECTED")&&main.includes("legacy_terminal_316")&&level3.includes("316_LEGACY_TERMINAL")&&main.includes("SECOND_CAMPUS_ACCESS"),'M3 two-stage ER-to-316 resolve or campus call missing');
 
-assert(ward.includes("type:'second_campus_nursing_report'")&&ward.includes("type:'second_chest_patient'")&&ward.includes("type:'second_chest_transfer'"),'M4 nursing report/patient/form sequence missing');
+assert(main.includes('function completeSecondCampus5FWardReport()')&&main.includes("SECOND_CAMPUS_5F_REPORTED")&&ward.includes("type:'second_chest_patient'")&&ward.includes("type:'second_chest_transfer'"),'M4 ward-door report/patient/form sequence missing');
 assert(ward.includes('Second5F_DutyPhoto_')&&ward.includes('1998 夜班合照')&&ward.includes('臨床教學留影'),'M4 second-campus 5F duty room must contain visible framed photos');
 const second2f=readFileSync('./src/world/zones/SecondCampus2F.js','utf8');
 assert(!second2f.includes("Doorway.build({scene:this.zoneGroup,colliders:this.colliders,x:72,z:4.5"),'second-campus 2F elevator-front doorway must remain removed');
 assert(ward.includes("label:'查看病人處置醫囑'"),'M4 desk paper must retain its initial treatment-order name');
-assert(main.includes("SECOND_CAMPUS_5F_REPORTED")&&main.includes('醫師你剛剛開好了，現在簽名就好')&&main.includes('李承禮醫師？我剛剛也有這張醫囑單嗎？'),'M4 must use concise nurse wording plus protagonist Li-identity misdirection');
+assert(main.includes("SECOND_CAMPUS_5F_REPORTED")&&main.includes('門禁看到你的刷卡紀錄了，算報到完成')&&main.includes('李承禮醫師？我剛剛也有這張醫囑單嗎？'),'M4 must use automatic ward-door report wording plus protagonist Li-identity misdirection');
 assert(main.includes("LEGEND 03 — 事先填妥的轉院單")&&main.includes("M4_CHEST_RESOLVED")&&main.includes("second_chest_roster_clue"),'M4 clinical/admin-horror decision flow or physical clue missing');
 
 assert(bridge.includes("type:'bridge_loop_event'")&&main.includes("LEGEND 04 — 不能回頭的天橋"),'M5 bridge legend missing');
