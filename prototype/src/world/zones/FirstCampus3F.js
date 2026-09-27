@@ -9,6 +9,7 @@ import { applyFirstFloorArt } from '../../art/FirstFloorArt.js';
 import { applyAct1CollisionHotfix } from '../CollisionHotfix.js';
 import { KeyedKnobDoor } from '../shared/KeyedKnobDoor.js';
 import { asset, solid } from '../../art/ArtDetails.js';
+import { getCorePersonnelProfiles } from '../../story/CharacterBible.js';
 
 export class FirstCampus3F {
   constructor(scene, geometryFactory) {
@@ -261,6 +262,13 @@ export class FirstCampus3F {
       buildShelf('E2',23.22,-5.55,-Math.PI/2)
     ];
 
+    const personnelPages=getCorePersonnelProfiles().map(profile=>[
+      `【1998 夜班核心人員檔案】\n\n姓名：${profile.name}\n員編：${profile.employeeId}\n職稱：${profile.role}`,
+      `個人介紹\n\n${profile.introduction}`,
+      `個性\n\n${profile.personality}\n\n嗜好\n\n${profile.hobby}`,
+      `人物識別\n\n常見語氣：「${profile.signatureQuote}」\n\n關係備註：${profile.relationship}`
+    ]).flat();
+
     const documents=[
       {
         id:'ARCHIVE_NIGHT_RECORD',shelf:shelves[0],x:.26,y:1.66,
@@ -296,6 +304,14 @@ export class FirstCampus3F {
           '封面沒有日期，也沒有歸檔編號。第一頁只有一句話：\n\n「如果你是從 316 的系統訊息找到這裡，代表它又開始了。」',
           '第二頁列出幾個重複時間：02:17、03:16、04:09。旁邊有人用紅筆寫：\n\n「不要把它當成樓層或房號。」',
           '最後一頁只剩一行：\n\n「今晚先完成值班。真正要找的東西，不在病歷裡。」\n\n頁角蓋著模糊的舊院章。\n\n旁邊夾著一張殘缺索引：409／舊隔離零號房；316／夜間封鎖決策點；1F／警衛台後配電；2F／舊式手圈索引。'
+        ]
+      },
+      {
+        id:'ARCHIVE_PERSONNEL_1998',shelf:shelves[3],x:.26,y:1.20,
+        title:'1998 夜班核心人員名錄｜4+3',
+        pages:[
+          '【院內機密｜人事與文史交叉索引】\n\n4 位醫師 + 3 位核心院內人員。這不是答案表；每份資料保留原始人事欄位與文史備註。',
+          ...personnelPages
         ]
       }
     ];
