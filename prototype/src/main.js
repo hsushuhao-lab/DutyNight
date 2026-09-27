@@ -356,7 +356,7 @@ function activateB2OverwriteRoute(){
   persistentMemory.resolveLegend('lastCall');
   persistentMemory.addJournalNote(
     'B2_FIRE_RECAP',
-    'B2 封存終端重播 1998 火災：02:17 的錯誤程序使防火門與備援排煙失常；八名罹難者的最後位置重新對上。回放結束時，一個 UNKNOWN SESSION 正在再次覆寫這些紀錄。必須返回 316，以正確權限阻止覆寫。'
+    'B2 封存終端重播 1998 火災：02:17 的錯誤程序使防火門與備援排煙失常；八名罹難者的最後位置重新對上。回放結束時，一個 UNKNOWN SESSION 正在再次覆寫這些紀錄。離開 B2 後必須先到 3F 文史室重新核對 1998 夜班核心人員名錄，再前往 316。'
   );
   uiManager.updateTasks();
 }
@@ -370,7 +370,7 @@ function playB2FireRecap(){
       activateB2OverwriteRoute();
       uiManager.showSubtitle(
         '封存終端',
-        '「UNKNOWN SESSION：紀錄覆寫進行中。有人正在把火災與人員資料再次塗掉。快離開 B2，回到 316，用正確權限阻止這一切。」',
+        '「UNKNOWN SESSION：紀錄覆寫進行中。有人正在把火災與人員資料再次塗掉。快離開 B2；先去 3F 文史室核對 1998 夜班核心人員名錄，再到 316。」',
         7200
       );
       controller.enabled=true;
@@ -398,9 +398,10 @@ function restartFreshExperience(){
 
 function completeFinalIdentityAt316(name,employeeId,{deferred=false}={}) {
   const sourceVerified=
-    gameState.getFlag('B2_FIRE_RECAP_SEEN') ||
-    gameState.getFlag('M7_B2_RESOLVED') ||
-    gameState.getFlag('HISTORY_PERSONNEL_PROFILES_REVIEWED');
+    gameState.getFlag('B2_FIRE_RECAP_SEEN') &&
+    gameState.getFlag('B2_EXITED_PERMANENTLY') &&
+    gameState.getFlag('HISTORY_PERSONNEL_PROFILES_REVIEWED') &&
+    !gameState.getFlag('ARCHIVE_PERSONNEL_OBJECTIVE');
   if(name!==TRUE_NAME_CANON||employeeId!=='0409'||!sourceVerified)return false;
   establishCanonicalIdentity({at316:deferred});
   gameState.setFlag('LAST_CALL_SEEN',true);
@@ -1018,6 +1019,10 @@ controller.onInteract = async (interactable) => {
     soundManager.startPhoneRing();
     uiManager.showSubtitle('316 舊資料終端','「1998-ER-0217｜病人：劉志遠／ENG-860214｜責任醫師：張○○｜員編前綴：MED-87。」\n\n終端機停止後，桌上的院內電話立刻響起。',5200);
   } else if (interactable.type === 'workstation') {
+    if(gameState.getFlag('B2_EXITED_PERMANENTLY')&&gameState.getFlag('ARCHIVE_PERSONNEL_OBJECTIVE')&&worldRouter.activeZoneId==='first_campus_3f'){
+      uiManager.showSubtitle('316 舊終端','「文史室的 1998 夜班核心人員名錄還沒完成核對。先回文史室；這一步不能跳過。」',3600);
+      return;
+    }
     if(gameState.getFlag('M8_IDENTITY_BATTLE_ACTIVE')&&gameState.getFlag('B2_FIRE_RECAP_SEEN')&&worldRouter.activeZoneId==='first_campus_3f'){
       revealFinal316Handoff({deferred:gameState.getFlag('B2_HISTORY_FALLBACK_ACTIVE')});
       return;
@@ -1047,8 +1052,12 @@ controller.onInteract = async (interactable) => {
     uiManager.openArchiveDocument({title:interactable.documentTitle,pages:interactable.pages,onComplete:interactable.id==='ARCHIVE_PERSONNEL_1998'?()=>{
       gameState.setFlag('HISTORY_PERSONNEL_PROFILES_REVIEWED',true);
       gameState.setFlag('ARCHIVE_PERSONNEL_OBJECTIVE',false);
-      if(gameState.getFlag('B2_EXITED_PERMANENTLY'))gameState.setFlag('M8_IDENTITY_BATTLE_ACTIVE',true);
-      persistentMemory.addJournalNote('ARCHIVE_PERSONNEL_REVIEWED','完成 1998 夜班核心人員名錄七頁核對。返回 316，以正確權限阻止紀錄覆寫。');
+      gameState.setFlag('B2_HISTORY_FALLBACK_ACTIVE',false);
+      if(gameState.getFlag('B2_EXITED_PERMANENTLY')){
+        gameState.setFlag('M8_IDENTITY_BATTLE_ACTIVE',true);
+        worldRouter.activeZoneInstance?.syncStoryState?.();
+      }
+      persistentMemory.addJournalNote('ARCHIVE_PERSONNEL_REVIEWED','完成 B2 後強制的 1998 夜班核心人員名錄七頁核對。現在返回 316，以正確權限阻止紀錄覆寫。');
       uiManager.updateTasks();
     }:null});
     gameState.addEvidence(1);
@@ -1188,19 +1197,20 @@ controller.onInteract = async (interactable) => {
     // FIRST CONTACT CONTRACT:
     // No matter whether B2 identity evidence is complete, incomplete, resolved,
     // or already consumed, the first terminal interaction always plays the
-    // 1998 fire-history recap. The recap itself is the mandatory bridge to 316.
+    // 1998 fire-history recap. After leaving B2, every route must pass through
+    // the 3F history room before the final 316 authorization.
     if(!gameState.getFlag('B2_FIRE_RECAP_SEEN')){
       playB2FireRecap();
       return;
     }
 
-    // After the fire recap, the player is already allowed to leave B2 and
-    // return to 316. Keep the old one-shot identity matrix as an OPTIONAL
-    // second interaction for players who still want to compare the candidates.
+    // After the fire recap, the player may leave B2. The one-shot identity
+    // matrix stays OPTIONAL, but the post-B2 history-room review is mandatory
+    // regardless of whether this comparison succeeds or fails.
     if(gameState.getFlag('M7_B2_RESOLVED')||gameState.getFlag('B2_IDENTITY_ATTEMPT_USED')){
       uiManager.showSubtitle(
         '封存終端',
-        '「UNKNOWN SESSION / OVERWRITE ACTIVE。火災紀錄已讀取；有人正在再次覆蓋人員與事故資料。立即離開 B2，回到 316，用正確權限阻止這一切。」',
+        '「UNKNOWN SESSION / OVERWRITE ACTIVE。火災紀錄已讀取；有人正在再次覆蓋人員與事故資料。立即離開 B2，先到 3F 文史室核對 1998 夜班核心人員名錄，再回 316。」',
         5200
       );
       return;
@@ -1226,8 +1236,8 @@ controller.onInteract = async (interactable) => {
           return {
             resolved:false,
             message:candidate.id==='ZHANG_SHOUHENG'
-              ?'來源資料不足，候選身分比對未完成。火災回放已完成；可直接返回 316 進行最後權限驗證。'
-              :candidate.contradiction+'\n候選身分比對失敗。火災回放已完成；可直接返回 316。'
+              ?'來源資料不足，候選身分比對未完成。火災回放已完成；離開 B2 後仍必須先到 3F 文史室完成核對。'
+              :candidate.contradiction+'\n候選身分比對失敗。火災回放已完成；離開 B2 後仍必須先到 3F 文史室完成核對。'
           };
         }
         establishCanonicalIdentity();
@@ -1237,13 +1247,13 @@ controller.onInteract = async (interactable) => {
         );
         return {
           resolved:true,
-          message:'>>> IDENTITY RECONSTRUCTED\n>>> 張守恆 / MED-870409\n>>> 火災封存紀錄已讀取｜請返回 316 阻止覆寫'
+          message:'>>> IDENTITY RECONSTRUCTED\n>>> 張守恆 / MED-870409\n>>> 火災封存紀錄已讀取｜離開 B2 後仍須先到 3F 文史室核對名錄'
         };
       }
     });
     if(missing.length){
       uiManager.setIdentityMatrixStatus(
-        '火災封存紀錄已播放。資料仍不完整：'+missing.join('、')+'。身分矩陣為選擇性比對；可直接離開 B2 返回 316。',
+        '火災封存紀錄已播放。資料仍不完整：'+missing.join('、')+'。身分矩陣仍為選擇性比對；離開 B2 後仍必須前往 3F 文史室完成核對。',
         'error'
       );
     }
@@ -1265,7 +1275,10 @@ controller.onInteract = async (interactable) => {
       gameState.setFlag('HIDDEN_SERVICE_DOOR_DISCOVERED',false);
       gameState.setFlag('SECURITY_RECORD_OBJECTIVE',false);
       gameState.setFlag('RECORD_OVERWRITE_ACTIVE',true);
-      gameState.setFlag('M8_IDENTITY_BATTLE_ACTIVE',true);
+      gameState.setFlag('M8_IDENTITY_BATTLE_ACTIVE',false);
+      gameState.setFlag('B2_HISTORY_FALLBACK_ACTIVE',true);
+      gameState.setFlag('ARCHIVE_PERSONNEL_OBJECTIVE',true);
+      gameState.setFlag('ARCHIVE_ACCESS_KEY',true);
       gameState.setFlag('LAST_CALL_SEEN',true);
       controller.enabled=false;
       worldRouter.activeZoneInstance?.beginExitClosure?.();
@@ -1274,23 +1287,23 @@ controller.onInteract = async (interactable) => {
         gameState.setFlag('B2_IDENTITY_INCOMPLETE',true);
         persistentMemory.addJournalNote(
           'B2_EXIT_INCOMPLETE',
-          'B2 身分矩陣尚未完整重建，但火災回放已證明紀錄正在被重新覆寫。B2 關閉後直接返回 316，以已掌握的正確權限進行最後驗證。'
+          'B2 身分矩陣尚未完整重建，但火災回放已證明紀錄正在被重新覆寫。B2 關閉後必須先進入 3F 文史室，重新核對 1998 夜班核心人員名錄；完成前不得進行 316 最終驗證。'
         );
       }else{
         persistentMemory.addJournalNote(
           'B2_EXIT_RESOLVED',
-          'B2 身分矩陣與火災回放均已完成。封存層永久關閉；返回 316 阻止 UNKNOWN SESSION 繼續覆寫。'
+          'B2 身分矩陣與火災回放均已完成。即使身分已辨識成功，封存層關閉後仍必須先進入 3F 文史室重新核對 1998 夜班核心人員名錄，再返回 316。'
         );
       }
 
       const finishLeavingB2=async()=>{
         await prepareZoneWithRetry('first_campus_3f');
-        worldRouter.loadZone('first_campus_3f','first_3f_316');
+        worldRouter.loadZone('first_campus_3f','first_3f_history_inside');
         gameState.setGameTime('03:30');
         soundManager.playDoorLockClack();
         setTimeout(()=>uiManager.showSubtitle(
           '全院廣播',
-          '「RECORD OVERWRITE ACTIVE。有人正在覆蓋事故與人員紀錄。請立即返回 316，以正確權限終止覆寫。」',
+          '「RECORD OVERWRITE ACTIVE。離開 B2 後的文史核對為必要程序。請先在 3F 文史室核對 1998 夜班核心人員名錄，完成後再前往 316。」',
           7200
         ),700);
         uiManager.updateTasks();
