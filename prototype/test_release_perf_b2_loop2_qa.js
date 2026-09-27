@@ -10,7 +10,12 @@ const zoneAssets=readFileSync('./src/art/ZoneAssetManifest.js','utf8');
 const b2=readFileSync('./src/world/zones/B2Archive.js','utf8');
 const routes=readFileSync('./src/world/shared/WorldRoutes.js','utf8');
 
-assert(main.includes('await preloadZoneEssential(openingZoneId)'),'opening art and PBR must be ready before scene construction');
+const modelPreload=main.indexOf('await preloadAssetNames(openingAssets.models)');
+const surfacePreload=main.indexOf('void preloadMaterialSurfaces(openingAssets.surfaces)');
+const sceneSetup=main.indexOf('// Setup Three.js Scene & Renderer');
+assert(modelPreload>=0&&modelPreload<sceneSetup,'opening GLTF art must be ready before scene construction');
+assert(surfacePreload>=0&&surfacePreload<sceneSetup,'opening PBR preload must start before scene construction without blocking first render');
+assert(!main.includes('await preloadZoneEssential(openingZoneId)'),'opening scene must not wait for all PBR texture channels');
 for(const asset of ['officeChair','storageCabinet','workDesk','printer','bench','plant'])assert(zoneAssets.includes(`'${asset}'`),'opening critical asset missing: '+asset);
 assert(!main.includes('deferredHospitalAssets'),'first paint must not start a whole-world download storm');
 assert(main.includes("prepareLoopReset:()=>preloadZoneEssential('first_campus_3f')"),'loop reset must prepare 3F art and materials');
