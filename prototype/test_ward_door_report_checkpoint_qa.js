@@ -4,6 +4,7 @@ import {readFileSync} from 'node:fs';
 const main=readFileSync('./src/main.js','utf8');
 const ward=readFileSync('./src/world/shared/WardFloorplan.js','utf8');
 const floor3=readFileSync('./src/world/zones/FirstCampus3F.js','utf8');
+const fpsController=readFileSync('./src/player/FPSController.js','utf8');
 
 // 4F and second-campus 5F reporting must be completed by opening a ward access door.
 assert(main.includes('function completeFirstCampus4FWardReport()'),'4F door-report helper missing');
@@ -24,5 +25,10 @@ assert(floor3.includes("new THREE.BoxGeometry(1.55,1.30,.18)"),'checkpoint board
 assert(floor3.includes("patrolHit.position.set(19,1.38,1.58)"),'initial checkpoint interaction must be on the board');
 assert(floor3.includes("futureSignHit.position.set(19,1.38,1.58)"),'21:17 checkpoint interaction must reuse the board position');
 assert(floor3.includes("guardPatrolPoint={id:'3F_GUARD_PATROL_POINT',position:[19,1.38,1.625]"),'patrol metadata must match the visible board');
+
+// The 17:00 spare-key sensor and 21:17 patrol sensor intentionally overlap.
+// Raycast selection must skip a disabled front hit instead of masking the active 21:17 hotspot.
+assert(fpsController.includes('for (const hit of hits)'),'raycast must scan all geometric hits for the first active interactable');
+assert(!fpsController.includes('let cur = hits[0].object;'),'inactive nearest hit must not mask an overlapping active interaction');
 
 console.log('WARD DOOR REPORT / 3F CHECKPOINT ALIGNMENT QA PASS');
