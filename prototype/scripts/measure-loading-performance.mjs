@@ -75,12 +75,12 @@ async function visit(page, fromZone, toZone, coldOrWarm) {
 
 try {
   for (const [fromZone, toZone] of routes) {
-    const context = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+    const context = await browser.newContext({ viewport: { width: 1280, height: 720 } });
     const page = await context.newPage();
     page.on('pageerror', error => errors.push(error.message));
     for (const coldOrWarm of ['cold', 'warm']) {
       const bootStart = Date.now();
-      await page.goto(`${url}${url.includes('?') ? '&' : '?'}qa=story`, { timeout: 120000 });
+      await page.goto(`${url}${url.includes('?') ? '&' : '?'}qa=story`, { waitUntil: 'domcontentloaded', timeout: 120000 });
       await page.waitForFunction(() => window.__storyQA?.worldRouter?.activeZoneInstance, null, { timeout: 120000 });
       if (fromZone === 'first_campus_3f' && toZone === 'first_campus_4f') {
         rows.push({ fromZone: 'BOOT', toZone: 'first_campus_3f', coldOrWarm,
@@ -94,8 +94,8 @@ try {
   const fields = ['fromZone','toZone','coldOrWarm','essentialBytes','optionalBytes','elevatorAnimationMs','extraWaitMs','totalTransitionMs','transitionStart','essentialReady','zoneBuilt','transitionEnd','status'];
   await mkdir(dirname(output), { recursive: true });
   await writeFile(output, [fields.join(','), ...rows.map(row => fields.map(field => row[field] ?? '').join(','))].join('\n') + '\n');
-  await writeFile(output.replace(/\.csv$/, '.json'), JSON.stringify({ url, rows, errors, browser: browser.version() }, null, 2));
-  if (errors.length && !publicUrl) throw new Error(errors.join('\n'));
+  await writeFile(output.replace(/\.csv$/, '.json'), JSON.stringify({ verdict: errors.length ? 'FAIL' : 'PASS', url, rows, errors, browser: browser.version() }, null, 2));
+  if (errors.length) throw new Error(errors.join('\n'));
   console.log(`LOADING PERFORMANCE ${errors.length ? 'BASELINE FAIL' : 'PASS'}: ${rows.length} cold/warm route samples, ${errors.length} errors`);
 } finally {
   await browser.close();

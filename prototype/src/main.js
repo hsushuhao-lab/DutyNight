@@ -5,13 +5,16 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
-import { auditSceneMaterials } from './art/MaterialRegistry.js';
+import { auditSceneMaterials, preloadMaterialSurfaces } from './art/MaterialRegistry.js';
 import { zoneAssetManifest, preloadZoneEssential, preloadZoneOptional } from './art/ZoneAssetManifest.js';
+import { preloadAssetNames } from './art/AssetRegistry.js';
 
 RectAreaLightUniformsLib.init();
 const requestedOpeningZone = new URLSearchParams(location.search).get('zone');
 const openingZoneId = zoneAssetManifest[requestedOpeningZone] ? requestedOpeningZone : 'first_campus_3f';
-await preloadZoneEssential(openingZoneId);
+const openingAssets = zoneAssetManifest[openingZoneId].essential;
+await preloadAssetNames(openingAssets.models);
+void preloadMaterialSurfaces(openingAssets.surfaces).catch(error => console.warn('[art] opening material surface preload failed', error));
 const prefetchDestinationAssets = async destination => {
   const zoneId=destination?.zoneId;
   await preloadZoneEssential(zoneId);

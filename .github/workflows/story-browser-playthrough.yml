@@ -12,7 +12,7 @@ concurrency:
 jobs:
   story-playthrough:
     runs-on: ubuntu-latest
-    timeout-minutes: 75
+    timeout-minutes: 150
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -45,6 +45,18 @@ jobs:
         timeout-minutes: 30
         working-directory: prototype
         run: node scripts/test-story-playthrough.mjs qa-results/story-v2-public 'https://hsushuhao-lab.github.io/DutyNight/'
+      - name: Public material runtime audit
+        timeout-minutes: 15
+        working-directory: prototype
+        run: node scripts/test-material-runtime.mjs qa-results/material-runtime-public.json 'https://hsushuhao-lab.github.io/DutyNight/'
+      - name: Public cold/warm loading audit
+        timeout-minutes: 30
+        working-directory: prototype
+        run: node scripts/measure-loading-performance.mjs qa-results/loading-public.csv 'https://hsushuhao-lab.github.io/DutyNight/'
+      - name: Public visual capture
+        timeout-minutes: 30
+        working-directory: prototype
+        run: node scripts/capture-visual-qa.mjs qa-results/visual-public '' 'https://hsushuhao-lab.github.io/DutyNight/'
       - name: Preserve browser evidence
         if: always()
         uses: actions/upload-artifact@v4

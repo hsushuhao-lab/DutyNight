@@ -6,7 +6,9 @@ import { dirname } from 'node:path';
 import assert from 'node:assert/strict';
 
 const output = process.argv[2] || 'qa-results/material-runtime.json';
-const server = await preview({ root: fileURLToPath(new URL('..', import.meta.url)), preview: { port: 4173, strictPort: true } });
+const publicUrl = process.argv[3];
+const server = publicUrl ? null : await preview({ root: fileURLToPath(new URL('..', import.meta.url)), preview: { port: 4173, strictPort: true } });
+const url = publicUrl || 'http://localhost:4173/';
 const browser = await chromium.launch({ channel: 'chrome', headless: true });
 const zones = [
   'first_campus_3f', 'first_campus_4f', 'first_campus_2f', 'first_campus_1f',
@@ -18,7 +20,7 @@ try {
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
   page.on('response', response => { if (response.status() >= 400) errors.push(`${response.status()} ${response.url()}`); });
-  await page.goto('http://localhost:4173/?debug=1');
+  await page.goto(`${url}${url.includes('?') ? '&' : '?'}debug=1`);
   await page.waitForFunction(() => window.worldRouter?.activeZoneInstance && typeof window.__materialAudit === 'function');
   await page.waitForFunction(() => window.__materialAudit().materials.some(item => item.materialName === 'hospital/wall' && item.hasMap), null, { timeout: 120000 });
   const results = [];
@@ -40,5 +42,5 @@ try {
   console.log(`MATERIAL RUNTIME PASS: ${results.length} zone visits`);
 } finally {
   await browser.close();
-  await new Promise(resolve => server.httpServer.close(resolve));
+  if (server) await new Promise(resolve => server.httpServer.close(resolve));
 }
