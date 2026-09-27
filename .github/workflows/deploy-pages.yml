@@ -51,6 +51,7 @@ jobs:
           node test_cross_floor_entanglement_qa.js
           node test_cross_floor_sequence_qa.js
           node test_persistent_loop_qa.js
+          node test_patientization_recovery_qa.js
           node test_bed33_gold_slice_qa.js
           node test_m3_m9_story_qa.js
           node test_b2_attempt_scope_qa.js
