@@ -31,8 +31,6 @@ try{
       assert.match(rewind.body,/17:00[\s\S]*19:30/);
       assert.match(rewind.body,/這些我已經記得/);
       await page.locator('#btn-loop-skip').click();
-    }else{
-      await page.screenshot({path:`${output}/natural-patientization.png`,timeout:10000});
     }
     await page.waitForFunction(()=>!document.querySelector('#loop-cutscene').classList.contains('active'),null,{timeout:20000});
     await page.waitForTimeout(800);
