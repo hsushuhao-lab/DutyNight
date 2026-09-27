@@ -177,8 +177,8 @@ export function buildDistantNightLandscape(parent, { position = [0, 0, 0], rotat
   ridge.lineTo(-15, 9); ridge.lineTo(-4, 6); ridge.lineTo(8, 11); ridge.lineTo(21, 6);
   ridge.lineTo(34, 8); ridge.lineTo(45, 3); ridge.lineTo(56, -1); ridge.lineTo(56, -8); ridge.lineTo(-56, -8); ridge.closePath();
   const ridgeGeometry = new THREE.ExtrudeGeometry(ridge, { depth: 4, bevelEnabled: false, curveSegments: 4 });
-  mesh('Distant hillside silhouette', ridgeGeometry, hillFar, 0, -1, -29, 1, .24, 1);
-  mesh('Distant hillside slope', new THREE.SphereGeometry(1, 18, 10), hillNear, -20, -1.5, -20, 35, 1.5, 8);
+  mesh('Distant hillside silhouette', ridgeGeometry, hillFar, 0, -1, -29, 1, 1.2, 1);
+  mesh('Distant hillside slope', new THREE.SphereGeometry(1, 18, 10), hillNear, -20, -1.5, -20, 35, 5, 8);
   for (const [x, z, height] of [[-39, -14, 3.2], [-31, -22, 4.1], [-19, -27, 3.5], [18, -30, 4.3], [31, -21, 3.2], [40, -17, 3.8]])
     mesh('Distant tree silhouette', new THREE.ConeGeometry(1.2, height, 7), hillFar, x, -.4 + height / 2, z);
   for (const [x, z] of [[-8, 10], [8, 10], [22, 17], [30, 26]]) {
@@ -186,14 +186,14 @@ export function buildDistantNightLandscape(parent, { position = [0, 0, 0], rotat
     mesh('Distant pathway light glow', new THREE.SphereGeometry(.12, 8, 6), lampMat, x, .29, z, 1.4, .75, 1.4);
   }
   const starPositions=[];const random=seeded(19981012);
-  for(let i=0;i<110;i++)starPositions.push(-48+random()*96,-1.2+random()*2.1,-66+random()*2);
+  for(let i=0;i<110;i++)starPositions.push(-48+random()*96,16+random()*22,-66+random()*2);
   const starGeometry=new THREE.BufferGeometry();starGeometry.setAttribute('position',new THREE.Float32BufferAttribute(starPositions,3));
   const starMaterial=new THREE.PointsMaterial({color:0xd9e1da,size:2.2,sizeAttenuation:false,transparent:true,opacity:.82,depthWrite:false});
   const stars=new THREE.Points(starGeometry,starMaterial);stars.name='Distant exterior starfield';stars.userData.sceneRole='DistantEnvironment';root.add(stars);
   parent.add(root);
   root.userData.setExteriorPhase = phase => {
     waterMat.color.setHex(phase === 'DAWN' ? 0x314943 : phase === 'DUSK' ? 0x25463b : 0x142a24);
-    waterMat.emissiveIntensity = phase === 'DEEP_NIGHT' ? .72 : .24;
+    waterMat.emissiveIntensity = phase === 'DEEP_NIGHT' ? .12 : .04;
     lampMat.emissiveIntensity = phase === 'DEEP_NIGHT' ? .62 : phase === 'DAWN' ? .06 : .24;
     starMaterial.opacity = phase === 'DEEP_NIGHT' ? .82 : phase === 'DAWN' ? .08 : 0;
   };

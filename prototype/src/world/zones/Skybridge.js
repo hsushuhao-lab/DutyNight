@@ -230,10 +230,10 @@ export class Skybridge {
     });
 
     const art=artRoot(this.zoneGroup,'Bridge');
-    buildCampusBackdrop(art);
+    buildCampusBackdrop(art, { landscapeView: true });
     this.distantLandscapes = [
-      buildDistantNightLandscape(art, { position: [30, -1.2, -21] }),
-      buildDistantNightLandscape(art, { position: [30, -1.2, 21], rotationY: Math.PI })
+      buildDistantNightLandscape(art, { position: [30, -10, -38] }),
+      buildDistantNightLandscape(art, { position: [30, -10, 38], rotationY: Math.PI })
     ];
     // Adjacent vestibules remain visible until the existing portal changes zones.
     for (const [x, end] of [[-4,-8],[64,68]]) {

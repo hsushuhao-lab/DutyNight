@@ -39,7 +39,7 @@ export function preloadCampusBackdropAssets() {
   return Promise.all([preloadOutdoorAssets(), preloadOutdoorMaterials()]);
 }
 
-export function buildCampusBackdrop(parent) {
+export function buildCampusBackdrop(parent, { landscapeView = false } = {}) {
   const root = new THREE.Group();
   root.name = 'ArtRoot_ExteriorCampus';
   const m = getMaterials();
@@ -86,6 +86,7 @@ export function buildCampusBackdrop(parent) {
 
   const sites = [[-18,-33,18,18,12],[8,-42,16,25,15],[39,-36,24,15,12],[74,-48,15,30,17],[-7,35,20,16,13],[30,45,30,22,15],[72,34,17,18,12],[95,0,18,11,22]];
   sites.forEach(([x,z,width,height,depth],site) => {
+    if (landscapeView) z *= 3;
     box(x,height/2-12,z,width,height,depth,m.wall);
     box(x,height-11.82,z,width+.35,.35,depth+.35,concrete);
     // Recessed rooftop mechanical enclosure, parapets and different-height side wings.

@@ -19,8 +19,8 @@ try {
   await page.evaluate(async () => {
     await window.__storyQA.prefetch({ zoneId: 'skybridge' });
     await window.__storyQA.load('skybridge', 'm7_skybridge_mid');
-    window.__storyQA.controller.teleport(33.5, 1.7, 1);
-    window.__storyQA.lookAt([30, -1.3, -21]);
+    window.__storyQA.controller.teleport(33.5, 1.7, -1.55);
+    window.__storyQA.lookAt([30, -3, -48]);
     for (const id of ['modeling-qa-panel', 'task-panel', 'interaction-prompt', 'subtitle-box']) {
       const element = document.getElementById(id);
       if (element) element.style.display = 'none';
