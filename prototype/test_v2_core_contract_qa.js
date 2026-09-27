@@ -24,9 +24,12 @@ assert(!ward.zoneGroup.getObjectByName('Bed_409A'),'409A must not be rendered as
 
 const actions=ward.interactables.map(item=>item.userData??item).filter(item=>item.type==='p1_action');
 for(const retired of ['DUTY_ROOM_PREP','WARD_ROUND','INSOMNIA_403'])assert(!actions.some(item=>item.action===retired),retired+' must not survive the simplified 4F flow');
-assert.equal(actions.find(item=>item.action==='NURSE_REPORT')?.id,'4F_NURSING_REPORT');
-const reportTarget=ward.interactables.find(item=>(item.userData??item).id==='4F_NURSING_REPORT');
-assert.equal(reportTarget,ward.zoneGroup.getObjectByName('FourF_NursingHandoverBoard'),'report interaction belongs to the visible information board');
+assert(!actions.some(item=>item.action==='NURSE_REPORT'),'4F report must no longer require a separate nursing-board action');
+const reportTarget=ward.zoneGroup.getObjectByName('FourF_NursingHandoverBoard');
+assert(reportTarget,'visible 4F handover board must remain in scene');
+assert.equal(reportTarget.userData.interactable,false,'handover board is informational; opening the ward access door now completes report');
+assert(mainSource.includes('function completeFirstCampus4FWardReport()'),'main must own the door-triggered 4F report helper');
+assert(mainSource.includes("if(worldRouter.activeZoneId==='first_campus_4f')completeFirstCampus4FWardReport()"),'opening a 4F ward access door must complete report');
 assert.equal(actions.find(item=>item.action==='NORMAL_EVENT')?.id,'408C_BED_PLAQUE');
 assert.equal(actions.find(item=>item.action==='END_SHIFT')?.id,'4F_DUTY_COMPUTER','21:00 rest must use the physical duty-room computer');
 assert.doesNotMatch(mainSource,/KNOCK_403_49/,'403 cannot own the knock clue');
