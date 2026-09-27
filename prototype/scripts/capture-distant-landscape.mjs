@@ -12,7 +12,7 @@ const report = { sourceSha:process.env.GITHUB_SHA || 'local-working-tree', error
 
 const browser = await chromium.launch({ headless: true });
 try {
-  const page = await browser.newPage({ viewport: { width: 1600, height: 900 } });
+  const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
   page.on('pageerror', error => report.errors.push(error.message));
   await page.goto(`${base}?qa=story`, { waitUntil: 'load', timeout: 120000 });
   await page.waitForFunction(() => window.__storyQA?.worldRouter?.activeZoneInstance, null, { timeout: 120000 });
