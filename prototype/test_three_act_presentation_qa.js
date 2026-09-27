@@ -6,7 +6,7 @@ const main=readFileSync('./src/main.js','utf8');
 
 assert(director.includes("ACT II · 21:17 之後"),'Act II title card missing');
 assert(director.includes("ACT III · 最後交班"),'Act III title card missing');
-assert(director.includes("青嶺醫療中心 · 夜班"),'opening hospital orientation missing');
+assert(director.includes("ACT I · 正常值班")&&director.includes("青嶺醫療中心｜17:00"),'Act I opening hospital orientation missing');
 assert(director.includes("其實就是一個普通夜班"),'Act I light-duty tone missing');
 assert(director.includes("去 316 完成交班"),'opening must hand control into 316 objective');
 assert(director.includes("8F 天橋"),'opening campus orientation must mention 8F bridge without making it an active objective');
