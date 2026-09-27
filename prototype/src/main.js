@@ -35,6 +35,7 @@ import { LoopManager } from './core/LoopManager.js';
 import { canAccess } from './core/AccessGraph.js';
 import { getMemorySequence, IDENTITY_CANDIDATES } from './story/NarrativeV22.js';
 import { CinematicDirector } from './story/CinematicDirector.js';
+import { ActPresentationDirector } from './story/ActPresentationDirector.js';
 
 // Setup Three.js Scene & Renderer
 const container = document.getElementById('canvas-container');
@@ -117,6 +118,14 @@ uiManager = new UIManager(
     renderer.domElement.requestPointerLock();
   }
 );
+
+const actPresentationDirector=new ActPresentationDirector({
+  gameState,
+  persistentMemory,
+  controller,
+  pointerElement:renderer.domElement,
+  getZoneId:()=>worldRouter.activeZoneId
+});
 
 const loopManager=new LoopManager({
   gameState,worldRouter,controller,uiManager,
@@ -323,7 +332,7 @@ if(new URLSearchParams(location.search).get('qa')==='story'){
     });
   };
   window.__storyQA={
-    gameState,persistentMemory,legendState,worldRouter,uiManager,loopManager,dutyEvents,GamePhase,floorStateManager,controller,cinematicDirector,
+    gameState,persistentMemory,legendState,worldRouter,uiManager,loopManager,dutyEvents,GamePhase,floorStateManager,controller,cinematicDirector,actPresentationDirector,
     prefetch:prefetchDestinationAssets,
     load:(zone,spawn)=>{worldRouter.loadZone(zone,spawn);worldRouter.activeZoneInstance?.syncStoryState?.();},
     enter:(zone,spawn)=>{
@@ -750,6 +759,14 @@ controller.onInteract = async (interactable) => {
     gameState.addEvidence(1);
     if(interactable.id?.startsWith('ADMIN_'))gameState.setFlag('B2_ADMIN_SOURCE',true);
     if(interactable.id?.startsWith('ARCHIVE_'))gameState.setFlag('B2_HISTORY_SOURCE',true);
+    if(interactable.id==='ARCHIVE_PERSONNEL_1998'&&!gameState.getFlag('HISTORY_PERSONNEL_PROFILES_REVIEWED')){
+      gameState.setFlag('HISTORY_PERSONNEL_PROFILES_REVIEWED',true);
+      persistentMemory.addJournalNote(
+        'HISTORY_PERSONNEL_PROFILES',
+        '3F 文史室的 1998 夜班核心人員名錄記下四位醫師與三位院內關係人；每個人都有不同的工作習慣、語氣與物件線索。'
+      );
+      uiManager.updateTasks();
+    }
     if(interactable.id==='ARCHIVE_UNINDEXED_HANDOFF'&&gameState.getFlag('ARCHIVE_OBJECTIVE')){
       gameState.markTaskComplete('ARCHIVE_CLUE_FOUND');
       gameState.setFlag('ARCHIVE_CLUE_FOUND',true);
@@ -1403,6 +1420,7 @@ function animate() {
 
   controller.update(delta);
   worldRouter.update(delta);
+  actPresentationDirector.update();
   if(gameState.getFlag('BRIDGE_REFLECTION_NOTICE_PENDING')){
     gameState.setFlag('BRIDGE_REFLECTION_NOTICE_PENDING',false);
     gameState.setFlag('BRIDGE_REFLECTION_NOTICE_SEEN',true);
