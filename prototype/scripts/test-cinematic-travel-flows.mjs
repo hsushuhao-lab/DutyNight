@@ -36,6 +36,18 @@ async function chooseFloor(page,zone){
 try{
   await mkdir(output,{recursive:true});
 
+  const previewPage=await startPage('first_campus_3f');
+  await previewPage.evaluate(()=>window.__storyQA.setFlag('SECOND_CAMPUS_ACCESS',true));
+  await chooseFloor(previewPage,'first_campus_4f');
+  await previewPage.waitForFunction(()=>window.__storyQA.gameState.getFlag('CG_ELEVATOR_6F_PREVIEW_ACTIVE'));
+  await previewPage.waitForTimeout(1450);
+  await previewPage.screenshot({path:`${output}/6f-preview-gap.png`});
+  await previewPage.waitForFunction(()=>window.__storyQA.worldRouter.activeZoneId==='first_campus_4f');
+  const previewState=await previewPage.evaluate(()=>({zone:window.__storyQA.worldRouter.activeZoneId,played:window.__storyQA.gameState.getFlag('CG_ELEVATOR_6F_PREVIEW_PLAYED'),resolved:!!window.__storyQA.gameState.getFlag('M6_FLOOR6_RESOLVED'),canvas:!!document.querySelector('.elevator-glimpse-canvas')}));
+  assert.deepEqual(previewState,{zone:'first_campus_4f',played:true,resolved:false,canvas:false});
+  report.flows.push({id:'6F_PREVIEW_PRESERVES_DESTINATION',state:previewState});
+  await previewPage.close();
+
   const erPage=await startPage('first_campus_4f');
   await erPage.evaluate(()=>window.__storyQA.setFlag('GHOST_REGISTRATION_AVAILABLE',true));
   await chooseFloor(erPage,'first_campus_2f');

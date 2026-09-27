@@ -1,4 +1,5 @@
 // UIManager.js - Handles HUD, HIS computer terminal, Duty Log, and Elevator transition
+import { playElevatorGlimpse } from '../story/ElevatorGlimpseScene.js';
 import { PatientizationScene } from '../story/PatientizationScene.js';
 import { soundManager } from '../audio/SoundManager.js';
 import { persistentMemory, TRUE_NAME_CANON } from '../core/PersistentMemory.js';
@@ -875,7 +876,12 @@ export class UIManager {
     }
     this.travelTimer=setTimeout(async()=>{
       try {
-        await preloadPromise;
+        const preview6F=kind==='elevator'&&this.gameState.getFlag('SECOND_CAMPUS_ACCESS')&&!this.gameState.getFlag('FLOOR6_AVAILABLE')&&!this.gameState.getFlag('M6_FLOOR6_RESOLVED')&&!this.gameState.getFlag('CG_ELEVATOR_6F_PREVIEW_PLAYED');
+        if(preview6F){
+          this.gameState.setFlag('CG_ELEVATOR_6F_PREVIEW_ACTIVE',true);
+          try{await Promise.all([preloadPromise,playElevatorGlimpse(this.elevatorCutscene)]);this.gameState.setFlag('CG_ELEVATOR_6F_PREVIEW_PLAYED',true);}
+          finally{this.gameState.setFlag('CG_ELEVATOR_6F_PREVIEW_ACTIVE',false);}
+        }else await preloadPromise;
         onSelect(destination);
         soundManager.playElevatorChime();
       } finally {
