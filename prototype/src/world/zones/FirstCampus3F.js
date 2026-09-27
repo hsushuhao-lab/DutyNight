@@ -209,18 +209,21 @@ export class FirstCampus3F {
     const patrolFace=new THREE.Mesh(new THREE.PlaneGeometry(.42,.38),new THREE.MeshBasicMaterial({map:patrolTex}));
     patrolFace.position.set(19,1.38,1.625);patrolFace.rotation.y=Math.PI;this.zoneGroup.add(patrolFace);
     const hiddenKey=new THREE.Mesh(new THREE.TorusGeometry(.045,.009,10,20),m.stainless);hiddenKey.visible=false;hiddenKey.position.set(19,1.18,1.61);this.zoneGroup.add(hiddenKey);
-    const patrolHit=new THREE.Mesh(new THREE.BoxGeometry(1.55,1.45,.70),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
-    patrolHit.position.set(19,1.34,1.62);
+    // Interaction slab is physically aligned to the visible patrol board.
+    // Keep it only slightly larger than the plaque so the prompt appears when
+    // the player is actually aiming at the board, not at the floor/shelf nearby.
+    const patrolHit=new THREE.Mesh(new THREE.BoxGeometry(.66,.58,.18),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
+    patrolHit.position.set(19,1.38,1.58);
     patrolHit.userData={interactable:true,id:'316_SPARE_KEY',type:'spare_key_316',label:'檢查夜間警衛查哨點',targetGroup:hiddenKey};
     this.zoneGroup.add(patrolHit);this.interactables.push(patrolHit);this.spareKeyMesh=patrolHit;
 
     // 21:17 bootstrap is intentionally two-step: first notice the impossible wall record,
     // then sign the actual logbook on the shelf. This prevents the mission from stalling
     // when the player looks at the panel but never hits a tiny overlapping trigger.
-    // Large, wall-aligned interaction volume centred on the actual patrol board.
-    // The previous sub-metre sensor sat too low/too close to the spare-key shelf.
-    const futureSignHit=new THREE.Mesh(new THREE.BoxGeometry(1.55,1.30,.62),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
-    futureSignHit.position.set(19,1.55,1.44);
+    // 21:17 uses the same physical board position as the initial checkpoint.
+    // Do not leave a second oversized hotspot floating above/below the plaque.
+    const futureSignHit=new THREE.Mesh(new THREE.BoxGeometry(.66,.58,.18),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
+    futureSignHit.position.set(19,1.38,1.58);
     futureSignHit.name='Guard2117_SignSensor';
     futureSignHit.userData={interactable:false,id:'GUARD_SIGN_2117',type:'guard_sign_2117',label:'查看 21:17 查哨紀錄'};
     this.zoneGroup.add(futureSignHit);this.interactables.push(futureSignHit);this.guardSign2117=futureSignHit;
@@ -239,7 +242,7 @@ export class FirstCampus3F {
     this.zoneGroup.add(logBookHit);this.interactables.push(logBookHit);
     this.guardLog2117=logBookHit;this.guardLog2117Visual=logBook;
 
-    this.guardPatrolPoint={id:'3F_GUARD_PATROL_POINT',position:[19,1.34,1.69],opposite:'3F_ARCHIVE_DOOR'};
+    this.guardPatrolPoint={id:'3F_GUARD_PATROL_POINT',position:[19,1.38,1.625],opposite:'3F_ARCHIVE_DOOR'};
 
     const shelfMat=this.gf.materials.floorWood,folderMat=this.gf.materials.doorWood;
     const buildShelf=(id,x,z,yaw=0)=>{
