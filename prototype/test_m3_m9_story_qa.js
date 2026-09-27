@@ -65,7 +65,7 @@ assert(main.includes("B_PANEL_CLUE_KNOWN")&&main.includes("WANG_B_PANEL_KEY")&&!
 assert(main.includes("interactable.type === 'er_nurse_computer'")&&main.includes('這個電腦是護理師專用'),'ER nurse computers must redirect the physician');
 assert(main.includes("gameState.setFlag('B2_IDENTITY_INCOMPLETE',true)")&&main.includes("interactable.type === 'b2_exit_door'")&&main.includes("B2_EXITED_PERMANENTLY"),'B2 unresolved identity may still fail forward through the permanent one-way exit');
 assert(main.includes("先啟動 B2 封存終端")&&main.includes("B2_FIRE_RECAP_SEEN"),'B2 exit must remain locked until the fire-history recap has been viewed');
-assert(main.includes("資料不完整：")&&main.includes("仍可進行一次比對"),'B2 evidence gaps must warn without hard-blocking the one-shot identity comparison before the fire recap');
+assert(main.includes("火災封存紀錄已播放。資料仍不完整：")&&main.includes("身分矩陣為選擇性比對；可直接離開 B2 返回 316"),'B2 evidence gaps may offer an optional post-recap identity comparison but must never block return to 316');
 assert(main.includes("completeFinalIdentityAt316")&&main.includes("gameState.getFlag('B2_FIRE_RECAP_SEEN')"),'316 final authorization must unlock after the B2 fire recap even if B2 identity reconstruction was incomplete');
 assert(router.includes("'b2_archive': B2Archive")&&routes.includes("b2_archive_entry")&&routes.includes("first_1f_guard_back")&&!routes.includes("b2_archive_lift"),'M7 B2 entry and 1F guard-back exit route registration missing');
 assert(main.includes("M7_B2_RESOLVED")&&main.includes("02:17｜警衛台後方 B-Panel"),'M7 02:17/B2 logic missing');
