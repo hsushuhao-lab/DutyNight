@@ -65,8 +65,9 @@ assert(main.includes("B_PANEL_CLUE_KNOWN")&&main.includes("WANG_B_PANEL_KEY")&&!
 assert(main.includes("interactable.type === 'er_nurse_computer'")&&main.includes('這個電腦是護理師專用'),'ER nurse computers must redirect the physician');
 assert(main.includes("gameState.setFlag('B2_IDENTITY_INCOMPLETE',true)")&&main.includes("interactable.type === 'b2_exit_door'")&&main.includes("B2_EXITED_PERMANENTLY"),'B2 unresolved identity may still fail forward through the permanent one-way exit');
 assert(main.includes("先啟動 B2 封存終端")&&main.includes("B2_FIRE_RECAP_SEEN"),'B2 exit must remain locked until the fire-history recap has been viewed');
-assert(main.includes("火災封存紀錄已播放。資料仍不完整：")&&main.includes("身分矩陣為選擇性比對；可直接離開 B2 返回 316"),'B2 evidence gaps may offer an optional post-recap identity comparison but must never block return to 316');
-assert(main.includes("completeFinalIdentityAt316")&&main.includes("gameState.getFlag('B2_FIRE_RECAP_SEEN')"),'316 final authorization must unlock after the B2 fire recap even if B2 identity reconstruction was incomplete');
+assert(main.includes("火災封存紀錄已播放。資料仍不完整：")&&main.includes("身分矩陣仍為選擇性比對；離開 B2 後仍必須前往 3F 文史室完成核對"),'B2 identity comparison may be optional, but the post-exit history-room review must never be optional');
+assert(main.includes("gameState.setFlag('B2_HISTORY_FALLBACK_ACTIVE',true)")&&main.includes("gameState.setFlag('ARCHIVE_PERSONNEL_OBJECTIVE',true)")&&main.includes("gameState.setFlag('M8_IDENTITY_BATTLE_ACTIVE',false)"),'every B2 exit outcome must force the history-room checkpoint before M8');
+assert(main.includes("completeFinalIdentityAt316")&&main.includes("gameState.getFlag('HISTORY_PERSONNEL_PROFILES_REVIEWED')")&&main.includes("!gameState.getFlag('ARCHIVE_PERSONNEL_OBJECTIVE')"),'316 final authorization must stay locked until the post-B2 personnel review is completed');
 assert(router.includes("'b2_archive': B2Archive")&&routes.includes("b2_archive_entry")&&routes.includes("first_1f_guard_back")&&!routes.includes("b2_archive_lift"),'M7 B2 entry and 1F guard-back exit route registration missing');
 assert(main.includes("M7_B2_RESOLVED")&&main.includes("02:17｜警衛台後方 B-Panel"),'M7 02:17/B2 logic missing');
 
