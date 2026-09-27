@@ -1,4 +1,5 @@
 // UIManager.js - Handles HUD, HIS computer terminal, Duty Log, and Elevator transition
+import { PatientizationScene } from '../story/PatientizationScene.js';
 import { soundManager } from '../audio/SoundManager.js';
 import { persistentMemory, TRUE_NAME_CANON } from '../core/PersistentMemory.js';
 import { drawCharacterStrip } from '../art/CharacterPortraitArt.js';
@@ -529,6 +530,8 @@ export class UIManager {
 
   playLegendOverride({legend='409 PATIENTIZATION',reason='你重演了當年的錯誤。'}={},onComplete){
     document.exitPointerLock();
+    this.patientizationScene?.dispose();
+    this.patientizationScene=new PatientizationScene(this.loopCutscene);
     this.loopOverrideComplete=onComplete;
     for(const t of this.loopCutsceneTimers)clearTimeout(t);
     this.loopCutsceneTimers=[];
@@ -557,6 +560,7 @@ export class UIManager {
     if(!this.loopCutscene?.classList.contains('active'))return;
     for(const t of this.loopCutsceneTimers)clearTimeout(t);
     this.loopCutsceneTimers=[];
+    this.patientizationScene?.dispose();this.patientizationScene=null;
     const cb=this.loopOverrideComplete;this.loopOverrideComplete=null;
     const body=document.getElementById('loop-stage-body');
     const result=cb?.();

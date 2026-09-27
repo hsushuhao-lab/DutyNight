@@ -24,7 +24,12 @@ try {
   if (await page.locator('#debug-zone-selector').count()) throw new Error('Public build exposes modeling selector');
   await page.keyboard.press('Backquote');
   if (await page.locator('#debug-panel').isVisible()) throw new Error('Public build exposes debug panel');
+  const captureUrl = new URL(url);
+  captureUrl.searchParams.set('capture', '1');
+  await page.goto(captureUrl.href);
+  await page.waitForFunction(() => window.worldRouter?.activeZoneInstance);
   await page.waitForTimeout(8000);
+  if (await page.locator('#act-presentation').isVisible()) throw new Error('Presentation obscures scene capture');
   const registeredZones = await page.evaluate(() => Object.keys(window.worldRouter.zones));
   for (const [id, spawn] of Object.entries(DEBUG_SPAWN_POINTS).filter(([id]) => id.startsWith(prefix))) {
     if (!registeredZones.includes(spawn.zoneId)) { skipped.push({ id, zone: spawn.zoneId, reason: 'not registered in WorldRouter' }); continue; }

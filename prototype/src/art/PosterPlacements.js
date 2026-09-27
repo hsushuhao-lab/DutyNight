@@ -16,7 +16,7 @@ export const ERA_POSTER_PLACEMENTS=Object.freeze({
   ]),
   first_campus_3f:Object.freeze([
     P('poster_06_night_shift_attendance',-21.78,1.62,7.7,Math.PI/2,.78,'stained',true,-.008),
-    P('poster_04_hospital_history_1998',-19.0,1.62,11.28,Math.PI,.76,'stained',true,.012),
+    P('poster_04_hospital_history_1998',-16.75,1.62,11.28,Math.PI,.76,'stained',true,.012),
     P('poster_03_doppelganger_delusion',-17.0,1.62,3.72,0,.66,'redacted',true,-.02)
   ]),
   first_campus_4f:Object.freeze([
@@ -35,9 +35,9 @@ export const ERA_POSTER_PLACEMENTS=Object.freeze({
     P('poster_05_derealization_dissociation',74.6,1.64,.13,0,.70,'stained',true,-.012)
   ]),
   first_campus_8f:Object.freeze([
-    P('poster_04_hospital_history_1998',-3.25,1.55,-1.78,0,.66,'stained',true,-.02),
-    P('poster_03_doppelganger_delusion',-1.75,1.55,-1.78,0,.60,'redacted',false,.018),
-    P('poster_06_night_shift_attendance',-3.25,1.55,1.78,Math.PI,.62,'stained',false,.012)
+    P('poster_04_hospital_history_1998',-10.5,1.65,-3.28,0,.66,'stained',true,-.02),
+    P('poster_03_doppelganger_delusion',-8.5,1.65,-3.28,0,.60,'redacted',false,.018),
+    P('poster_06_night_shift_attendance',-6.5,1.65,-3.28,0,.62,'stained',false,.012)
   ]),
   skybridge:Object.freeze([
     P('poster_05_derealization_dissociation',8,1.55,-1.78,0,.64,'stained',true,-.016),

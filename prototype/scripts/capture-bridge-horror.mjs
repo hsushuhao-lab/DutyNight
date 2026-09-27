@@ -14,7 +14,7 @@ try {
   await page.goto('http://localhost:4173/?qa=story');
   await page.waitForFunction(() => !!window.__storyQA);
   await page.evaluate(() => window.__storyQA.prefetch({ zoneId: 'skybridge' }));
-  for (const [name, returnTrip, looks] of [['outbound', false, 0], ['return-stage-1', true, 0], ['return-stage-3', true, 2]]) {
+  for (const [name, returnTrip, looks] of [['outbound', false, 0], ['return-stage-1', true, 0], ['return-stage-2', true, 1], ['return-stage-3', true, 2]]) {
     report[name] = await page.evaluate(({ returnTrip, looks }) => {
       const qa = window.__storyQA;
       qa.gameState.setGameTime('01:45');

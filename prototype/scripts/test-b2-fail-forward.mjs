@@ -7,13 +7,14 @@ import { preview } from 'vite';
 const output = process.argv[2] || 'qa-results/b2-fail-forward';
 await mkdir(output, { recursive: true });
 
-const server = await preview({
+const publicUrl = process.argv[3];
+const server = publicUrl ? null : await preview({
   root: fileURLToPath(new URL('..', import.meta.url)),
   preview: { port: 4173, strictPort: true }
 });
 const browser = await chromium.launch({ channel: 'chrome', headless: true });
 const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
-const report = { verdict: 'FAIL', checkpoints: [], errors: [] };
+const report = { sourceSha: process.env.GITHUB_SHA || 'local-working-tree', started: new Date().toISOString(), verdict: 'FAIL', checkpoints: [], errors: [] };
 
 try {
   await page.addInitScript(() => localStorage.clear());
@@ -21,7 +22,7 @@ try {
   page.on('response', response => {
     if (response.status() >= 400) report.errors.push(`${response.status()} ${response.url()}`);
   });
-  await page.goto('http://localhost:4173/?qa=story');
+  await page.goto(`${publicUrl || 'http://localhost:4173/'}?qa=story`);
   await page.waitForFunction(() => window.__storyQA?.worldRouter?.activeZoneInstance);
 
   await page.evaluate(() => {
@@ -56,6 +57,8 @@ try {
 
   await page.evaluate(() => window.__storyQA.interact({ type: 'b2_exit_door' }));
   await page.locator('#btn-story-primary').click();
+  await page.waitForFunction(() => window.__storyQA.gameState.getFlag('CG_B2_PERMANENT_CLOSURE_ACTIVE'));
+  await page.screenshot({ path: `${output}/02-b2-closure-active.png` });
   await page.waitForFunction(() => window.__storyQA.worldRouter.activeZoneId === 'first_campus_1f', null, { timeout: 15000 });
   const afterExit = await page.evaluate(() => window.__storyQA.snapshot());
   assert.equal(afterExit.flags.B2_EXITED_PERMANENTLY, true);
@@ -91,6 +94,8 @@ try {
   report.checkpoints.push({ id: 'HISTORY_REQUIRED_AND_REVIEWED', ...history });
 
   await page.evaluate(() => window.__storyQA.interact({ type: 'workstation' }));
+  await page.waitForFunction(() => window.__storyQA.gameState.getFlag('CG_316_TRUE_NAME_FINAL_HANDOFF_ACTIVE'));
+  await page.screenshot({ path: `${output}/03-316-pre-input-cinematic.png` });
   await page.locator('#final-employee-id').fill('0409');
   await page.locator('#btn-submit-final-handoff').click();
   await page.waitForFunction(() => window.__storyQA.gameState.getFlag('GAME_COMPLETE') === true, null, { timeout: 10000 });
@@ -121,7 +126,7 @@ try {
   report.finished = new Date().toISOString();
   await writeFile(`${output}/result.json`, JSON.stringify(report, null, 2));
   await browser.close();
-  await new Promise(resolve => server.httpServer.close(resolve));
+  if (server) await new Promise(resolve => server.httpServer.close(resolve));
 }
 
 console.log(JSON.stringify(report));
