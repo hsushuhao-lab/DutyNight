@@ -10,7 +10,7 @@ const between=(start,end)=>{
 };
 
 const assessment=between("} else if(action==='NORMAL_EVENT'){","} else if(action==='ER_ASSESS'){");
-const knockHelper=between("function trigger409PostSealKnock(){","uiManager.setBed33Handlers({");
+const knockHelper=between("function trigger409PostSealKnock(){","\n}\n\nuiManager.setBed33Handlers({");
 const seal=between("} else if (interactable.type === 'bed33_409_sealed') {","} else if (interactable.type === 'bed33_assignment') {");
 const duty409=between("if(interactable.doorId==='room_409'){","if(interactable.doorId==='3F_ADMIN_OFFICE_DOOR')");
 const ghostCall=between("}else if(callKind==='ER_GHOST_0033'){","}else return;");
