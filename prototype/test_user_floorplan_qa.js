@@ -13,6 +13,7 @@ const router=new WorldRouter(new THREE.Scene(),new THREE.PerspectiveCamera(),nul
 for(const [zoneId,prefix] of [['first_campus_4f','40'],['second_campus_5f','50']]){
   const zone=router.loadZone(zoneId);
   assert.equal(zone.layoutVersion,'USER_PLAN_20260923_IMAGE_V5_2');
+  assert(!zone.clinicalProps.some(p=>p.type==='sharps_container'),'green sharps box must not obscure the handover board');
   assert.equal(zone.layoutPlan.dualGate,true);
   assert.equal(zone.layoutPlan.nursingStationFourSideGlass,true);
   assert.equal(zone.layoutPlan.nursingStationLowerWallUpperGlass,true);
@@ -104,6 +105,10 @@ for(const [zoneId,prefix] of [['first_campus_4f','40'],['second_campus_5f','50']
     assert(zone.roomAreas.some(r=>r.id==='SECOND_DUTY'&&r.label==='值班室'));
     assert.equal(zone.keyedDoors.second_duty_room?.closed,false);
     assert.equal(zone.keyedDoors.second_duty_room?.keepOpen,true);
+    const sign=zone.zoneGroup.getObjectByName('Plaque_5F_醫師值班室');
+    const duty=zone.roomAreas.find(r=>r.id==='SECOND_DUTY');
+    assert(sign&&sign.position.x<duty.door[0],'5F duty-room sign must be on the corridor side of the wall');
+    assert.equal(sign.rotation.y,-Math.PI/2,'5F sign must face the approach corridor');
     assert(zone.zoneGroup.getObjectByName('Second5F_DutyRoomDecor'));
     assert(!zone.roomAreas.some(r=>r.id==='DOCTOR'));
     const patient=zone.zoneGroup.getObjectByName('SecondCampus_ChestPainPatient');

@@ -13,9 +13,18 @@ Implemented:
 - 4F report interaction belongs to the information board; 5F doctor-room bilingual sign; second-campus 2F shelf moved away from desk chair.
 - E-captured clinical, second-campus phone and final permission dialogue. Final code remains text 0409.
 
-Evidence before publication:
-- Browser identity regression: 11 checks PASS (initial scope).
-- B2 failure -> direct 3F -> seven-page review -> 316 -> 0409 success: PASS, zero browser errors.
-- Production build: PASS.
+Verified at public revision ad132725eaa7ecba4f535ab050a8872a95971668:
+- Pages workflow 36309357851 SUCCESS; public build fingerprint matched.
+- Public browser identity regression: 14 checks PASS, zero page errors.
+- Public B2 failure -> direct 3F -> seven-page review -> 316 -> 0409 success: PASS, zero browser errors; 885 cinematic frames with zero input-lock violations.
+- All 17 deployment structural tests and production build PASS.
+- Missing-leading-zero code 409 rejected; loop2 report-only and 6F lift return checked.
 
-Not a complete release acceptance: fresh public revision, full M1-M9, scene captures, all cinematics and loading/material audits still require verification. Previous public 8e1be87 material audit timed out on exterior surfaces; its visual batch flagged an underexposed 4F detail frame. Those failures must not be represented as PASS.
+Follow-up visual corrections:
+- Move 5F duty-room sign to the corridor-facing wall surface.
+- Remove the clinical sharps box that obscured the shared 4F/5F handover board.
+- Floorplan regression asserts both sign mounting side and absence of the blocking box. PASS.
+- Fresh visual captures use a settled render delay; earlier capture frames are not acceptance evidence.
+
+Status: DEPLOYED_WITH_VERIFICATION_PENDING, not DEPLOYED_AND_VISUALLY_VERIFIED.
+Full M1-M9, all cinematics and current loading/material audits still require verification. Previous public 8e1be87 material audit timed out on exterior surfaces; its visual batch flagged an underexposed 4F detail frame. Those failures must not be represented as PASS.

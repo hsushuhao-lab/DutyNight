@@ -288,7 +288,7 @@ export class WardFloorplan {
     const door=new KeyedKnobDoor(this,{id:'second_duty_room',x:o+8,z:6,yaw:Math.PI/2,width:1.4,title:'值班室',openDirection:1});
     door.keepOpen=true;door.setClosed(false);
     door.root.traverse(object=>{if(object.userData?.doorId==='second_duty_room')object.userData.interactable=false;});
-    SignAnchor.buildWallPlaque({scene:this.zoneGroup,x:o+8.115,y:2.62,z:6,rotationY:-Math.PI/2,width:1.18,height:.34,code:'5F',title:'醫師值班室',subtitle:"DOCTORS' DUTY ROOM",header:''});
+    SignAnchor.buildWallPlaque({scene:this.zoneGroup,x:o+7.885,y:2.62,z:6,rotationY:-Math.PI/2,width:1.18,height:.34,code:'5F',title:'醫師值班室',subtitle:"DOCTORS' DUTY ROOM",header:''});
     const decor=new THREE.Group();decor.name='Second5F_DutyRoomDecor';this.zoneGroup.add(decor);
     asset(decor,'bench',[o+10,0,9.25],[.62,.62,.62],Math.PI);
     asset(decor,'plant',[o+13.15,0,9.1],[.55,.55,.55]);

@@ -157,7 +157,10 @@ export function buildNursingStationClinicalProps(zone,{x,z=-4.3,id}){
   const coat=make('white_coat','white_coat',[x-4.40,0,z-3.00]);
   solid(coat,m.bedSheet,[.04,1.48,0],[.08,.96,.62]);solid(coat,m.bedSheet,[.04,1.43,-.39],[.08,.62,.16]);solid(coat,m.bedSheet,[.04,1.43,.39],[.08,.62,.16]);solid(coat,m.metal,[.04,2.05,0],[.06,.08,.50]);
 
+  const hasHandoverBoard=(zone.campus==='first'&&zone.floor===4)||(zone.campus==='second'&&zone.floor===5);
+  if(!hasHandoverBoard){
   const sharps=make('sharps_container','sharps_container',[x-2.80,0,z-4.10]);solid(sharps,m.wallBumper,[0,1.42,0],[.48,.54,.24]);solid(sharps,m.wallDark,[0,1.70,0],[.40,.035,.18]);
+  }
   const supplies=make('supply_boxes','supply_boxes',[x-4.22,0,z+2.60]);for(let i=0;i<3;i++)solid(supplies,i===0?m.bedSheet:(i===1?m.wallBumper:m.stainless),[.05,.52+i*.27,0],[.28,.22,.62]);
 
   return zone.clinicalProps.filter(p=>p.id.startsWith(id+'_')).map(p=>p.id);
