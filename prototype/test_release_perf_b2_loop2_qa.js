@@ -58,7 +58,7 @@ for(const zone of ['first_campus_3f','first_campus_4f','first_campus_2f','first_
 
 // B2: terminal + one-way door, no staircase, exit lands behind 1F guard post and cannot be re-entered.
 assert(b2.includes("type:'b2_exit_door'")&&!b2.includes('B2_EscapeStairwell'),'B2 must have a door exit and no stairwell');
-assert(routes.includes("first_1f_guard_back"),'B2 return spawn must be behind the 1F guard post');
+assert(main.includes("worldRouter.loadZone('first_campus_3f','first_3f_316')"),'B2 must return directly to 3F');
 assert(main.includes("B2_EXITED_PERMANENTLY"),'B2 one-way exit lockout missing');
 assert(main.includes("M7_IDENTITY_RESOLVED_AT_316"),'B2 fail-forward must allow direct identity declaration at 316');
 assert(main.includes("getDeferred316IdentityHints"),'316 advisory evidence hints missing');

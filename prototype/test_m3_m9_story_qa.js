@@ -24,7 +24,7 @@ const adminBranch=main.slice(main.indexOf("['admin_roster_3f','admin_printer_doc
 assert(adminBranch.includes('openArchiveDocument'),'3F admin evidence documents must remain readable');
 assert(!adminBranch.includes("if(gameState.getFlag('FAST_PATH_3F'))"),'loop fast path must never suppress unread 3F admin evidence after an early HANDOFF_DEFAULT override');
 assert(main.includes("M5_CCTV_RESOLVED")&&main.includes("SIX_FLOOR_HISTORY_CONFIRMED"),'M5 CCTV must seed the erased-6F story before M6 can unlock');
-assert(main.includes("M8_CODE_BLACK_ANNOUNCED")&&main.includes("CODE BLACK"),'B2 reconstruction must trigger systemic Code Black pursuit pressure');
+assert(main.includes("M8_CODE_BLACK_ANNOUNCED")&&main.includes("有人正在覆寫紀錄，時間不多了，請找到正確權限輸入避免被覆蓋。"),'B2 reconstruction must trigger record overwrite pressure');
 assert(!routes.includes('hill_from_')&&!routes.includes('pond_from_'),'production routes must not expose outdoor spawns');
 assert(!router.includes('HillsideRoute')&&!router.includes('EcologyPond'),'production router must not load outdoor zones');
 assert(main.includes("setTrueNameFragment('frag_employeePrefix','MED-87')"),'M3 MED-87 clue missing');

@@ -26,13 +26,12 @@ const actions=ward.interactables.map(item=>item.userData??item).filter(item=>ite
 for(const retired of ['DUTY_ROOM_PREP','WARD_ROUND','INSOMNIA_403'])assert(!actions.some(item=>item.action===retired),retired+' must not survive the simplified 4F flow');
 assert.equal(actions.find(item=>item.action==='NURSE_REPORT')?.id,'4F_NURSING_REPORT');
 const reportTarget=ward.interactables.find(item=>(item.userData??item).id==='4F_NURSING_REPORT');
-assert(reportTarget&&!reportTarget.isObject3D,'the 17:15 report target must not render a box over the handover board');
-assert.equal(reportTarget.radius,2.1,'the 17:15 report prompt must cover the accessible nursing-station counter');
+assert.equal(reportTarget,ward.zoneGroup.getObjectByName('FourF_NursingHandoverBoard'),'report interaction belongs to the visible information board');
 assert.equal(actions.find(item=>item.action==='NORMAL_EVENT')?.id,'408C_BED_PLAQUE');
 assert.equal(actions.find(item=>item.action==='END_SHIFT')?.id,'4F_DUTY_COMPUTER','21:00 rest must use the physical duty-room computer');
 assert.doesNotMatch(mainSource,/KNOCK_403_49/,'403 cannot own the knock clue');
 assert.match(mainSource,/registerBed33Clue\('KNOCK_408C_49'\)/,'408C must own the knock clue');
-assert.match(uiSource,/19:30 查看 408C 反映的敲牆聲/,'the duty board must identify the real 408C event');
+assert.match(uiSource,/19:30 前往 408C，評估敲牆聲是否可能為幻聽／知覺異常/,'the duty board must identify the real 408C event');
 assert.doesNotMatch(uiSource,/19:30 處理一般病房事件/,'the stale generic event label must not return');
 const handoverBoard=ward.zoneGroup.getObjectByName('FourF_NursingHandoverBoard');
 assert.deepEqual(handoverBoard.position.toArray(),[-2,1.78,-8.495],'handover board must return to its original north wall');
@@ -58,6 +57,10 @@ assert(lobby.interactables.includes(lobby.guardPostObject),'the guard post itsel
 assert.equal(lobby.guardPostObject.userData.type,'guard_post_inspection');
 assert.equal(lobby.hiddenServiceHit.userData.interactable,false,'the concealed door stays hidden before guard-post inspection');
 assert.equal(lobby.hiddenServiceFrame.visible,false,'the concealed metal frame stays hidden before guard-post inspection');
+assert.equal(lobby.guardPostObject.userData.interactable,false,'guard post must not offer E before 6F');
+gameState.setFlag('M6_FLOOR6_RESOLVED',true);
+lobby.syncStoryState();
+assert.equal(lobby.guardPostObject.userData.interactable,true,'guard post becomes available after 6F');
 gameState.setFlag('HIDDEN_SERVICE_DOOR_DISCOVERED',true);
 lobby.syncStoryState();
 assert.equal(lobby.guardPostObject.userData.interactable,false,'the inspected guard post yields focus to the revealed door');
