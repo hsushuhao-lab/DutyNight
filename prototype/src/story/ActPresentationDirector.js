@@ -206,7 +206,7 @@ export class ActPresentationDirector {
     if(this.openingSeen||this.qaMode||this.active)return Promise.resolve(false);
     this.openingSeen=true;mark(KEYS.opening);
     return this.run([
-      {theme:'warm',kicker:'青嶺醫療中心 · 夜班',title:'17:00｜第一院區',subtitle:'今晚從三樓行政區開始。\\n先完成交班，再去四樓接手病房。',duration:2300},
+      {theme:'warm',kicker:'ACT I · 正常值班',title:'青嶺醫療中心｜17:00',subtitle:'今晚從第一院區三樓行政區開始。\\n先完成交班，再去四樓接手病房。',duration:2300},
       {theme:'warm',kicker:'院區簡介',title:'今晚會經過的地方',kind:'campus',duration:3000},
       {theme:'warm',kicker:'值班工作',title:'其實就是一個普通夜班',kind:'route',subtitle:'先把眼前的工作做好。其他事情，照院內流程處理就好。',duration:3000},
       {theme:'warm',kicker:'今晚第一件事',title:'去 316 完成交班',quote:'學長：「我先走了，316 鎖著。你自己想辦法進去，把今晚的交班做完吧。」',subtitle:'值班開始。',duration:2500}
