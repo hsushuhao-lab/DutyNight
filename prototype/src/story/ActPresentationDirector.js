@@ -143,9 +143,9 @@ export class ActPresentationDirector {
       const grid=document.createElement('div');
       grid.className='act-campus-grid';
       [
-        ['第一院區','3F 行政與 316\\n4F 病房與值班室\\n2F 急診支援'],
-        ['8F 天橋','跨院區連通\\n夜間需依通知開放權限'],
-        ['第二院區','有支援需求時前往\\n先到護理站報到']
+        ['第一院區','3F 行政與 316\n4F 病房與值班室\n2F 急診支援'],
+        ['8F 天橋','跨院區連通\n夜間需依通知開放權限'],
+        ['第二院區','有支援需求時前往\n先到護理站報到']
       ].forEach(([name,copy])=>{
         const box=document.createElement('div');
         box.className='act-campus';
@@ -206,7 +206,7 @@ export class ActPresentationDirector {
     if(this.openingSeen||this.qaMode||this.active)return Promise.resolve(false);
     this.openingSeen=true;mark(KEYS.opening);
     return this.run([
-      {theme:'warm',kicker:'ACT I · 正常值班',title:'青嶺醫療中心｜17:00',subtitle:'今晚從第一院區三樓行政區開始。\\n先完成交班，再去四樓接手病房。',duration:2300},
+      {theme:'warm',kicker:'ACT I · 正常值班',title:'青嶺醫療中心｜17:00',subtitle:'今晚從第一院區三樓行政區開始。\n先完成交班，再去四樓接手病房。',duration:2300},
       {theme:'warm',kicker:'院區簡介',title:'今晚會經過的地方',kind:'campus',duration:3000},
       {theme:'warm',kicker:'值班工作',title:'其實就是一個普通夜班',kind:'route',subtitle:'先把眼前的工作做好。其他事情，照院內流程處理就好。',duration:3000},
       {theme:'warm',kicker:'今晚第一件事',title:'去 316 完成交班',quote:'學長：「我先走了，316 鎖著。你自己想辦法進去，把今晚的交班做完吧。」',subtitle:'值班開始。',duration:2500}
@@ -217,8 +217,8 @@ export class ActPresentationDirector {
     if(this.act2Seen||this.qaMode||this.active)return Promise.resolve(false);
     this.act2Seen=true;mark(KEYS.act2);
     return this.run([
-      {theme:'horror',kicker:'ACT II · 21:17 之後',title:'記錄開始對不上',subtitle:'同一個時間，留下不同的紀錄。\\n同一個空間，開始出現不該存在的痕跡。',glitch:true,duration:3300},
-      {theme:'horror',kicker:'夜班仍在繼續',title:'不要急著相信答案',subtitle:'21:17、316、409、00:33。\\n線索會彼此矛盾，但每一個矛盾都在指向同一件事。',duration:2900}
+      {theme:'horror',kicker:'ACT II · 21:17 之後',title:'記錄開始對不上',subtitle:'同一個時間，留下不同的紀錄。\n同一個空間，開始出現不該存在的痕跡。',glitch:true,duration:3300},
+      {theme:'horror',kicker:'夜班仍在繼續',title:'不要急著相信答案',subtitle:'21:17、316、409、00:33。\n線索會彼此矛盾，但每一個矛盾都在指向同一件事。',duration:2900}
     ]);
   }
 
@@ -226,7 +226,7 @@ export class ActPresentationDirector {
     if(this.act3Seen||this.qaMode||this.active)return Promise.resolve(false);
     this.act3Seen=true;mark(KEYS.act3);
     return this.run([
-      {theme:'horror',kicker:'ACT III · 最後交班',title:'把自己的名字留下來',subtitle:'你現在要證明的，不是「今晚誰應該值班」。\\n而是——你到底是誰。',glitch:true,duration:3600}
+      {theme:'horror',kicker:'ACT III · 最後交班',title:'把自己的名字留下來',subtitle:'你現在要證明的，不是「今晚誰應該值班」。\n而是——你到底是誰。',glitch:true,duration:3600}
     ]);
   }
 
