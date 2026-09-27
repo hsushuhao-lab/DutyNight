@@ -749,12 +749,12 @@ export class UIManager {
     document.getElementById('ending-cg-screen')?.classList.remove('active');
     this.finalHandoffModal?.classList.remove('active');
     const win=this.finalSuccessModal?.querySelector('.anomaly-window');
-    const title=win?.querySelector('h2');if(title)title.textContent='OFFICIAL SHIFT COMPLETED';
+    const title=win?.querySelector('h2');if(title)title.textContent='PERFECT ENDING — RECORD RESTORED';
     const paragraphs=win?.querySelectorAll('p');
-    if(paragraphs?.[0])paragraphs[0].textContent='DUTY R1：'+name+'（MED-870409）｜COMPLETED & RESTORED';
-    if(paragraphs?.[1])paragraphs[1].textContent='409-A PATIENTIZATION ORDER：INVALIDATED｜歷史覆寫：REVOKED｜八名罹難者姓名已永久寫回紀念紀錄。';
+    if(paragraphs?.[0])paragraphs[0].textContent=name+'（MED-870409）｜IDENTITY RESTORED｜原始夜班紀錄已恢復';
+    if(paragraphs?.[1])paragraphs[1].textContent='409-A 錯誤病人紀錄：INVALIDATED｜身分覆寫：REVOKED｜八名罹難者姓名：RESTORED';
     const last=this.finalSuccessModal?.querySelector('.anomaly-last');
-    if(last)last.textContent='答錄磁帶最後留下林婉真的聲音：「張醫師……如果你還聽得到，天亮了。辛苦了。這一班，你可以交了。」';
+    if(last)last.textContent='316 舊終端最後留下：「RECORD WRITE COMPLETE｜這一次，所有名字都回到正確的位置。」';
     this.finalSuccessModal?.classList.add('active');
   }
 
@@ -1016,8 +1016,8 @@ export class UIManager {
     const currentZone=window.worldRouter?.activeZoneId || '';
 
     if(this.gameState.getFlag('GAME_COMPLETE')){
-      this.renderTaskBoard('翌日 04:05｜交班完成',[
-        {id:'task-game-complete',text:'張守恆已完成真正的晨間交班',state:'completed'}
+      this.renderTaskBoard('RECORD RESTORED｜紀錄覆寫完成',[
+        {id:'task-game-complete',text:'張守恆與八名罹難者的原始夜班紀錄已恢復',state:'completed'}
       ]);
       return;
     }
