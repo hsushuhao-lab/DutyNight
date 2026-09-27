@@ -1,9 +1,0 @@
-{
-  "sourceSha": "b5d41e1ae5d9657af1266a9f020f417ba03099ab",
-  "verdict": "FAIL",
-  "flows": [],
-  "errors": [
-    "page.waitForFunction: Timeout 30000ms exceeded.\n    at C:\\Users\\Asher\\Documents\\game\\DutyNight-visual-closeout\\prototype\\scripts\\test-cinematic-travel-flows.mjs:47:21"
-  ],
-  "finished": "2026-09-27T10:51:35.717Z"
-}

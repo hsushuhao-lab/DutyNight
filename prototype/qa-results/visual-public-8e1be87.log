@@ -1,8 +1,0 @@
-file:///C:/Users/Asher/Documents/game/DutyNight-visual-closeout/prototype/scripts/capture-visual-qa.mjs:70
-  if (errors.length) throw new Error(JSON.stringify(errors));
-                           ^
-
-Error: ["Blank or severely underexposed render: m2_4f_duty_room_detail.png"]
-    at file:///C:/Users/Asher/Documents/game/DutyNight-visual-closeout/prototype/scripts/capture-visual-qa.mjs:70:28
-
-Node.js v24.18.0

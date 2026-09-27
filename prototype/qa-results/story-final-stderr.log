@@ -1,2 +1,0 @@
-AssertionError [ERR_ASSERTION]: completed game must close the task chain instead of dropping guidance
-    at file:///C:/Users/Asher/Documents/game/DutyNight-visual-closeout/prototype/scripts/test-story-playthrough.mjs:485:10
