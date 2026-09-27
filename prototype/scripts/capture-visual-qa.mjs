@@ -75,6 +75,9 @@ try {
   await writeFile(`${output}/capture-manifest.json`, JSON.stringify({ browser: browser.version(), captures, skipped, errors, productionDebugHidden: true, explicitDebugAvailable: true, note: 'Detail is narrower FOV at identical standing position; junction is rotated camera, not a new collision probe.' }, null, 2));
   if (errors.length) throw new Error(JSON.stringify(errors));
   console.log(JSON.stringify({ captures: captures.length, skipped: skipped.length, errors, productionDebugHidden: true }));
+} catch (error) {
+  await writeFile(`${output}/capture-manifest.json`, JSON.stringify({verdict:'FAIL',browser:browser.version(),captures,skipped,errors:[...errors,error.message]},null,2));
+  throw error;
 } finally {
   await browser.close();
   if (server) await new Promise(resolve => server.httpServer.close(resolve));

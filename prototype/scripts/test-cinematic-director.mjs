@@ -3,7 +3,8 @@ import { chromium } from 'playwright';
 import { preview } from 'vite';
 import { fileURLToPath } from 'node:url';
 
-const server = await preview({
+const base=process.argv[2]||'http://localhost:4173/';
+const server = process.argv[2]?null:await preview({
   root: fileURLToPath(new URL('..', import.meta.url)),
   preview: { port: 4173, strictPort: true }
 });
@@ -13,7 +14,7 @@ try {
   const page = await browser.newPage();
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
-  await page.goto('http://localhost:4173/?qa=story');
+  await page.goto(base+'?qa=story');
   await page.waitForFunction(() => window.__storyQA?.cinematicDirector);
 
   const result = await page.evaluate(async () => {
@@ -49,5 +50,5 @@ try {
   console.log(JSON.stringify({ verdict: 'PASS', ...result, errors }));
 } finally {
   await browser.close();
-  await new Promise(resolve => server.httpServer.close(resolve));
+  if(server)await new Promise(resolve => server.httpServer.close(resolve));
 }
