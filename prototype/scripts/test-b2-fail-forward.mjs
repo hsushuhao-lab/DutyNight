@@ -131,19 +131,21 @@ try {
   await page.waitForFunction(() => document.querySelector('#ending-cg-screen')?.classList.contains('active'), null, { timeout: 10000 });
   const final = await page.evaluate(() => ({
     complete: window.__storyQA.gameState.getFlag('GAME_COMPLETE'),
-    resolvedAt316: window.__storyQA.gameState.getFlag('M7_IDENTITY_RESOLVED_AT_316'),
+    reconstructed: window.__storyQA.gameState.getFlag('M7_B2_RESOLVED'),
+    fireRecapSeen: window.__storyQA.gameState.getFlag('B2_FIRE_RECAP_SEEN'),
     trueName: window.__storyQA.persistentMemory.data.trueName,
     gameComplete: window.__storyQA.persistentMemory.data.gameComplete,
     endingCgActive: document.querySelector('#ending-cg-screen')?.classList.contains('active')
   }));
-  assert.deepEqual({ complete: final.complete, resolvedAt316: final.resolvedAt316, trueName: final.trueName, gameComplete: final.gameComplete }, {
+  assert.deepEqual({ complete: final.complete, reconstructed: final.reconstructed, fireRecapSeen: final.fireRecapSeen, trueName: final.trueName, gameComplete: final.gameComplete }, {
     complete: true,
-    resolvedAt316: true,
+    reconstructed: true,
+    fireRecapSeen: true,
     trueName: '張守恆',
     gameComplete: true
   });
   assert.equal(final.endingCgActive, true);
-  report.checkpoints.push({ id: 'FINAL_316_AFTER_HISTORY', ...final });
+  report.checkpoints.push({ id: 'FINAL_316_AFTER_B2_FIRE_RECAP', ...final });
   await page.screenshot({ path: `${output}/02-ending-cg.png` });
 
   assert.deepEqual(report.errors, []);
