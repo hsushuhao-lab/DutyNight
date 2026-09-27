@@ -10,6 +10,7 @@ import { auditSceneMaterials, preloadMaterialSurfaces } from './art/MaterialRegi
 import { prepareZoneWithRetry } from './art/ZoneReadiness.js';
 import { zoneAssetManifest, preloadZoneEssential, preloadZoneOptional } from './art/ZoneAssetManifest.js';
 import { preloadAssetNames } from './art/AssetRegistry.js';
+import { preloadArtPass2 } from './art/ArtPass2Assets.js';
 
 soundManager.installUnlockHandlers();
 gameState.addListener((event,data)=>{
@@ -35,6 +36,9 @@ while(true){
     loadingMessage.textContent='夜間系統載入中…';
   }
 }
+// Art Pass 2 is lightweight visual enrichment (~260 KB total) and is intentionally
+// background-prefetched. It never blocks zone readiness or reintroduces whole-world preload.
+void preloadArtPass2().catch(error=>console.warn('[artpass2] background preload failed',error));
 const prefetchDestinationAssets = async destination => {
   const zoneId=destination?.zoneId;
   await prepareZoneWithRetry(zoneId);
