@@ -1,4 +1,5 @@
 // ActPresentationDirector.js — isolated three-act presentation layer.
+import {ART_PASS2,preloadArtPass2Image} from '../art/ArtPass2Assets.js';
 // Watches existing story flags; does not own story progression or modify M1–M9 state.
 
 const KEYS=Object.freeze({
@@ -48,6 +49,11 @@ export class ActPresentationDirector {
       '@keyframes act-scan{to{transform:translateY(100vh)}}',
       '.act-vignette{position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 180px rgba(0,0,0,.82)}',
       '.act-card{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:7vh 8vw;opacity:0;transform:scale(1.018);transition:opacity .55s ease,transform .8s ease}',
+      '.act-art-backdrop{position:absolute;inset:-7%;width:114%;height:114%;object-fit:cover;object-position:50% 72%;filter:saturate(.78) contrast(1.12) brightness(.72);animation:act-kenburns 11s ease-out forwards;pointer-events:none}',
+      '.act-art-scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,9,10,.72) 0%,rgba(7,10,9,.32) 35%,rgba(8,10,9,.54) 72%,rgba(4,5,5,.82) 100%),radial-gradient(circle at 50% 55%,transparent 20%,rgba(0,0,0,.46) 100%);pointer-events:none}',
+      '.act-card.has-art>*:not(.act-art-backdrop):not(.act-art-scrim){position:relative;z-index:2}',
+      '.act-card.has-art .act-campus,.act-card.has-art .act-route span,.act-card.has-art .act-quote{backdrop-filter:blur(5px);background:rgba(7,12,10,.64);border-color:rgba(226,210,175,.38)}',
+      '@keyframes act-kenburns{from{transform:scale(1.02) translate3d(0,0,0)}to{transform:scale(1.10) translate3d(-1.2%,-1.1%,0)}}',
       '.act-card.visible{opacity:1;transform:scale(1)}',
       '.act-kicker{letter-spacing:.34em;text-transform:uppercase;font-size:clamp(12px,1.2vw,18px);color:#91b09e;margin-bottom:18px}',
       '.warm .act-kicker{color:#d2bc8e}.dawn .act-kicker{color:#f0c992}',
@@ -119,8 +125,20 @@ export class ActPresentationDirector {
     const target=root.querySelector('.act-card');
     const progress=root.querySelector('.act-progress');
     root.className='act-presentation active '+(card.theme||'warm');
-    target.className='act-card'+(card.glitch?' act-glitch':'');
+    target.className='act-card'+(card.glitch?' act-glitch':'')+(card.art?' has-art':'');
     target.replaceChildren();
+
+    if(card.art){
+      const art=document.createElement('img');
+      art.className='act-art-backdrop';
+      art.src=card.art;
+      art.alt='';
+      art.setAttribute('aria-hidden','true');
+      if(card.artPosition)art.style.objectPosition=card.artPosition;
+      const scrim=document.createElement('div');
+      scrim.className='act-art-scrim';
+      target.append(art,scrim);
+    }
 
     const kicker=document.createElement('div');
     kicker.className='act-kicker';
@@ -202,14 +220,45 @@ export class ActPresentationDirector {
     return true;
   }
 
-  playOpening(){
-    if(this.openingSeen||this.qaMode||this.active)return Promise.resolve(false);
+  async playOpening(){
+    if(this.openingSeen||this.qaMode||this.active)return false;
     this.openingSeen=true;mark(KEYS.opening);
+    await preloadArtPass2Image('opening').catch(error=>console.warn('[artpass2] opening art preload failed',error));
     return this.run([
-      {theme:'warm',kicker:'ACT I · 正常值班',title:'青嶺醫療中心｜17:00',subtitle:'今晚從第一院區三樓行政區開始。\n先完成交班，再去四樓接手病房。',duration:2300},
-      {theme:'warm',kicker:'院區簡介',title:'今晚會經過的地方',kind:'campus',duration:3000},
-      {theme:'warm',kicker:'值班工作',title:'其實就是一個普通夜班',kind:'route',subtitle:'先把眼前的工作做好。其他事情，照院內流程處理就好。',duration:3000},
-      {theme:'warm',kicker:'今晚第一件事',title:'去 316 完成交班',quote:'學長：「我先走了，316 鎖著。你自己想辦法進去，把今晚的交班做完吧。」',subtitle:'值班開始。',duration:2500}
+      {
+        theme:'warm',
+        art:ART_PASS2.opening,
+        artPosition:'50% 72%',
+        kicker:'ACT I · 正常值班',
+        title:'青嶺醫療中心｜17:00',
+        subtitle:'雨後的院區剛亮起夜燈。今晚從第一院區三樓行政區開始。\n先完成交班，再去四樓接手病房。',
+        duration:3200
+      },
+      {
+        theme:'warm',
+        art:ART_PASS2.opening,
+        artPosition:'48% 66%',
+        kicker:'院區簡介',
+        title:'兩個院區，一條夜間動線',
+        kind:'campus',
+        duration:3600
+      },
+      {
+        theme:'warm',
+        kicker:'值班工作',
+        title:'其實就是一個普通夜班',
+        kind:'route',
+        subtitle:'先把眼前的工作做好。病房、急診、電話支援——其他事情，照院內流程處理就好。',
+        duration:3000
+      },
+      {
+        theme:'warm',
+        kicker:'今晚第一件事',
+        title:'去 316 完成交班',
+        quote:'學長：「我先走了，316 鎖著。你自己想辦法進去，把今晚的交班做完吧。」',
+        subtitle:'17:00，夜班開始。',
+        duration:2700
+      }
     ]);
   }
 
