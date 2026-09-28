@@ -254,9 +254,13 @@ function triggerPost2117DutyRoomSequence(){
   const paper=document.createElement('canvas');paper.width=1024;paper.height=640;
   const texture=new THREE.CanvasTexture(paper);texture.colorSpace=THREE.SRGBColorSpace;
   const material=new THREE.MeshBasicMaterial({map:texture,side:THREE.DoubleSide});
-  const record=new THREE.Mesh(new THREE.PlaneGeometry(.72,.45),material);
-  record.name='DutyRoom_2117_RecapRecord';record.position.set(-10,.84,3.24);record.rotation.x=-Math.PI/2;
-  const room=worldRouter.activeZoneInstance.zoneGroup;room.add(record);
+  const roomZone=worldRouter.activeZoneInstance;
+  const dutyDesk=roomZone.workstations?.find(workstation=>workstation.id==='duty_desk');
+  const deskTop=dutyDesk?.desk?new THREE.Box3().setFromObject(dutyDesk.desk).max.y:.80;
+  const recordPosition=new THREE.Vector3(-10.58,deskTop+.008,2.92);
+  const record=new THREE.Mesh(new THREE.PlaneGeometry(.44,.275),material);
+  record.name='DutyRoom_2117_RecapRecord';record.position.copy(recordPosition);record.rotation.x=-Math.PI/2;
+  roomZone.zoneGroup.add(record);
   const drawRecord=count=>{
     const ctx=paper.getContext('2d');ctx.fillStyle='#e8e0ce';ctx.fillRect(0,0,1024,640);
     ctx.fillStyle='#263b32';ctx.font='bold 44px sans-serif';ctx.fillText('值班紀錄',50,76);
@@ -264,7 +268,7 @@ function triggerPost2117DutyRoomSequence(){
     ['21:17 — 被預先寫好的巡查','316 — 身分與權限','409 — 封鎖房間的敲擊'].slice(0,count).forEach((line,i)=>ctx.fillText(line,50,180+i*120));
     texture.needsUpdate=true;soundManager.playPaperSign();
   };
-  const delta=new THREE.Vector3(-10,.84,3.24).sub(controller.position);
+  const delta=recordPosition.clone().sub(controller.position);
   const targetYaw=Math.atan2(-delta.x,-delta.z)-controller.yaw;
   const targetPitch=Math.atan2(delta.y,Math.hypot(delta.x,delta.z))-controller.pitch;
   void cinematicDirector.play({
@@ -655,7 +659,7 @@ function completeFirstCampus4FWardReport(){
   }else{
     uiManager.showSubtitle(
       '晚班護理師',
-      '「張醫師，門禁有你的刷卡紀錄，算你報到了。今晚四樓滿床 32 床。408C 的老先生一直說隔壁有人敲牆；409 仍封閉整修。19:30 麻煩你去評估是否可能是幻聽或知覺異常。」',
+      '「醫師，門禁有你的刷卡紀錄，算你報到了。今晚四樓滿床 32 床。408C 的老先生一直說隔壁有人敲牆；409 仍封閉整修。19:30 麻煩你去評估是否可能是幻聽或知覺異常。」',
       5600
     );
   }
