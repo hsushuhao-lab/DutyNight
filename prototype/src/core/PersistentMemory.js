@@ -104,6 +104,15 @@ export class PersistentMemory {
       const engineerNote=data.journalNotes.find(note=>note.id==='LIU_MAINTENANCE_TAG');
       if(engineerNote)engineerNote.text='劉志遠／ENG-860214／工務機電技師。燒焦吊牌標示 6F SKILL LAB／B-PANEL；他提到紫色備援與王世榮保管的鑰匙。';
       for(const note of data.journalNotes)note.text=note.text.replaceAll('4+3 夜班核心人員檔案','1998 夜班核心人員名錄');
+
+      // Backfill durable B2 source provenance from older saves. These source
+      // flags used to exist only in transient GameState, so a Patientization
+      // could make already-read evidence appear forgotten.
+      const hasNote=id=>data.journalNotes.some(note=>note.id===id);
+      if(data.memoryEvidence.M1_ADMIN_DUTY_PHOTO)data.memoryEvidence.B2_SOURCE_ADMIN=true;
+      if(data.memoryEvidence.M1_ARCHIVE_6F_ALBUM||(data.knownCodes.code_0217&&data.knownCodes.code_0316))data.memoryEvidence.B2_SOURCE_HISTORY=true;
+      if(hasNote('ER0033_DECODED')||data.trueNameFragments.frag_surname==='張')data.memoryEvidence.B2_SOURCE_LEGACY=true;
+      if(hasNote('WANG_B_PANEL_KEY'))data.memoryEvidence.B2_SOURCE_SECURITY=true;
       return data;
     }catch(e){
       return defaults();
@@ -277,6 +286,10 @@ export class PersistentMemory {
       gameState.setFlag('B_PANEL_CLUE_KNOWN',true);
       gameState.setFlag('ER_LIU_IDENTITY_REVEALED',true);
     }
+    if(this.hasEvidence('B2_SOURCE_ADMIN')||this.hasEvidence('M1_ADMIN_DUTY_PHOTO'))gameState.setFlag('B2_ADMIN_SOURCE',true);
+    if(this.hasEvidence('B2_SOURCE_HISTORY')||this.hasEvidence('M1_ARCHIVE_6F_ALBUM'))gameState.setFlag('B2_HISTORY_SOURCE',true);
+    if(this.hasEvidence('B2_SOURCE_LEGACY')||this.data.journalNotes.some(note=>note.id==='ER0033_DECODED'))gameState.setFlag('B2_LEGACY_SOURCE',true);
+    if(this.hasEvidence('B2_SOURCE_SECURITY')||this.data.journalNotes.some(note=>note.id==='WANG_B_PANEL_KEY'))gameState.setFlag('B2_SECURITY_SOURCE',true);
     gameState.setFlag('IDENTITY_EROSION_LEVEL',this.data.identityErosionLevel);
     gameState.setFlag('SPACE_PROOF',this.data.proofs.space);
     gameState.setFlag('IDENTITY_PROOF',this.data.proofs.identity);
