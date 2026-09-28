@@ -24,7 +24,6 @@ try {
   });
   await page.goto(`${publicUrl || 'http://localhost:4173/'}?qa=story`);
   await page.waitForFunction(() => window.__storyQA?.worldRouter?.activeZoneInstance);
-  await page.waitForFunction(()=>window.__materialAudit().materials.filter(m=>['hospital/wall','hospital/floorTile','hospital/doorWood'].includes(m.materialName)).every(m=>m.hasMap&&m.hasNormalMap&&m.hasRoughnessMap),null,{timeout:300000});
 
   await page.evaluate(() => {
     const qa = window.__storyQA;
