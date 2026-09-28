@@ -25,11 +25,18 @@ assert 'async function waitForPageCondition' not in s
 assert '\ntry {\n' in s
 s = s.replace('\ntry {\n', '\n' + helper + '\ntry {\n', 1)
 s = s.replace('await page.waitForFunction(', 'await waitForPageCondition(')
+# Do not serialize the complete cyclic Three.js world merely to test readiness.
+s = s.replace('() => window.__storyQA?.worldRouter?.activeZoneInstance', '() => !!window.__storyQA?.worldRouter?.activeZoneInstance')
+s = s.replace('const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });', "const captureScreenshots=process.env.STORY_CAPTURE!=='0';\nconst page = await browser.newPage({viewport:captureScreenshots?{width:1440,height:900}:{width:800,height:600}});")
+s = s.replace('const report = { sourceSha:', 'const report = { captureScreenshots, sourceSha:')
+s = s.replace('await page.screenshot(', 'if(captureScreenshots)await page.screenshot(')
 s = s.replace('  report.errors.push(error.stack || error.message);', "  report.errors.push(error.stack || error.message);\n  report.failureState=await page.evaluate(()=>({snapshot:window.__storyQA.snapshot(),dialogue:!!window.__storyQA.uiManager.dialogueSequence,cinematic:window.__storyQA.cinematicDirector.activeId,subtitle:document.getElementById('subtitle-text').textContent}));")
 p.write_text(s)
 
 p = Path('prototype/scripts/test-story-playthrough.mjs')
 s = p.read_text()
+s = s.replace('()=>window.__storyQA?.worldRouter?.activeZoneInstance', '()=>!!window.__storyQA?.worldRouter?.activeZoneInstance')
+s = s.replace('()=>window.worldRouter?.activeZoneInstance', '()=>!!window.worldRouter?.activeZoneInstance')
 start = s.index("  await interact({id:'B2_ARCHIVE_TERMINAL'});")
 end = s.index('  s=await snap();', start)
 s = s[:start] + """  // Fire recap is mandatory on first contact; identity comparison is second.
@@ -59,5 +66,5 @@ notes.write_text('''# DutyNight 2026.09.28 — 修正發布
 - B2 不論辨識結果皆需完成文史室七頁核對，才開啟 316 末四碼驗證。
 - 驗收改用實際病房感應門及先火災回放、後身分矩陣的現行流程；未放寬故事條件。
 
-測試紀錄及發布 SHA 以本次 Release 附件與 GitHub Actions 記錄為準。
+主線狀態驗證與畫面驗證分開：主線保留所有狀態斷言；公開修正專項另提供實際準星、E 鍵及截圖。測試紀錄及發布 SHA 以本次 Release 附件與 GitHub Actions 記錄為準。
 ''')
