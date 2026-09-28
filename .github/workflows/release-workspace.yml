@@ -5,16 +5,26 @@ on:
     paths: ['.github/workflows/release-workspace.yml']
 permissions:
   contents: write
+  actions: write
   pages: write
   id-token: write
+concurrency:
+  group: verified-release
+  cancel-in-progress: true
 jobs:
   release:
     runs-on: ubuntu-latest
     timeout-minutes: 75
+    env:
+      STORY_CAPTURE: '0'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - name: Stop superseded release candidate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh run cancel 36420395816 --repo hsushuhao-lab/DutyNight || echo 'Previous candidate already ended'
       - uses: actions/checkout@v4
         with:
           fetch-depth: 100
@@ -57,8 +67,6 @@ jobs:
       - name: Complete M1-M9 story and perfect ending
         working-directory: prototype
         timeout-minutes: 25
-        env:
-          STORY_CAPTURE: '0'
         run: node scripts/test-story-playthrough.mjs qa-results/release-story-local
       - name: First and repeated Patientization recovery
         working-directory: prototype
