@@ -633,20 +633,23 @@ function completeFirstCampus4FWardReport(){
   if(worldRouter.activeZoneId!=='first_campus_4f')return false;
   if(!gameState.isTaskComplete('WARD_ENTRY')||gameState.isTaskComplete('P1_4F_REPORT'))return false;
 
-  dutyEvents.complete('P1_4F_REPORT','17:15');
+  const recoveredBed33=gameState.getFlag('PATIENTIZATION_RECOVERY_ANCHOR')==='BED33';
+  dutyEvents.complete('P1_4F_REPORT',recoveredBed33?'19:30':'17:15');
 
   if(gameState.getFlag('FAST_PATH_3F')){
     dutyEvents.complete('P1_NORMAL_EVENT_DONE','19:30');
     gameState.setFlag('FOURF_409_SEAL_CHECKED_AFTER_408C',true);
     gameState.setFlag('BED33_RESOLVED',true);
     gameState.markTaskComplete('LEGEND_BED33_RESOLVED');
+    legendState.resolve('LEGEND_BED33');
+    persistentMemory.resolveLegend('bed33');
     persistentMemory.addJournalNote(
       'BED33_FAST_PATH',
-      '上一輪已確認 408C 的敲擊與 409 封閉狀態；這次打開 4F 感應門即完成報到，直接前往值班室接下一通電話。'
+      '上一輪已確認 408C、409 與 409A 第 33 床的錯誤；這次只需在 4F 護理站完成報到，這段不再重演。'
     );
     uiManager.showSubtitle(
       '晚班護理師',
-      '「張醫師，感應門已刷開，算你報到了。今晚仍是滿床 32 床；照上一輪的紀錄，408C 與 409 不用再重查。」',
+      '「門禁已記錄你到站。408C、409 與那張 409A 床位單不用再重查；先回值班室等下一通電話。」',
       4300
     );
   }else{
