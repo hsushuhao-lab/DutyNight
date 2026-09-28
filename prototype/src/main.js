@@ -1147,8 +1147,11 @@ controller.onInteract = async (interactable) => {
     if(gameState.getFlag('M6_FLOOR6_RESOLVED')!==true||gameState.getFlag('B2_EXITED_PERMANENTLY'))return;
     gameState.setFlag('B2_SECURITY_SOURCE',true);
     gameState.setFlag('SECURITY_RECORD_OBJECTIVE',false);
-    const learnedPanel=gameState.getFlag('B_PANEL_CLUE_KNOWN')===true;
-    if(learnedPanel&&!gameState.getFlag('B_PANEL_KEY')){
+    // M3's Liu Zhi-Yuan clue is learned knowledge and may have been lost from
+    // transient GameState after an earlier Patientization. The 1F guard post
+    // itself reconfirms the B-Panel provenance, so it must always repair it.
+    gameState.setFlag('B_PANEL_CLUE_KNOWN',true);
+    if(!gameState.getFlag('B_PANEL_KEY')){
       gameState.setFlag('B_PANEL_KEY',true);
       gameState.setFlag('FIRST_FLOOR_GUARD_KEY',true);
       persistentMemory.addJournalNote('WANG_B_PANEL_KEY','王世榮 SEC-760117 的值勤簿記載：B-Panel 十字鑰匙屬警衛門禁設備，實體仍掛在警衛台金屬鑰匙櫃。');
@@ -1157,11 +1160,12 @@ controller.onInteract = async (interactable) => {
       gameState.setFlag('HIDDEN_SERVICE_DOOR_DISCOVERED',true);
       worldRouter.activeZoneInstance?.syncStoryState?.();
       soundManager.playClick();
-      const keyLine=learnedPanel?'鑰匙櫃裡那把褪色紫牌十字鑰匙正標著「B-PANEL」。':'鑰匙櫃裡有一排老舊機房鑰匙。';
-      uiManager.showSubtitle('值班醫師','「王世榮的值勤簿……'+keyLine+'」\nCCTV 最後一頁停在 02:17，警衛設備旁的牆面浮出一道舊門框接縫。',5600);
+      uiManager.showSubtitle('值班醫師','「王世榮的值勤簿……鑰匙櫃裡那把褪色紫牌十字鑰匙正標著『B-PANEL』。」\nCCTV 最後一頁停在 02:17，警衛設備旁的牆面浮出一道舊門框接縫。',5600);
     }else{
+      worldRouter.activeZoneInstance?.syncStoryState?.();
       uiManager.showSubtitle('值班醫師','「舊門框就在警衛台後面。王世榮留下的門禁紀錄和 B-Panel 鑰匙都對上了。」',3200);
     }
+    uiManager.updateTasks();
   } else if (interactable.type === 'hidden_service_door_1f') {
     if(gameState.getFlag('M6_FLOOR6_RESOLVED')!==true)return;
     if(!gameState.getFlag('HIDDEN_SERVICE_DOOR_DISCOVERED')){
@@ -1169,7 +1173,9 @@ controller.onInteract = async (interactable) => {
       return;
     }
     if(!gameState.getFlag('B_PANEL_KEY')){
-      uiManager.showSubtitle('值班醫師','「牆面接縫不像一般裝修……B-Panel 的十字鑰匙應該還在警衛設備裡。」',3200);
+      worldRouter.activeZoneInstance?.syncStoryState?.();
+      uiManager.updateTasks();
+      uiManager.showSubtitle('值班醫師','「門框已經浮出來，但我還沒把 B-Panel 十字鑰匙帶過來。回警衛台的金屬鑰匙櫃拿。」',3600);
       return;
     }
     if(gameState.getFlag('B2_EXITED_PERMANENTLY')){
