@@ -254,6 +254,7 @@ export class PersistentMemory {
       FINAL:{legend:'lastCall',rule:null,notes:[['RULE_FINAL','316 權限核對錯誤會把值班身分覆寫成 409-A 病人紀錄。']]}
     };
     const cfg=configs[id];
+    if(id==='HANDOFF_DEFAULT')this.data.knownCodes.pass_1700=true;
     if(id==='BED33'){this.data.hasSeenOverride_Bed33=true;this.data.knownCodes.code_0409=true;}
     if(cfg){
       if(cfg.legend)this.data.legends[cfg.legend]=true;
