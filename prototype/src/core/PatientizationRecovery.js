@@ -6,6 +6,10 @@ const BASE_TASKS=Object.freeze([
   'KEY_PICKUP','DUTY_LOG','E_HANDOFF','WARD_ENTRY','P1_4F_REPORT','P1_NORMAL_EVENT_DONE'
 ]);
 
+const M2_RECOVERY_TASKS=Object.freeze([
+  'KEY_PICKUP','DUTY_LOG','E_HANDOFF','WARD_ENTRY'
+]);
+
 const POST_BED33_TASKS=Object.freeze([
   ...BASE_TASKS,'LEGEND_BED33_RESOLVED','P1_ER_CALL_RECEIVED','P1_ER_ASSESSMENT_DONE',
   'P1_ER_NOTE_DONE','P1_RETURN_4F','ACT1_NORMAL_FLOW'
@@ -52,34 +56,41 @@ const POST_ER0033_FLAGS=Object.freeze({
 export const PATIENTIZATION_RECOVERY_ANCHORS=Object.freeze({
   HANDOFF_DEFAULT:Object.freeze({
     id:'HANDOFF_DEFAULT',
-    label:'17:00｜316 值班身分驗證',
+    label:'17:00｜316 值班物品櫃',
     time:'17:00',
     phase:'Phase0_1700_FirstArrival',
     zoneId:'first_campus_3f',
     spawnId:'m0_316_office',
     trace:['17:00'],
-    tasks:['FOUND_316_SPARE_KEY','HIS_CREDENTIALS_FOUND'],
+    tasks:['FOUND_316_SPARE_KEY','HIS_CREDENTIALS_FOUND','DUTY_LOG','E_HANDOFF'],
     flags:{
       FAST_PATH_3F:false,
       FOUND_316_SPARE_KEY:true,
       OPENED_316:true,
+      LOCKER_OPENED:false,
       HIS_CREDENTIALS:true,
       HIS_AUTHENTICATED:true,
-      M1_HANDOFF_CHOICE_RESOLVED:false
+      M1_HANDOFF_CHOICE_RESOLVED:true,
+      FAST_PATH_316_ENTERED:true,
+      FAST_PATH_316_CALL_DONE:true,
+      PHONE_RING_ACTIVE:false,
+      PHONE_ANSWERED:true,
+      STAFF_ACCESS_CARD:false
     }
   }),
   BED33:Object.freeze({
     id:'BED33',
-    label:'19:30｜4F 第 33 床決策前',
+    label:'19:30｜4F 護理站報到',
     time:'19:30',
     phase:'Phase0_1700_FirstArrival',
     zoneId:'first_campus_4f',
-    spawnId:'m3_4f_nursing_station',
+    spawnId:'m3_4f_ward_gate',
     trace:['17:00','19:30'],
-    tasks:[...BASE_TASKS],
+    tasks:[...M2_RECOVERY_TASKS],
     flags:{
       ...BASE_FLAGS,
-      FOURF_409_SEAL_CHECKED_AFTER_408C:true,
+      FAST_PATH_3F:true,
+      FOURF_409_SEAL_CHECKED_AFTER_408C:false,
       BED33_UNDERSTOOD:true,
       WHERE_0409:true,
       BED33_RESOLVED:false
@@ -104,17 +115,17 @@ export const PATIENTIZATION_RECOVERY_ANCHORS=Object.freeze({
   }),
   CHEST:Object.freeze({
     id:'CHEST',
-    label:'01:15｜第二院區轉院單決策前',
+    label:'01:15｜第二院區 5F／504B',
     time:'01:15',
     phase:'Phase3_2117_NightPatrol',
     zoneId:'second_campus_5f',
-    spawnId:'recovery_chest_transfer',
+    spawnId:'recovery_chest_patient',
     trace:['17:00','21:17','00:33','01:15'],
     tasks:[...POST_BED33_TASKS],
     flags:{
       ...POST_ER0033_FLAGS,
       SECOND_CAMPUS_5F_REPORTED:true,
-      SECOND_CHEST_PATIENT_SEEN:true,
+      SECOND_CHEST_PATIENT_SEEN:false,
       M4_CHEST_RESOLVED:false
     }
   }),
