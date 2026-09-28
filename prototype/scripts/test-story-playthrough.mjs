@@ -13,6 +13,7 @@ const server=supplied?null:await preview({root,preview:{port:4173,strictPort:tru
 const base=(supplied||'http://localhost:4173/').replace(/\/+$/,'')+'/';
 const url=base+'?qa=story';
 const browser=await chromium.launch({headless:true});
+const captureScreenshots=process.env.STORY_CAPTURE!=='0';
 const requiredShots=[
   'm1-3f-admin-316.png','m1-3f-storage-annie-static.png','m1-annie-close-inspection.png','m2-4f-nursing-station.png','m2-4f-duty-room.png',
   'm2-408c-bed.png','m2-409-sealed.png','m3-er-nursing-station.png','m3-0033-registration.png',
@@ -35,17 +36,21 @@ async function shot(name,zone,spawn,anchorName,position,target){
   if(zone)await load(zone,spawn);
   const view=await q(args=>window.__storyQA.captureView(args),{anchorName,position,target});
   await page.waitForTimeout(180);
-  const buffer=await page.screenshot({path:out+'/'+file,fullPage:false,timeout:90000});
-  const image=await readFile(out+'/'+file);
-  assert(buffer.length>1024,'Screenshot was empty: '+file);
-  assert.deepEqual([...image.subarray(0,8)],[137,80,78,71,13,10,26,10],'Invalid PNG: '+file);
-  assert.equal(image.readUInt32BE(16),1440,'Unexpected screenshot width: '+file);
-  assert.equal(image.readUInt32BE(20),900,'Unexpected screenshot height: '+file);
-  report.screenshots.push({
-    file,anchorName,rect:view.rect,bytes:image.length,
-    camera:{position,target,distance:Number(Math.hypot(...position.map((value,index)=>value-target[index])).toFixed(2))},
-    sha256:createHash('sha256').update(image).digest('hex')
-  });
+  if(captureScreenshots){
+    const buffer=await page.screenshot({path:out+'/'+file,fullPage:false,timeout:90000});
+    const image=await readFile(out+'/'+file);
+    assert(buffer.length>1024,'Screenshot was empty: '+file);
+    assert.deepEqual([...image.subarray(0,8)],[137,80,78,71,13,10,26,10],'Invalid PNG: '+file);
+    assert.equal(image.readUInt32BE(16),1440,'Unexpected screenshot width: '+file);
+    assert.equal(image.readUInt32BE(20),900,'Unexpected screenshot height: '+file);
+    report.screenshots.push({
+      file,anchorName,rect:view.rect,bytes:image.length,
+      camera:{position,target,distance:Number(Math.hypot(...position.map((value,index)=>value-target[index])).toFixed(2))},
+      sha256:createHash('sha256').update(image).digest('hex')
+    });
+  }else{
+    report.screenshots.push({file,anchorName,rect:view.rect,bytes:0,logicOnly:true});
+  }
   await writeFile(out+'/progress.json',JSON.stringify(report,null,2));
   console.log('SCREENSHOT',JSON.stringify({file,anchorName,rect:view.rect,bytes:image.length}));
 }
@@ -72,14 +77,18 @@ async function motionShot(name,anchorName,position,target,motionValue){
     motionValue=sample.value;
   }
   try{
-    const buffer=await page.screenshot({path:out+'/'+file,fullPage:false,timeout:90000});
-    assert(buffer.length>1024,'Motion screenshot was empty: '+file);
-    const image=await readFile(out+'/'+file);
-    report.motionScreenshots.push({
-      file,anchorName,rect:view.rect,motionValue,
-      camera:{position,target,distance:Number(Math.hypot(...position.map((value,index)=>value-target[index])).toFixed(2))},
-      bytes:image.length,sha256:createHash('sha256').update(image).digest('hex')
-    });
+    if(captureScreenshots){
+      const buffer=await page.screenshot({path:out+'/'+file,fullPage:false,timeout:90000});
+      assert(buffer.length>1024,'Motion screenshot was empty: '+file);
+      const image=await readFile(out+'/'+file);
+      report.motionScreenshots.push({
+        file,anchorName,rect:view.rect,motionValue,
+        camera:{position,target,distance:Number(Math.hypot(...position.map((value,index)=>value-target[index])).toFixed(2))},
+        bytes:image.length,sha256:createHash('sha256').update(image).digest('hex')
+      });
+    }else{
+      report.motionScreenshots.push({file,anchorName,rect:view.rect,motionValue,bytes:0,logicOnly:true});
+    }
     await writeFile(out+'/progress.json',JSON.stringify(report,null,2));
   }finally{
     if(frozen)await q(()=>{
@@ -141,10 +150,14 @@ async function answer4fPhone(label){
 async function functionalShot(file){
   await mkdir(out+'/functional',{recursive:true});
   const path=out+'/functional/'+file;
-  const buffer=await page.screenshot({path,fullPage:false,timeout:90000});
-  const image=await readFile(path);
-  assert(buffer.length>1024,'Functional screenshot was empty: '+file);
-  report.functionalScreenshots.push({file:'functional/'+file,bytes:image.length,sha256:createHash('sha256').update(image).digest('hex')});
+  if(captureScreenshots){
+    const buffer=await page.screenshot({path,fullPage:false,timeout:90000});
+    const image=await readFile(path);
+    assert(buffer.length>1024,'Functional screenshot was empty: '+file);
+    report.functionalScreenshots.push({file:'functional/'+file,bytes:image.length,sha256:createHash('sha256').update(image).digest('hex')});
+  }else{
+    report.functionalScreenshots.push({file:'functional/'+file,bytes:0,logicOnly:true});
+  }
   await writeFile(out+'/progress.json',JSON.stringify(report,null,2));
 }
 async function domClick(selector){
@@ -565,8 +578,10 @@ try{
   assert.equal(report.motionScreenshots.length,5,'Three bridge idle and two CPR animation frames are required');
   assert.deepEqual(report.functionalScreenshots.map(shot=>shot.file),['functional/m1-handoff-identity-choice.png','functional/m7-guard-post-approach.png','functional/m7-b-panel-e-prompt.png'],'M1 identity and M7 physical interaction screenshots are required');
   assert.equal(report.functionalFlows.length,4,'Three 4F phone raycast checks and the M7 physical interaction flow are required');
-  const pngFiles=(await readdir(out)).filter(file=>file.endsWith('.png')).sort();
-  assert.deepEqual(pngFiles.filter(file=>file!=='failure.png'),[...requiredShots].sort(),'Output must contain the 27 required screenshots');
+  if(captureScreenshots){
+    const pngFiles=(await readdir(out)).filter(file=>file.endsWith('.png')).sort();
+    assert.deepEqual(pngFiles.filter(file=>file!=='failure.png'),[...requiredShots].sort(),'Output must contain the 27 required screenshots');
+  }
   report.verdict='PASS';
 }catch(e){
   report.verdict='FAIL';report.failure=e.stack;report.last=await snap().catch(()=>null);
