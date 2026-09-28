@@ -52,7 +52,8 @@ async function shot(name,zone,spawn,anchorName,position,target){
     report.screenshots.push({file,anchorName,rect:view.rect,bytes:0,logicOnly:true});
   }
   await writeFile(out+'/progress.json',JSON.stringify(report,null,2));
-  console.log('SCREENSHOT',JSON.stringify({file,anchorName,rect:view.rect,bytes:image.length}));
+  const shotMeta=report.screenshots.at(-1);
+  console.log(captureScreenshots?'SCREENSHOT':'SHOT-CHECK',JSON.stringify({file,anchorName,rect:view.rect,bytes:shotMeta?.bytes||0}));
 }
 async function motionShot(name,anchorName,position,target,motionValue){
   const file='motion/'+name+'.png';
