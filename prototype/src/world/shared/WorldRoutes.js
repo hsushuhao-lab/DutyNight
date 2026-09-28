@@ -30,8 +30,12 @@ export const LIFT_PANELS={}, STAIR_DOORS={};
 for(const campus of ['first','second'])for(const f of campus==='first'?FIRST_FLOORS:SECOND_FLOORS){
  const zoneId=`${campus}_campus_${f}f`,o=CORE_ORIGINS[zoneId];
  add(`${campus}_${f}f_lift`,zoneId,corePoint(zoneId,0,1.5),0,`${campus==='first'?'第一':'第二'}院區 ${f}F 電梯`);
- const stair=campus==='first'?[6.2,1]:[-5,2.2];
- add(`${campus}_${f}f_stairs`,zoneId,corePoint(zoneId,...stair),campus==='first'?-Math.PI/2:Math.PI,`${f}F 安全梯門前`);
+ const first2F=zoneId==='first_campus_2f';
+ const stair=campus==='first'?(first2F?[-6.2,0]:[6.2,1]):[-5,2.2];
+ const stairYaw=campus==='first'?(first2F?Math.PI/2:-Math.PI/2):Math.PI;
+ add(`${campus}_${f}f_stairs`,zoneId,corePoint(zoneId,...stair),stairYaw,`${f}F 安全梯門前`);
  LIFT_PANELS[zoneId]={position:[o[0]+1.65,1.23,o[1]+3.72],yaw:Math.PI};
- STAIR_DOORS[zoneId]={position:[o[0]+(campus==='first'?7.78:-5),0,o[1]+(campus==='first'?1:3.78)],yaw:campus==='first'?-Math.PI/2:Math.PI};
+ STAIR_DOORS[zoneId]=first2F
+   ?{position:[o[0]-7.78,0,o[1]],yaw:-Math.PI/2}
+   :{position:[o[0]+(campus==='first'?7.78:-5),0,o[1]+(campus==='first'?0:3.78)],yaw:campus==='first'?-Math.PI/2:Math.PI};
 }
