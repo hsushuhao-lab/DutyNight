@@ -503,6 +503,7 @@ try{
   await waitForPageCondition(page,()=>document.getElementById('identity-matrix-modal')?.classList.contains('active'),30000);
   await domClick('#identity-candidate-ZHANG_SHOUHENG');
   await waitForPageCondition(page,()=>window.__storyQA.gameState.getFlag('M7_B2_RESOLVED')===true,30000);
+  await waitForPageCondition(page,()=>!document.getElementById('identity-matrix-modal')?.classList.contains('active'),5000);
   s=await snap();
   assert.equal(s.flags.M7_B2_RESOLVED,true);
   assert.equal(s.flags.B2_FIRE_RECAP_SEEN,true);
