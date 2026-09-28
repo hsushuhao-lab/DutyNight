@@ -448,6 +448,12 @@ try{
   assert.equal((await snap()).memory.proofs.identity,true);
   assert.equal((await snap()).memory.proofs.time,true);
   await load('first_campus_1f','m5_1f_lobby_entrance');
+  // Regression for repeated-Patientization softlock: older loop state could
+  // arrive here with M6 complete but transient B-Panel knowledge/key missing.
+  await flag('B_PANEL_CLUE_KNOWN',false);
+  await flag('B_PANEL_KEY',false);
+  await flag('FIRST_FLOOR_GUARD_KEY',false);
+  await flag('B2_SECURITY_SOURCE',false);
   await shot('m7-1f-guard-post',null,null,'FirstCampus1F_OldGuardPost',[-7.8,1.7,3.2],[-10.7,1.0,3.2]);
   await shot('m7-b-panel-concealed-door',null,null,'FirstFloor_BPanel_ConcealedDoor',[-11.2,1.7,4.55],[-13.78,1.18,4.55]);
   await load('first_campus_1f','m5_1f_lobby_entrance');
@@ -458,7 +464,11 @@ try{
   await functionalShot('m7-guard-post-approach.png');
   await page.keyboard.press('e');
   await waitForPageCondition(page,()=>window.__storyQA.gameState.getFlag('HIDDEN_SERVICE_DOOR_DISCOVERED')===true,5000);
-  assert.equal((await snap()).flags.B_PANEL_KEY,true,'B-Panel key must come from the 1F guard-post key cabinet, not the ER patient');
+  s=await snap();
+  assert.equal(s.flags.B_PANEL_CLUE_KNOWN,true,'guard post must repair B-Panel knowledge lost to an earlier Patientization');
+  assert.equal(s.flags.B_PANEL_KEY,true,'B-Panel key must come from the 1F guard-post key cabinet, not the ER patient');
+  assert.equal(s.flags.FIRST_FLOOR_GUARD_KEY,true);
+  assert.equal(s.flags.B2_SECURITY_SOURCE,true,'guard inspection must restore the security source before B2');
   assert(await q(()=>{const zone=window.__storyQA.worldRouter.activeZoneInstance;return zone.hiddenServiceFrame.visible&&zone.hiddenServiceKeyhole.visible}),'the discovered door frame and keyhole must be visible in the live scene');
   assert.match(await taskText(),/檢查警衛台後方浮現的舊門框/,'inspecting the post must reveal the updated service-door objective');
   await q(position=>window.__storyQA.controller.teleport(...position),[-12.15,1.7,4.55]);
