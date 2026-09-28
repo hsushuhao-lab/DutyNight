@@ -1,53 +1,133 @@
-name: Release candidate diagnostics
+name: DutyNight verified release
 on:
   push:
     branches: [master]
     paths: ['.github/workflows/release-workspace.yml']
 permissions:
-  contents: read
+  contents: write
+  pages: write
+  id-token: write
 jobs:
-  acceptance:
+  release:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 75
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 100
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Prepare isolated candidate
+          cache: npm
+          cache-dependency-path: prototype/package-lock.json
+      - name: Prepare exact release source
+        id: candidate
         run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          import textwrap,subprocess
-          source=Path('.github/workflows/repair-workspace-export.yml').read_text()
-          command=source.split('      - name: Apply guarded targeted repairs\n',1)[1].split('        run: |\n',1)[1].split('      - name: Build and verify candidate geometry\n',1)[0]
-          subprocess.run(['bash','-e','-c',textwrap.dedent(command)],check=True)
-          p=Path('prototype/scripts/test-b2-fail-forward.mjs');s=p.read_text()
-          s=s.replace("  page.on('pageerror', error => report.errors.push(error.message));", "  page.on('pageerror', error => report.errors.push(error.message));\n  page.on('console',m=>{if(m.text().startsWith('FINAL_DIAG'))console.log(m.text());});")
-          s=s.replace("    q.interact({type:'workstation'});", """    const original=q.controller.onInteract;
-              q.controller.onInteract=async target=>{
-                console.log('FINAL_DIAG before '+JSON.stringify({target,zone:q.worldRouter.activeZoneId,flags:Object.fromEntries(q.gameState.flags)}));
-                await original(target);
-                console.log('FINAL_DIAG after '+JSON.stringify({active:q.cinematicDirector.activeId,dialogue:!!q.uiManager.dialogueSequence,modal:document.getElementById('final-handoff-modal').className,flags:Object.fromEntries(q.gameState.flags)}));
-              };
-              q.interact({type:'workstation'});""")
-          s=s.replace("  report.errors.push(error.stack || error.message);", "  report.errors.push(error.stack || error.message);\n  report.failureState=await page.evaluate(()=>({snapshot:window.__storyQA.snapshot(),subtitle:document.getElementById('subtitle-text').textContent,active:window.__storyQA.cinematicDirector.activeId,modals:[...document.querySelectorAll('.active')].map(e=>e.id)}));")
-          p.write_text(s)
-          PY
-      - name: Build candidate
+          python3 .github/prepare_release_candidate.py
+          git rm .github/prepare_release_candidate.py .github/workflows/repair-workspace-export.yml .github/workflows/release-workspace.yml
+          git add prototype/scripts/test-b2-fail-forward.mjs prototype/scripts/test-story-playthrough.mjs docs/releases/2026-09-28.md
+          git diff --cached --check
+          git commit -m 'release: deterministic story acceptance and clean release source'
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "DUTYNIGHT_SOURCE_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      - name: Build and complete structural regressions
         working-directory: prototype
         run: |
           npm ci
           node scripts/write-build-info.mjs
           npm run build
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,os,subprocess,textwrap
+          source=Path('../.github/workflows/deploy-pages.yml').read_text()
+          commands=source.split('      - name: Fast structural QA\n',1)[1].split('        run: |\n',1)[1].split('      - name: Report runtime asset budget\n',1)[0]
+          subprocess.run(['bash','-e','-c',textwrap.dedent(commands)],check=True)
+          Path('qa-results').mkdir(exist_ok=True)
+          Path('qa-results/structural.json').write_text(json.dumps({'verdict':'PASS','sourceSha':os.environ['DUTYNIGHT_SOURCE_SHA']}))
+          PY
+          node scripts/check-asset-budget.mjs
           npx playwright install --with-deps chromium
-      - name: B2 readiness reproduction
+      - name: B2 failed identity through mandatory history to 316
         working-directory: prototype
-        timeout-minutes: 8
-        run: node scripts/test-b2-fail-forward.mjs qa-results/release-b2-diagnostic
-      - uses: actions/upload-artifact@v4
-        if: always()
+        timeout-minutes: 10
+        run: node scripts/test-b2-fail-forward.mjs qa-results/release-b2-local
+      - name: Complete M1-M9 story and perfect ending
+        working-directory: prototype
+        timeout-minutes: 25
+        env:
+          STORY_CAPTURE: '0'
+        run: node scripts/test-story-playthrough.mjs qa-results/release-story-local
+      - name: First and repeated Patientization recovery
+        working-directory: prototype
+        timeout-minutes: 6
+        env:
+          GITHUB_SHA: ${{ steps.candidate.outputs.sha }}
+        run: node scripts/test-patientization-cinematic.mjs qa-results/release-patientization
+      - name: Publish only the passing unchanged source
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,os
+          base=Path('prototype/qa-results')
+          for path in [base/'structural.json',base/'release-b2-local/result.json',base/'release-story-local/result.json',base/'release-patientization/result.json']:
+              data=json.loads(path.read_text())
+              assert data['verdict']=='PASS',(str(path),data)
+              assert data['sourceSha']==os.environ['DUTYNIGHT_SOURCE_SHA'],(str(path),data['sourceSha'])
+              print(path,'PASS',data['sourceSha'])
+          PY
+          git diff --exit-code
+          git fetch origin master main --depth=100
+          test "$(git rev-parse origin/master)" = "$GITHUB_SHA"
+          git merge-base --is-ancestor origin/main HEAD
+          git push --atomic origin HEAD:master HEAD:main
+      - uses: actions/configure-pages@v5
         with:
-          name: release-diagnostics
+          enablement: true
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: prototype/dist
+      - name: Deploy verified source to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+      - name: Verify public release fingerprint
+        working-directory: prototype
+        env:
+          GITHUB_SHA: ${{ steps.candidate.outputs.sha }}
+        run: node scripts/verify-live-build.mjs '${{ steps.deployment.outputs.page_url }}'
+      - name: Public anonymous reports desktop and 2F escape-door acceptance
+        working-directory: prototype
+        timeout-minutes: 12
+        run: node scripts/test-repair-acceptance.mjs qa-results/release-repair-public '${{ steps.deployment.outputs.page_url }}'
+      - name: Public B2 fail-forward and final authorization
+        working-directory: prototype
+        timeout-minutes: 10
+        run: node scripts/test-b2-fail-forward.mjs qa-results/release-b2-public '${{ steps.deployment.outputs.page_url }}'
+      - name: Create formal GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,os
+          base=Path('prototype/qa-results')
+          for suite in ['release-repair-public','release-b2-public']:
+              data=json.loads((base/suite/'result.json').read_text())
+              assert data['verdict']=='PASS',(suite,data)
+              assert data['sourceSha']==os.environ['DUTYNIGHT_SOURCE_SHA'],(suite,data['sourceSha'])
+          notes=Path('/tmp/release-notes.md')
+          notes.write_text(Path('docs/releases/2026-09-28.md').read_text()+'\n發布 SHA：`'+os.environ['DUTYNIGHT_SOURCE_SHA']+'`\n\nPASS：結構／幾何回歸、M1–M9 主線與完美結局、Patientization 回溯、B2 辨識失敗仍可通關、公開版匿名報到／桌面／2F 門體與互動、公開版 SHA 核對。\n\nM1–M9 使用 QA 定位及必要狀態設置；公開專項另以實際準星及 E 鍵驗證互動，並附真實截圖。\n')
+          PY
+          cd prototype
+          zip -qr /tmp/DutyNight-2026.09.28-acceptance.zip qa-results
+          cd ..
+          gh release create v2026.09.28 /tmp/DutyNight-2026.09.28-acceptance.zip --target "$DUTYNIGHT_SOURCE_SHA" --title 'DutyNight 2026.09.28｜修正正式發布' --notes-file /tmp/release-notes.md
+      - name: Preserve release evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dutynight-release-evidence
           path: prototype/qa-results/
-          retention-days: 2
+          retention-days: 30
