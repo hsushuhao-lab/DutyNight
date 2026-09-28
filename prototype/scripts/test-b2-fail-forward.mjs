@@ -61,6 +61,8 @@ try {
   assert.match(firstAttempt.status, /比對失敗|載入事故紀錄/);
   report.checkpoints.push({ id: 'ONE_ATTEMPT_ONLY', ...firstAttempt });
   await page.screenshot({ path: `${output}/01-attempt-consumed.png` });
+  await page.locator('#btn-close-identity-matrix').click();
+  await page.waitForFunction(()=>!document.getElementById('identity-matrix-modal')?.classList.contains('active'),null,{timeout:5000});
 
   await page.evaluate(() => window.__storyQA.interact({ type: 'b2_archive_terminal' }));
   await page.waitForTimeout(120);
