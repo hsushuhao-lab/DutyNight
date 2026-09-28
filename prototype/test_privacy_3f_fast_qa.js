@@ -58,7 +58,7 @@ assert(floor.includes("AdminDesk_Printer")&&floor.includes("AdminDesk_Keyboard")
 assert(!floor.includes("asset(this.zoneGroup,'printer',[-20.28,.82,5.30]"),'Floating printer asset must not return');
 assert(level.includes("RailNorthEast_WestOfStorage")&&level.includes("RailNorthEast_EastOfStorage"),'CPR doorway handrail must remain split');
 assert(art.includes("clearStorageDoor=x>=12.75&&x<=14.25"),'Rail mounting brackets must skip the CPR doorway');
-assert(verticalCore.includes("zoneId==='first_campus_4f'||zoneId==='first_campus_3f'"),'3F shared elevator core must cut the west office doorway');
+assert(verticalCore.includes("['first_campus_2f','first_campus_3f','first_campus_4f'].includes(zoneId)"),'first-campus 2F/3F/4F shared core must cut the west stair/office doorway');
 assert(level.includes("id:'CPR_ANNE'")&&level.includes("type:'cpr_anne'"),'CPR mannequin inspection interaction missing');
 assert(level.includes("state:'STORAGE_STATIC'")&&level.includes("this.anneStool"),'Static Annie mannequin or stool missing');
 assert(main.includes("office_phone_316")&&main.includes("PHONE_ANSWERED"),'316 phone anomaly interaction missing');
