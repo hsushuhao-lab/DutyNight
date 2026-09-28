@@ -41,7 +41,21 @@ try{
         detail:document.querySelector('#loop-gameover-card span')?.textContent||''
       }));
       assert.equal(restoredCard.title,'MEMORY ANCHOR RESTORED');
-      assert.match(restoredCard.detail,/19:30｜4F 第 33 床決策前/);
+      assert.match(restoredCard.detail,/19:30｜4F 護理站報到/);
+      const beforeReport=await page.evaluate(()=>({
+        reported:window.__storyQA.gameState.isTaskComplete('P1_4F_REPORT'),
+        normalEvent:window.__storyQA.gameState.isTaskComplete('P1_NORMAL_EVENT_DONE'),
+        bed33:window.__storyQA.gameState.getFlag('BED33_RESOLVED')
+      }));
+      assert.deepEqual(beforeReport,{reported:false,normalEvent:false,bed33:false});
+      await page.evaluate(()=>window.__storyQA.interact({id:'first_ward_reader_sensor'}));
+      await page.waitForFunction(()=>window.__storyQA.gameState.isTaskComplete('P1_4F_REPORT')&&window.__storyQA.gameState.getFlag('BED33_RESOLVED')===true);
+      const afterReport=await page.evaluate(()=>({
+        reported:window.__storyQA.gameState.isTaskComplete('P1_4F_REPORT'),
+        normalEvent:window.__storyQA.gameState.isTaskComplete('P1_NORMAL_EVENT_DONE'),
+        bed33:window.__storyQA.gameState.getFlag('BED33_RESOLVED')
+      }));
+      assert.deepEqual(afterReport,{reported:true,normalEvent:true,bed33:true},'M2 repeat must collapse 408C/409/Bed33 after one nursing report');
     }
     report.runs.push({skip,scene,after});
   }
