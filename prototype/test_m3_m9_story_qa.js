@@ -17,6 +17,7 @@ const routes=readFileSync('./src/world/shared/WorldRoutes.js','utf8');
 const html=readFileSync('./index.html','utf8');
 const ui=readFileSync('./src/ui/UIManager.js','utf8');
 const memorySource=readFileSync('./src/core/PersistentMemory.js','utf8');
+const first1f=readFileSync('./src/world/zones/FirstCampus1F.js','utf8');
 
 assert(!main.includes('工號'),'player-facing story copy must use 員編 terminology');
 assert(ui.includes("17:00｜值班身分驗證異常")&&main.includes("HANDOFF_DEFAULT"),'M1 must make the default-template choice a real 409 Patientization decision');
@@ -61,7 +62,10 @@ assert(main.includes("M6_FLOOR6_RESOLVED")&&!main.includes("interactable.type ==
 
 assert(b2.includes("type:'b2_archive_terminal'")&&b2.includes("type:'b2_exit_door'")&&!b2.includes('B2_EscapeStairwell'),'M7 B2 must use terminal plus one-way exit door, with no stairwell');
 assert(html.includes('identity-matrix-modal')&&main.includes('IDENTITY_CANDIDATES')&&main.includes("candidate.id!=='ZHANG_SHOUHENG'"),'B2 must use the four-doctor contradiction matrix rather than auto-resolving identity');
-assert(main.includes("B_PANEL_CLUE_KNOWN")&&main.includes("WANG_B_PANEL_KEY")&&!main.includes('她掉下來的舊十字鑰匙'),'B-Panel key provenance must resolve through the 1F guard post');
+assert(main.includes("gameState.setFlag('B_PANEL_CLUE_KNOWN',true)")&&main.includes("gameState.setFlag('B_PANEL_KEY',true)")&&main.includes("WANG_B_PANEL_KEY")&&!main.includes('她掉下來的舊十字鑰匙'),'B-Panel key provenance must always resolve through the 1F guard post');
+assert(first1f.includes("unlocked&&(!discovered||!hasPanelKey)"),'guard post must remain interactable after the hidden door appears if the B-Panel key is still missing');
+assert(ui.includes('回警衛台金屬鑰匙櫃取出 B-Panel 十字鑰匙'),'M7 task guidance must recover from a discovered-door/missing-key state');
+assert(memorySource.includes("this.hasEvidence('M3_ER_PHOTO')")&&memorySource.includes("gameState.setFlag('B_PANEL_CLUE_KNOWN',true)"),'persistent Liu Zhi-Yuan evidence must rehydrate B-Panel knowledge after Patientization');
 assert(main.includes("interactable.type === 'er_nurse_computer'")&&main.includes('這個電腦是護理師專用'),'ER nurse computers must redirect the physician');
 assert(main.includes("gameState.setFlag('B2_IDENTITY_INCOMPLETE',true)")&&main.includes("interactable.type === 'b2_exit_door'")&&main.includes("B2_EXITED_PERMANENTLY"),'B2 unresolved identity may still fail forward through the permanent one-way exit');
 assert(main.includes("先啟動 B2 封存終端")&&main.includes("B2_FIRE_RECAP_SEEN"),'B2 exit must remain locked until the fire-history recap has been viewed');
