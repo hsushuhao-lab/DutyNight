@@ -35,6 +35,8 @@ assert(main.includes("setFlag('SECOND_CAMPUS_OBJECTIVE_ACTIVE',true)"),'M3 looku
 assert(main.includes('八樓天橋的門禁權限已開放'),'second-campus call must identify the bridge floor');
 assert(main.includes('怎麼知道我在 316 辦公室'),'M3 phone must establish the 316 privacy violation');
 assert(html.includes('final-employee-id'),'M9 must collect the four-digit employee suffix');
+assert(html.includes('316｜紀錄權限驗證')&&html.includes('請輸入本夜值班紀錄的正確員編末四碼。'),'M9 UI must request only the employee suffix, not name plus full ID');
+assert(!html.includes('請核對本夜真正完成值班之醫師姓名與員編。'),'obsolete name-plus-ID instruction must not return');
 assert(main.includes("name!==TRUE_NAME_CANON||employeeId!=='0409'"),'M9 must require both the exact canonical name and employee ID');
 assert(!readFileSync('./src/ui/UIManager.js','utf8').includes('突然出現在樓層選單裡的「6F」'),'M6 task must not spoil the floor');
 assert(!readFileSync('./src/world/WorldRouter.js','utf8').includes("label:'6F'"),'phantom 6F must never be a selectable floor');
