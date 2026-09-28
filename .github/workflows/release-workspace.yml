@@ -1,4 +1,4 @@
-name: Release workspace snapshot
+name: Release candidate diagnostics
 on:
   push:
     branches: [master]
@@ -6,15 +6,15 @@ on:
 permissions:
   contents: read
 jobs:
-  snapshot:
+  acceptance:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Reproduce the guarded repair candidate without publishing
+      - name: Prepare isolated candidate
         id: candidate
         run: |
           python3 - <<'PY'
@@ -25,17 +25,68 @@ jobs:
           Path('/tmp/prepare-candidate.sh').write_text(textwrap.dedent(command))
           PY
           bash /tmp/prepare-candidate.sh
-      - name: Export tracked source and locked dependencies only
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('prototype/scripts/test-b2-fail-forward.mjs');s=p.read_text()
+          s=s.replace("  page.on('pageerror', error => report.errors.push(error.message));", "  page.on('pageerror', error => report.errors.push(error.message));\n  page.on('console',m=>{if(m.text().startsWith('FINAL_DIAG'))console.log(m.text());});")
+          s=s.replace("    q.interact({type:'workstation'});", """    const original=q.controller.onInteract;
+              q.controller.onInteract=async target=>{
+                console.log('FINAL_DIAG before '+JSON.stringify({target,zone:q.worldRouter.activeZoneId,flags:Object.fromEntries(q.gameState.flags)}));
+                await original(target);
+                console.log('FINAL_DIAG after '+JSON.stringify({active:q.cinematicDirector.activeId,dialogue:!!q.uiManager.dialogueSequence,modal:document.getElementById('final-handoff-modal').className,flags:Object.fromEntries(q.gameState.flags)}));
+              };
+              q.interact({type:'workstation'});""")
+          s=s.replace("  report.errors.push(error.stack || error.message);", "  report.errors.push(error.stack || error.message);\n  report.failureState=await page.evaluate(()=>({snapshot:window.__storyQA.snapshot(),subtitle:document.getElementById('subtitle-text').textContent,active:window.__storyQA.cinematicDirector.activeId,modals:[...document.querySelectorAll('.active')].map(e=>e.id)}));")
+          p.write_text(s)
+          p=Path('prototype/scripts/test-story-playthrough.mjs');s=p.read_text()
+          old="""  await waitForPageCondition(page,()=>document.getElementById('identity-matrix-modal')?.classList.contains('active'),30000);
+            await domClick('#identity-candidate-ZHANG_SHOUHENG');
+            await waitForPageCondition(page,()=>document.getElementById('b2-fire-recap')?.classList.contains('active'),30000);
+            await waitForPageCondition(page,()=>window.__storyQA.gameState.getFlag('M7_B2_RESOLVED')===true,30000);"""
+          old=textwrap.dedent(old)
+          start=s.index("  await interact({id:'B2_ARCHIVE_TERMINAL'});")
+          end=s.index("  s=await snap();",start)
+          s=s[:start]+"""  await interact({id:'B2_ARCHIVE_TERMINAL'});
+            await waitForPageCondition(page,()=>document.getElementById('b2-fire-recap')?.classList.contains('active'),30000);
+            for(let i=0;i<24;i++){
+              if(await q(()=>window.__storyQA.gameState.getFlag('B2_FIRE_RECAP_SEEN')))break;
+              await page.waitForTimeout(360);await page.keyboard.press('E');
+            }
+            await waitForPageCondition(page,()=>window.__storyQA.gameState.getFlag('B2_FIRE_RECAP_SEEN')===true,30000);
+            await interact({id:'B2_ARCHIVE_TERMINAL'});
+            await waitForPageCondition(page,()=>document.getElementById('identity-matrix-modal')?.classList.contains('active'),30000);
+            await domClick('#identity-candidate-ZHANG_SHOUHENG');
+            await waitForPageCondition(page,()=>window.__storyQA.gameState.getFlag('M7_B2_RESOLVED')===true,30000);
+            await domClick('#btn-close-identity-matrix');
+          """+s[end:]
+          p.write_text(s)
+          git add prototype/scripts/test-b2-fail-forward.mjs prototype/scripts/test-story-playthrough.mjs
+          git commit -m 'test: diagnose final readiness and follow recap-first B2 contract'
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Build candidate
+        working-directory: prototype
         run: |
-          mkdir -p /tmp/release-workspace
-          git archive --format=tar.gz HEAD > /tmp/release-workspace/source.tar.gz
-          git rev-parse HEAD > /tmp/release-workspace/source-sha.txt
-          git rev-parse HEAD^{tree} > /tmp/release-workspace/source-tree.txt
-          cd prototype
           npm ci
-          tar -czf /tmp/release-workspace/dependencies.tar.gz node_modules
+          node scripts/write-build-info.mjs
+          npm run build
+          npx playwright install --with-deps chromium
+      - name: B2 readiness reproduction
+        working-directory: prototype
+        timeout-minutes: 8
+        env:
+          DUTYNIGHT_SOURCE_SHA: ${{ steps.candidate.outputs.sha }}
+        run: node scripts/test-b2-fail-forward.mjs qa-results/release-b2-diagnostic
+      - name: Complete story progression
+        if: success() || failure()
+        working-directory: prototype
+        timeout-minutes: 25
+        env:
+          DUTYNIGHT_SOURCE_SHA: ${{ steps.candidate.outputs.sha }}
+          STORY_CAPTURE: '0'
+        run: node scripts/test-story-playthrough.mjs qa-results/release-story-diagnostic
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
-          name: release-workspace
-          path: /tmp/release-workspace/
-          retention-days: 1
+          name: release-diagnostics
+          path: prototype/qa-results/
+          retention-days: 2
