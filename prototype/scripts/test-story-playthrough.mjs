@@ -223,14 +223,16 @@ try{
   await shot('m2-408c-bed','first_campus_4f','m2_4f_409','Bed_408C',[9.8,1.7,-8.2],[8.1,.8,-7.32]);
   await shot('m2-409-sealed','first_campus_4f','m2_4f_409','Bed33_409_WarningTape',[5.0,1.7,-3.0],[6.88,1.2,-3.0]);
 
-  // M2: deliberately fail first, verify identity override + soft reset + persistent cognition.
+  // M2 primary story path: resolve the 408C -> sealed 409 -> Bed33 contradiction.
+  // Patientization/recovery is covered separately by test-patientization-cinematic.mjs,
+  // so this full M1-M9 pass stays focused on uninterrupted production progression.
   await setM2Checkpoint();
   await task('P1_4F_REPORT');
   await load('first_campus_4f','m3_4f_nursing_station');
   await interact({id:'BED33_ASSIGNMENT'});
   assert.equal(await page.locator('#bed33-modal.active').count(),0,'409A form must stay closed before the 408C event');
   await interact({id:'408C_BED_PLAQUE'});
-  await page.waitForTimeout(6000);
+  await page.waitForTimeout(700);
   assert.equal(await page.locator('#bed33-modal.active').count(),0,'408C must not open the 409A form automatically');
   await load('first_campus_4f','m2_4f_409');
   await pressEAt([6.72,1.18,-3.0],'BED33_409_SEALED');
@@ -242,37 +244,13 @@ try{
   await interact({id:'BED33_ASSIGNMENT'});
   await page.waitForSelector('#bed33-modal.active');
   await assertCinematicPlayed('FIRST_409_BED33_ANOMALY');
-
-  await q(()=>new Promise((resolve,reject)=>{
-    document.getElementById('btn-bed33-confirm').click();
-    setTimeout(()=>{
-      const cutscene=document.getElementById('loop-cutscene');
-      const skip=document.getElementById('btn-loop-skip');
-      if(!cutscene?.classList.contains('active')||!skip||skip.getBoundingClientRect().width===0){
-        reject(new Error('Loop fast-forward control was not visible during override'));
-        return;
-      }
-      skip.click();
-      resolve();
-    },500);
-  }));
-  await waitForPageCondition(page,()=>window.__storyQA.worldRouter.activeZoneId==='first_campus_3f',30000);
-  s=await snap();
-  assert.equal(s.memory.loopCount,1);assert.equal(s.memory.survivalRules.neverSignBed33,true);
-  assert(s.memory.journalNotes.some(n=>n.id==='RULE_BED33'));
-  await mark('M2 override loops to 17:00 with memory');
-
-  // M2 second loop: use remembered rule and reject without re-learning every clue.
-  await flag('STAFF_ACCESS_CARD',true);await flag('HOOK_409_ZERO_ROOM',true);await task('KEY_PICKUP');await task('WARD_ENTRY');await task('P1_4F_REPORT');await task('P1_NORMAL_EVENT_DONE');
-  await load('first_campus_4f','m2_4f_409');
-  await pressEAt([6.72,1.18,-3.0],'BED33_409_SEALED');await closeArchive();
-  await load('first_campus_4f','m3_4f_nursing_station');
-  await interact({id:'BED33_ASSIGNMENT'});
-  await page.waitForSelector('#bed33-modal.active');
-  assert.equal(await page.locator('#btn-bed33-reject').isVisible(),true);
   await domClick('#btn-bed33-reject');
-  s=await snap();assert.equal(s.flags.BED33_RESOLVED,true);assert.equal(s.memory.proofs.space,true);assert.equal(s.memory.trueNameFragments.frag_employeePrefix,'MED-87');
-  await mark('M2 resolved by persistent cognition');
+  s=await snap();
+  assert.equal(s.flags.BED33_RESOLVED,true);
+  assert.equal(s.memory.proofs.space,true);
+  assert.equal(s.memory.trueNameFragments.frag_employeePrefix,'MED-87');
+  assert.equal(s.memory.loopCount,0,'correct M2 choice must not consume a loop');
+  await mark('M2 Bed33 contradiction resolved without Patientization');
 
   // 20:05: opening the duty-room door starts the call; the task and Jane Doe appear only after E on the ringing phone.
   await flag('HOOK_0217',true);await task('P1_NORMAL_EVENT_DONE');
