@@ -187,6 +187,8 @@ export const PATIENTIZATION_RECOVERY_ANCHORS=Object.freeze({
       HIDDEN_SERVICE_DOOR_DISCOVERED:true,
       B_PANEL_CLUE_KNOWN:true,
       B_PANEL_KEY:true,
+      FIRST_FLOOR_GUARD_KEY:true,
+      B2_SECURITY_SOURCE:true,
       M7_B2_OPEN:false
     }
   })
