@@ -1242,8 +1242,13 @@ export class UIManager {
           {id:'task-m9-final-handoff',text:'文史核對完成；立即返回 316，輸入正確權限阻止事故與身分紀錄被再次覆蓋',state:'ready'}
         ]);
       }else if(this.gameState.getFlag('M6_FLOOR6_RESOLVED')&&!this.gameState.getFlag('M7_B2_OPEN')&&!this.gameState.getFlag('M7_B2_RESOLVED')){
+        const serviceDoorFound=this.gameState.getFlag('HIDDEN_SERVICE_DOOR_DISCOVERED');
+        const panelKey=this.gameState.getFlag('B_PANEL_KEY');
+        const text=serviceDoorFound
+          ?(panelKey?'檢查警衛台後方浮現的舊門框':'回警衛台金屬鑰匙櫃取出 B-Panel 十字鑰匙')
+          :'02:17 前往第一院區 1F 警衛台，查找異常門禁與監視紀錄';
         this.renderTaskBoard('翌日 02:17 前｜門禁紀錄',[
-          {id:'task-m7-service-door',text:this.gameState.getFlag('HIDDEN_SERVICE_DOOR_DISCOVERED')?'檢查警衛台後方浮現的舊門框':'02:17 前往第一院區 1F 警衛台，查找異常門禁與監視紀錄',state:'ready'}
+          {id:'task-m7-service-door',text,state:'ready'}
         ]);
       }else if(this.gameState.getFlag('M7_B2_OPEN')&&!this.gameState.getFlag('B2_FIRE_RECAP_SEEN')){
         this.renderTaskBoard('翌日 02:17｜B2 封存終端',[
