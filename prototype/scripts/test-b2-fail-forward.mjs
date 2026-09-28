@@ -141,7 +141,14 @@ try {
   assert.equal(await page.locator('#final-handoff-modal.active').count(),0,'employee-code input must stay closed until the post-recap dialogue is acknowledged');
   await page.screenshot({ path: `${output}/03-316-post-recap-pre-input.png` });
   report.checkpoints.push({id:'INPUT_LOCKED_UNTIL_RECAP_AND_DIALOGUE_COMPLETE',...recapAudit});
-  while(await page.evaluate(()=>!!window.__storyQA.uiManager.dialogueSequence))await page.keyboard.press('e');
+  // CG_*_PLAYED can flip on the last cinematic frame just before its onComplete
+  // callback installs the two-line terminal dialogue. Wait for that handoff so
+  // the test does not mistake the tiny gap for "no dialogue".
+  await page.waitForFunction(()=>!!window.__storyQA.uiManager.dialogueSequence||document.getElementById('final-handoff-modal')?.classList.contains('active'),null,{timeout:10000});
+  while(await page.evaluate(()=>!!window.__storyQA.uiManager.dialogueSequence)){
+    await page.keyboard.press('e');
+    await page.waitForTimeout(40);
+  }
   await page.waitForFunction(()=>document.getElementById('final-handoff-modal')?.classList.contains('active'),null,{timeout:10000});
   await page.locator('#final-employee-id').fill('0409');
   // Use the DOM event directly here: the submit handler immediately launches a
