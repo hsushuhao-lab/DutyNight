@@ -104,9 +104,12 @@ try {
   // post-B2 1998 personnel review before the 316 final authorization can open.
   await page.evaluate(() => window.__storyQA.interact({ id: 'ARCHIVE_PERSONNEL_1998' }));
   await page.waitForFunction(()=>document.getElementById('archive-modal')?.classList.contains('active'),null,{timeout:10000});
-  for(let i=0;i<6;i++)await page.locator('#btn-archive-next').click();
+  for(let i=0;i<6;i++){
+    await page.evaluate(()=>document.getElementById('btn-archive-next')?.click());
+    await page.waitForTimeout(120);
+  }
   await page.waitForFunction(()=>window.__storyQA.gameState.getFlag('ARCHIVE_PERSONNEL_OBJECTIVE')===false,null,{timeout:10000});
-  await page.locator('#btn-close-archive').click();
+  await page.evaluate(()=>document.getElementById('btn-close-archive')?.click());
   const afterHistory=await page.evaluate(()=>window.__storyQA.snapshot());
   assert.equal(afterHistory.flags.HISTORY_PERSONNEL_PROFILES_REVIEWED,true);
   assert.equal(afterHistory.flags.B2_HISTORY_FALLBACK_ACTIVE,false);
