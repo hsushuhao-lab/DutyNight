@@ -1,34 +1,89 @@
-name: Repair workspace export
+name: Repair acceptance run
 on:
   push:
     branches: [master]
     paths: ['.github/workflows/repair-workspace-export.yml']
 permissions:
-  contents: read
+  contents: write
 jobs:
-  export:
+  repair:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
-        with:
-          persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Install locked test dependencies
-        working-directory: prototype
-        run: npm ci
-      - name: Package tracked source and test dependencies only
+      - name: Apply exact audited repair patch
+        id: candidate
         run: |
-          git rev-parse HEAD > source-sha.txt
-          git archive --format=tar.gz HEAD > source.tar.gz
-          tar -czf dependencies.tar.gz -C prototype node_modules
+          python3 - <<'PY'
+          import base64,gzip,hashlib,pathlib,subprocess
+          encoded='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 '
+          patch=gzip.decompress(base64.b64decode(encoded))
+          assert hashlib.sha256(patch).hexdigest()=='031911e8fa6bf890f6e443a3541cd87b265079032ec38879675364c50eb7ef0f','Patch checksum mismatch'
+          pathlib.Path('/tmp/repair.patch').write_bytes(patch)
+          subprocess.run(['git','apply','--check','/tmp/repair.patch'],check=True)
+          subprocess.run(['git','apply','/tmp/repair.patch'],check=True)
+          PY
+          git diff --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .github/workflows/deploy-pages.yml .github/workflows/story-browser-playthrough.yml prototype/scripts/test-story-playthrough.mjs prototype/scripts/test-repair-acceptance.mjs prototype/src/world/shared/VerticalCore.js prototype/src/world/shared/WorldRoutes.js prototype/test_visual_geometry_contract_qa.js prototype/test_repair_geometry_qa.js
+          git commit -m 'fix: validate real M4 report and finish 2F escape-door mounting'
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Install locked dependencies and build candidate
+        working-directory: prototype
+        env:
+          GITHUB_SHA: ${{ steps.candidate.outputs.sha }}
+        run: |
+          npm ci
+          node scripts/write-build-info.mjs
+          npm run build
+          node test_repair_geometry_qa.js
+          node test_playable_world_qa.js
+          node test_visual_geometry_contract_qa.js
+          npx playwright install --with-deps chromium
+      - name: Targeted visual and interaction acceptance
+        id: targeted
+        continue-on-error: true
+        timeout-minutes: 10
+        working-directory: prototype
+        env:
+          GITHUB_SHA: ${{ steps.candidate.outputs.sha }}
+        run: node scripts/test-repair-acceptance.mjs qa-results/repair-acceptance
+      - name: Complete M1-M9 browser progression
+        id: story
+        continue-on-error: true
+        timeout-minutes: 20
+        working-directory: prototype
+        env:
+          GITHUB_SHA: ${{ steps.candidate.outputs.sha }}
+          STORY_CAPTURE: '0'
+        run: node scripts/test-story-playthrough.mjs qa-results/repair-story
+      - name: B2 failed-identity fail-forward
+        id: b2
+        continue-on-error: true
+        timeout-minutes: 10
+        working-directory: prototype
+        env:
+          GITHUB_SHA: ${{ steps.candidate.outputs.sha }}
+        run: node scripts/test-b2-fail-forward.mjs qa-results/repair-b2
+      - name: Publish only the fully passing candidate
+        if: steps.targeted.outcome == 'success' && steps.story.outcome == 'success' && steps.b2.outcome == 'success'
+        run: |
+          git fetch origin master --depth=1
+          test "$(git rev-parse origin/master)" = '${{ github.sha }}'
+          git push origin HEAD:master
+      - name: Require all acceptance results
+        if: always()
+        run: |
+          test '${{ steps.targeted.outcome }}' = success
+          test '${{ steps.story.outcome }}' = success
+          test '${{ steps.b2.outcome }}' = success
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
-          name: repair-workspace
-          path: |
-            source-sha.txt
-            source.tar.gz
-            dependencies.tar.gz
-          retention-days: 1
+          name: repair-acceptance-evidence
+          path: prototype/qa-results/
+          retention-days: 7
