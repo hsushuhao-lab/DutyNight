@@ -364,14 +364,14 @@
   <div id="final-handoff-modal" class="modal-overlay">
     <div class="locker-window">
       <div class="locker-header">
-        <div><strong>316｜最終交班驗證</strong><small>值班醫師身分核對</small></div>
+        <div><strong>316｜紀錄權限驗證</strong><small>值班紀錄身分核對</small></div>
         <button id="btn-close-final-handoff" class="btn-win-close" aria-label="關閉最終交班">✕</button>
       </div>
       <div class="locker-body">
-        <p>請核對本夜真正完成值班之醫師姓名與員編。</p>
+        <p>請輸入本夜值班紀錄的正確員編末四碼。</p>
         <label for="final-employee-id">員編末四碼</label>
         <input id="final-employee-id" type="text" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" autocomplete="off" placeholder="四位數字" />
-        <button id="btn-submit-final-handoff" class="btn-primary">完成交班</button>
+        <button id="btn-submit-final-handoff" class="btn-primary">確認權限</button>
         <div id="final-handoff-status">IDENTITY VERIFICATION REQUIRED</div>
       </div>
     </div>
