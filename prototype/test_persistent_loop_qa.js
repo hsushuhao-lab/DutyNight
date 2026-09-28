@@ -37,9 +37,12 @@ state.resetForLoop();
 assert.equal(resets,1);
 assert.equal(state.getFlag('TEMP_TEST'),false);
 assert.equal(state.isTaskComplete('TEMP_TASK'),false);
+reloaded.rememberEvidence('M3_ER_PHOTO');
 reloaded.applyToGameState(state);
 assert.equal(state.getFlag('LOOP_COUNT'),2);
 assert.equal(state.getFlag('MEMORY_NEVER_SIGN_BED33'),true);
+assert.equal(state.getFlag('B_PANEL_CLUE_KNOWN'),true,'learned B-Panel provenance must survive a later Patientization reset');
+assert.equal(state.getFlag('ER_LIU_IDENTITY_REVEALED'),true);
 
 const legend=new LegendStateManager();
 assert.equal(legend.getState('LEGEND_BED33'),NodeState.UNSEEN);
