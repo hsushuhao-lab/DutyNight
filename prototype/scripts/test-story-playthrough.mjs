@@ -486,16 +486,23 @@ try{
   await interact({id:'MEMORY_B2_VICTIM_MAP'});
   await waitForPageCondition(page,()=>document.getElementById('memory-modal')?.classList.contains('active'),30000);
   await domClick('#btn-close-memory');
+
+  // First B2 terminal contact always plays the fire-history recap before any
+  // optional identity comparison. This is the production contract.
   await interact({id:'B2_ARCHIVE_TERMINAL'});
-  await waitForPageCondition(page,()=>document.getElementById('identity-matrix-modal')?.classList.contains('active'),30000);
-  await domClick('#identity-candidate-ZHANG_SHOUHENG');
   await waitForPageCondition(page,()=>document.getElementById('b2-fire-recap')?.classList.contains('active'),30000);
-  await waitForPageCondition(page,()=>window.__storyQA.gameState.getFlag('M7_B2_RESOLVED')===true,30000);
   for(let i=0;i<6;i++){
     await page.waitForTimeout(360);
     await page.keyboard.press('E');
   }
   await waitForPageCondition(page,()=>window.__storyQA.gameState.getFlag('B2_FIRE_RECAP_SEEN')===true,30000);
+
+  // After the recap, a second terminal interaction may run the optional
+  // identity matrix. Successful reconstruction still cannot skip 3F history.
+  await interact({id:'B2_ARCHIVE_TERMINAL'});
+  await waitForPageCondition(page,()=>document.getElementById('identity-matrix-modal')?.classList.contains('active'),30000);
+  await domClick('#identity-candidate-ZHANG_SHOUHENG');
+  await waitForPageCondition(page,()=>window.__storyQA.gameState.getFlag('M7_B2_RESOLVED')===true,30000);
   s=await snap();
   assert.equal(s.flags.M7_B2_RESOLVED,true);
   assert.equal(s.flags.B2_FIRE_RECAP_SEEN,true);
