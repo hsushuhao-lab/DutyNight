@@ -24,6 +24,7 @@ assert(ui.includes("17:00｜值班身分驗證異常")&&main.includes("HANDOFF_D
 const adminBranch=main.slice(main.indexOf("['admin_roster_3f','admin_printer_doc_3f','admin_drawer_manual_3f']"),main.indexOf("} else if (interactable.type === 'spare_key_316')"));
 assert(adminBranch.includes('openArchiveDocument'),'3F admin evidence documents must remain readable');
 assert(!adminBranch.includes("if(gameState.getFlag('FAST_PATH_3F'))"),'loop fast path must never suppress unread 3F admin evidence after an early HANDOFF_DEFAULT override');
+assert(main.includes("gameState.setFlag('ADMIN_IDENTITY_PUZZLE_RESOLVED',true)")&&main.includes("gameState.setFlag('B2_ADMIN_SOURCE',true)")&&main.includes("persistentMemory.rememberEvidence('B2_SOURCE_ADMIN')"),'completed 3F admin puzzle must feed B2 immediately and survive Patientization');
 assert(main.includes("M5_CCTV_RESOLVED")&&main.includes("SIX_FLOOR_HISTORY_CONFIRMED"),'M5 CCTV must seed the erased-6F story before M6 can unlock');
 assert(main.includes("M8_CODE_BLACK_ANNOUNCED")&&main.includes("UNKNOWN SESSION")&&main.includes("B2_FIRE_RECAP_SEEN"),'B2 terminal fire recap must trigger anonymous record-overwrite pressure');
 assert(!routes.includes('hill_from_')&&!routes.includes('pond_from_'),'production routes must not expose outdoor spawns');
