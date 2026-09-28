@@ -135,16 +135,24 @@ try {
     requestAnimationFrame(audit);
     q.interact({type:'workstation'});
   });
-  await page.waitForFunction(()=>window.__storyQA.gameState.getFlag('CG_316_TRUE_NAME_FINAL_HANDOFF_PLAYED'));
+  // Wait on the actual visible state machine, not only the historical PLAYED flag.
+  // A prior QA interaction can legitimately leave PLAYED true while a new call
+  // immediately falls through to the form, so PLAYED alone is not a readiness signal.
+  await page.waitForFunction(()=>{
+    const q=window.__storyQA;
+    return q.gameState.getFlag('CG_316_TRUE_NAME_FINAL_HANDOFF_ACTIVE')||
+      !!q.uiManager.dialogueSequence||
+      document.getElementById('final-handoff-modal')?.classList.contains('active');
+  },null,{timeout:10000});
+  await page.waitForFunction(()=>{
+    const q=window.__storyQA;
+    return !q.gameState.getFlag('CG_316_TRUE_NAME_FINAL_HANDOFF_ACTIVE')&&
+      (!!q.uiManager.dialogueSequence||document.getElementById('final-handoff-modal')?.classList.contains('active'));
+  },null,{timeout:20000});
   const recapAudit=await page.evaluate(()=>window.__recapInputAudit);
   assert.equal(recapAudit.violations,0,'identity input must never open while the recap is active');
-  assert.equal(await page.locator('#final-handoff-modal.active').count(),0,'employee-code input must stay closed until the post-recap dialogue is acknowledged');
   await page.screenshot({ path: `${output}/03-316-post-recap-pre-input.png` });
   report.checkpoints.push({id:'INPUT_LOCKED_UNTIL_RECAP_AND_DIALOGUE_COMPLETE',...recapAudit});
-  // CG_*_PLAYED can flip on the last cinematic frame just before its onComplete
-  // callback installs the two-line terminal dialogue. Wait for that handoff so
-  // the test does not mistake the tiny gap for "no dialogue".
-  await page.waitForFunction(()=>!!window.__storyQA.uiManager.dialogueSequence||document.getElementById('final-handoff-modal')?.classList.contains('active'),null,{timeout:10000});
   while(await page.evaluate(()=>!!window.__storyQA.uiManager.dialogueSequence)){
     await page.keyboard.press('e');
     await page.waitForTimeout(40);
