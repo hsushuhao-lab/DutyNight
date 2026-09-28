@@ -16,7 +16,7 @@ export function buildVerticalCore(zone,zoneId){
  const local={gf:zone.gf,colliders:[],walkables:[],interactables:[],zoneGroup:new THREE.Group()};
  const root=local.zoneGroup;root.name=`VerticalCore_${first?'first':'second'}`;root.position.set(cx,0,cz);zone.zoneGroup.add(root);
  const walls=new PlanWalls(local);walls.rect(-8,-4,8,4);walls.cut('x',-4,0,zone.wardDoor?2.4:3.2);
- if(zoneId==='first_campus_4f'||zoneId==='first_campus_3f')walls.cut('z',-8,0,1.4);
+ if(['first_campus_2f','first_campus_3f','first_campus_4f'].includes(zoneId))walls.cut('z',-8,0,1.4);
  if(zoneId==='second_campus_5f'||zoneId==='second_campus_4f_story'||zoneId==='second_campus_std')walls.cut('z',8,0,1.4);
  walls.build();zone.gf.buildFloor(root,local.walkables,0,0,0,16,8,m.floorTile);zone.gf.buildCeiling(root,0,3.2,0,16,8);
  for(const x of [-4,4])zone.gf.buildCeilingLight(root,x,3.15,0,.8,9);
@@ -30,7 +30,7 @@ export function buildVerticalCore(zone,zoneId){
  hit.userData={interactable:true,id:`${zoneId}_elevator`,type:'elevator',kind:'elevator',label:'電梯：選擇樓層'};zone.interactables.push(hit);
  const button=new THREE.Mesh(new THREE.CircleGeometry(.047,20),new THREE.MeshBasicMaterial({color:0xffb326}));button.position.z=.051;panel.add(button);
  SignAnchor.buildWallPlaque({scene:root,x:0,y:2.75,z:3.69,rotationY:Math.PI,width:1.2,height:.3,code:'',title:`${zone.floor||Number(zoneId.match(/_(\d)f/)?.[1])}F 電梯`,subtitle:'',header:''});
- const stair=new THREE.Group();stair.position.set(first?(zoneId==='first_campus_2f'?-7:7.78):-5,0,first?0:3.78);stair.rotation.y=first?-Math.PI/2:Math.PI;root.add(stair);
+ const stair=new THREE.Group();stair.name=`StairDoorAssembly_${zoneId}`;stair.position.set(first?(zoneId==='first_campus_2f'?-7.78:7.78):-5,0,first?0:3.78);stair.rotation.y=first?-Math.PI/2:Math.PI;root.add(stair);
  for(const sx of [-.64,.64])solid(stair,m.metal,[sx,1.2,0],[.10,2.4,.16]);solid(stair,m.metal,[0,2.42,0],[1.38,.12,.16]);
  const leaf=solid(stair,m.metal,[0,1.18,.02],[1.16,2.36,.1]);solid(stair,m.stainless,[0,1,.1],[.9,.06,.08]);
  leaf.userData={interactable:true,id:`${zoneId}_stairs`,type:'travel_selector',kind:'stairs',label:'安全梯：選擇樓層'};zone.interactables.push(leaf);
@@ -45,6 +45,6 @@ export function buildVerticalCore(zone,zoneId){
  SignAnchor.buildWallPlaque({scene:stair,x:0,y:2.7,z:.1,width:1.1,height:.3,code:'',title:'安全梯',subtitle:'',header:''});
  root.updateWorldMatrix(true,true);for(const c of local.colliders)zone.colliders.push(c.applyMatrix4(root.matrixWorld));
  zone.walkables.push(...local.walkables);zone.colliders.push(new THREE.Box3().setFromObject(leaf));
- zone.verticalCore={origin,layout:first?'FIRST_CORE_V1':'SECOND_CORE_V1',lift:[0,3.81],panel:[1.65,3.72],stairs:first?(zoneId==='first_campus_2f'?[-7,0]:[7.78,1]):[-5,3.78],root};
+ zone.verticalCore={origin,layout:first?'FIRST_CORE_V1':'SECOND_CORE_V1',lift:[0,3.81],panel:[1.65,3.72],stairs:first?(zoneId==='first_campus_2f'?[-7.78,0]:[7.78,1]):[-5,3.78],root};
  if(zone.levelInstance){zone.elevatorLight=button;zone.levelInstance.elevatorLight=button;}
 }
