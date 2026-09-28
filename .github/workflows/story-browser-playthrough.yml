@@ -36,8 +36,10 @@ jobs:
         working-directory: prototype
         run: node scripts/test-patientization-cinematic.mjs qa-results/patientization-local
       - name: Local production M2-M9 browser playthrough
-        timeout-minutes: 30
+        timeout-minutes: 20
         working-directory: prototype
+        env:
+          STORY_CAPTURE: '0'
         run: node scripts/test-story-playthrough.mjs qa-results/story-v2-local
       - name: Local B2 failed-identity fail-forward QA
         timeout-minutes: 10
@@ -50,8 +52,10 @@ jobs:
           GITHUB_SHA: ${{ github.sha }}
         run: node scripts/verify-live-build.mjs 'https://hsushuhao-lab.github.io/DutyNight/'
       - name: Public Pages M2-M9 browser playthrough
-        timeout-minutes: 30
+        timeout-minutes: 20
         working-directory: prototype
+        env:
+          STORY_CAPTURE: '0'
         run: node scripts/test-story-playthrough.mjs qa-results/story-v2-public 'https://hsushuhao-lab.github.io/DutyNight/'
       - name: Public material runtime audit
         timeout-minutes: 15
