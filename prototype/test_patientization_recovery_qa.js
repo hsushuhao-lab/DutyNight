@@ -7,7 +7,7 @@ import {
 } from './src/core/PatientizationRecovery.js';
 
 const expected={
-  HANDOFF_DEFAULT:['17:00','first_campus_3f','m0_316_office'],
+  HANDOFF_DEFAULT:['17:00','first_campus_3f','m0_316_entrance'],
   BED33:['19:30','first_campus_4f','m3_4f_ward_gate'],
   ER0033:['00:33','first_campus_2f','recovery_er0033'],
   CHEST:['01:15','second_campus_5f','recovery_chest_patient'],
