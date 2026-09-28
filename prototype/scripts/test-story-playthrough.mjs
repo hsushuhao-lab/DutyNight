@@ -491,7 +491,8 @@ try{
   // optional identity comparison. This is the production contract.
   await interact({id:'B2_ARCHIVE_TERMINAL'});
   await waitForPageCondition(page,()=>document.getElementById('b2-fire-recap')?.classList.contains('active'),30000);
-  for(let i=0;i<6;i++){
+  for(let i=0;i<24;i++){
+    if(await q(()=>window.__storyQA.gameState.getFlag('B2_FIRE_RECAP_SEEN')===true))break;
     await page.waitForTimeout(360);
     await page.keyboard.press('E');
   }
