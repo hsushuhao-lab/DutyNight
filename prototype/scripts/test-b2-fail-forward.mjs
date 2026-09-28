@@ -144,7 +144,10 @@ try {
   while(await page.evaluate(()=>!!window.__storyQA.uiManager.dialogueSequence))await page.keyboard.press('e');
   await page.waitForFunction(()=>document.getElementById('final-handoff-modal')?.classList.contains('active'),null,{timeout:10000});
   await page.locator('#final-employee-id').fill('0409');
-  await page.locator('#btn-submit-final-handoff').click();
+  // Use the DOM event directly here: the submit handler immediately launches a
+  // full-screen cinematic, which can make Playwright's actionability click wait
+  // on the very overlay that the click successfully triggered.
+  await page.evaluate(()=>document.getElementById('btn-submit-final-handoff')?.click());
   await page.waitForFunction(() => window.__storyQA.gameState.getFlag('GAME_COMPLETE') === true, null, { timeout: 10000 });
   await page.waitForFunction(() => document.querySelector('#ending-cg-screen')?.classList.contains('active'), null, { timeout: 10000 });
   const final = await page.evaluate(() => ({
