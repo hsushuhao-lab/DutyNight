@@ -38,11 +38,40 @@ assert.equal(resets,1);
 assert.equal(state.getFlag('TEMP_TEST'),false);
 assert.equal(state.isTaskComplete('TEMP_TASK'),false);
 reloaded.rememberEvidence('M3_ER_PHOTO');
+for(const source of ['B2_SOURCE_ADMIN','B2_SOURCE_HISTORY','B2_SOURCE_LEGACY','B2_SOURCE_SECURITY'])reloaded.rememberEvidence(source);
 reloaded.applyToGameState(state);
 assert.equal(state.getFlag('LOOP_COUNT'),2);
 assert.equal(state.getFlag('MEMORY_NEVER_SIGN_BED33'),true);
 assert.equal(state.getFlag('B_PANEL_CLUE_KNOWN'),true,'learned B-Panel provenance must survive a later Patientization reset');
 assert.equal(state.getFlag('ER_LIU_IDENTITY_REVEALED'),true);
+assert.equal(state.getFlag('B2_ADMIN_SOURCE'),true,'admin provenance must survive Patientization');
+assert.equal(state.getFlag('B2_HISTORY_SOURCE'),true,'history provenance must survive Patientization');
+assert.equal(state.getFlag('B2_LEGACY_SOURCE'),true,'316 legacy provenance must survive Patientization');
+assert.equal(state.getFlag('B2_SECURITY_SOURCE'),true,'security provenance must survive Patientization');
+
+// Older localStorage payloads did not store B2 source flags directly. Migration
+// must reconstruct them from evidence, archive codes and journal notes.
+const legacyBacking=new Map();
+legacyBacking.set('DutyNight_PersistentData',JSON.stringify({
+  version:5,loopCount:4,
+  knownCodes:{code_0217:true,code_0316:true},
+  trueNameFragments:{frag_surname:'張'},
+  memoryEvidence:{M1_ADMIN_DUTY_PHOTO:true,M1_ARCHIVE_6F_ALBUM:true},
+  journalNotes:[
+    {id:'ER0033_DECODED',text:'legacy',loop:2},
+    {id:'WANG_B_PANEL_KEY',text:'legacy',loop:3}
+  ]
+}));
+const legacyStorage={
+  getItem:k=>legacyBacking.get(k)||null,
+  setItem:(k,v)=>legacyBacking.set(k,v),
+  removeItem:k=>legacyBacking.delete(k)
+};
+const migrated=new PersistentMemory(legacyStorage);
+const migratedState=new GameState();
+migrated.applyToGameState(migratedState);
+for(const flag of ['B2_ADMIN_SOURCE','B2_HISTORY_SOURCE','B2_LEGACY_SOURCE','B2_SECURITY_SOURCE'])
+  assert.equal(migratedState.getFlag(flag),true,'legacy save migration failed for '+flag);
 
 const legend=new LegendStateManager();
 assert.equal(legend.getState('LEGEND_BED33'),NodeState.UNSEEN);
