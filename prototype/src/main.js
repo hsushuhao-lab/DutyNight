@@ -549,6 +549,7 @@ function resolveAdminIdentityPuzzleIfReady() {
   gameState.setFlag('ECHO_2117_KNOWN',true);
   gameState.markTaskComplete('P1_ADMIN_IDENTITY_PUZZLE');
   gameState.addEvidence(1);
+  persistentMemory.rememberEvidence('B2_SOURCE_ADMIN');
   uiManager.showSubtitle('值班醫師','「名冊是空的，補登單卻寫我 21:17 已完成巡查……而備忘錄又說最後完成交班的人才算值班醫師。這三份資料不可能同時是真的。」',6200);
 }
 
@@ -1023,6 +1024,7 @@ controller.onInteract = async (interactable) => {
     gameState.setFlag('PHONE_ANSWERED',false);
     gameState.setFlag('PHONE_RING_ACTIVE',true);
     gameState.setFlag('B2_LEGACY_SOURCE',true);
+    persistentMemory.rememberEvidence('B2_SOURCE_LEGACY');
     soundManager.startPhoneRing();
     uiManager.showSubtitle('316 舊資料終端','「1998-ER-0217｜病人：劉志遠／ENG-860214｜責任醫師：張○○｜員編前綴：MED-87。」\n\n終端機停止後，桌上的院內電話立刻響起。',5200);
   } else if (interactable.type === 'workstation') {
@@ -1044,8 +1046,14 @@ controller.onInteract = async (interactable) => {
     const sequence=getMemorySequence(interactable.memoryId);
     if(!sequence)return;
     persistentMemory.rememberEvidence(sequence.id);
-    if(sequence.id==='M1_ADMIN_DUTY_PHOTO')gameState.setFlag('B2_ADMIN_SOURCE',true);
-    if(sequence.id==='M1_ARCHIVE_6F_ALBUM')gameState.setFlag('B2_HISTORY_SOURCE',true);
+    if(sequence.id==='M1_ADMIN_DUTY_PHOTO'){
+      gameState.setFlag('B2_ADMIN_SOURCE',true);
+      persistentMemory.rememberEvidence('B2_SOURCE_ADMIN');
+    }
+    if(sequence.id==='M1_ARCHIVE_6F_ALBUM'){
+      gameState.setFlag('B2_HISTORY_SOURCE',true);
+      persistentMemory.rememberEvidence('B2_SOURCE_HISTORY');
+    }
     if(sequence.id==='M6_6F_PLAYBACK')gameState.setFlag('SIX_FLOOR_HISTORY_CONFIRMED',true);
     controller.enabled=false;
     uiManager.openMemorySequence(sequence);
@@ -1068,8 +1076,14 @@ controller.onInteract = async (interactable) => {
       uiManager.updateTasks();
     }:null});
     gameState.addEvidence(1);
-    if(interactable.id?.startsWith('ADMIN_'))gameState.setFlag('B2_ADMIN_SOURCE',true);
-    if(interactable.id?.startsWith('ARCHIVE_'))gameState.setFlag('B2_HISTORY_SOURCE',true);
+    if(interactable.id?.startsWith('ADMIN_')){
+      gameState.setFlag('B2_ADMIN_SOURCE',true);
+      persistentMemory.rememberEvidence('B2_SOURCE_ADMIN');
+    }
+    if(interactable.id?.startsWith('ARCHIVE_')){
+      gameState.setFlag('B2_HISTORY_SOURCE',true);
+      persistentMemory.rememberEvidence('B2_SOURCE_HISTORY');
+    }
     if(interactable.id==='ARCHIVE_UNINDEXED_HANDOFF'&&gameState.getFlag('ARCHIVE_OBJECTIVE')){
       gameState.markTaskComplete('ARCHIVE_CLUE_FOUND');
       gameState.setFlag('ARCHIVE_CLUE_FOUND',true);
@@ -1146,6 +1160,7 @@ controller.onInteract = async (interactable) => {
   } else if (interactable.type === 'guard_post_inspection') {
     if(gameState.getFlag('M6_FLOOR6_RESOLVED')!==true||gameState.getFlag('B2_EXITED_PERMANENTLY'))return;
     gameState.setFlag('B2_SECURITY_SOURCE',true);
+    persistentMemory.rememberEvidence('B2_SOURCE_SECURITY');
     gameState.setFlag('SECURITY_RECORD_OBJECTIVE',false);
     // M3's Liu Zhi-Yuan clue is learned knowledge and may have been lost from
     // transient GameState after an earlier Patientization. The 1F guard post
