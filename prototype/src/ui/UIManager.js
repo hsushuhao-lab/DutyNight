@@ -1086,7 +1086,7 @@ export class UIManager {
   }
 
   updateTime() {
-    if (this.timeEl) this.timeEl.textContent = `${this.gameState.getDisplayTime?.()||this.gameState.gameTime} ｜ 第一線值班：值班醫師｜姓名待核`;
+    if (this.timeEl) this.timeEl.textContent = `${this.gameState.getDisplayTime?.()||this.gameState.gameTime} ｜ 值班醫師｜姓名待核`;
   }
 
   renderTaskBoard(header, items) {
@@ -1136,6 +1136,13 @@ export class UIManager {
 
     if(this.gameState.getFlag('PHONE_RING_ACTIVE')&&['ER_JANE_2005','NIGHT_PATROL_2115','ER_GHOST_0033','FAST_PATH_316'].includes(this.gameState.getFlag('PHONE_CALL_KIND'))){
       this.renderTaskBoard('',[]);
+      return;
+    }
+
+    if(this.gameState.getFlag('PATIENTIZATION_RECOVERY_ANCHOR')==='HANDOFF_DEFAULT'&&!this.gameState.getFlag('KEY_PICKUP')){
+      this.renderTaskBoard('17:00｜316｜回溯後的值班',[
+        {id:'task-m1-recovery-locker',text:'進入 316，使用 1700 打開值班物品櫃，取得 4F 值班室鑰匙與感應卡',state:'ready'}
+      ]);
       return;
     }
 
