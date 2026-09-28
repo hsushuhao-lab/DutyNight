@@ -273,6 +273,10 @@ export class PersistentMemory {
     gameState.setFlag('MEMORY_CODE_0316',this.data.knownCodes.code_0316);
     gameState.setFlag('MEMORY_CODE_0409',this.data.knownCodes.code_0409);
     gameState.setFlag('MEMORY_NEVER_SIGN_BED33',this.data.survivalRules.neverSignBed33);
+    if(this.hasEvidence('M3_ER_PHOTO')||this.data.journalNotes.some(note=>note.id==='LIU_MAINTENANCE_TAG')){
+      gameState.setFlag('B_PANEL_CLUE_KNOWN',true);
+      gameState.setFlag('ER_LIU_IDENTITY_REVEALED',true);
+    }
     gameState.setFlag('IDENTITY_EROSION_LEVEL',this.data.identityErosionLevel);
     gameState.setFlag('SPACE_PROOF',this.data.proofs.space);
     gameState.setFlag('IDENTITY_PROOF',this.data.proofs.identity);
