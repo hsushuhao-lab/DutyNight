@@ -35,14 +35,14 @@ jobs:
         timeout-minutes: 4
         working-directory: prototype
         run: node scripts/test-patientization-cinematic.mjs qa-results/patientization-local
-      - name: Local B2 failed-identity fail-forward QA
-        timeout-minutes: 10
-        working-directory: prototype
-        run: node scripts/test-b2-fail-forward.mjs qa-results/b2-fail-forward-local
       - name: Local production M2-M9 browser playthrough
         timeout-minutes: 30
         working-directory: prototype
         run: node scripts/test-story-playthrough.mjs qa-results/story-v2-local
+      - name: Local B2 failed-identity fail-forward QA
+        timeout-minutes: 10
+        working-directory: prototype
+        run: node scripts/test-b2-fail-forward.mjs qa-results/b2-fail-forward-local
       - name: Wait for matching public Pages build
         timeout-minutes: 8
         working-directory: prototype
