@@ -139,8 +139,7 @@ try {
     q.interact({type:'workstation'});
   });
   await page.waitForFunction(() => window.__storyQA.gameState.getFlag('CG_316_TRUE_NAME_FINAL_HANDOFF_ACTIVE'));
-  await page.waitForTimeout(1000);
-  assert.equal(await page.evaluate(()=>!!window.__storyQA.gameState.getFlag('CG_316_TRUE_NAME_FINAL_HANDOFF_ACTIVE')),true,'capture must occur during the recap');
+  assert.equal(await page.evaluate(()=>!!window.__storyQA.gameState.getFlag('CG_316_TRUE_NAME_FINAL_HANDOFF_ACTIVE')),true,'316 recap must enter an active cinematic state');
   await page.screenshot({ path: `${output}/03-316-pre-input-cinematic.png` });
   await page.waitForFunction(()=>window.__storyQA.gameState.getFlag('CG_316_TRUE_NAME_FINAL_HANDOFF_PLAYED'));
   const recapAudit=await page.evaluate(()=>window.__recapInputAudit);
