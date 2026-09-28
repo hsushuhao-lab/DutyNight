@@ -14,6 +14,10 @@ assert(main.includes("if(worldRouter.activeZoneId==='first_campus_4f')completeFi
 assert(main.includes("if(worldRouter.activeZoneId==='second_campus_5f')completeSecondCampus5FWardReport()"),'second-campus 5F access-door opening must complete report');
 assert(main.includes('const openedNow=changed&&wasClosed&&!door.closed'),'door-report must fire only when a closed access door is actually opened');
 assert(main.includes('door===zone.wardDoor')&&main.includes('door===zone.innerWardDoor')&&main.includes('door===zone.glassBypassDoor'),'all supported ward access routes must count as arrival/report');
+assert(!main.includes('「張醫師，門禁有你的刷卡紀錄'),'4F nursing report must not reveal the player surname before identity reconstruction');
+assert(main.includes('new THREE.PlaneGeometry(.44,.275)'),'21:17 recap paper must remain compact on the duty desk');
+assert(main.includes('new THREE.Vector3(-10.58,deskTop+.008,2.92)'),'21:17 recap paper must stay left/front of the keyboard and coffee instead of covering them');
+assert(!main.includes("new THREE.PlaneGeometry(.72,.45),material"),'oversized 21:17 recap paper must not return');
 
 assert(ward.includes("id:'4F_NURSING_REPORT_BOARD',type:'decorative'"),'4F nursing information board should remain visual, not a required report hotspot');
 assert(!ward.includes("action:'NURSE_REPORT',label:'查看值班資訊並向護理站報到'"),'old 4F manual nursing-report interaction must be removed');
