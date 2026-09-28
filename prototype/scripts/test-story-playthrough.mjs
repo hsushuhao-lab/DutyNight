@@ -34,31 +34,32 @@ async function mark(label,extra={}){
 async function shot(name,zone,spawn,anchorName,position,target){
   const file=name+'.png';
   if(zone)await load(zone,spawn);
+  if(!captureScreenshots){
+    report.screenshots.push({file,anchorName,rect:null,bytes:0,logicOnly:true});
+    await writeFile(out+'/progress.json',JSON.stringify(report,null,2));
+    console.log('SHOT-SKIP',JSON.stringify({file,anchorName,logicOnly:true}));
+    return;
+  }
   const view=await q(args=>window.__storyQA.captureView(args),{anchorName,position,target});
   await page.waitForTimeout(180);
-  if(captureScreenshots){
-    const buffer=await page.screenshot({path:out+'/'+file,fullPage:false,timeout:90000});
-    const image=await readFile(out+'/'+file);
-    assert(buffer.length>1024,'Screenshot was empty: '+file);
-    assert.deepEqual([...image.subarray(0,8)],[137,80,78,71,13,10,26,10],'Invalid PNG: '+file);
-    assert.equal(image.readUInt32BE(16),1440,'Unexpected screenshot width: '+file);
-    assert.equal(image.readUInt32BE(20),900,'Unexpected screenshot height: '+file);
-    report.screenshots.push({
-      file,anchorName,rect:view.rect,bytes:image.length,
-      camera:{position,target,distance:Number(Math.hypot(...position.map((value,index)=>value-target[index])).toFixed(2))},
-      sha256:createHash('sha256').update(image).digest('hex')
-    });
-  }else{
-    report.screenshots.push({file,anchorName,rect:view.rect,bytes:0,logicOnly:true});
-  }
+  const buffer=await page.screenshot({path:out+'/'+file,fullPage:false,timeout:90000});
+  const image=await readFile(out+'/'+file);
+  assert(buffer.length>1024,'Screenshot was empty: '+file);
+  assert.deepEqual([...image.subarray(0,8)],[137,80,78,71,13,10,26,10],'Invalid PNG: '+file);
+  assert.equal(image.readUInt32BE(16),1440,'Unexpected screenshot width: '+file);
+  assert.equal(image.readUInt32BE(20),900,'Unexpected screenshot height: '+file);
+  report.screenshots.push({
+    file,anchorName,rect:view.rect,bytes:image.length,
+    camera:{position,target,distance:Number(Math.hypot(...position.map((value,index)=>value-target[index])).toFixed(2))},
+    sha256:createHash('sha256').update(image).digest('hex')
+  });
   await writeFile(out+'/progress.json',JSON.stringify(report,null,2));
-  const shotMeta=report.screenshots.at(-1);
-  console.log(captureScreenshots?'SCREENSHOT':'SHOT-CHECK',JSON.stringify({file,anchorName,rect:view.rect,bytes:shotMeta?.bytes||0}));
+  console.log('SCREENSHOT',JSON.stringify({file,anchorName,rect:view.rect,bytes:image.length}));
 }
 async function motionShot(name,anchorName,position,target,motionValue){
   const file='motion/'+name+'.png';
   await mkdir(out+'/motion',{recursive:true});
-  const view=await q(args=>window.__storyQA.captureView(args),{anchorName,position,target});
+  const view=captureScreenshots?await q(args=>window.__storyQA.captureView(args),{anchorName,position,target}):{rect:null};
   let frozen=false;
   if(motionValue?.capture==='cpr'){
     const phase=motionValue.phase;
