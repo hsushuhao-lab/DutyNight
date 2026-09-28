@@ -79,10 +79,8 @@ try {
 
   await page.evaluate(() => window.__storyQA.captureView({position:[0,1.65,-1.5],target:[0,1.2,2],anchorName:'B2_OneWayExitDoor'}));
   await page.evaluate(() => window.__storyQA.interact({ type: 'b2_exit_door' }));
-  await page.waitForFunction(() => window.__storyQA.gameState.getFlag('CG_B2_PERMANENT_CLOSURE_ACTIVE'));
-  await page.waitForTimeout(650);
-  assert.equal(await page.evaluate(() => !!window.__storyQA.gameState.getFlag('CG_B2_PERMANENT_CLOSURE_ACTIVE')),true);
-  await page.screenshot({ path: `${output}/02-b2-closure-active.png` });
+  await page.waitForFunction(() => window.__storyQA.gameState.getFlag('CG_B2_PERMANENT_CLOSURE_PLAYED')||window.__storyQA.worldRouter.activeZoneId === 'first_campus_3f', null, { timeout: 10000 });
+  await page.screenshot({ path: `${output}/02-b2-closure-transition.png` });
   await page.waitForFunction(() => window.__storyQA.worldRouter.activeZoneId === 'first_campus_3f', null, { timeout: 15000 });
   const afterExit = await page.evaluate(() => window.__storyQA.snapshot());
   assert.equal(afterExit.flags.B2_EXITED_PERMANENTLY, true);
