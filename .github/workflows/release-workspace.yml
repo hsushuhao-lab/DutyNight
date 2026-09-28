@@ -39,11 +39,6 @@ jobs:
           s=s.replace("  report.errors.push(error.stack || error.message);", "  report.errors.push(error.stack || error.message);\n  report.failureState=await page.evaluate(()=>({snapshot:window.__storyQA.snapshot(),subtitle:document.getElementById('subtitle-text').textContent,active:window.__storyQA.cinematicDirector.activeId,modals:[...document.querySelectorAll('.active')].map(e=>e.id)}));")
           p.write_text(s)
           p=Path('prototype/scripts/test-story-playthrough.mjs');s=p.read_text()
-          old="""  await waitForPageCondition(page,()=>document.getElementById('identity-matrix-modal')?.classList.contains('active'),30000);
-            await domClick('#identity-candidate-ZHANG_SHOUHENG');
-            await waitForPageCondition(page,()=>document.getElementById('b2-fire-recap')?.classList.contains('active'),30000);
-            await waitForPageCondition(page,()=>window.__storyQA.gameState.getFlag('M7_B2_RESOLVED')===true,30000);"""
-          old=textwrap.dedent(old)
           start=s.index("  await interact({id:'B2_ARCHIVE_TERMINAL'});")
           end=s.index("  s=await snap();",start)
           s=s[:start]+"""  await interact({id:'B2_ARCHIVE_TERMINAL'});
