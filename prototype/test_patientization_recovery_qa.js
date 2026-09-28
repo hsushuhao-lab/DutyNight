@@ -55,6 +55,8 @@ for(const [id,[time,zoneId,spawnId]] of Object.entries(expected)){
   const state=new GameState();
   applyPatientizationRecoveryAnchor(state,'ER0033');
   assert.equal(state.getFlag('GHOST_REGISTRATION_AVAILABLE'),true);
+  assert.equal(state.getFlag('B_PANEL_CLUE_KNOWN'),true,'late recovery must retain Liu Zhi-Yuan B-Panel knowledge');
+  assert.equal(state.getFlag('ER_LIU_IDENTITY_REVEALED'),true);
   assert.equal(state.getFlag('ER0033_SLIP_COLLECTED'),false,'00:33 recovery must return before creating/reading the record');
 }
 
@@ -79,6 +81,8 @@ for(const [id,[time,zoneId,spawnId]] of Object.entries(expected)){
   assert.equal(state.getFlag('M6_FLOOR6_RESOLVED'),true);
   assert.equal(state.getFlag('HIDDEN_SERVICE_DOOR_DISCOVERED'),true);
   assert.equal(state.getFlag('B_PANEL_KEY'),true);
+  assert.equal(state.getFlag('FIRST_FLOOR_GUARD_KEY'),true);
+  assert.equal(state.getFlag('B2_SECURITY_SOURCE'),true,'02:17 recovery must retain the already-inspected guard source');
   assert.equal(state.getFlag('M7_B2_OPEN'),false,'02:17 recovery must return before opening B2');
 }
 
