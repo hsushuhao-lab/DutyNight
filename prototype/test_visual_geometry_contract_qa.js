@@ -92,6 +92,11 @@ assert(zone.guardLog2117Visual?.visible===true,'21:17 visual logbook must be vis
 // 2F: the 00:33 terminal must be dormant during the first ER visit.
 gameState.resetForLoop();
 zone=router.loadZone('first_campus_2f');
+const escapeDoor2F=zone.zoneGroup.getObjectByName('StairDoorAssembly_first_campus_2f');
+assert(escapeDoor2F,'first-campus 2F escape-door assembly missing');
+const escapeDoor2FPos=escapeDoor2F.getWorldPosition(new THREE.Vector3());
+assert(Math.abs(escapeDoor2FPos.x-(-15.78))<.03,'first-campus 2F escape door must sit against the west wall instead of floating inward');
+assert(Math.abs(escapeDoor2FPos.x-(-16))<.3,'first-campus 2F escape door must remain wall-mounted');
 const triageGlass=zone.zoneGroup.getObjectByName('ER_TriageCounter_GlassPartition');
 assert(triageGlass,'2F triage glass divider missing');
 assert.equal(triageGlass.position.z,3.125,'2F glass divider must sit at the counter front edge');
