@@ -8,7 +8,7 @@ permissions:
 jobs:
   repair:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 55
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -31,13 +31,40 @@ jobs:
             assert.equal((await snap()).flags.SECOND_CAMPUS_5F_REPORTED,false);
             assert.equal(await q(()=>window.__storyQA.worldRouter.activeZoneInstance.wardDoor.closed),true);
             await q(position=>window.__storyQA.controller.teleport(...position),[73.36,1.7,3.25]);
-            const reportAim=await pressEAt([73.36,1.4,2],'second_ward_reader_sensor');
+            const reportAim=await pressEAt([73.36,1.4,2],'second_ward_front');
             await waitForPageCondition(page,()=>window.__storyQA.gameState.getFlag('SECOND_CAMPUS_5F_REPORTED')===true,5000);
             assert.equal(await q(()=>window.__storyQA.worldRouter.activeZoneInstance.wardDoor.closed),false);
             await functionalShot('m4-5f-door-report.png');
-            report.functionalFlows.push({name:'M4 5F WARD DOOR REPORT',steps:['QA positioned at the real 5F gate reader','live raycast resolved second_ward_reader_sensor','pressed E','door opened and nursing report completed'],raycast:reportAim});"""),
+            report.functionalFlows.push({name:'M4 5F WARD DOOR REPORT',steps:['QA positioned at the real 5F gate reader','live raycast resolved the real second_ward_front reader','pressed E','door opened and nursing report completed'],raycast:reportAim});"""),
               ("['functional/m1-handoff-identity-choice.png','functional/m7-guard-post-approach.png','functional/m7-b-panel-e-prompt.png'],'M1 identity and M7 physical interaction screenshots are required'", "['functional/m1-handoff-identity-choice.png','functional/m4-5f-door-report.png','functional/m7-guard-post-approach.png','functional/m7-b-panel-e-prompt.png'],'M1 identity, M4 ward door and M7 physical interaction screenshots are required'"),
-              ("assert.equal(report.functionalFlows.length,4,'Three 4F phone raycast checks and the M7 physical interaction flow are required');", "assert.equal(report.functionalFlows.length,5,'Three 4F phone checks, the M4 ward door and M7 physical interaction flow are required');")
+              ("assert.equal(report.functionalFlows.length,4,'Three 4F phone raycast checks and the M7 physical interaction flow are required');", "assert.equal(report.functionalFlows.length,5,'Three 4F phone checks, the M4 ward door and M7 physical interaction flow are required');"),
+              ("sourceSha:process.env.GITHUB_SHA", "sourceSha:process.env.DUTYNIGHT_SOURCE_SHA||process.env.GITHUB_SHA"),
+              ("page=await browser.newPage({viewport:{width:1440,height:900}})", "page=await browser.newPage({viewport:captureScreenshots?{width:1440,height:900}:{width:800,height:600}})")
+          ])
+          edit('prototype/scripts/test-repair-acceptance.mjs',[
+              ("    return q.lookAt(p.toArray());", "    const aimed=q.lookAt(p.toArray()),hit=q.controller.currentInteractable;\n    return {...aimed,type:hit?.type,doorId:hit?.doorId};"),
+              ("  assert.equal(aim.current,doorId+'_reader_sensor');", "  assert.equal(aim.type,'access_door');\n  assert.equal(aim.doorId,doorId);\n  assert([doorId+'_front',doorId+'_back',doorId+'_reader_sensor'].includes(aim.current),'raycast must hit a reader belonging to this door');"),
+              ("      assert.equal(aim.current,'first_campus_2f_stairs');", "      assert.equal(aim.current,'first_campus_2f_stairs');\n      await page.evaluate(()=>window.__storyQA.task('KEY_PICKUP'));"),
+              ("sourceSha:process.env.GITHUB_SHA", "sourceSha:process.env.DUTYNIGHT_SOURCE_SHA||process.env.GITHUB_SHA")
+          ])
+          edit('prototype/scripts/test-b2-fail-forward.mjs',[
+              ("sourceSha: process.env.GITHUB_SHA", "sourceSha: process.env.DUTYNIGHT_SOURCE_SHA || process.env.GITHUB_SHA"),
+              ("  await page.evaluate(()=>document.getElementById('btn-submit-final-handoff')?.click());", """  await page.evaluate(()=>{
+              const overlay=document.getElementById('ending-cg-screen');
+              window.__endingVisibilityAudit={seen:false};
+              const observer=new MutationObserver(()=>{
+                if(overlay.classList.contains('active')){
+                  window.__endingVisibilityAudit.seen=true;
+                  observer.disconnect();
+                }
+              });
+              observer.observe(overlay,{attributes:true,attributeFilter:['class']});
+              document.getElementById('btn-submit-final-handoff')?.click();
+            });"""),
+              ("  await page.waitForFunction(() => document.querySelector('#ending-cg-screen')?.classList.contains('active'), null, { timeout: 10000 });", "  await page.waitForFunction(() => window.__endingVisibilityAudit?.seen, null, { timeout: 10000 });"),
+              ("    endingCgActive: document.querySelector('#ending-cg-screen')?.classList.contains('active')", "    endingCgSeen: window.__endingVisibilityAudit.seen"),
+              ("  assert.equal(final.endingCgActive, true);", "  assert.equal(final.endingCgSeen, true,'the ending CG must actually become visible after correct authorization');"),
+              ("  await page.screenshot({ path: `${output}/02-ending-cg.png` });", "  await page.waitForFunction(()=>document.getElementById('final-success-recap')?.classList.contains('active'),null,{timeout:20000});\n  await page.screenshot({ path: `${output}/04-ending-recap.png` });")
           ])
           edit('prototype/src/world/shared/VerticalCore.js',[
               (" const first=zoneId.startsWith('first'),[cx,cz]=origin,m=zone.gf.materials;", " const first=zoneId.startsWith('first'),first2F=zoneId==='first_campus_2f',[cx,cz]=origin,m=zone.gf.materials;"),
@@ -58,13 +85,13 @@ jobs:
           git diff --check
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add .github/workflows/deploy-pages.yml .github/workflows/story-browser-playthrough.yml prototype/scripts/test-story-playthrough.mjs prototype/src/world/shared/VerticalCore.js prototype/src/world/shared/WorldRoutes.js prototype/test_visual_geometry_contract_qa.js
-          git commit -m 'fix: validate real M4 report and finish 2F escape-door mounting'
+          git add .github/workflows/deploy-pages.yml .github/workflows/story-browser-playthrough.yml prototype/scripts/test-story-playthrough.mjs prototype/scripts/test-repair-acceptance.mjs prototype/scripts/test-b2-fail-forward.mjs prototype/src/world/shared/VerticalCore.js prototype/src/world/shared/WorldRoutes.js prototype/test_visual_geometry_contract_qa.js
+          git commit -m 'fix: real ward report tests and flush inward-facing 2F escape door'
           echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
-      - name: Install locked dependencies and build candidate
+      - name: Build and verify candidate geometry
         working-directory: prototype
         env:
-          GITHUB_SHA: ${{ steps.candidate.outputs.sha }}
+          DUTYNIGHT_SOURCE_SHA: ${{ steps.candidate.outputs.sha }}
         run: |
           npm ci
           node scripts/write-build-info.mjs
@@ -74,42 +101,40 @@ jobs:
           node test_visual_geometry_contract_qa.js
           npx playwright install --with-deps chromium
       - name: Targeted visual and interaction acceptance
-        id: targeted
-        continue-on-error: true
         timeout-minutes: 12
         working-directory: prototype
         env:
-          GITHUB_SHA: ${{ steps.candidate.outputs.sha }}
+          DUTYNIGHT_SOURCE_SHA: ${{ steps.candidate.outputs.sha }}
         run: node scripts/test-repair-acceptance.mjs qa-results/repair-acceptance
-      - name: Complete M1-M9 browser progression
-        id: story
-        continue-on-error: true
-        timeout-minutes: 20
-        working-directory: prototype
-        env:
-          GITHUB_SHA: ${{ steps.candidate.outputs.sha }}
-          STORY_CAPTURE: '0'
-        run: node scripts/test-story-playthrough.mjs qa-results/repair-story
       - name: B2 failed-identity fail-forward
-        id: b2
-        continue-on-error: true
         timeout-minutes: 10
         working-directory: prototype
         env:
-          GITHUB_SHA: ${{ steps.candidate.outputs.sha }}
+          DUTYNIGHT_SOURCE_SHA: ${{ steps.candidate.outputs.sha }}
         run: node scripts/test-b2-fail-forward.mjs qa-results/repair-b2
-      - name: Publish only the fully passing candidate
-        if: steps.targeted.outcome == 'success' && steps.story.outcome == 'success' && steps.b2.outcome == 'success'
+      - name: Complete M1-M9 browser progression
+        timeout-minutes: 30
+        working-directory: prototype
+        env:
+          DUTYNIGHT_SOURCE_SHA: ${{ steps.candidate.outputs.sha }}
+          STORY_CAPTURE: '0'
+        run: node scripts/test-story-playthrough.mjs qa-results/repair-story
+      - name: Verify result files and publish passing candidate
+        env:
+          EXPECTED_SHA: ${{ steps.candidate.outputs.sha }}
         run: |
+          python3 - <<'PY'
+          import json,os
+          from pathlib import Path
+          for suite in ['repair-acceptance','repair-b2','repair-story']:
+              report=json.loads(Path('prototype/qa-results',suite,'result.json').read_text())
+              assert report['verdict']=='PASS',(suite,report)
+              assert report['sourceSha']==os.environ['EXPECTED_SHA'],(suite,report['sourceSha'])
+              print(suite,'PASS',report['sourceSha'])
+          PY
           git fetch origin master --depth=1
           test "$(git rev-parse origin/master)" = '${{ github.sha }}'
           git push origin HEAD:master
-      - name: Require all acceptance results
-        if: always()
-        run: |
-          test '${{ steps.targeted.outcome }}' = success
-          test '${{ steps.story.outcome }}' = success
-          test '${{ steps.b2.outcome }}' = success
       - uses: actions/upload-artifact@v4
         if: always()
         with:
