@@ -60,7 +60,7 @@ export const PATIENTIZATION_RECOVERY_ANCHORS=Object.freeze({
     time:'17:00',
     phase:'Phase0_1700_FirstArrival',
     zoneId:'first_campus_3f',
-    spawnId:'m0_316_office',
+    spawnId:'m0_316_entrance',
     trace:['17:00'],
     tasks:['FOUND_316_SPARE_KEY','HIS_CREDENTIALS_FOUND','DUTY_LOG','E_HANDOFF'],
     flags:{
