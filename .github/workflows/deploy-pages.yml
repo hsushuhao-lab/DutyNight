@@ -70,6 +70,32 @@ jobs:
           node test_visual_geometry_contract_qa.js
           node test_user_floorplan_qa.js
           node test_ward_circulation_qa.js
+          node test_acute_gate_qa.js
+          node test_annie_hero_asset_qa.js
+          node test_archive_key_order_independence_qa.js
+          node test_art_resources_qa.js
+          node test_door_defaults_qa.js
+          node test_door_reset_on_zone_exit_qa.js
+          node test_duty_room_door_qa.js
+          node test_entry_boundary_qa.js
+          node test_er_boundary_qa.js
+          node test_first_campus_rooms_qa.js
+          node test_first_upper_rooms_qa.js
+          node test_ground_movement_qa.js
+          node test_hospital_access_policy_qa.js
+          node test_key_revisit_qa.js
+          node test_m3_to_m4_objective_qa.js
+          node test_modeling_qa.js
+          node test_p1_normal_duty_qa.js
+          node test_poster_system_qa.js
+          node test_screenshot_access_qa.js
+          node test_second_campus_environment_qa.js
+          node test_second_rooms_qa.js
+          node test_travel_panel_mount_qa.js
+          node test_travel_ui_contract_qa.js
+          node test_ward_gate_qa.js
+          node test_ward_lighting_qa.js
+          node test_world_traversal_qa.js
           node scripts/test-408c-clinical-audio.mjs
           node scripts/test-second-campus-exterior-manifest.mjs
       - name: Report runtime asset budget
