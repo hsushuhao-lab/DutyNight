@@ -547,6 +547,7 @@ function resolveAdminIdentityPuzzleIfReady() {
   if(!complete) return;
   gameState.setFlag('ADMIN_IDENTITY_PUZZLE_RESOLVED',true);
   gameState.setFlag('ECHO_2117_KNOWN',true);
+  gameState.setFlag('B2_ADMIN_SOURCE',true);
   gameState.markTaskComplete('P1_ADMIN_IDENTITY_PUZZLE');
   gameState.addEvidence(1);
   persistentMemory.rememberEvidence('B2_SOURCE_ADMIN');
