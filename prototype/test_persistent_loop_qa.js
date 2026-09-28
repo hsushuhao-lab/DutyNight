@@ -14,15 +14,17 @@ const memory=new PersistentMemory(storage);
 assert.equal(memory.data.loopCount,0);
 assert(memory.learnCode('pass_1700'));
 assert(memory.learnCode('pass_3082'));
+memory.recordOverride('HANDOFF_DEFAULT');
+assert.equal(memory.data.knownCodes.pass_1700,true,'M1 Patientization must remember 1700 so the repeat only needs the locker pickup');
 memory.recordOverride('BED33');
-assert.equal(memory.data.loopCount,1);
+assert.equal(memory.data.loopCount,2);
 assert.equal(memory.data.hasSeenOverride_Bed33,true);
 assert.equal(memory.data.survivalRules.neverSignBed33,true);
 assert.equal(memory.data.knownCodes.code_0409,true);
 assert(memory.data.journalNotes.some(n=>/409A/.test(n.text)));
 
 const reloaded=new PersistentMemory(storage);
-assert.equal(reloaded.data.loopCount,1);
+assert.equal(reloaded.data.loopCount,2);
 assert.equal(reloaded.data.knownCodes.pass_1700,true);
 assert.equal(reloaded.data.knownCodes.pass_3082,true);
 assert.equal(reloaded.claimOnce('hotCoffee'),true);
@@ -36,7 +38,7 @@ assert.equal(resets,1);
 assert.equal(state.getFlag('TEMP_TEST'),false);
 assert.equal(state.isTaskComplete('TEMP_TASK'),false);
 reloaded.applyToGameState(state);
-assert.equal(state.getFlag('LOOP_COUNT'),1);
+assert.equal(state.getFlag('LOOP_COUNT'),2);
 assert.equal(state.getFlag('MEMORY_NEVER_SIGN_BED33'),true);
 
 const legend=new LegendStateManager();
