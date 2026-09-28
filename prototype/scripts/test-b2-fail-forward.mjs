@@ -34,7 +34,8 @@ try {
 
   // First contact always shows the fire-history recap.
   await page.waitForFunction(()=>document.getElementById('b2-fire-recap')?.classList.contains('active'),null,{timeout:30000});
-  for(let i=0;i<6;i++){
+  for(let i=0;i<24;i++){
+    if(await page.evaluate(()=>window.__storyQA.gameState.getFlag('B2_FIRE_RECAP_SEEN')===true))break;
     await page.waitForTimeout(360);
     await page.keyboard.press('E');
   }
