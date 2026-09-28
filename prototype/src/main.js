@@ -1194,6 +1194,11 @@ controller.onInteract = async (interactable) => {
       uiManager.showSubtitle('值班醫師','「門框已經浮出來，但我還沒把 B-Panel 十字鑰匙帶過來。回警衛台的金屬鑰匙櫃拿。」',3600);
       return;
     }
+    // Repair legacy / repeated-loop saves that retained the physical key but
+    // lost transient provenance flags before entering B2.
+    gameState.setFlag('B_PANEL_CLUE_KNOWN',true);
+    gameState.setFlag('FIRST_FLOOR_GUARD_KEY',true);
+    gameState.setFlag('B2_SECURITY_SOURCE',true);
     if(gameState.getFlag('B2_EXITED_PERMANENTLY')){
       soundManager.playDoorLockClack();
       uiManager.showSubtitle('值班醫師','「門已經從 B2 那一側永久鎖死。沒有第二次機會。」',3400);
