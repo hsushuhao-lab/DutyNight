@@ -1,0 +1,27 @@
+import assert from 'node:assert/strict';
+import * as THREE from 'three';
+import {WorldRouter} from './src/world/WorldRouter.js';
+import {STAIR_DOORS,WORLD_SPAWNS} from './src/world/shared/WorldRoutes.js';
+
+const context=new Proxy({measureText:t=>({width:t.length*20})},{get:(o,k)=>o[k]||(()=>({addColorStop(){}}))});
+global.document={querySelector:()=>null,addEventListener(){},createElement:()=>({getContext:()=>context})};
+const router=new WorldRouter(new THREE.Scene(),new THREE.PerspectiveCamera(),null);
+const zone=router.loadZone('first_campus_2f');
+const door=zone.zoneGroup.getObjectByName('StairDoorAssembly_first_campus_2f');
+assert(door,'2F escape door missing');
+zone.zoneGroup.updateWorldMatrix(true,true);
+const position=door.getWorldPosition(new THREE.Vector3());
+const normal=new THREE.Vector3(0,0,1).transformDirection(door.matrixWorld);
+const jambs=door.children.filter(o=>o.isMesh&&Math.abs(Math.abs(o.position.x)-.64)<1e-6&&Math.abs(o.position.y-1.2)<1e-6);
+const boxes=jambs.map(o=>new THREE.Box3().setFromObject(o));
+const wallInnerX=-16+.11;
+const headerPoint=new THREE.Vector3(-16,2.85,7.5);
+const observations={position:position.toArray(),normal:normal.toArray(),jambGaps:boxes.map(b=>b.min.x-wallInnerX),headerClosed:zone.colliders.some(b=>b.containsPoint(headerPoint))};
+console.log('2F_ESCAPE_DOOR_GEOMETRY',JSON.stringify(observations));
+assert(normal.x>.99,'2F escape-door sign and push bar must face inward toward the corridor');
+assert(boxes.length===2&&boxes.every(b=>b.min.x<=wallInnerX&&b.max.x>=wallInnerX),'2F escape-door jambs must physically overlap the wall, not float ahead of it');
+assert(observations.headerClosed,'the 2F stair aperture must be closed above the frame');
+assert.deepEqual(STAIR_DOORS.first_campus_2f.position,position.toArray(),'2F stair route metadata must match the actual assembly');
+assert.equal(STAIR_DOORS.first_campus_2f.yaw,door.rotation.y);
+assert(WORLD_SPAWNS.first_2f_stairs.pos[0]>position.x,'stair arrival must remain inside the corridor');
+console.log('REPAIR GEOMETRY QA PASS');
